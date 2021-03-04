@@ -1,0 +1,4 @@
+CREATE SEQUENCE procedure_load_session_seq NOCACHE;
+CREATE SEQUENCE procedure_seq NOCACHE;
+
+COMMIT;
