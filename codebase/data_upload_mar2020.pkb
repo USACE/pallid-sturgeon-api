@@ -15,8 +15,7 @@ INSERT INTO DEBUG_T (ID, debug_text,date_created,apex_sessioN_id)
                                             ,p_debug_text
                                             , SYSDATE  
                                            , p_apex_session_id
-                                            );
-                                            
+                                            );                                 
                                             
                 COMMIT;*/
                 NULL;
@@ -2263,7 +2262,7 @@ WHILE ( v_position <= v_blob_len ) LOOP
          --v_data_array(2),
          --p_suppSessionID, -- this is the system id for supplemental, populated later
          v_data_array(3),    
-         v_data_array(4),
+         v_data_array(4),  -- This should be converted TO_DATE
          REPLACE (v_data_array(5), '_', ':'),
          REPLACE (v_data_array(6), '_', ':'),
          v_data_array(7),

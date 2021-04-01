@@ -1,0 +1,2173 @@
+
+  CREATE TABLE "DS_FISH_CHECK" 
+   (	
+	"PANELHOOK" VARCHAR2(5 BYTE), 
+	"BAIT" VARCHAR2(1 BYTE), 
+	"SPECIES_CODE" VARCHAR2(10 BYTE), 
+	"LENGTH" NUMBER(4,0), 
+	"WEIGHT" NUMBER(6,1), 
+	"FISH_COUNT" NUMBER, 
+	"OTOLITH" VARCHAR2(1 BYTE), 
+	"RAYSPINE" VARCHAR2(1 BYTE), 
+	"SCALE" VARCHAR2(1 BYTE), 
+	"FT_PREFIX_CODE" VARCHAR2(3 BYTE), 
+	"FT_NUMBER" VARCHAR2(7 BYTE), 
+	"FT_MR_CODE" VARCHAR2(1 BYTE), 
+	"F_ID" NUMBER(*,0), 
+	"MR_ID" NUMBER(*,0), 
+	"LAST_UPDATED" DATE, 
+	"UPLOADED_BY" VARCHAR2(20 BYTE), 
+	"F_FID" VARCHAR2(50 BYTE), 
+	"CHECKBY" VARCHAR2(3 BYTE), 
+	"COMPLETE" NUMBER, 
+	"UPLOAD_SESSION_ID" NUMBER, 
+	"MR_FID" VARCHAR2(50 BYTE), 
+	"FIN_CURL_YN" VARCHAR2(1 BYTE)
+   );
+
+  CREATE UNIQUE INDEX "DS_FISH_CHECK_R01" ON "DS_FISH_CHECK" ("F_ID");
+
+  CREATE TABLE "DS_FISH" 
+   (	"FIELDOFFICE" VARCHAR2(2 BYTE), 
+	"PROJECT" NUMBER, 
+	"SEGMENT" NUMBER, 
+	"UNIQUEIDENTIFIER" NUMBER, 
+	"ID" NUMBER, 
+	"PANELHOOK" VARCHAR2(5 BYTE), 
+	"BAIT" VARCHAR2(1 BYTE), 
+	"SPECIES_CODE" VARCHAR2(10 BYTE), 
+	"LENGTH" NUMBER(4,0), 
+	"WEIGHT" NUMBER(6,1), 
+	"FISH_COUNT" NUMBER, 
+	"OTOLITH" VARCHAR2(1 BYTE), 
+	"RAYSPINE" VARCHAR2(1 BYTE), 
+	"SCALE" VARCHAR2(1 BYTE), 
+	"FT_PREFIX_CODE" VARCHAR2(3 BYTE), 
+	"FT_NUMBER" VARCHAR2(7 BYTE), 
+	"FT_MR_CODE" VARCHAR2(1 BYTE), 
+	"F_ID" NUMBER(*,0), 
+	"MR_ID" NUMBER(*,0), 
+	"LAST_UPDATED" DATE, 
+	"UPLOADED_BY" VARCHAR2(20 BYTE), 
+	"APPROVED" NUMBER, 
+	"F_FID" VARCHAR2(50 BYTE), 
+	"LAST_EDIT_COMMENT" VARCHAR2(1000 BYTE), 
+	"EDIT_INITIALS" VARCHAR2(10 BYTE), 
+	"CHECKBY" VARCHAR2(3 BYTE), 
+	"COMPLETE" NUMBER, 
+	"UPLOAD_FILENAME" VARCHAR2(200 BYTE), 
+	"UPLOAD_SESSION_ID" NUMBER, 
+	"MR_FID" VARCHAR2(50 BYTE), 
+	"CCA_DATE" DATE, 
+	"RSD" VARCHAR2(3 BYTE), 
+	"KN" NUMBER, 
+	"WR" NUMBER, 
+	"FIN_CURL_YN" VARCHAR2(1 BYTE),
+	"GENETICS_VIAL_NUMBER" VARCHAR2(20 BYTE), 
+	"CONDITION" NUMBER, 
+	 CONSTRAINT "DS_FISH_R01" PRIMARY KEY ("F_ID") ENABLE
+   ) ;
+
+  CREATE INDEX "DS_FISH_FID_IDX" ON "DS_FISH" ("F_FID");
+
+  CREATE INDEX "DS_FISH_MRID_IDX" ON "DS_FISH" ("MR_ID");
+
+  CREATE INDEX "DS_FISH_SESSIONID_IDX" ON "DS_FISH" ("UPLOAD_SESSION_ID") ;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_FISH_UPDATE_NULL" 
+BEFORE UPDATE ON DS_FISH REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+BEGIN        
+
+    IF :NEW.approved = 0 THEN
+    
+        :NEW.approved := NULL;
+          
+    END IF; 
+    
+    IF :NEW.complete = 0 THEN
+    
+        :NEW.complete := NULL;
+          
+    END IF;  
+
+end;
+/
+ALTER TRIGGER "TR_DS_FISH_UPDATE_NULL" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_FISH_INSERT_NULL" 
+BEFORE INSERT ON DS_fish 
+FOR EACH ROW
+BEGIN        
+
+    IF :NEW.approved = 0 THEN
+    
+        select NULL into :NEW."APPROVED" from dual;
+          
+    END IF;  
+    
+    IF :NEW.complete = 0 THEN
+    
+        select NULL into :NEW."COMPLETE" from dual;
+          
+    END IF;  
+
+
+
+end;
+/
+ALTER TRIGGER "TR_DS_FISH_INSERT_NULL" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "BI_ds_fish" 
+  before insert on "DS_FISH"               
+  for each row
+begin   
+  if :NEW."F_ID" is null then 
+    select "F_SEQ".nextval into :NEW."F_ID" from dual; 
+  end if; 
+end; 
+/
+ALTER TRIGGER "BI_ds_fish" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_FISH_UPDATE" 
+BEFORE UPDATE ON DS_FISH REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+DECLARE
+
+    v_old_setdate varchar2(20);
+    v_new_setdate varchar2(20);
+
+
+BEGIN                
+      
+     /* -- for  PANELHOOK Column -- */
+     IF (nvl(:OLD.PANELHOOK,0) != nvl(:NEW.PANELHOOK,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 63, :new.f_id, :old.PANELHOOK, :new.PANELHOOK, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+     /* -- for  BAIT Column -- */
+     IF (nvl(:OLD.BAIT,0) != nvl(:NEW.BAIT,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 64, :new.f_id, :old.BAIT, :new.BAIT, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+     /* -- for  SPECIES Column -- */
+     IF (nvl(:OLD.SPECIES,0) != nvl(:NEW.SPECIES,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 65, :new.f_id, :old.SPECIES, :new.SPECIES, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+     /* -- for  LENGTH Column -- */
+     IF (nvl(:OLD.LENGTH,0) != nvl(:NEW.LENGTH,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 66, :new.f_id, :old.LENGTH, :new.LENGTH, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+     /* -- for  WEIGHT Column -- */
+     IF (nvl(:OLD.WEIGHT,0) != nvl(:NEW.WEIGHT,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 67, :new.f_id, :old.WEIGHT, :new.WEIGHT, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+     /* -- for  FISHCOUNT Column -- */
+     IF (nvl(:OLD.FISHCOUNT,0) != nvl(:NEW.FISHCOUNT,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 68, :new.f_id, :old.FISHCOUNT, :new.FISHCOUNT, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+     /* -- for  OTOLITH Column -- */
+     IF (nvl(:OLD.OTOLITH,0) != nvl(:NEW.OTOLITH,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 69, :new.f_id, :old.OTOLITH, :new.OTOLITH, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+     /* -- for  RAYSPINE Column -- */
+     IF (nvl(:OLD.RAYSPINE,0) != nvl(:NEW.RAYSPINE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 70, :new.f_id, :old.RAYSPINE, :new.RAYSPINE, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+     /* -- for  SCALE Column -- */
+     IF (nvl(:OLD.SCALE,0) != nvl(:NEW.SCALE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 71, :new.f_id, :old.SCALE, :new.SCALE, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+      /* -- for  FTNUM Column -- */
+     IF (nvl(:OLD.FTNUM,0) != nvl(:NEW.FTNUM,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 72, :new.f_id, :old.FTNUM, :new.FTNUM, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+      /* -- for  FTMR Column -- */
+     IF (nvl(:OLD.FTMR,0) != nvl(:NEW.FTMR,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 3, 73, :new.f_id, :old.FTMR, :new.FTMR, :new.last_edit_comment, :new.edit_initials,
+                v('P24_YEAR')
+             );
+     END IF;
+     
+END TR_DS_FISH_UPDATE; 
+/
+ALTER TRIGGER "TR_DS_FISH_UPDATE" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_FISH_LAST_UPDATED" 
+BEFORE UPDATE ON DS_FISH FOR EACH ROW
+DECLARE
+    n INTEGER;
+BEGIN
+  IF ( :NEW.panelhook != :OLD.panelhook
+     OR :NEW.BAIT != :OLD.BAIT
+     OR :NEW.SPECIES != :OLD.SPECIES
+     OR :NEW.LENGTH != :OLD.LENGTH
+     OR :NEW.WEIGHT != :OLD.WEIGHT
+     OR :NEW.FISHCOUNT != :OLD.FISHCOUNT
+     OR :NEW.OTOLITH != :OLD.OTOLITH
+     OR :NEW.RAYSPINE != :OLD.RAYSPINE
+     OR :NEW.SCALE != :OLD.SCALE
+     OR :NEW.FTNUM != :OLD.FTNUM
+     OR :NEW.FTMR != :OLD.FTMR 
+     ) THEN
+      :NEW.last_updated := sysdate;
+      :NEW.last_edit_comment := v('P24_EDIT_COMMENT');
+      :NEW.edit_initials := v('P24_EDIT_INITIALS');
+   
+   END IF;
+END; 
+/
+ALTER TRIGGER "TR_FISH_LAST_UPDATED" ENABLE;
+
+
+
+  CREATE TABLE "DS_MORIVER_CHECK" 
+   (	
+	"UNIQUEIDENTIFIER" NUMBER, 
+	"SEASON" VARCHAR2(5 BYTE), 
+	"SETDATE" DATE, 
+	"BEND" NUMBER, 
+	"BENDRN" VARCHAR2(1 BYTE), 
+	"REPLICATE" NUMBER, 
+	"REPLICATERN" VARCHAR2(1 BYTE), 
+	"SUBSAMPLE" NUMBER(3,0), 
+	"SUBSAMPLEPASS" NUMBER(1,0), 
+	"SUBSAMPLEN" VARCHAR2(1 BYTE), 
+	"BIOLOGIST" VARCHAR2(3 BYTE), 
+	"RECORDER" VARCHAR2(3 BYTE), 
+	"CHECKBY" VARCHAR2(3 BYTE), 
+	"GEAR" VARCHAR2(10 BYTE), 
+	"TEMP" NUMBER(3,1), 
+	"TURBIDITY" NUMBER(4,0), 
+	"CONDUCTIVITY" NUMBER(4,0), 
+	"DO" NUMBER(3,1), 
+	"DISTANCE" NUMBER(3,0), 
+	"WIDTH" NUMBER(3,1), 
+	"BENDRIVERMILE" NUMBER(5,1), 
+	"NETRIVERMILE" NUMBER(5,1), 
+	"STRUCTURENUMBER" VARCHAR2(10 BYTE), 
+	"USGS" VARCHAR2(8 BYTE), 
+	"RIVERSTAGE" NUMBER(3,1), 
+	"DISCHARGE" NUMBER, 
+	"U1" VARCHAR2(3 BYTE), 
+	"U2" VARCHAR2(3 BYTE), 
+	"U3" VARCHAR2(4 BYTE), 
+	"U4" VARCHAR2(4 BYTE), 
+	"U5" VARCHAR2(6 BYTE), 
+	"U6" VARCHAR2(6 BYTE), 
+	"U7" VARCHAR2(8 BYTE), 
+	"MACRO" VARCHAR2(4 BYTE), 
+	"MACROSW" VARCHAR2(1 BYTE), 
+	"MESO" VARCHAR2(5 BYTE), 
+	"MESOSW" VARCHAR2(1 BYTE), 
+	"MICRO" VARCHAR2(6 BYTE), 
+	"STARTTIME" VARCHAR2(11 BYTE), 
+	"STOPTIME" VARCHAR2(11 BYTE), 
+	"STARTLATITUDE" NUMBER(7,5), 
+	"STOPLATITUDE" NUMBER(7,5), 
+	"STARTLONGITUDE" NUMBER(9,5), 
+	"STOPLONGITUDE" NUMBER(9,5), 
+	"DEPTH1" NUMBER(3,1), 
+	"DEPTH2" NUMBER(3,1), 
+	"DEPTH3" NUMBER(3,1), 
+	"VELOCITYBOT1" NUMBER, 
+	"VELOCITYBOT2" NUMBER, 
+	"VELOCITYBOT3" NUMBER, 
+	"VELOCITY08_1" NUMBER, 
+	"VELOCITY08_2" NUMBER, 
+	"VELOCITY08_3" NUMBER, 
+	"VELOCITY02OR06_1" NUMBER, 
+	"VELOCITY02OR06_2" NUMBER, 
+	"VELOCITY02OR06_3" NUMBER, 
+	"WATERVEL" NUMBER, 
+	"HABITATRN" VARCHAR2(1 BYTE), 
+	"COBBLE" NUMBER, 
+	"SILT" NUMBER, 
+	"SAND" NUMBER, 
+	"GRAVEL" NUMBER, 
+	"ORGANIC" NUMBER, 
+	"QC" VARCHAR2(1 BYTE), 
+	"COMMENTS" VARCHAR2(2000 BYTE), 
+	"MAPPINGBOX" VARCHAR2(100 BYTE), 
+	"MR_ID" NUMBER(*,0), 
+	"SITE_ID" NUMBER(*,0), 
+	"MICRO_STRUCTURE" VARCHAR2(1 BYTE), 
+	"STRUCTURE_FLOW" VARCHAR2(1 BYTE), 
+	"STRUCTURE_MOD" VARCHAR2(1 BYTE), 
+	"SET_SITE_1" VARCHAR2(1 BYTE), 
+	"SET_SITE_2" VARCHAR2(1 BYTE), 
+	"SET_SITE_3" VARCHAR2(1 BYTE), 
+	"GEAR_TYPE" VARCHAR2(1 BYTE), 
+	"LAST_UPDATED" DATE, 
+	"UPLOADED_BY" VARCHAR2(20 BYTE), 
+	"APPROVED" NUMBER, 
+	"MR_FID" VARCHAR2(50 BYTE), 
+	"LAST_EDIT_COMMENT" VARCHAR2(1000 BYTE), 
+	"EDIT_INITIALS" VARCHAR2(10 BYTE), 
+	"COMPLETE" NUMBER, 
+	"NO_TURBIDITY" VARCHAR2(1 BYTE), 
+	"NO_VELOCITY" VARCHAR2(1 BYTE), 
+	"UPLOAD_SESSION_ID" NUMBER, 
+	"SITE_FID" VARCHAR2(50 BYTE), 
+	"SE_FIELD_ID" VARCHAR2(199 BYTE)
+   );
+
+  CREATE INDEX "DS_MORIVERCHK_SESSIONID_IDX" ON "DS_MORIVER_CHECK" ("UPLOAD_SESSION_ID");
+
+  CREATE INDEX "DS_MORIVERCHK_UPLOADBY_IDX" ON "DS_MORIVER_CHECK" ("UPLOADED_BY");
+
+  CREATE OR REPLACE TRIGGER "BI_DS_MORIVER_CHECK" 
+  before insert on "DS_MORIVER_CHECK"               
+  for each row
+begin   
+  if :NEW."MR_ID" is null then 
+    select "MR_CHECK_SEQ".nextval into :NEW."MR_ID" from dual; 
+  end if; 
+end; 
+/
+ALTER TRIGGER "BI_DS_MORIVER_CHECK" ENABLE;
+
+
+CREATE TABLE "DS_MORIVER" 
+   (	"FIELDOFFICE" VARCHAR2(2 BYTE) NOT NULL DISABLE, 
+	"PROJECT" NUMBER NOT NULL DISABLE, 
+	"SEGMENT" NUMBER NOT NULL DISABLE, 
+	"UNIQUEIDENTIFIER" NUMBER NOT NULL DISABLE, 
+	"NPAGE" NUMBER, 
+	"TOTALPAGES" NUMBER, 
+	"SEASON" VARCHAR2(5 BYTE), 
+	"SETDATE" DATE, 
+	"BEND" NUMBER, 
+	"BENDRN" VARCHAR2(1 BYTE), 
+	"REPLICATE" NUMBER, 
+	"REPLICATERN" VARCHAR2(1 BYTE), 
+	"SUBSAMPLE" NUMBER(3,0), 
+	"SUBSAMPLEPASS" NUMBER(1,0), 
+	"SUBSAMPLEN" VARCHAR2(1 BYTE), 
+	"BIOLOGIST" VARCHAR2(3 BYTE), 
+	"RECORDER" VARCHAR2(3 BYTE), 
+	"CHECKBY" VARCHAR2(3 BYTE), 
+	"GEAR" VARCHAR2(10 BYTE), 
+	"TEMP" NUMBER(3,1), 
+	"TURBIDITY" NUMBER(4,0), 
+	"CONDUCTIVITY" NUMBER(4,0), 
+	"DO" NUMBER(3,1), 
+	"DISTANCE" NUMBER(3,0), 
+	"WIDTH" NUMBER(3,1), 
+	"BENDRIVERMILE" NUMBER(5,1), 
+	"NETRIVERMILE" NUMBER(5,1), 
+	"STRUCTURENUMBER" VARCHAR2(10 BYTE), 
+	"USGS" VARCHAR2(8 BYTE), 
+	"RIVERSTAGE" NUMBER(3,1), 
+	"DISCHARGE" NUMBER, 
+	"U1" VARCHAR2(3 BYTE), 
+	"U2" VARCHAR2(3 BYTE), 
+	"U3" VARCHAR2(4 BYTE), 
+	"U4" VARCHAR2(4 BYTE), 
+	"U5" VARCHAR2(6 BYTE), 
+	"U6" VARCHAR2(6 BYTE), 
+	"U7" VARCHAR2(8 BYTE), 
+	"MACRO" VARCHAR2(4 BYTE), 
+	"MACROSW" VARCHAR2(1 BYTE), 
+	"MESO" VARCHAR2(5 BYTE), 
+	"MESOSW" VARCHAR2(1 BYTE), 
+	"MICRO" VARCHAR2(6 BYTE), 
+	"STARTTIME" VARCHAR2(11 BYTE), 
+	"STOPTIME" VARCHAR2(11 BYTE), 
+	"STARTLATITUDE" NUMBER(7,5), 
+	"STOPLATITUDE" NUMBER(7,5), 
+	"STARTLONGITUDE" NUMBER(9,5), 
+	"STOPLONGITUDE" NUMBER(9,5), 
+	"DEPTH1" NUMBER(3,1), 
+	"DEPTH2" NUMBER(3,1), 
+	"DEPTH3" NUMBER(3,1), 
+	"VELOCITYBOT1" NUMBER, 
+	"VELOCITYBOT2" NUMBER, 
+	"VELOCITYBOT3" NUMBER, 
+	"VELOCITY08_1" NUMBER, 
+	"VELOCITY08_2" NUMBER, 
+	"VELOCITY08_3" NUMBER, 
+	"VELOCITY02OR06_1" NUMBER, 
+	"VELOCITY02OR06_2" NUMBER, 
+	"VELOCITY02OR06_3" NUMBER, 
+	"WATERVEL" NUMBER, 
+	"HABITATRN" VARCHAR2(1 BYTE), 
+	"COBBLE" NUMBER, 
+	"SILT" NUMBER, 
+	"SAND" NUMBER, 
+	"GRAVEL" NUMBER, 
+	"ORGANIC" NUMBER, 
+	"QC" VARCHAR2(1 BYTE), 
+	"COMMENTS" VARCHAR2(2000 BYTE), 
+	"MAPPINGBOX" VARCHAR2(100 BYTE), 
+	"MR_ID" NUMBER(*,0), 
+	"SITE_ID" NUMBER(*,0), 
+	"MICRO_STRUCTURE" VARCHAR2(1 BYTE), 
+	"STRUCTURE_FLOW" VARCHAR2(1 BYTE), 
+	"STRUCTURE_MOD" VARCHAR2(1 BYTE), 
+	"SET_SITE_1" VARCHAR2(1 BYTE), 
+	"SET_SITE_2" VARCHAR2(1 BYTE), 
+	"SET_SITE_3" VARCHAR2(1 BYTE), 
+	"GEAR_TYPE" VARCHAR2(1 BYTE), 
+	"LAST_UPDATED" DATE, 
+	"UPLOADED_BY" VARCHAR2(20 BYTE), 
+	"APPROVED" NUMBER, 
+	"MR_FID" VARCHAR2(50 BYTE), 
+	"LAST_EDIT_COMMENT" VARCHAR2(1000 BYTE), 
+	"EDIT_INITIALS" VARCHAR2(10 BYTE), 
+	"COMPLETE" NUMBER, 
+	"UPLOAD_FILENAME" VARCHAR2(200 BYTE), 
+	"NO_TURBIDITY" VARCHAR2(1 BYTE), 
+	"NO_VELOCITY" VARCHAR2(1 BYTE), 
+	"UPLOAD_SESSION_ID" NUMBER, 
+	"CCA_DATE" DATE, 
+	"STANDARD_SAMPLE" VARCHAR2(1 BYTE), 
+	"EFFORT" VARCHAR2(10 BYTE), 
+	"SHAPE" "SDO_GEOMETRY", 
+	"SE_ID" NUMBER, 
+	 CONSTRAINT "DS_MORIVER_PK" PRIMARY KEY ("MR_ID")
+   ) ;
+
+  CREATE INDEX "DSMORIVER_SITEID_IDX" ON "DS_MORIVER" ("SITE_ID") ;
+
+  CREATE INDEX "DS_MORIVER_FID_IDX" ON "DS_MORIVER" ("MR_FID");
+
+  CREATE INDEX "DS_MORIVER_SESSIONID_IDX" ON "DS_MORIVER" ("UPLOAD_SESSION_ID") ;
+
+  CREATE INDEX "DS_MORIVER_SETDATE_IDX" ON "DS_MORIVER" ("SETDATE");
+
+  CREATE INDEX "DS_MORIVER_SIDX" ON "DS_MORIVER" ("SHAPE") 
+   INDEXTYPE IS "MDSYS"."SPATIAL_INDEX" ;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_MORIVER_UPDATE" 
+BEFORE UPDATE ON DS_MORIVER REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+DECLARE
+
+    v_old_setdate varchar2(20);
+    v_new_setdate varchar2(20);
+
+BEGIN                
+      
+     /* -- for  Subsample Pass Column -- */
+     IF (nvl(:OLD.subsamplepass,0) != nvl(:NEW.subsamplepass,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 11, :new.mr_id, :old.subsamplepass, :new.subsamplepass, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+     /* -- for calculated_hatch_date Column -- */
+     IF :OLD.setdate IS NULL THEN     
+        v_old_setdate := 'Null';        
+     ELSE     
+        v_old_setdate := to_char(:OLD.setdate);     
+     END IF;
+     
+     IF :NEW.setdate IS NULL THEN     
+        v_new_setdate := 'Null';        
+     ELSE     
+        v_new_setdate := to_char(:NEW.setdate);     
+     END IF;
+     
+     /* -- for  setdate Column -- */
+     IF (v_old_setdate != v_new_setdate) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 7, :new.mr_id, :old.setdate, :new.setdate, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+--     
+     /* -- for  replicate Column -- */
+     IF (nvl(:OLD.replicate,0) != nvl(:NEW.replicate,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 8, :new.mr_id, :old.replicate, :new.replicate, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+     /* -- for  replicatern Column -- */
+     IF (nvl(:OLD.replicatern,0) != nvl(:NEW.replicatern,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 9, :new.mr_id, :old.replicatern, :new.replicatern, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+     /* -- for  subsample Column -- */
+     IF (nvl(:OLD.subsample,0) != nvl(:NEW.subsample,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 10, :new.mr_id, :old.subsample, :new.subsample, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  subsamplen Column -- */
+     IF (nvl(:OLD.subsamplen,0) != nvl(:NEW.subsamplen,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 12, :new.mr_id, :old.subsamplen, :new.subsamplen, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  recorder Column -- */
+     IF (nvl(:OLD.recorder,0) != nvl(:NEW.recorder,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 13, :new.mr_id, :old.recorder, :new.recorder, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  CHECKBY Column -- */
+--     IF (nvl(:OLD.CHECKBY,0) != nvl(:NEW.CHECKBY,0)) THEN
+
+--          INSERT INTO change_tracking (
+--                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username
+--             ) VALUES (
+--                sysdate, 2, 14, :new.mr_id, :old.CHECKBY, :new.CHECKBY, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS')
+--             );
+--     END IF;
+     
+      /* -- for  GEAR Column -- */
+     IF (nvl(:OLD.GEAR,0) != nvl(:NEW.GEAR,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 15, :new.mr_id, :old.GEAR, :new.GEAR, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  TEMP Column -- */
+     IF (nvl(:OLD.TEMP,0) != nvl(:NEW.TEMP,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 16, :new.mr_id, :old.TEMP, :new.TEMP, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  TURBIDITY Column -- */
+     IF (nvl(:OLD.TURBIDITY,0) != nvl(:NEW.TURBIDITY,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 17, :new.mr_id, :old.TURBIDITY, :new.TURBIDITY, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  CONDUCTIVITY Column -- */
+     IF (nvl(:OLD.CONDUCTIVITY,0) != nvl(:NEW.CONDUCTIVITY,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 18, :new.mr_id, :old.CONDUCTIVITY, :new.CONDUCTIVITY, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  DO Column -- */
+     IF (nvl(:OLD.DO,0) != nvl(:NEW.DO,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 19, :new.mr_id, :old.DO, :new.DO, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+       /* -- for  DISTANCE Column -- */
+     IF (nvl(:OLD.DISTANCE,0) != nvl(:NEW.DISTANCE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 20, :new.mr_id, :old.DISTANCE, :new.DISTANCE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+       /* -- for  WIDTH Column -- */
+     IF (nvl(:OLD.WIDTH,0) != nvl(:NEW.WIDTH,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 21, :new.mr_id, :old.WIDTH, :new.WIDTH, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+       /* -- for  NETRIVERMILE Column -- */
+     IF (nvl(:OLD.NETRIVERMILE,0) != nvl(:NEW.NETRIVERMILE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 22, :new.mr_id, :old.NETRIVERMILE, :new.NETRIVERMILE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+       /* -- for  STRUCTURENUMBER Column -- */
+     IF (nvl(:OLD.STRUCTURENUMBER,0) != nvl(:NEW.STRUCTURENUMBER,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 23, :new.mr_id, :old.STRUCTURENUMBER, :new.STRUCTURENUMBER, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+       /* -- for  USGS Column -- */
+     IF (nvl(:OLD.USGS,0) != nvl(:NEW.USGS,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 24, :new.mr_id, :old.USGS, :new.USGS, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+       /* -- for  RIVERSTAGE Column -- */
+     IF (nvl(:OLD.RIVERSTAGE,0) != nvl(:NEW.RIVERSTAGE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 25, :new.mr_id, :old.RIVERSTAGE, :new.RIVERSTAGE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+       /* -- for  DISCHARGE Column -- */
+     IF (nvl(:OLD.DISCHARGE,0) != nvl(:NEW.DISCHARGE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 26, :new.mr_id, :old.DISCHARGE, :new.DISCHARGE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+        /* -- for  U1 Column -- */
+     IF (nvl(:OLD.U1,0) != nvl(:NEW.U1,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 27, :new.mr_id, :old.U1, :new.U1, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+        /* -- for  U2 Column -- */
+     IF (nvl(:OLD.U2,0) != nvl(:NEW.U2,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 28, :new.mr_id, :old.U2, :new.U2, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+         /* -- for  U3 Column -- */
+     IF (nvl(:OLD.U3,0) != nvl(:NEW.U3,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 29, :new.mr_id, :old.U3, :new.U3, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+         /* -- for  U4 Column -- */
+     IF (nvl(:OLD.U4,0) != nvl(:NEW.U4,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 30, :new.mr_id, :old.U4, :new.U4, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+          /* -- for  U5 Column -- */
+     IF (nvl(:OLD.U5,0) != nvl(:NEW.U5,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 31, :new.mr_id, :old.U5, :new.U5, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+          /* -- for  U6 Column -- */
+     IF (nvl(:OLD.U6,0) != nvl(:NEW.U6,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 32, :new.mr_id, :old.U6, :new.U6, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+          /* -- for  U7 Column -- */
+     IF (nvl(:OLD.U7,0) != nvl(:NEW.U7,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 33, :new.mr_id, :old.U7, :new.U7, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+          /* -- for  MACRO Column -- */
+     IF (nvl(:OLD.MACRO,0) != nvl(:NEW.MACRO,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 34, :new.mr_id, :old.MACRO, :new.MACRO, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+           /* -- for  MESO Column -- */
+     IF (nvl(:OLD.MESO,0) != nvl(:NEW.MESO,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 35, :new.mr_id, :old.MESO, :new.MESO, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+           /* -- for  MICRO Column -- */
+     IF (nvl(:OLD.MICRO,0) != nvl(:NEW.MICRO,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 36, :new.mr_id, :old.MICRO, :new.MICRO, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  STARTTIME Column -- */
+     IF (nvl(:OLD.STARTTIME,0) != nvl(:NEW.STARTTIME,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 37, :new.mr_id, :old.STARTTIME, :new.STARTTIME, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  STARTTIME Column -- */
+     IF (nvl(:OLD.STARTTIME,0) != nvl(:NEW.STARTTIME,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 37, :new.mr_id, :old.STARTTIME, :new.STARTTIME, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  STOPTIME Column -- */
+     IF (nvl(:OLD.STOPTIME,0) != nvl(:NEW.STOPTIME,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 38, :new.mr_id, :old.STOPTIME, :new.STOPTIME, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  STARTLATITUDE Column -- */
+     IF (nvl(:OLD.STARTLATITUDE,0) != nvl(:NEW.STARTLATITUDE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 39, :new.mr_id, :old.STARTLATITUDE, :new.STARTLATITUDE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  STOPLATITUDE Column -- */
+     IF (nvl(:OLD.STOPLATITUDE,0) != nvl(:NEW.STOPLATITUDE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 40, :new.mr_id, :old.STOPLATITUDE, :new.STOPLATITUDE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  STARTLONGITUDE Column -- */
+     IF (nvl(:OLD.STARTLONGITUDE,0) != nvl(:NEW.STARTLONGITUDE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 41, :new.mr_id, :old.STARTLONGITUDE, :new.STARTLONGITUDE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  STOPLONGITUDE Column -- */
+     IF (nvl(:OLD.STOPLONGITUDE,0) != nvl(:NEW.STOPLONGITUDE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 42, :new.mr_id, :old.STOPLONGITUDE, :new.STOPLONGITUDE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  DEPTH1 Column -- */
+     IF (nvl(:OLD.DEPTH1,0) != nvl(:NEW.DEPTH1,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 43, :new.mr_id, :old.DEPTH1, :new.DEPTH1, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  DEPTH2 Column -- */
+     IF (nvl(:OLD.DEPTH2,0) != nvl(:NEW.DEPTH2,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 44, :new.mr_id, :old.DEPTH2, :new.DEPTH2, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  DEPTH3 Column -- */
+     IF (nvl(:OLD.DEPTH3,0) != nvl(:NEW.DEPTH3,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 45, :new.mr_id, :old.DEPTH3, :new.DEPTH3, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  VELOCITYBOT1 Column -- */
+     IF (nvl(:OLD.VELOCITYBOT1,0) != nvl(:NEW.VELOCITYBOT1,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 46, :new.mr_id, :old.VELOCITYBOT1, :new.VELOCITYBOT1, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  VELOCITYBOT2 Column -- */
+     IF (nvl(:OLD.VELOCITYBOT2,0) != nvl(:NEW.VELOCITYBOT2,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 47, :new.mr_id, :old.VELOCITYBOT2, :new.VELOCITYBOT2, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  VELOCITYBOT3 Column -- */
+     IF (nvl(:OLD.VELOCITYBOT3,0) != nvl(:NEW.VELOCITYBOT3,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 48, :new.mr_id, :old.VELOCITYBOT3, :new.VELOCITYBOT3, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  VELOCITY08_1 Column -- */
+     IF (nvl(:OLD.VELOCITY08_1,0) != nvl(:NEW.VELOCITY08_1,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 49, :new.mr_id, :old.VELOCITY08_1, :new.VELOCITY08_1, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+            /* -- for  VELOCITY08_2 Column -- */
+     IF (nvl(:OLD.VELOCITY08_2,0) != nvl(:NEW.VELOCITY08_2,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 50, :new.mr_id, :old.VELOCITY08_2, :new.VELOCITY08_2, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+     /* -- for  VELOCITY08_3 Column -- */
+     IF (nvl(:OLD.VELOCITY08_3,0) != nvl(:NEW.VELOCITY08_3,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 51, :new.mr_id, :old.VELOCITY08_3, :new.VELOCITY08_3, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+     /* -- for  VELOCITY02OR06_1 Column -- */
+     IF (nvl(:OLD.VELOCITY02OR06_1,0) != nvl(:NEW.VELOCITY02OR06_1,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 52, :new.mr_id, :old.VELOCITY02OR06_1, :new.VELOCITY02OR06_1, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  VELOCITY02OR06_2 Column -- */
+     IF (nvl(:OLD.VELOCITY02OR06_2,0) != nvl(:NEW.VELOCITY02OR06_2,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 53, :new.mr_id, :old.VELOCITY02OR06_2, :new.VELOCITY02OR06_2, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  VELOCITY02OR06_3 Column -- */
+     IF (nvl(:OLD.VELOCITY02OR06_3,0) != nvl(:NEW.VELOCITY02OR06_3,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 54, :new.mr_id, :old.VELOCITY02OR06_3, :new.VELOCITY02OR06_3, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  WATERVEL Column -- */
+     IF (nvl(:OLD.WATERVEL,0) != nvl(:NEW.WATERVEL,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 55, :new.mr_id, :old.WATERVEL, :new.WATERVEL, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  HABITATRN Column -- */
+     IF (nvl(:OLD.HABITATRN,0) != nvl(:NEW.HABITATRN,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 56, :new.mr_id, :old.HABITATRN, :new.HABITATRN, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  COBBLE Column -- */
+     IF (nvl(:OLD.COBBLE,0) != nvl(:NEW.COBBLE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 57, :new.mr_id, :old.COBBLE, :new.COBBLE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  SILT Column -- */
+     IF (nvl(:OLD.SILT,0) != nvl(:NEW.SILT,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 58, :new.mr_id, :old.SILT, :new.SILT, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  SAND Column -- */
+     IF (nvl(:OLD.SAND,0) != nvl(:NEW.SAND,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 59, :new.mr_id, :old.SAND, :new.SAND, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  GRAVEL Column -- */
+     IF (nvl(:OLD.GRAVEL,0) != nvl(:NEW.GRAVEL,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 60, :new.mr_id, :old.GRAVEL, :new.GRAVEL, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+      /* -- for  ORGANIC Column -- */
+     IF (nvl(:OLD.ORGANIC,0) != nvl(:NEW.ORGANIC,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 61, :new.mr_id, :old.ORGANIC, :new.ORGANIC, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+       /* -- for  GEAR_TYPE Column -- */
+     IF (nvl(:OLD.GEAR_TYPE,0) != nvl(:NEW.GEAR_TYPE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 2, 62, :new.mr_id, :old.GEAR_TYPE, :new.GEAR_TYPE, v('P23_EDIT_COMMENT'), v('P23_EDIT_INITIALS'),
+                v('P23_YEAR')
+             );
+     END IF;
+     
+     
+END TR_DS_MORIVER_UPDATE; 
+/
+ALTER TRIGGER "TR_DS_MORIVER_UPDATE" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_MORIVER_INSERT_NULL" 
+BEFORE INSERT ON DS_moriver 
+FOR EACH ROW
+BEGIN        
+
+    IF :NEW.approved = 0 THEN
+    
+        select NULL into :NEW."APPROVED" from dual;    
+                 
+    END IF;  
+    
+    IF :NEW.complete = 0 THEN
+    
+        select NULL into :NEW."COMPLETE" from dual;    
+                  
+    END IF;  
+
+
+
+end;
+/
+ALTER TRIGGER "TR_DS_MORIVER_INSERT_NULL" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_MORIVER_UPDATE_NULL" 
+BEFORE UPDATE ON DS_MORIVER REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+BEGIN        
+
+    IF :NEW.approved = 0 THEN
+    
+        :NEW.approved := NULL;
+          
+    END IF; 
+    
+    IF :NEW.complete = 0 THEN
+    
+        :NEW.complete := NULL;
+          
+    END IF;  
+
+end;
+/
+ALTER TRIGGER "TR_DS_MORIVER_UPDATE_NULL" ENABLE;
+
+CREATE OR REPLACE TRIGGER "BI_DS_MORIVER" 
+  before insert on "DS_MORIVER"               
+  for each row
+begin   
+  if :NEW."MR_ID" is null then 
+    select "MR_SEQ".nextval into :NEW."MR_ID" from dual; 
+  end if; 
+end; 
+/
+ALTER TRIGGER "BI_DS_MORIVER" ENABLE;
+
+
+  CREATE TABLE "PSPA"."DS_SEARCH" 
+   (	"SE_ID" NUMBER NOT NULL ENABLE, 
+	"SEARCH_DATE" DATE NOT NULL ENABLE, 
+	"RECORDER" VARCHAR2(3 BYTE) NOT NULL ENABLE, 
+	"SEARCH_TYPE_CODE" VARCHAR2(2 BYTE) NOT NULL ENABLE, 
+	"START_TIME" VARCHAR2(11 BYTE) NOT NULL ENABLE, 
+	"START_LATITUDE" NUMBER NOT NULL ENABLE, 
+	"START_LONGITUDE" NUMBER NOT NULL ENABLE, 
+	"STOP_TIME" VARCHAR2(11 BYTE) NOT NULL ENABLE, 
+	"STOP_LATITUDE" NUMBER NOT NULL ENABLE, 
+	"STOP_LONGITUDE" NUMBER NOT NULL ENABLE, 
+	"SE_FID" VARCHAR2(199 BYTE), 
+	"DS_ID" NUMBER NOT NULL ENABLE, 
+	"SITE_ID" NUMBER NOT NULL ENABLE, 
+	"SITE_FID" VARCHAR2(199 BYTE), 
+	"TEMP" NUMBER, 
+	"CONDUCTIVITY" NUMBER, 
+	"LAST_UPDATED" DATE, 
+	"UPLOAD_SESSION_ID" NUMBER, 
+	 CONSTRAINT "SEARCH_EFFORT_T_PK" PRIMARY KEY ("SE_ID") ENABLE, 
+	 CONSTRAINT "DS_SEARCH_T_FK1" FOREIGN KEY ("SEARCH_TYPE_CODE")
+	  REFERENCES "SEARCH_TYPE_LK" ("SEARCH_TYPE_CODE") ENABLE
+   ) ;
+
+   COMMENT ON COLUMN "DS_SEARCH"."SE_ID" IS 'Primary Key. Field app will not know it';
+   COMMENT ON COLUMN "DS_SEARCH"."SEARCH_DATE" IS 'Field Search Date. The date the search went on the water. ';
+   COMMENT ON COLUMN "DS_SEARCH"."RECORDER" IS 'recorder = initials of the user FK to a users table?';
+   COMMENT ON COLUMN "DS_SEARCH"."SEARCH_TYPE_CODE" IS 'Lookup value of what type of search it is';
+   COMMENT ON COLUMN "DS_SEARCH"."START_TIME" IS 'Time when the search started';
+   COMMENT ON COLUMN "DS_SEARCH"."SE_FID" IS 'tablet unique identifier (is this ever used???)';
+
+
+CREATE TABLE ds_site_check (
+SITE_FID	VARCHAR2(50 BYTE)
+,YEAR		NUMBER
+,FIELD_OFFICE_CODE	VARCHAR2(10 BYTE)
+,PROJECT_CODE	NUMBER
+,SEGMENT_CODE	NUMBER
+,SEASON_CODE	VARCHAR2(5 BYTE)
+,SAMPLE_UNIT_CODE	NUMBER
+,BEND_RIVER_MILE_ID	NUMBER
+,SAMPLE_UNIT_TYPE_CODE	VARCHAR2(1 BYTE)
+,SAMPLE_METHOD_CODE	NUMBER
+,COMMENTS	VARCHAR2(2000 BYTE)
+,SITE_ID		NUMBER
+
+,CONSTRAINT UPLOAD_SITES_PK PRIMARY KEY (SITE_FID)
+);
+COMMENT ON COLUMN ds_site_check.SITE_FID	IS 'Site Field ID. PK';
+COMMENT ON COLUMN ds_site_check.YEAR	IS 'The year that the site was searched';
+COMMENT ON COLUMN ds_site_check.FIELD_OFFICE_CODE	IS 'The field office code. FK to FIELD_OFFICE_LK.FIELD_OFFICE_CODE';
+COMMENT ON COLUMN ds_site_check.PROJECT_CODE	IS 'Project ID of the site. FK to PROJECT_LK.CODE';
+COMMENT ON COLUMN ds_site_check.SEGMENT_CODE	IS 'Segment ID of the site. FK to SEGMENT_LK.CODE';
+COMMENT ON COLUMN ds_site_check.SEASON_CODE	IS 'Season code. FK to SEASON_LK.CODE';
+COMMENT ON COLUMN ds_site_check.SAMPLE_UNIT_CODE	IS 'This unit code will correspond to the code based on the sample unit type';
+COMMENT ON COLUMN ds_site_check.BEND_RIVER_MILE_ID	IS 'Bend River Mile ID. FK to BEND_RIVER_MILE_LK.ID';
+COMMENT ON COLUMN ds_site_check.SAMPLE_UNIT_TYPE_CODE	IS 'Sample unit type code. FK to SAMPLE_UNIT_TYPE_LK.CODE';
+COMMENT ON COLUMN ds_site_check.SAMPLE_METHOD_CODE	IS 'The sample method used at the site. FK to SAMPLE_METHOD_LK.CODE';
+COMMENT ON COLUMN ds_site_check.UPLOAD_SESSION_ID	IS 'Upload Session ID. FK to UPLOAD_SESSION_T.ID';
+COMMENT ON COLUMN ds_site_check.COMMENTS	IS 'Comments on site';
+COMMENT ON COLUMN ds_site_check.SITE_ID	IS 'Internal Site ID';
+
+COMMENT ON TABLE ds_site_check IS 'Site details after the check processing';
+
+
+CREATE TABLE ds_site (
+SITE_FID	VARCHAR2(50 BYTE)
+,YEAR		NUMBER
+,FIELD_OFFICE_CODE	VARCHAR2(10 BYTE)
+,PROJECT_CODE	NUMBER
+,SEGMENT_CODE	NUMBER
+,SEASON_CODE	VARCHAR2(5 BYTE)
+,SAMPLE_UNIT_CODE	NUMBER
+,BEND_RIVER_MILE_ID	NUMBER
+,SAMPLE_UNIT_TYPE_CODE	VARCHAR2(1 BYTE)
+,SAMPLE_METHOD_CODE	NUMBER
+,COMMENTS	VARCHAR2(2000 BYTE)
+,SITE_ID		NUMBER,
+,SAMPLE_UNIT_TYPE	VARCHAR2(1 BYTE)
+,BRM_ID		NUMBER
+
+,CONSTRAINT UPLOAD_SITES_PK PRIMARY KEY (SITE_FID)
+);
+COMMENT ON COLUMN ds_site.SITE_FID	IS 'Site Field ID. PK';
+COMMENT ON COLUMN ds_site.YEAR	IS 'The year that the site was searched';
+COMMENT ON COLUMN ds_site.FIELD_OFFICE_CODE	IS 'The field office code. FK to FIELD_OFFICE_LK.FIELD_OFFICE_CODE';
+COMMENT ON COLUMN ds_site.PROJECT_CODE	IS 'Project ID of the site. FK to PROJECT_LK.CODE';
+COMMENT ON COLUMN ds_site.SEGMENT_CODE	IS 'Segment ID of the site. FK to SEGMENT_LK.CODE';
+COMMENT ON COLUMN ds_site.SEASON_CODE	IS 'Season code. FK to SEASON_LK.CODE';
+COMMENT ON COLUMN ds_site.SAMPLE_UNIT_CODE	IS 'This unit code will correspond to the code based on the sample unit type';
+COMMENT ON COLUMN ds_site.BEND_RIVER_MILE_ID	IS 'Bend River Mile ID. FK to BEND_RIVER_MILE_LK.ID';
+COMMENT ON COLUMN ds_site.SAMPLE_UNIT_TYPE_CODE	IS 'Sample unit type code. FK to SAMPLE_UNIT_TYPE_LK.CODE';
+COMMENT ON COLUMN ds_site.SAMPLE_METHOD_CODE	IS 'The sample method used at the site. FK to SAMPLE_METHOD_LK.CODE';
+COMMENT ON COLUMN ds_site.UPLOAD_SESSION_ID	IS 'Upload Session ID. FK to UPLOAD_SESSION_T.ID';
+COMMENT ON COLUMN ds_site.COMMENTS	IS 'Comments on site';
+COMMENT ON COLUMN ds_site.SITE_ID	IS 'Internal Site ID';
+
+COMMENT ON TABLE ds_site IS 'Site details after the check processing';
+
+
+
+CREATE TABLE "DS_SUPPLEMENTAL_CHECK" 
+   (	"FIELDOFFICE" VARCHAR2(2 BYTE), 
+	"PROJECT" NUMBER, 
+	"SEGMENT" NUMBER, 
+	"UNIQUEIDENTIFIER" NUMBER, 
+	"NPAGE" NUMBER, 
+	"TOTALPAGES" NUMBER, 
+	"BIOLOGIST" VARCHAR2(3 BYTE), 
+	"RECORDER" VARCHAR2(3 BYTE), 
+	"CHECKBY" VARCHAR2(3 BYTE), 
+	"ID" NUMBER, 
+	"TAGNUMBER" VARCHAR2(20 BYTE), 
+	"PITRN" VARCHAR2(1 BYTE), 
+	"CWTYN" VARCHAR2(1 BYTE), 
+	"DANGLER" VARCHAR2(1 BYTE), 
+	"SCUTELOC" VARCHAR2(1 BYTE), 
+	"SCUTENUM" NUMBER, 
+	"ELHV" VARCHAR2(1 BYTE), 
+	"ELCOLOR" VARCHAR2(1 BYTE), 
+	"ERHV" VARCHAR2(1 BYTE), 
+	"ERCOLOR" VARCHAR2(1 BYTE), 
+	"BLACKLIGHT" VARCHAR2(1 BYTE), 
+	"GLASSES" VARCHAR2(1 BYTE), 
+	"FINPUNCH" VARCHAR2(1 BYTE), 
+	"GENETIC" VARCHAR2(1 BYTE), 
+	"PITTAG" VARCHAR2(1 BYTE), 
+	"TAG2" VARCHAR2(1 BYTE), 
+	"EL" VARCHAR2(1 BYTE), 
+	"ER" VARCHAR2(1 BYTE), 
+	"EH" VARCHAR2(1 BYTE), 
+	"MARK" VARCHAR2(1 BYTE), 
+	"TOTAL" NUMBER, 
+	"STANDARD" NUMBER, 
+	"HEAD" NUMBER, 
+	"SNOUTTOMOUTH" NUMBER, 
+	"INTER" NUMBER, 
+	"MOUTHWIDTH" NUMBER, 
+	"M_IB" NUMBER, 
+	"L_OB" NUMBER, 
+	"L_IB" NUMBER, 
+	"R_IB" NUMBER, 
+	"R_OB" NUMBER, 
+	"ANAL" NUMBER, 
+	"DORSAL" NUMBER, 
+	"S_ID" NUMBER(*,0), 
+	"F_ID" NUMBER(*,0), 
+	"RECAPTURE" VARCHAR2(1 BYTE), 
+	"OTHER_TAG_INFO" VARCHAR2(500 BYTE), 
+	"RIVER" NUMBER, 
+	"STATE" VARCHAR2(5 BYTE), 
+	"LOCATION" VARCHAR2(100 BYTE), 
+	"PICTURE" BLOB, 
+	"GENETICS_VIAL_NUMBER" VARCHAR2(20 BYTE), 
+	"SEX" VARCHAR2(5 BYTE), 
+	"STAGE" VARCHAR2(5 BYTE), 
+	"FORK_LENGTH" NUMBER, 
+	"STATUS" VARCHAR2(5 BYTE), 
+	"CAPTURED_BY" VARCHAR2(100 BYTE), 
+	"COMMENTS" VARCHAR2(2000 BYTE), 
+	"PIT_TAG" VARCHAR2(20 BYTE), 
+	"HATCHERY_ORIGIN" VARCHAR2(1 BYTE), 
+	"GENETIC_NEEDS" VARCHAR2(100 BYTE), 
+	"MR_ID" NUMBER(*,0), 
+	"LAST_UPDATED" DATE, 
+	"UPLOADED_BY" VARCHAR2(20 BYTE), 
+	"APPROVED" NUMBER, 
+	"F_FID" VARCHAR2(50 BYTE), 
+	"PHOTO" VARCHAR2(1 BYTE), 
+	"LAST_EDIT_COMMENT" VARCHAR2(1000 BYTE), 
+	"EDIT_INITIALS" VARCHAR2(10 BYTE), 
+	"COMPLETE" NUMBER, 
+	"UPLOAD_FILENAME" VARCHAR2(200 BYTE), 
+	"CI" NUMBER(3,2), 
+	"MCI" NUMBER(3,2), 
+	"UPLOAD_SESSION_ID" NUMBER, 
+	"MR_FID" VARCHAR2(50 BYTE), 
+	"BROODSTOCK" NUMBER, 
+	"HATCH_WILD" NUMBER, 
+	"SPECIES_ID" NUMBER, 
+	"ARCHIVE" NUMBER, 
+	"SCUTELOC2" VARCHAR2(1 BYTE), 
+	"SCUTENUM2" NUMBER
+   ) ;
+
+  CREATE INDEX "DS_MOSUPPCHK_SESSIONID_IDX" ON "DS_SUPPLEMENTAL_CHECK" ("UPLOAD_SESSION_ID") ;
+
+  CREATE INDEX "DS_MOSUPPCHK_UPLOADBY_IDX" ON "DS_SUPPLEMENTAL_CHECK" ("UPLOADED_BY");
+
+  CREATE OR REPLACE TRIGGER "BI_DS_SUPPLEMENTAL_CHECK" 
+  before insert on "DS_SUPPLEMENTAL_CHECK"               
+  for each row
+begin   
+  if :NEW."S_ID" is null then 
+    select "SUPP_CHECK_SEQ".nextval into :NEW."S_ID" from dual; 
+  end if; 
+end; 
+/
+ALTER TRIGGER "BI_DS_SUPPLEMENTAL_CHECK" ENABLE;
+
+
+CREATE TABLE "DS_SUPPLEMENTAL" 
+   (	"FIELDOFFICE" VARCHAR2(2 BYTE) NOT NULL DISABLE, 
+	"PROJECT" NUMBER NOT NULL DISABLE, 
+	"SEGMENT" NUMBER NOT NULL DISABLE, 
+	"UNIQUEIDENTIFIER" NUMBER NOT NULL DISABLE, 
+	"NPAGE" NUMBER, 
+	"TOTALPAGES" NUMBER, 
+	"BIOLOGIST" VARCHAR2(3 BYTE), 
+	"RECORDER" VARCHAR2(3 BYTE), 
+	"CHECKBY" VARCHAR2(3 BYTE), 
+	"ID" NUMBER NOT NULL DISABLE, 
+	"TAGNUMBER" VARCHAR2(20 BYTE), 
+	"PITRN" VARCHAR2(1 BYTE), 
+	"CWTYN" VARCHAR2(1 BYTE), 
+	"DANGLER" VARCHAR2(1 BYTE), 
+	"SCUTELOC" VARCHAR2(1 BYTE), 
+	"SCUTENUM" NUMBER, 
+	"ELHV" VARCHAR2(1 BYTE), 
+	"ELCOLOR" VARCHAR2(1 BYTE), 
+	"ERHV" VARCHAR2(1 BYTE), 
+	"ERCOLOR" VARCHAR2(1 BYTE), 
+	"BLACKLIGHT" VARCHAR2(1 BYTE), 
+	"GLASSES" VARCHAR2(1 BYTE), 
+	"FINPUNCH" VARCHAR2(1 BYTE), 
+	"GENETIC" VARCHAR2(1 BYTE), 
+	"HEAD" NUMBER, 
+	"SNOUTTOMOUTH" NUMBER, 
+	"INTER" NUMBER, 
+	"MOUTHWIDTH" NUMBER, 
+	"M_IB" NUMBER, 
+	"L_OB" NUMBER, 
+	"L_IB" NUMBER, 
+	"R_IB" NUMBER, 
+	"R_OB" NUMBER, 
+	"ANAL" NUMBER, 
+	"DORSAL" NUMBER, 
+	"S_ID" NUMBER(*,0), 
+	"F_ID" NUMBER(*,0), 
+	"RECAPTURE" VARCHAR2(1 BYTE), 
+	"OTHER_TAG_INFO" VARCHAR2(500 BYTE), 
+	"PICTURE" BLOB, 
+	"GENETICS_VIAL_NUMBER" VARCHAR2(20 BYTE), 
+	"SEX" VARCHAR2(5 BYTE), 
+	"STAGE" VARCHAR2(5 BYTE), 
+	"STATUS" VARCHAR2(5 BYTE), 
+	"COMMENTS" VARCHAR2(2000 BYTE), 
+	"HATCHERY_ORIGIN" VARCHAR2(1 BYTE), 
+	"GENETIC_NEEDS" VARCHAR2(100 BYTE), 
+	"MR_ID" NUMBER(*,0), 
+	"LAST_UPDATED" DATE, 
+	"UPLOADED_BY" VARCHAR2(20 BYTE), 
+	"APPROVED" NUMBER, 
+	"F_FID" VARCHAR2(50 BYTE), 
+	"PHOTO" VARCHAR2(1 BYTE), 
+	"LAST_EDIT_COMMENT" VARCHAR2(1000 BYTE), 
+	"EDIT_INITIALS" VARCHAR2(10 BYTE), 
+	"COMPLETE" NUMBER, 
+	"UPLOAD_FILENAME" VARCHAR2(200 BYTE), 
+	"CI" NUMBER(3,2), 
+	"MCI" NUMBER(3,2), 
+	"UPLOAD_SESSION_ID" NUMBER, 
+	"CCA_DATE" DATE, 
+	"BROODSTOCK" NUMBER, 
+	"HATCH_WILD" NUMBER, 
+	"SPECIES_ID" NUMBER, 
+	"ARCHIVE" NUMBER, 
+	"PIT_TAG" VARCHAR2(10 BYTE), 
+	"PITTAG" VARCHAR2(1 BYTE), 
+	"LOCATION" VARCHAR2(100 BYTE), 
+	"STANDARD" NUMBER(1,0), 
+	"TOTAL" NUMBER, 
+	"MARK" VARCHAR2(1 BYTE), 
+	"EH" VARCHAR2(1 BYTE), 
+	"ER" VARCHAR2(1 BYTE), 
+	"EL" VARCHAR2(1 BYTE), 
+	"TAG2" VARCHAR2(1 BYTE), 
+	"FORK_LENGTH" NUMBER, 
+	"SCUTELOC2" VARCHAR2(1 BYTE), 
+	"SCUTENUM2" NUMBER, 
+	 UNIQUE ("F_ID")
+ LOB ("PICTURE") STORE AS BASICFILE (
+  ENABLE STORAGE IN ROW CHUNK 8192 RETENTION 
+  NOCACHE LOGGING 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)) ;
+
+  CREATE INDEX "DS_SUPP_FID_IDX" ON "DS_SUPPLEMENTAL" ("F_FID") ;
+
+  CREATE INDEX "DS_SUPP_SESSIONID_IDX" ON "DS_SUPPLEMENTAL" ("UPLOAD_SESSION_ID") ;
+
+  CREATE INDEX "DS_SUPP_VIALNO_IDX" ON "DS_SUPPLEMENTAL" ("GENETICS_VIAL_NUMBER") ;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_SUPP_INSERT_NULL" 
+BEFORE INSERT ON DS_supplemental 
+FOR EACH ROW
+BEGIN        
+
+    IF :NEW.approved = 0 THEN           
+        
+        select NULL into :NEW."APPROVED" from dual;
+          
+    END IF;  
+    
+    IF :NEW.complete = 0 THEN 
+        
+        select NULL into :NEW."COMPLETE" from dual;
+          
+    END IF; 
+
+
+
+end;
+/
+ALTER TRIGGER "TR_DS_SUPP_INSERT_NULL" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_SUPP_UPDATE_NULL" 
+BEFORE UPDATE ON DS_supplemental REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+BEGIN        
+
+    IF :NEW.approved = 0 THEN
+    
+        :NEW.approved := NULL;
+          
+    END IF; 
+    
+    IF :NEW.complete = 0 THEN
+    
+        :NEW.complete := NULL;
+          
+    END IF;  
+
+end;
+/
+ALTER TRIGGER "TR_DS_SUPP_UPDATE_NULL" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "BI_DS_SUPPLEMENTAL" 
+  before insert on "DS_SUPPLEMENTAL"               
+  for each row
+begin   
+  if :NEW."S_ID" is null then 
+    select "SUPP_SEQ".nextval into :NEW."S_ID" from dual; 
+  end if; 
+end; 
+/
+ALTER TRIGGER "BI_DS_SUPPLEMENTAL" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_SUPPLEMENTAL_UPDATE" 
+BEFORE UPDATE ON DS_supplemental REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+DECLARE
+
+    v_old_setdate varchar2(20);
+    v_new_setdate varchar2(20);
+
+
+BEGIN                
+      
+     /* -- for  RECORDER Column -- */
+     IF (nvl(:OLD.RECORDER,0) != nvl(:NEW.RECORDER,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 74, :new.s_id, :old.RECORDER, :new.RECORDER, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  CHECKBY Column -- */
+--     IF (nvl(:OLD.CHECKBY,0) != nvl(:NEW.CHECKBY,0)) THEN
+
+--          INSERT INTO change_tracking (
+--                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username
+--             ) VALUES (
+--                sysdate, 4, 75, :new.s_id, :old.CHECKBY, :new.CHECKBY, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS')
+--             );
+--     END IF;
+     
+     /* -- for  TAGNUMBER Column -- */
+     IF (nvl(:OLD.TAGNUMBER,0) != nvl(:NEW.TAGNUMBER,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 76, :new.s_id, :old.TAGNUMBER, :new.TAGNUMBER, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  PITRN Column -- */
+     IF (nvl(:OLD.PITRN,0) != nvl(:NEW.PITRN,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 77, :new.s_id, :old.PITRN, :new.PITRN, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  CWTYN Column -- */
+     IF (nvl(:OLD.CWTYN,0) != nvl(:NEW.CWTYN,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 78, :new.s_id, :old.CWTYN, :new.CWTYN, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  DANGLER Column -- */
+     IF (nvl(:OLD.DANGLER,0) != nvl(:NEW.DANGLER,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 79, :new.s_id, :old.DANGLER, :new.DANGLER, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  SCUTELOC Column -- */
+     IF (nvl(:OLD.SCUTELOC,0) != nvl(:NEW.SCUTELOC,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 80, :new.s_id, :old.SCUTELOC, :new.SCUTELOC, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  SCUTENUM Column -- */
+     IF (nvl(:OLD.SCUTENUM,0) != nvl(:NEW.SCUTENUM,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 81, :new.s_id, :old.SCUTENUM, :new.SCUTENUM, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  ELHV Column -- */
+     IF (nvl(:OLD.ELHV,0) != nvl(:NEW.ELHV,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 82, :new.s_id, :old.ELHV, :new.ELHV, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  ELCOLOR Column -- */
+     IF (nvl(:OLD.ELCOLOR,0) != nvl(:NEW.ELCOLOR,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 83, :new.s_id, :old.ELCOLOR, :new.ELCOLOR, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  ERHV Column -- */
+     IF (nvl(:OLD.ERHV,0) != nvl(:NEW.ERHV,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 84, :new.s_id, :old.ERHV, :new.ERHV, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  ERCOLOR Column -- */
+     IF (nvl(:OLD.ERCOLOR,0) != nvl(:NEW.ERCOLOR,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 85, :new.s_id, :old.ERCOLOR, :new.ERCOLOR, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  GENETIC Column -- */
+     IF (nvl(:OLD.GENETIC,0) != nvl(:NEW.GENETIC,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 105, :new.s_id, :old.GENETIC, :new.GENETIC, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  HEAD Column -- */
+     IF (nvl(:OLD.HEAD,0) != nvl(:NEW.HEAD,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 86, :new.s_id, :old.HEAD, :new.HEAD, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  SNOUTTOMOUTH Column -- */
+     IF (nvl(:OLD.SNOUTTOMOUTH,0) != nvl(:NEW.SNOUTTOMOUTH,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 87, :new.s_id, :old.SNOUTTOMOUTH, :new.SNOUTTOMOUTH, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  INTER Column -- */
+     IF (nvl(:OLD.INTER,0) != nvl(:NEW.INTER,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 88, :new.s_id, :old.INTER, :new.INTER, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  MOUTHWIDTH Column -- */
+     IF (nvl(:OLD.MOUTHWIDTH,0) != nvl(:NEW.MOUTHWIDTH,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 89, :new.s_id, :old.MOUTHWIDTH, :new.MOUTHWIDTH, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  M_IB Column -- */
+     IF (nvl(:OLD.M_IB,0) != nvl(:NEW.M_IB,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 90, :new.s_id, :old.M_IB, :new.M_IB, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  L_OB Column -- */
+     IF (nvl(:OLD.L_OB,0) != nvl(:NEW.L_OB,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 91, :new.s_id, :old.L_OB, :new.L_OB, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  L_IB Column -- */
+     IF (nvl(:OLD.L_IB,0) != nvl(:NEW.L_IB,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 92, :new.s_id, :old.L_IB, :new.L_IB, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  R_IB Column -- */
+     IF (nvl(:OLD.R_IB,0) != nvl(:NEW.R_IB,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 93, :new.s_id, :old.R_IB, :new.R_IB, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  R_OB Column -- */
+     IF (nvl(:OLD.R_OB,0) != nvl(:NEW.R_OB,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 94, :new.s_id, :old.R_OB, :new.R_OB, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  ANAL Column -- */
+     IF (nvl(:OLD.ANAL,0) != nvl(:NEW.ANAL,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 95, :new.s_id, :old.ANAL, :new.ANAL, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  DORSAL Column -- */
+     IF (nvl(:OLD.DORSAL,0) != nvl(:NEW.DORSAL,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 96, :new.s_id, :old.DORSAL, :new.DORSAL, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  GENETICS_VIAL_NUMBER Column -- */
+     IF (nvl(:OLD.GENETICS_VIAL_NUMBER,0) != nvl(:NEW.GENETICS_VIAL_NUMBER,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 97, :new.s_id, :old.GENETICS_VIAL_NUMBER, :new.GENETICS_VIAL_NUMBER, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  SEX Column -- */
+     IF (nvl(:OLD.SEX,0) != nvl(:NEW.SEX,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 98, :new.s_id, :old.SEX, :new.SEX, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  STAGE Column -- */
+     IF (nvl(:OLD.STAGE,0) != nvl(:NEW.STAGE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 99, :new.s_id, :old.STAGE, :new.STAGE, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  STATUS Column -- */
+     IF (nvl(:OLD.STATUS,0) != nvl(:NEW.STATUS,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 100, :new.s_id, :old.STATUS, :new.STATUS, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  PIT_TAG Column -- */
+     IF (nvl(:OLD.PIT_TAG,0) != nvl(:NEW.PIT_TAG,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 101, :new.s_id, :old.PIT_TAG, :new.PIT_TAG, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  HATCHERY_ORIGIN Column -- */
+     IF (nvl(:OLD.HATCHERY_ORIGIN,0) != nvl(:NEW.HATCHERY_ORIGIN,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 102, :new.s_id, :old.HATCHERY_ORIGIN, :new.HATCHERY_ORIGIN, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  GENETIC_NEEDS Column -- */
+     IF (nvl(:OLD.GENETIC_NEEDS,0) != nvl(:NEW.GENETIC_NEEDS,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 103, :new.s_id, :old.GENETIC_NEEDS, :new.GENETIC_NEEDS, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  RECAPTURE Column -- */
+     IF (nvl(:OLD.RECAPTURE,0) != nvl(:NEW.RECAPTURE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 104, :new.s_id, :old.RECAPTURE, :new.RECAPTURE, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  BROODSTOCK Column -- */
+     IF (nvl(:OLD.BROODSTOCK,0) != nvl(:NEW.BROODSTOCK,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 107, :new.s_id, :old.BROODSTOCK, :new.BROODSTOCK, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  HATCH_WILD Column -- */
+     IF (nvl(:OLD.HATCH_WILD,0) != nvl(:NEW.HATCH_WILD,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 108, :new.s_id, :old.HATCH_WILD, :new.HATCH_WILD, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  SPECIES_ID Column -- */
+     IF (nvl(:OLD.SPECIES_ID,0) != nvl(:NEW.SPECIES_ID,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 109, :new.s_id, :old.SPECIES_ID, :new.SPECIES_ID, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+     /* -- for  ARCHIVE Column -- */
+     IF (nvl(:OLD.ARCHIVE,0) != nvl(:NEW.ARCHIVE,0)) THEN
+
+          INSERT INTO change_tracking (
+                 trk_date, pspa_table, tbl_column, tbl_record, orig_value, new_value, trk_comments, username,
+                 site_year
+             ) VALUES (
+                sysdate, 4, 110, :new.s_id, :old.ARCHIVE, :new.ARCHIVE, v('P29_EDIT_COMMENT'), v('P29_EDIT_INITIALS'),
+                v('P29_YEAR')
+             );
+     END IF;
+     
+
+     
+END TR_DS_supplemental_UPDATE; 
+/
+ALTER TRIGGER "TR_DS_SUPPLEMENTAL_UPDATE" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_SUPP_UPDATE_VIAL" 
+BEFORE UPDATE ON DS_supplemental REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+BEGIN        
+
+    IF (nvl(:OLD.genetics_vial_number,0) != nvl(:NEW.genetics_vial_number,0)) THEN
+    
+        UPDATE ds_fish
+        set genetics_vial_number = :NEW.genetics_vial_number
+        where f_id = :NEW.F_ID;
+          
+     END IF;  
+
+
+
+end;
+/
+ALTER TRIGGER "TR_DS_SUPP_UPDATE_VIAL" ENABLE;
+
+  CREATE OR REPLACE TRIGGER "TR_DS_SUPP_INSERT_VIAL" 
+BEFORE INSERT ON DS_supplemental 
+FOR EACH ROW
+BEGIN        
+
+    IF :NEW.genetics_vial_number IS NOT NULL THEN
+    
+        UPDATE ds_fish
+        set genetics_vial_number = :NEW.genetics_vial_number
+        where f_id = :NEW.F_ID;
+          
+     END IF;  
+
+
+
+end;
+/
+ALTER TRIGGER "TR_DS_SUPP_INSERT_VIAL" ENABLE;
+
+
+### Create DS_TELEMETRY Table
+CREATE TABLE upload_telemetry (
+T_FID		VARCHAR2(50 BYTE)
+,SE_FID		VARCHAR2(199 BYTE)
+,BEND		NUMBER
+,RADIO_TAG_NUM	NUMBER
+,FREQUENCY_ID	NUMBER
+,CAPTURE_TIME	VARCHAR2(9 BYTE)
+,CAPTURE_LATITUDE	NUMBER
+,CAPTURE_LONGITUDE	NUMBER
+,POSITION_CONFIDENCE	NUMBER
+,MACRO_CODE	VARCHAR2(10 BYTE)
+,MESO_CODE	VARCHAR2(10 BYTE)
+,DEPTH		NUMBER
+,TEMP		NUMBER
+,CONDUCTIVITY	NUMBER
+,TURBIDITY	NUMBER
+,SILT		NUMBER
+,SAND		NUMBER
+,GRAVEL		NUMBER
+,COMMENTS	VARCHAR2(2000 BYTE)
+,UPLOAD_SESSION_ID	NUMBER
+
+,CONSTRAINT UPLOAD_TELEMETRY_PK PRIMARY KEY (T_FID)
+);
+
+COMMENT ON COLUMN ds_telemetry.T_FID	IS 'Telemetry Field ID. PK';
+COMMENT ON COLUMN ds_telemetry.SE_FID	IS 'Search Effort Field ID';
+COMMENT ON COLUMN ds_telemetry.BEND	IS 'based on the site and the segment the bend will be, this can be fixed to bend_id later, right now necessary for analytics';
+COMMENT ON COLUMN ds_telemetry.RADIO_TAG_NUM	IS 'Radio tag number';
+COMMENT ON COLUMN ds_telemetry.FREQUENCY_ID	IS 'Frequency ID of the telemetry. FK to FREQUENCY_LK';
+COMMENT ON COLUMN ds_telemetry.CAPTURE_TIME	IS 'Capture time of the fish telemetry';
+COMMENT ON COLUMN ds_telemetry.CAPTURE_LATITUDE	IS 'Latitude of the capture';
+COMMENT ON COLUMN ds_telemetry.CAPTURE_LONGITUDE	IS 'Longitude of the capture';
+COMMENT ON COLUMN ds_telemetry.POSITION_CONFIDENCE	IS 'Confidence value of the fish being close to this location';
+COMMENT ON COLUMN ds_telemetry.MACRO_CODE	IS 'FK to MACROHABITATE_LK.CODE';
+COMMENT ON COLUMN ds_telemetry.MESO_CODE	IS 'FK to MESOHABITATE_LK.CODE';
+COMMENT ON COLUMN ds_telemetry.DEPTH	IS 'Depth of the river at reading location.';
+COMMENT ON COLUMN ds_telemetry.TEMP	IS 'Tempurature of river';
+COMMENT ON COLUMN ds_telemetry.CONDUCTIVITY	IS 'Conductivity of the river';
+COMMENT ON COLUMN ds_telemetry.TURBIDITY	IS 'Turbidity of the river';
+COMMENT ON COLUMN ds_telemetry.SILT	IS 'The precentage of the river bottom that is silt';
+COMMENT ON COLUMN ds_telemetry.SAND	IS 'The precentage of the river bottom that is sand';
+COMMENT ON COLUMN ds_telemetry.GRAVEL	IS 'The precentage of the river bottom that is gravel';
+COMMENT ON COLUMN ds_telemetry.COMMENTS	IS 'Comments';
+COMMENT ON COLUMN ds_telemetry.UPLOAD_SESSION_ID	IS 'Upload Session ID. FK to UPLOAD_SESSION_T.ID';
+
+COMMENT ON TABLE ds_TELEMETRY IS 'Telemetry details in the final table';
