@@ -1,0 +1,5 @@
+﻿SITE_ID,SITE_FID,SITE_YEAR,FIELDOFFICE_ID,FIELD_OFFICE,PROJECT_ID,PROJECT,SEGMENT_ID,SEGMENT,SEASON_ID,SEASON,BEND,BENDRN,BEND_RIVER_MILE,COMMENTS
+10482,,2020,NE,NE - Nebraska Game and Parks Commission,1,1 - Pallid Sturgeon Population Assessment,8,8 - Ponca to Platte River confluence,ST,ST - Sturgeon,6,N,734.7,-
+0,F-1,2021,MO,MO - Missouri Department of Conservation,1,1 - Pallid Sturgeon Population Assessment,34,34 - Platte River (MO),MR,MR - Mark Recapture,1,R,2.4,-
+0,F-2,2021,NE,NE - Nebraska Game and Parks Commission,1,1 - Pallid Sturgeon Population Assessment,9,9 - Platte River confluence to Kansas River confluence,MR,MR - Mark Recapture,6,R,578.8,-
+0,F-3,2021,NE,NE - Nebraska Game and Parks Commission,1,1 - Pallid Sturgeon Population Assessment,9,9 - Platte River confluence to Kansas River confluence,MR,MR - Mark Recapture,8,R,574.6,-

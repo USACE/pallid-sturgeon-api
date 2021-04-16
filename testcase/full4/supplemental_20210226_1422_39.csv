@@ -1,0 +1,4 @@
+﻿site_id,f_fid,mr_fid,tagnumber,pitrn,scuteloc,scutenum,scuteloc2,scutenum2,elhv,elcolor,erhv,ercolor,cwtyn,dangler,genetic,genetics_vial_number,broodstock,hatch_wild,species_id,archive,head,snouttomouth,inter,mouthwidth,m_ib,l_ob,l_ib,r_ib,r_ob,anal,dorsal,status,hatchery_origin,sex,stage,recapture,photo,genetic_needs,other_tag_info,comments
+0,20210226-130520225-001-001,20210226-130520225-001,9898,Z,L,5,D,2,H,G,V,P,N,N,N,,1,0,0,0,6,4,3,2,1,3,5,1,2,22,22,M,W,,,,,,,-
+0,20210226-130520225-001-002,20210226-130520225-001,9999,Z,L,3,L,3,V,O,V,K,N,Y,N,,1,1,0,0,2,3,4,4,4,2,4,4,4,2,,M,W,,,,,,,-
+0,20210226-130520225-001-003,20210226-130520225-001,00000,,L,2,L,3,V,G,X,G,N,N,N,,1,0,0,0,1,2,2,7,6,7,7,7,7,7,7,M,W,,,,,,,-

@@ -90,9 +90,10 @@ WHILE ( v_position <= v_blob_len ) LOOP
        IF v_line_count > 1 THEN
 
     -- Insert data into target table
-    EXECUTE IMMEDIATE 'INSERT INTO upload_search(SE_FID, DS_ID, SITE_ID, SITE_FID, SEARCH_DATE, RECORDER, SEARCH_TYPE_CODE, START_TIME, START_LATITUDE, START_LONGITUDE, STOP_TIME, 
-                          STOP_LATITUDE, STOP_LONGITUDE, TEMP, CONDUCTIVITY, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, UPLOAD_FILENAME)
-         VALUES (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19)'
+    EXECUTE IMMEDIATE 'INSERT INTO upload_search(SE_FID, DS_ID, SITE_ID, SITE_FID, SEARCH_DATE, RECORDER, SEARCH_TYPE_CODE, SEARCH_DAY, START_TIME,  
+                                       START_LATITUDE, START_LONGITUDE, STOP_TIME, STOP_LATITUDE, STOP_LONGITUDE, TEMP, CONDUCTIVITY, LAST_UPDATED, 
+                                       UPLOAD_SESSION_ID, UPLOADED_BY, UPLOAD_FILENAME)
+         VALUES (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20)'
          USING
          v_data_array(1),
          TO_NUMBER(v_data_array(2)),
@@ -101,15 +102,16 @@ WHILE ( v_position <= v_blob_len ) LOOP
          TO_DATE(v_data_array(5), 'MM/DD/YYYY'),
          v_data_array(6),
          v_data_array(7),
-         REPLACE (v_data_array(8), '_', ':'),--TO_TIMESTAMP(v_data_array(8)), -- Start time, also a date?
-         TO_NUMBER(v_data_array(9)),
+         TO_NUMBER(v_data_array(8)),
+         REPLACE (v_data_array(9), '_', ':'),--TO_TIMESTAMP(v_data_array(8)), -- Start time, also a date?
          TO_NUMBER(v_data_array(10)),
-         REPLACE (v_data_array(11), '_', ':'),--TO_TIMESTAMP(v_data_array(11)),
-         TO_NUMBER(v_data_array(12)),
+         TO_NUMBER(v_data_array(11)),
+         REPLACE (v_data_array(12), '_', ':'),--TO_TIMESTAMP(v_data_array(11)),
          TO_NUMBER(v_data_array(13)),
          TO_NUMBER(v_data_array(14)),
+         TO_NUMBER(v_data_array(15)),
          CASE WHEN LENGTH(v_line) = l_last_param_count THEN NULL -- If no data in the last parameter the array call will fail
-         ELSE TO_NUMBER(v_data_array(15))
+         ELSE TO_NUMBER(v_data_array(16))
          END,
          sysdate,
          p_upload_session_id,
@@ -2890,9 +2892,9 @@ PROCEDURE uploadFinal (
   p_debug ('processFinalUpload Inserting Records into the main tables', NULL);
 
   -- Insert any new rows into DS_SEARCH
-  INSERT INTO DS_SEARCH (SE_ID, SEARCH_DATE, RECORDER, SEARCH_TYPE_CODE, START_TIME, START_LATITUDE, START_LONGITUDE, STOP_TIME, STOP_LATITUDE, STOP_LONGITUDE, SE_FID,
+  INSERT INTO DS_SEARCH (SE_ID, SEARCH_DATE, RECORDER, SEARCH_TYPE_CODE, SEARCH_DAY, START_TIME, START_LATITUDE, START_LONGITUDE, STOP_TIME, STOP_LATITUDE, STOP_LONGITUDE, SE_FID,
                          DS_ID, SITE_ID, SITE_FID, TEMP, CONDUCTIVITY, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, UPLOAD_FILENAME)  
-  SELECT search_seq.nextval, SEARCH_DATE, RECORDER, SEARCH_TYPE_CODE, START_TIME, START_LATITUDE, START_LONGITUDE, STOP_TIME, STOP_LATITUDE, STOP_LONGITUDE, SE_FID,
+  SELECT search_seq.nextval, SEARCH_DATE, RECORDER, SEARCH_TYPE_CODE, SEARCH_DAY, START_TIME, START_LATITUDE, START_LONGITUDE, STOP_TIME, STOP_LATITUDE, STOP_LONGITUDE, SE_FID,
                          DS_ID, SITE_ID, SITE_FID, TEMP, CONDUCTIVITY, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, UPLOAD_FILENAME
     FROM upload_search us
    WHERE us.upload_session_id = p_upload_session_id AND (se_fid, site_id) NOT IN (SELECT se_fid, site_id FROM ds_search);

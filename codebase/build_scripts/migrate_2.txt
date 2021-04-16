@@ -186,15 +186,46 @@ SELECT T_ID, T_FID, SE_ID, BEND, RADIO_TAG_NUM, FREQUENCY_ID_CODE, CAPTURE_TIME,
        TEMP, CONDUCTIVITY, TURBIDITY, SILT, SAND, GRAVEL, COMMENTS, UPLOAD_SESSION_ID 
   FROM pspa_migration.ds_telemetry;
 
-INSERT INTO  ()
-SELECT  FROM pspa_migration.;
+INSERT INTO upload_session (id, uploaded_date, checked_by, mr_filename)
+SELECT upload_session_id, last_updated, checked_by, upload_filename FROM pspa_migration.ds_moriver;
+
+UPDATE upload_session us
+   SET fish_filename = (SELECT upload_filename 
+			  FROM pspa_migration.ds_fish df
+  			 WHERE df.upload_session_id = us.id AND rownum = 1)
+ WHERE EXISTS (SELECT 1 FROM pspa_migration.ds_fish WHERE upload_session_id = us.id);
+
+UPDATE upload_session us
+   SET search_filename = (SELECT upload_filename 
+			    FROM pspa_migration.ds_search ds
+  			   WHERE ds.upload_session_id = us.id AND rownum = 1)
+ WHERE EXISTS (SELECT 1 FROM pspa_migration.ds_search WHERE upload_session_id = us.id);
+
+UPDATE upload_session us
+   SET site_filename = (SELECT upload_filename 
+			  FROM pspa_migration.ds_sites ds
+  			 WHERE ds.upload_session_id = us.id AND rownum = 1)
+ WHERE EXISTS (SELECT 1 FROM pspa_migration.ds_sites WHERE upload_session_id = us.id);
+
+UPDATE upload_session us
+   SET supplemental_filename = (SELECT upload_filename 
+			  FROM pspa_migration.ds_supplemental ds
+  			 WHERE ds.upload_session_id = us.id AND rownum = 1)
+ WHERE EXISTS (SELECT 1 FROM pspa_migration.ds_supplemental WHERE upload_session_id = us.id);
+
+UPDATE upload_session us
+   SET telemetry_filename = (SELECT upload_filename 
+			       FROM pspa_migration.ds_telemetry dt
+  			      WHERE dt.upload_session_id = us.id AND rownum = 1)
+ WHERE EXISTS (SELECT 1 FROM pspa_migration.ds_telemetry WHERE upload_session_id = us.id);
+
+UPDATE upload_session us
+   SET procedure_filename = (SELECT upload_filename
+			       FROM pspa_migration.ds_procedure dp
+  			      WHERE dp.upload_session_id = us.id AND rownum = 1)
+ WHERE EXISTS (SELECT 1 FROM pspa_migration.ds_procedure WHERE upload_session_id = us.id);
 
 INSERT INTO  ()
 SELECT  FROM pspa_migration.;
 
-INSERT INTO  ()
-SELECT  FROM pspa_migration.;
-
-INSERT INTO  ()
-SELECT  FROM pspa_migration.;
 
