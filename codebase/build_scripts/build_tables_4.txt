@@ -1,14 +1,3 @@
-### Create  Table
-CREATE TABLE U_SEVEN_LK (
-CODE	VARCHAR2(2 BYTE)
-,DESCRIPTION	VARCHAR2(20 BYTE)
-
-,CONSTRAINT U_SEVEN_PK PRIMARY KEY (CODE)
-);
-COMMENT ON COLUMN U_SEVEN_LK.CODE IS 'Utility 7 code. PK';
-COMMENT ON COLUMN U_SEVEN_LK. IS 'Description of utility 7';
-
-COMMENT ON TABLE U_SEVEN_LK IS 'Look up table for Utility 7 values';
 
 
 ### Create YEAR_LK Table
@@ -22,19 +11,6 @@ COMMENT ON COLUMN year_lk.year IS 'Year';
 
 COMMENT ON TABLE year_lk IS 'Look up table for year';
 
-### Create YES_NO_LK Table
-CREATE TABLE yes_no_lk (
-CODE		VARCHAR2(1 BYTE)
-,DESCRIPTION	VARCHAR2(10 BYTE)
-,SORT_ORDER	NUMBER
-	
-,CONSTRAINT YES_NO_LK_PK PRIMARY KEY (CODE)
-);
-COMMENT ON COLUMN yes_no_lk.code IS 'Code Y/N/U - unknown. PK';
-COMMENT ON COLUMN yes_no_lk.description IS 'Description of options.';
-COMMENT ON COLUMN yes_no_lk.sort_order IS 'Sort order used for displaying options in application';
-
-COMMENT ON TABLE yes_no_lk IS 'Look up table for Yes_No';
 
 
 CREATE TABLE "CHANGE_TRACKING" 
