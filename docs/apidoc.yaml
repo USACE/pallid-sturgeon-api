@@ -46,10 +46,37 @@ paths:
             schema:
               $ref: "#/components/schemas/uploadSite"
       responses:
-        "405":
-          description: "Invalid input"
+        '201':
+          description: Null response
         default:
-          description: "successful operation"
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /fishUpload:
+    post:
+      tags:
+      - "fishUpload"
+      summary: "Add a fish upload"
+      description: ""
+      operationId: "addFishUpload"
+      requestBody:
+        description: "Fish upload object that needs to be uploaded"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadFish"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     season:
@@ -113,6 +140,54 @@ components:
           type: string
         bendRiverMile:
           type: number
+        comments:
+          type: string
+        uploadSessionId:
+          type: integer
+          format: int32
+        uploadFilename:
+          type: string
+    uploadFish:
+      type: object
+      required:
+        - siteId
+        - uploadSessionId
+        - uploadFilename
+      properties:
+        siteId:
+          type: integer
+          format: int32
+        fFid:
+          type: string
+        mrFid:
+          type: string
+        panelhook:
+          type: string
+        bait:
+          type: string
+        species:
+          type: string
+        length:
+          type: number
+        weight:
+          type: number
+        fishcount:
+          type: integer
+          format: int32
+        finCurl:
+          type: string
+        otolith:
+          type: string
+        rayspine:
+          type: string
+        scale:
+          type: string
+        ftprefix:
+          type: string
+        ftnum:
+          type: string
+        ftmr:
+          type: string
         comments:
           type: string
         uploadSessionId:
