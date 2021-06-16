@@ -6,6 +6,11 @@ Table of Contents
     - [uploads](#uploads)
 
 ---
+### Seasons
+- List Seasons \
+  [http://localhost:8080/psapi/seasons](http://localhost:8080/psapi/seasons)
+
+---
 ### Uploads
 - Site Upload \
   `http://localhost:8080/psapi/siteUpload`
@@ -48,6 +53,54 @@ Table of Contents
             "bendRiverMile": 799.5,
             "comments": "test",
             "uploadSessionId": 78,
+            "uploadFilename": "test_datasheet.csv"
+          }
+       ]
+- Fish Upload \
+  `http://localhost:8080/psapi/fishUpload`
+    - Example `POST` body
+        ```
+        [
+          {
+            "siteId": 0,
+            "fFid": "20150409-144555560-038-002",
+            "mrFid": "20150409-144555560-038",
+            "panelhook": "50",
+            "bait": "W",
+            "species": "SNSG",
+            "length": 545,
+            "weight": 578,
+            "fishcount": 1,
+            "finCurl": "X",
+            "otolith": "M",
+            "rayspine": "X",
+            "scale": "X",
+            "ftnum": "45678",
+            "ftmr": "L",
+            "ftprefix": "C",
+            "comments": "test",
+            "uploadSessionId": 1606,
+            "uploadFilename": "test_datasheet.csv"
+          },
+          {
+            "siteId": 2,
+            "fFid": "20150409-144555560-038-002",
+            "mrFid": "20150409-144555560-038",
+            "panelhook": "50",
+            "bait": "W",
+            "species": "SNSG",
+            "length": 545,
+            "weight": 578,
+            "fishcount": 1,
+            "finCurl": "X",
+            "otolith": "M",
+            "rayspine": "X",
+            "scale": "X",
+            "ftnum": "45678",
+            "ftmr": "L",
+            "ftprefix": "C",
+            "comments": "test",
+            "uploadSessionId": 1606,
             "uploadFilename": "test_datasheet.csv"
           }
        ]
