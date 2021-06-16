@@ -12,9 +12,9 @@
       "program": "${workspaceFolder}/server.go",
       "env": {
         "LAMBDACONTEXT": "false",
-        "DB_USER": "SMD",
-        "DB_PASS": "d3V!New!Us3r!4d",
-        "DB_NAME": "MAE1DEV",
+        "DB_USER": "",
+        "DB_PASS": "",
+        "DB_NAME": "",
         "LIB_DIR": "/usr/local/app/oracle/instantclient_21_1",
         "DB_HOST": "host.docker.internal",
         "DB_PORT": "1521",
