@@ -62,14 +62,18 @@ paths:
           description: Upload Session Id
           schema:
             type: string
-      requestBody:
-        description: "Out parameters from the store procedure"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/procedureOut"
       responses:
+        '200':
+          description: store procedure out data
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/procedureOut"
         '201':
           description: Null response
         default:

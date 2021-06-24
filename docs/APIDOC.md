@@ -292,7 +292,7 @@ Table of Contents
        ]
  - Store Procedure \
   `http://localhost:8080/psapi/storeProcedure/1606`
-    - Example `GET` response
+    - Example `POST` response
         ```
         {
           "uploadSessionId": 5308,
