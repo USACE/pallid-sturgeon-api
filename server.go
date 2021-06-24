@@ -53,12 +53,14 @@ func main() {
 
 	e.GET(urlContext+"/version", PallidSturgeonH.Version)
 	e.GET(urlContext+"/seasons", PallidSturgeonH.GetSeasons)
+	e.GET(urlContext+"/uploadSessionId", PallidSturgeonH.GetUploadSessionId)
 	e.POST(urlContext+"/siteUpload", PallidSturgeonH.SiteUpload)
 	e.POST(urlContext+"/fishUpload", PallidSturgeonH.FishUpload)
 	e.POST(urlContext+"/searchUpload", PallidSturgeonH.SearchUpload)
 	e.POST(urlContext+"/supplementalUpload", PallidSturgeonH.SupplementalUpload)
 	e.POST(urlContext+"/procedureUpload", PallidSturgeonH.ProcedureUpload)
-	e.POST(urlContext+"/mrUpload", PallidSturgeonH.MrUpload)
-	e.POST(urlContext+"/telemetryFishUpload", PallidSturgeonH.TelemetryFishUpload)
+	e.POST(urlContext+"/moriverUpload", PallidSturgeonH.MoriverUpload)
+	e.POST(urlContext+"/telemetryUpload", PallidSturgeonH.TelemetryUpload)
+	e.POST(urlContext+"/storeProcedure/:uploadSessionId", PallidSturgeonH.CallStoreProcedures)
 	e.Logger.Fatal(e.Start(":8080"))
 }

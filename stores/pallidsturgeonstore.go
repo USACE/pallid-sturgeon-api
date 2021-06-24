@@ -31,6 +31,19 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 	return seasons, err
 }
 
+var nextUploadSessionIdSql = `SELECT upload_session_seq.nextval from dual`
+
+func (s *PallidSturgeonStore) GetUploadSessionId() (int, error) {
+	rows, err := s.db.Query(nextUploadSessionIdSql)
+
+	var nextUploadSessionId int
+	for rows.Next() {
+		rows.Scan(&nextUploadSessionId)
+	}
+
+	return nextUploadSessionId, err
+}
+
 var insertUploadSiteSql = `insert into upload_site (site_id, site_fid, site_year, fieldoffice_id, 
 	field_office, project_id, project, 
 	segment_id, segment, season_id, season, bend, bendrn, bend_river_mile, comments,
@@ -59,25 +72,6 @@ func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error
 		uploadSite.UploadedBy,
 		uploadSite.UploadFilename,
 	)
-
-	return err
-}
-
-func (s *PallidSturgeonStore) UploadSiteDatasheetCheck(uploadedBy string, uploadSessionId int) error {
-	uploadSiteStmt, err := s.db.Prepare("begin DATA_UPLOAD.uploadSiteDatasheetCheck (:1,:2);  end;")
-
-	//var retVal string
-	uploadSiteStmt.Exec(godror.PlSQLArrays, uploadedBy, uploadSessionId)
-
-	//fmt.Println(retVal)
-
-	return err
-}
-
-func (s *PallidSturgeonStore) UploadSiteDatasheet(uploadedBy string) error {
-	uploadSiteStmt, err := s.db.Prepare("begin DATA_UPLOAD.uploadSiteDatasheet  (:1);  end;")
-
-	uploadSiteStmt.Exec(godror.PlSQLArrays, uploadedBy)
 
 	return err
 }
@@ -115,25 +109,6 @@ func (s *PallidSturgeonStore) SaveFishUpload(uploadFish models.UploadFish) error
 	return err
 }
 
-func (s *PallidSturgeonStore) UploadFishDatasheetCheck(uploadedBy string, uploadSessionId int) error {
-	uploadSiteStmt, err := s.db.Prepare("begin DATA_UPLOAD.uploadFishDatasheetCheck (:1,:2);  end;")
-
-	//var retVal string
-	uploadSiteStmt.Exec(godror.PlSQLArrays, uploadedBy, uploadSessionId)
-
-	//fmt.Println(retVal)
-
-	return err
-}
-
-func (s *PallidSturgeonStore) UploadFishDatasheet(uploadedBy string) error {
-	uploadSiteStmt, err := s.db.Prepare("begin DATA_UPLOAD.uploadFishDatasheet    (:1);  end;")
-
-	uploadSiteStmt.Exec(godror.PlSQLArrays, uploadedBy)
-
-	return err
-}
-
 var insertSearchUploadSql = `insert into upload_search(se_fid, ds_id, site_id, site_fid, search_date, recorder, search_type_code, search_day, start_time,  
 		start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, temp, conductivity, last_updated, 
 		upload_session_id, uploaded_by, upload_filename)
@@ -144,6 +119,7 @@ func (s *PallidSturgeonStore) SaveSearchUpload(uploadSearch models.UploadSearch)
 		uploadSearch.SeFid,
 		uploadSearch.DsId,
 		uploadSearch.SiteID,
+		uploadSearch.SiteFid,
 		uploadSearch.SearchDate,
 		uploadSearch.Recorder,
 		uploadSearch.SearchTypeCode,
@@ -221,6 +197,8 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 		uploadSupplemental.Stage,
 		uploadSupplemental.Recapture,
 		uploadSupplemental.Photo,
+		uploadSupplemental.GeneticNeeds,
+		uploadSupplemental.OtherTagInfo,
 		uploadSupplemental.Comments,
 		uploadSupplemental.LastUpdated,
 		uploadSupplemental.UploadSessionId,
@@ -231,18 +209,17 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 	return err
 }
 
-var insertProcedureUploadSql = `insert into upload_procedure (id, f_fid, purpose_code, procedure_date, procedure_start_time, procedure_end_time, procedure_by, 
+var insertProcedureUploadSql = `insert into upload_procedure (f_fid, purpose_code, procedure_date, procedure_start_time, procedure_end_time, procedure_by, 
 	antibiotic_injection_ind, photo_dorsal_ind, photo_ventral_ind, photo_left_ind,
 	old_radio_tag_num, old_frequency_id, dst_serial_num, dst_start_date, dst_start_time, dst_reimplant_ind, new_radio_tag_num,
 	new_frequency_id, sex_code, blood_sample_ind, egg_sample_ind, comments, fish_health_comments,
 	eval_location_code, spawn_code, visual_repro_status_code, ultrasound_repro_status_code,
 	expected_spawn_year, ultrasound_gonad_length, gonad_condition,
 	last_updated, upload_session_id, uploaded_by, upload_filename )                                                        
-values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35)`
+values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34)`
 
 func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadProcedure) error {
 	_, err := s.db.Exec(insertProcedureUploadSql,
-		uploadProcedure.Id,
 		uploadProcedure.FFid,
 		uploadProcedure.PurposeCode,
 		uploadProcedure.ProcedurDate,
@@ -282,7 +259,7 @@ func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadP
 	return err
 }
 
-var insertMrUploadSql = `insert into upload_mr (site_id, site_fid, mr_fid, season, setdate, subsample, subsamplepass, 
+var insertMoriverUploadSql = `insert into upload_moriver (site_id, site_fid, mr_fid, season, setdate, subsample, subsamplepass, 
 	subsamplen, recorder, gear, gear_type, temp, turbidity, conductivity, do,
 	distance, width, netrivermile, structurenumber, usgs, riverstage, discharge,
 	u1, u2, u3, u4, u5, u6, u7, macro, meso, habitatrn, qc,
@@ -301,58 +278,98 @@ var insertMrUploadSql = `insert into upload_mr (site_id, site_fid, mr_fid, seaso
 		:48,:49,:50,:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,
 		:71,:72)`
 
-func (s *PallidSturgeonStore) SaveMrUpload(uploadMr models.UploadMr) error {
-	_, err := s.db.Exec(insertMrUploadSql,
-		uploadMr.SiteID, uploadMr.SiteFid, uploadMr.MrFid, uploadMr.Season, uploadMr.Setdate,
-		uploadMr.Subsample, uploadMr.Subsamplepass, uploadMr.Subsamplen, uploadMr.Recorder,
-		uploadMr.Gear, uploadMr.GearType, uploadMr.Temp, uploadMr.Turbidity, uploadMr.Conductivity,
-		uploadMr.Do, uploadMr.Distance, uploadMr.Width, uploadMr.Netrivermile, uploadMr.Structurenumber,
-		uploadMr.Usgs, uploadMr.Riverstage, uploadMr.Discharge, uploadMr.U1, uploadMr.U2, uploadMr.U3, uploadMr.U4,
-		uploadMr.U5, uploadMr.U6, uploadMr.U7, uploadMr.Macro, uploadMr.Meso, uploadMr.Habitatrn, uploadMr.Qc,
-		uploadMr.MicroStructure, uploadMr.StructureFlow, uploadMr.StructureMod, uploadMr.SetSite1, uploadMr.SetSite2, uploadMr.SetSite3,
-		uploadMr.StartTime, uploadMr.StartLatitude, uploadMr.StartLongitude, uploadMr.StopTime, uploadMr.StopLatitude, uploadMr.StopLongitude,
-		uploadMr.Depth1, uploadMr.Velocitybot1, uploadMr.Velocity08_1, uploadMr.Velocity02or06_1,
-		uploadMr.Depth2, uploadMr.Velocitybot2, uploadMr.Velocity08_2, uploadMr.Velocity02or06_2,
-		uploadMr.Depth3, uploadMr.Velocitybot3, uploadMr.Velocity08_3, uploadMr.Velocity02or06_3,
-		uploadMr.Watervel, uploadMr.Cobble, uploadMr.Organic, uploadMr.Silt, uploadMr.Sand, uploadMr.Gravel,
-		uploadMr.Comments, uploadMr.LastUpdated, uploadMr.UploadSessionId,
-		uploadMr.UploadedBy, uploadMr.UploadFilename, uploadMr.Complete, uploadMr.Checkby,
-		uploadMr.NoTurbidity, uploadMr.NoVelocity,
+func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriver) error {
+	_, err := s.db.Exec(insertMoriverUploadSql,
+		UploadMoriver.SiteID, UploadMoriver.SiteFid, UploadMoriver.MrFid, UploadMoriver.Season, UploadMoriver.Setdate,
+		UploadMoriver.Subsample, UploadMoriver.Subsamplepass, UploadMoriver.Subsamplen, UploadMoriver.Recorder,
+		UploadMoriver.Gear, UploadMoriver.GearType, UploadMoriver.Temp, UploadMoriver.Turbidity, UploadMoriver.Conductivity,
+		UploadMoriver.Do, UploadMoriver.Distance, UploadMoriver.Width, UploadMoriver.Netrivermile, UploadMoriver.Structurenumber,
+		UploadMoriver.Usgs, UploadMoriver.Riverstage, UploadMoriver.Discharge, UploadMoriver.U1, UploadMoriver.U2, UploadMoriver.U3, UploadMoriver.U4,
+		UploadMoriver.U5, UploadMoriver.U6, UploadMoriver.U7, UploadMoriver.Macro, UploadMoriver.Meso, UploadMoriver.Habitatrn, UploadMoriver.Qc,
+		UploadMoriver.MicroStructure, UploadMoriver.StructureFlow, UploadMoriver.StructureMod, UploadMoriver.SetSite1, UploadMoriver.SetSite2, UploadMoriver.SetSite3,
+		UploadMoriver.StartTime, UploadMoriver.StartLatitude, UploadMoriver.StartLongitude, UploadMoriver.StopTime, UploadMoriver.StopLatitude, UploadMoriver.StopLongitude,
+		UploadMoriver.Depth1, UploadMoriver.Velocitybot1, UploadMoriver.Velocity08_1, UploadMoriver.Velocity02or06_1,
+		UploadMoriver.Depth2, UploadMoriver.Velocitybot2, UploadMoriver.Velocity08_2, UploadMoriver.Velocity02or06_2,
+		UploadMoriver.Depth3, UploadMoriver.Velocitybot3, UploadMoriver.Velocity08_3, UploadMoriver.Velocity02or06_3,
+		UploadMoriver.Watervel, UploadMoriver.Cobble, UploadMoriver.Organic, UploadMoriver.Silt, UploadMoriver.Sand, UploadMoriver.Gravel,
+		UploadMoriver.Comments, UploadMoriver.LastUpdated, UploadMoriver.UploadSessionId,
+		UploadMoriver.UploadedBy, UploadMoriver.UploadFilename, UploadMoriver.Complete, UploadMoriver.Checkby,
+		UploadMoriver.NoTurbidity, UploadMoriver.NoVelocity,
 	)
 
 	return err
 }
 
-var insertTelemetryFishUploadSql = `insert into upload_telemetry_fish(t_fid, se_fid, bend, radio_tag_num, frequency_id_code, capture_time, capture_latitude, capture_longitude,
+var insertTelemetryUploadSql = `insert into upload_telemetry(t_fid, se_fid, bend, radio_tag_num, frequency_id_code, capture_time, capture_latitude, capture_longitude,
 	position_confidence, macro_id, meso_id, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, last_updated, upload_session_id, uploaded_by, upload_filename)
 	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23)`
 
-func (s *PallidSturgeonStore) SaveTelemetryFishUpload(uploadTelemetryFish models.UploadTelemetryFish) error {
-	_, err := s.db.Exec(insertTelemetryFishUploadSql,
-		uploadTelemetryFish.TFid,
-		uploadTelemetryFish.SeFid,
-		uploadTelemetryFish.Bend,
-		uploadTelemetryFish.RadioTagNum,
-		uploadTelemetryFish.FrequencyIdCode,
-		uploadTelemetryFish.CaptureTime,
-		uploadTelemetryFish.CaptureLatitude,
-		uploadTelemetryFish.CaptureLongitude,
-		uploadTelemetryFish.PositionConfidence,
-		uploadTelemetryFish.MacroId,
-		uploadTelemetryFish.MesoId,
-		uploadTelemetryFish.Depth,
-		uploadTelemetryFish.Temp,
-		uploadTelemetryFish.Conductivity,
-		uploadTelemetryFish.Turbidity,
-		uploadTelemetryFish.Silt,
-		uploadTelemetryFish.Sand,
-		uploadTelemetryFish.Gravel,
-		uploadTelemetryFish.Comments,
-		uploadTelemetryFish.LastUpdated,
-		uploadTelemetryFish.UploadSessionId,
-		uploadTelemetryFish.UploadedBy,
-		uploadTelemetryFish.UploadFilename,
+func (s *PallidSturgeonStore) SaveTelemetryUpload(uploadTelemetry models.UploadTelemetry) error {
+	_, err := s.db.Exec(insertTelemetryUploadSql,
+		uploadTelemetry.TFid,
+		uploadTelemetry.SeFid,
+		uploadTelemetry.Bend,
+		uploadTelemetry.RadioTagNum,
+		uploadTelemetry.FrequencyIdCode,
+		uploadTelemetry.CaptureTime,
+		uploadTelemetry.CaptureLatitude,
+		uploadTelemetry.CaptureLongitude,
+		uploadTelemetry.PositionConfidence,
+		uploadTelemetry.MacroId,
+		uploadTelemetry.MesoId,
+		uploadTelemetry.Depth,
+		uploadTelemetry.Temp,
+		uploadTelemetry.Conductivity,
+		uploadTelemetry.Turbidity,
+		uploadTelemetry.Silt,
+		uploadTelemetry.Sand,
+		uploadTelemetry.Gravel,
+		uploadTelemetry.Comments,
+		uploadTelemetry.LastUpdated,
+		uploadTelemetry.UploadSessionId,
+		uploadTelemetry.UploadedBy,
+		uploadTelemetry.UploadFilename,
 	)
 
 	return err
+}
+
+func (s *PallidSturgeonStore) CallStoreProcedures(uploadedBy string, uploadSessionId int) (models.ProcedureOut, error) {
+
+	procedureOut := models.ProcedureOut{}
+
+	uploadFishStmt, err := s.db.Prepare("begin DATA_UPLOAD.uploadFinal (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12);  end;")
+	if err != nil {
+		return procedureOut, err
+	}
+	var p_site_cnt_final int
+	var p_mr_cnt_final int
+	var p_fishCntFinal int
+	var p_searchCntFinal int
+	var p_suppCntFinal int
+	var p_telemetryCntFinal int
+	var p_procedureCntFinal int
+	var p_noSite_cnt int
+	var p_siteMatch int
+	var p_noSiteID_msg string
+
+	_, err = uploadFishStmt.Exec(godror.PlSQLArrays, uploadedBy, sql.Out{Dest: &p_site_cnt_final}, sql.Out{Dest: &p_mr_cnt_final}, sql.Out{Dest: &p_fishCntFinal}, sql.Out{Dest: &p_searchCntFinal}, sql.Out{Dest: &p_suppCntFinal}, sql.Out{Dest: &p_telemetryCntFinal}, sql.Out{Dest: &p_procedureCntFinal}, sql.Out{Dest: &p_noSite_cnt}, sql.Out{Dest: &p_siteMatch}, sql.Out{Dest: &p_noSiteID_msg}, uploadSessionId)
+	if err != nil {
+		return procedureOut, err
+	}
+
+	procedureOut.UploadSessionId = uploadSessionId
+	procedureOut.UploadedBy = uploadedBy
+	procedureOut.SiteCntFinal = p_site_cnt_final
+	procedureOut.MrCntFinal = p_mr_cnt_final
+	procedureOut.FishCntFinal = p_fishCntFinal
+	procedureOut.SearchCntFinal = p_searchCntFinal
+	procedureOut.SuppCntFinal = p_suppCntFinal
+	procedureOut.TelemetryCntFinal = p_telemetryCntFinal
+	procedureOut.ProcedureCntFinal = p_procedureCntFinal
+	procedureOut.NoSiteCnt = p_noSite_cnt
+	procedureOut.SiteMatch = p_siteMatch
+	procedureOut.NoSiteIDMsg = p_noSiteID_msg
+
+	return procedureOut, err
 }

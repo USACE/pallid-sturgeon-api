@@ -59,12 +59,12 @@ type UploadFish struct {
 type UploadSearch struct {
 	SiteID          int       `db:"site_id" json:"siteId"`
 	SeFid           string    `db:"se_fid" json:"seFid"`
-	DsId            string    `db:"ds_id" json:"dsId"`
+	DsId            int       `db:"ds_id" json:"dsId"`
 	SiteFid         string    `db:"site_fid" json:"siteFid"`
 	SearchDate      time.Time `db:"search_date" json:"searchDate"`
 	Recorder        string    `db:"recorder" json:"recorder"`
 	SearchTypeCode  string    `db:"search_type_code" json:"searchTypeCode"`
-	SearchDay       time.Time `db:"search_day" json:"searchDay"`
+	SearchDay       int       `db:"search_day" json:"searchDay"`
 	StartTime       string    `db:"start_time" json:"startTime"`
 	StartLatitude   float64   `db:"start_latitude" json:"startLatitude"`
 	StartLongitude  float64   `db:"start_longitude" json:"startLongitude"`
@@ -156,6 +156,8 @@ type UploadSupplemental struct {
 	Stage              string    `db:"stage" json:"stage"`
 	Recapture          string    `db:"recapture" json:"recapture"`
 	Photo              string    `db:"photo" json:"photo"`
+	GeneticNeeds       string    `db:"genetic_needs" json:"geneticNeeds"`
+	OtherTagInfo       string    `db:"other_tag_info" json:"otherTagInfo"`
 	Comments           string    `db:"comments" json:"comments"`
 	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
@@ -163,13 +165,13 @@ type UploadSupplemental struct {
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
 }
 
-type UploadMr struct {
+type UploadMoriver struct {
 	SiteID           int       `db:"site_id" json:"siteId"`
 	SiteFid          string    `db:"site_fid" json:"siteFid"`
 	MrFid            string    `db:"mr_fid" json:"mrFid"`
 	Season           string    `db:"season" json:"season"`
 	Setdate          time.Time `db:"setdate" json:"setdate"`
-	Subsample        string    `db:"subsample" json:"subsample"`
+	Subsample        float64   `db:"subsample" json:"subsample"`
 	Subsamplepass    float64   `db:"subsamplepass" json:"subsamplepass"`
 	Subsamplen       string    `db:"subsamplen" json:"subsamplen"`
 	Recorder         string    `db:"recorder" json:"recorder"`
@@ -238,7 +240,7 @@ type UploadMr struct {
 	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
 }
 
-type UploadTelemetryFish struct {
+type UploadTelemetry struct {
 	TFid               string    `db:"t_fid" json:"tFid"`
 	SeFid              string    `db:"se_fid" json:"seFid"`
 	Bend               float64   `db:"bend" json:"bend"`
@@ -246,7 +248,7 @@ type UploadTelemetryFish struct {
 	FrequencyIdCode    int       `db:"frequency_id_code" json:"frequencyIdCode"`
 	CaptureTime        string    `db:"capture_time" json:"captureTime"`
 	CaptureLatitude    float64   `db:"capture_latitude" json:"captureLatitude"`
-	CaptureLongitude   float64   `db:"capture_longitude" json:"capture_Longitude"`
+	CaptureLongitude   float64   `db:"capture_longitude" json:"captureLongitude"`
 	PositionConfidence float64   `db:"position_confidence" json:"positionConfidence"`
 	MacroId            string    `db:"macro_id" json:"macroId"`
 	MesoId             string    `db:"meso_id" json:"mesoId"`
@@ -262,4 +264,19 @@ type UploadTelemetryFish struct {
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+}
+
+type ProcedureOut struct {
+	UploadSessionId   int    `json:"uploadSessionId"`
+	UploadedBy        string `json:"uploadedBy"`
+	SiteCntFinal      int    `json:"siteCntFinal"`
+	MrCntFinal        int    `json:"mrCntFinal"`
+	FishCntFinal      int    `json:"fishCntFinal"`
+	SearchCntFinal    int    `json:"searchCntFinal"`
+	SuppCntFinal      int    `json:"suppCntFinal"`
+	TelemetryCntFinal int    `json:"telemetryCntFinal"`
+	ProcedureCntFinal int    `json:"procedureCntFinal"`
+	NoSiteCnt         int    `json:"noSiteCnt"`
+	SiteMatch         int    `json:"siteMatch"`
+	NoSiteIDMsg       string `json:"noSiteIDMsg"`
 }

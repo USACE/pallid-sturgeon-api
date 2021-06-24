@@ -10,11 +10,18 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceFolder}/server.go",
+      "dlvLoadConfig": {
+        "followPointers": true,
+        "maxVariableRecurse": 1,
+        "maxStringLen": 400,
+        "maxArrayValues": 64,
+        "maxStructFields": -1
+      },
       "env": {
         "LAMBDACONTEXT": "false",
-        "DB_USER": "",
-        "DB_PASS": "",
-        "DB_NAME": "",
+        "DB_USER": "SMD",
+        "DB_PASS": "d3V!New!Us3r!4d",
+        "DB_NAME": "MAE1DEV",
         "LIB_DIR": "/usr/local/app/oracle/instantclient_21_1",
         "DB_HOST": "host.docker.internal",
         "DB_PORT": "1521",
