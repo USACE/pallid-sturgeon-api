@@ -26,12 +26,109 @@ func (sd *PallidSturgeonHandler) GetSeasons(c echo.Context) error {
 	return c.JSON(http.StatusOK, seasons)
 }
 
-func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
-	seasons, err := sd.Store.GetUploadSessionId()
+func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {
+	fishDataSummary, err := sd.Store.GetFishDataSummary()
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, seasons)
+	return c.JSON(http.StatusOK, fishDataSummary)
+}
+
+func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
+	sessionId, err := sd.Store.GetUploadSessionId()
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, sessionId)
+}
+
+func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
+	var err error
+	uploads := models.Upload{}
+	if err := c.Bind(&uploads); err != nil {
+		return err
+	}
+
+	sessionId, err := sd.Store.GetUploadSessionId()
+	if err != nil {
+		return err
+	}
+
+	for _, uploadSite := range uploads.SiteUpload {
+		uploadSite.LastUpdated = time.Now()
+		uploadSite.UploadedBy = "DeeLiang"
+		uploadSite.UploadSessionId = sessionId
+		err = sd.Store.SaveSiteUpload(uploadSite)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, uploadFish := range uploads.FishUpload {
+		uploadFish.LastUpdated = time.Now()
+		uploadFish.UploadedBy = "DeeLiang"
+		uploadFish.UploadSessionId = sessionId
+		err = sd.Store.SaveFishUpload(uploadFish)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, uploadSearch := range uploads.SearchUpload {
+		uploadSearch.LastUpdated = time.Now()
+		uploadSearch.UploadedBy = "DeeLiang"
+		uploadSearch.UploadSessionId = sessionId
+		err = sd.Store.SaveSearchUpload(uploadSearch)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, uploadSupplemental := range uploads.UploadSupplemental {
+		uploadSupplemental.LastUpdated = time.Now()
+		uploadSupplemental.UploadedBy = "DeeLiang"
+		uploadSupplemental.UploadSessionId = sessionId
+		err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
+		if err != nil {
+			return err
+		}
+	}
+	for _, uploadProcedure := range uploads.ProcedureUpload {
+		uploadProcedure.LastUpdated = time.Now()
+		uploadProcedure.UploadedBy = "DeeLiang"
+		uploadProcedure.UploadSessionId = sessionId
+		err = sd.Store.SaveProcedureUpload(uploadProcedure)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, uploadMoriver := range uploads.MoriverUpload {
+		uploadMoriver.LastUpdated = time.Now()
+		uploadMoriver.UploadedBy = "DeeLiang"
+		uploadMoriver.UploadSessionId = sessionId
+		err = sd.Store.SaveMoriverUpload(uploadMoriver)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, uploadTelemetry := range uploads.TelemetryUpload {
+		uploadTelemetry.LastUpdated = time.Now()
+		uploadTelemetry.UploadedBy = "DeeLiang"
+		uploadTelemetry.UploadSessionId = sessionId
+		err = sd.Store.SaveTelemetryUpload(uploadTelemetry)
+		if err != nil {
+			return err
+		}
+	}
+
+	procedureOut, err := sd.Store.CallStoreProcedures("DeeLiang", sessionId)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, procedureOut)
 }
 
 func (sd *PallidSturgeonHandler) SiteUpload(c echo.Context) error {

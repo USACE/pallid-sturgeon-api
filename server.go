@@ -4,13 +4,12 @@ import (
 	//"log"
 
 	//. "di2e.net/cwbi/pallid_sturgeon_api/server/auth"
+
 	"log"
 
 	"di2e.net/cwbi/pallid_sturgeon_api/server/config"
 	"di2e.net/cwbi/pallid_sturgeon_api/server/handlers"
 	"di2e.net/cwbi/pallid_sturgeon_api/server/stores"
-
-	//"di2e.net/cwbi/pallid_sturgeon_api/server/stores"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -51,9 +50,13 @@ func main() {
 	// 	Config: appconfig,
 	// }
 
+	//r := mux.NewRouter()
+
 	e.GET(urlContext+"/version", PallidSturgeonH.Version)
 	e.GET(urlContext+"/seasons", PallidSturgeonH.GetSeasons)
+	e.GET(urlContext+"/fishDataSummary", PallidSturgeonH.GetFishDataSummary)
 	e.GET(urlContext+"/uploadSessionId", PallidSturgeonH.GetUploadSessionId)
+	e.POST(urlContext+"/upload", PallidSturgeonH.Upload)
 	e.POST(urlContext+"/siteUpload", PallidSturgeonH.SiteUpload)
 	e.POST(urlContext+"/fishUpload", PallidSturgeonH.FishUpload)
 	e.POST(urlContext+"/searchUpload", PallidSturgeonH.SearchUpload)

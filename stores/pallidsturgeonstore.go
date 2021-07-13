@@ -19,6 +19,11 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 	rows, err := s.db.Query(seasonsSql)
 
 	seasons := []models.Season{}
+	if err != nil {
+		return seasons, err
+	}
+	defer rows.Close()
+
 	for rows.Next() {
 		season := models.Season{}
 		err = rows.Scan(&season.ID, &season.Code, &season.Description, &season.FieldAppFlag, &season.ProjectCode)
@@ -31,10 +36,42 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 	return seasons, err
 }
 
+var fishDataSummarySql = "SELECT bait FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3))"
+
+func (s *PallidSturgeonStore) GetFishDataSummary() ([]models.UploadFish, error) {
+	uploadFishes := []models.UploadFish{}
+	dbQuery, err := s.db.Prepare(fishDataSummarySql)
+	if err != nil {
+		return uploadFishes, err
+	}
+	defer dbQuery.Close()
+
+	rows, err := dbQuery.Query(2021, "MO", 1)
+	if err != nil {
+		return uploadFishes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		uploadFish := models.UploadFish{}
+		err = rows.Scan(&uploadFish.Bait)
+		if err != nil {
+			return nil, err
+		}
+		uploadFishes = append(uploadFishes, uploadFish)
+	}
+
+	return uploadFishes, err
+}
+
 var nextUploadSessionIdSql = `SELECT upload_session_seq.nextval from dual`
 
 func (s *PallidSturgeonStore) GetUploadSessionId() (int, error) {
 	rows, err := s.db.Query(nextUploadSessionIdSql)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
 
 	var nextUploadSessionId int
 	for rows.Next() {
@@ -342,6 +379,7 @@ func (s *PallidSturgeonStore) CallStoreProcedures(uploadedBy string, uploadSessi
 	if err != nil {
 		return procedureOut, err
 	}
+
 	var p_site_cnt_final int
 	var p_mr_cnt_final int
 	var p_fishCntFinal int
@@ -357,6 +395,8 @@ func (s *PallidSturgeonStore) CallStoreProcedures(uploadedBy string, uploadSessi
 	if err != nil {
 		return procedureOut, err
 	}
+
+	uploadFishStmt.Close()
 
 	procedureOut.UploadSessionId = uploadSessionId
 	procedureOut.UploadedBy = uploadedBy

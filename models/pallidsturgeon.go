@@ -10,6 +10,16 @@ type Season struct {
 	ProjectCode  *int   `db:"project_code" json:"projectCode"`
 }
 
+type Upload struct {
+	SiteUpload         []UploadSite         `json:"siteUpload"`
+	FishUpload         []UploadFish         `json:"fishUpload"`
+	SearchUpload       []UploadSearch       `json:"searchUpload"`
+	ProcedureUpload    []UploadProcedure    `json:"procedureUpload"`
+	UploadSupplemental []UploadSupplemental `json:"uploadSupplemental"`
+	MoriverUpload      []UploadMoriver      `json:"moriverUpload"`
+	TelemetryUpload    []UploadTelemetry    `json:"telemetryUpload"`
+}
+
 type UploadSite struct {
 	SiteID          int       `db:"site_id" json:"siteId"`
 	SiteFID         string    `db:"site_fid" json:"siteFid"`

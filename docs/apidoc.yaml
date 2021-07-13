@@ -15,55 +15,6 @@ paths:
         - seasons
       responses:
         '200':
-          description: Array of seasons
-          headers:
-            x-next:
-              description: A link to the next page of responses
-              schema:
-                type: string
-          content:
-            application/json:    
-              schema:
-                $ref: "#/components/schemas/season"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /uploadSessionId:
-    get:
-      summary:  next upload session id
-      operationId: GetUploadSessionId
-      tags:
-        - seasons
-      responses:
-        '200':
-          description: upload session id
-          headers:
-            x-next:
-              description: A link to the next page of responses
-              schema:
-                type: string
-          content:
-            application/json:    
-              schema:
-                type: string
-  /storeProcedure/{uploadSessionId}:
-    post:
-      summary: Call store procedures after all uploads are completed
-      operationId: CallStoreProcedures
-      tags:
-        - call_store_procedures
-      parameters:
-        - name: uploadSessionId
-          in: path
-          required: true
-          description: Upload Session Id
-          schema:
-            type: string
-      responses:
-        '200':
           description: store procedure out data
           headers:
             x-next:
@@ -74,166 +25,26 @@ paths:
             application/json:    
               schema:
                 $ref: "#/components/schemas/procedureOut"
-        '201':
-          description: Null response
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /siteUpload:
+  /upload:
     post:
       tags:
-      - "siteUpload"
-      summary: "Add a site upload"
+      - "upload"
+      summary: "upload all data"
       description: ""
-      operationId: "addSiteUpload"
+      operationId: "addUpload"
       requestBody:
-        description: "Site upload object that needs to be uploaded"
+        description: "Collection of different types of uploads"
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/uploadSite"
-      responses:
-        '201':
-          description: Null response
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /fishUpload:
-    post:
-      tags:
-      - "fishUpload"
-      summary: "Add a fish upload"
-      description: ""
-      operationId: "addFishUpload"
-      requestBody:
-        description: "Fish upload object that needs to be uploaded"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/uploadFish"
-      responses:
-        '201':
-          description: Null response
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /searchUpload:
-    post:
-      tags:
-      - "searchUpload"
-      summary: "Add a search upload"
-      description: ""
-      operationId: "addSearchUpload"
-      requestBody:
-        description: "Search upload object that needs to be uploaded"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/uploadSearch"
-      responses:
-        '201':
-          description: Null response
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"       
-  /supplementalUpload:
-    post:
-      tags:
-      - "SupplementalUpload"
-      summary: "Add a supplemental upload"
-      description: ""
-      operationId: "addSupplementalUpload"
-      requestBody:
-        description: "Supplemental upload object that needs to be uploaded"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/uploadSupplemental"
-      responses:
-        '201':
-          description: Null response
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"       
-  /procedureUpload:
-    post:
-      tags:
-      - "ProcedureUpload"
-      summary: "Add a procedure upload"
-      description: ""
-      operationId: "addProcedureUpload"
-      requestBody:
-        description: "Procedure upload object that needs to be uploaded"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/uploadProcedure"
-      responses:
-        '201':
-          description: Null response
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"    
-  /telemetryUpload:
-    post:
-      tags:
-      - "telemetryUpload"
-      summary: "Add a telemetry upload"
-      description: ""
-      operationId: "addTelemetryUpload"
-      requestBody:
-        description: "Telemetry upload object that needs to be uploaded"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/uploadTelemetry"
-      responses:
-        '201':
-          description: Null response
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"        
-  /moriverUpload:
-    post:
-      tags:
-      - "moriverUpload"
-      summary: "Add a moriver upload"
-      description: ""
-      operationId: "addMoriverUpload"
-      requestBody:
-        description: "Moriver upload object that needs to be uploaded"
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/uploadMoriver"
+              $ref: "#/components/schemas/upload"
       responses:
         '201':
           description: Null response
@@ -266,6 +77,37 @@ components:
         ProjectCode:
           type: integer
           format: int32
+    upload:
+      type: object
+      properties:
+        siteUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSite"
+        fishUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadFish"
+        telemetryUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadTelemetry"
+        searchUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSearch"
+        procedureUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadProcedure"
+        supplementalUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSupplemental"
+        moriverUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadMoriver"
     procedureOut:
       type: object
       required:
@@ -311,7 +153,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadSessionId
         - uploadFilename
       properties:
         siteId:
@@ -357,9 +198,6 @@ components:
         comments:
           type: string
           maxLength: 2000
-        uploadSessionId:
-          type: integer
-          format: int32
         uploadFilename:
           type: string
           maxLength: 200
@@ -367,7 +205,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadSessionId
         - uploadFilename
       properties:
         siteId:
@@ -419,9 +256,6 @@ components:
         comments:
           type: string
           maxLength: 2000
-        uploadSessionId:
-          type: integer
-          format: int32
         uploadFilename:
           type: string
           maxLength: 200
@@ -429,7 +263,6 @@ components:
       type: object
       required:
         - tFid
-        - uploadSessionId
         - uploadFilename
       properties:
         tFid:
@@ -478,9 +311,6 @@ components:
         comments:
           type: string
           maxLength: 20
-        uploadSessionId:
-          type: integer
-          format: int32
         uploadFilename:
           type: string
           maxLength: 200
@@ -488,7 +318,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadSessionId
         - uploadFilename
       properties:
         siteId:
@@ -532,9 +361,6 @@ components:
           type: number
         conductivity:
           type: number
-        uploadSessionId:
-          type: integer
-          format: int32
         uploadFilename:
           type: string
           maxLength: 200
@@ -542,7 +368,6 @@ components:
       type: object
       required:
         - id
-        - uploadSessionId
         - uploadFilename
       properties:
         id:
@@ -634,9 +459,6 @@ components:
         gonadCondition:
           type: string
           maxLength: 50
-        uploadSessionId:
-          type: integer
-          format: int32
         uploadedBy:
           type: string
           maxLength: 20
@@ -647,7 +469,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadSessionId
         - uploadFilename
       properties:
         siteId:
@@ -758,9 +579,6 @@ components:
         comments:
           type: string
           maxLength: 20
-        uploadSessionId:
-          type: integer
-          format: int32
         uploadBy:
           type: string
           maxLength: 20
@@ -771,7 +589,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadSessionId
         - uploadFilename
       properties:
         siteId:
@@ -943,9 +760,6 @@ components:
         noVelocity:
           type: string
           maxLength: 1
-        uploadSessionId:
-          type: integer
-          format: int32
         uploadFilename:
           type: string
           maxLength: 200
