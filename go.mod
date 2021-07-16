@@ -1,9 +1,9 @@
-module di2e.net/cwbi/pallid_sturgeon_api/server
+module github.com/USACE/pallid_sturgeon_api/server
 
 go 1.15
 
 require (
-	github.com/auth0/go-jwt-middleware v1.0.1
+
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/godror/godror v0.25.1

@@ -18,7 +18,6 @@
         "maxStructFields": -1
       },
       "env": {
-        "LAMBDACONTEXT": "false",
         "DB_USER": "",
         "DB_PASS": "",
         "DB_NAME": "MAE1DEV",

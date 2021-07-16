@@ -7,15 +7,15 @@ info:
 servers:
   - url: http://localhost:8080/psapi
 paths:
-  /seasons:
+  /projects:
     get:
-      summary: List Seasons
-      operationId: GetSeasons
+      summary: List projects
+      operationId: GetProjects
       tags:
-        - seasons
+        - projects
       responses:
         '200':
-          description: store procedure out data
+          description: Array of projects
           headers:
             x-next:
               description: A link to the next page of responses
@@ -24,7 +24,79 @@ paths:
           content:
             application/json:    
               schema:
-                $ref: "#/components/schemas/procedureOut"
+                $ref: "#/components/schemas/project"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /seasons:
+    get:
+      summary: List Seasons
+      operationId: GetSeasons
+      tags:
+        - seasons
+      responses:
+        '200':
+          description: Array of seasons
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/season"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /segments:
+    get:
+      summary: List segments
+      operationId: GetSegments
+      tags:
+        - segments
+      responses:
+        '200':
+          description: Array of segments
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/segment"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /bends:
+    get:
+      summary: List bends
+      operationId: GetBends
+      tags:
+        - bends
+      responses:
+        '200':
+          description: Array of bends
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/bend"
         default:
           description: unexpected error
           content:
@@ -56,6 +128,17 @@ paths:
                 $ref: "#/components/schemas/Error" 
 components:
   schemas:
+    project:
+      type: object
+      required:
+        - code
+        - description
+      properties:
+        code:
+          type: integer
+          format: int32
+        description:
+          type: string
     season:
       type: object
       required:
@@ -75,6 +158,60 @@ components:
         fieldAppFlag:
           type: string
         ProjectCode:
+          type: integer
+          format: int32
+    segment:
+      type: object
+      required:
+        - id
+        - code
+        - type
+      properties:
+        id:
+          type: integer
+          format: int32
+        code:
+          type: integer
+          format: int32
+        description:
+          type: string
+        type:
+          type: string
+        upperRiverMile:
+          type: integer
+          format: int32
+        lowerRiverMile:
+          type: integer
+          format: int32
+        rpma:
+          type: integer
+          format: int32
+    bend:
+      type: object
+      required:
+        - id
+        - code
+        - bendNumber
+        - state
+      properties:
+        id:
+          type: integer
+          format: int32
+        bendNumber:
+          type: integer
+          format: int32
+        description:
+          type: string
+        segmentCode:
+          type: integer
+          format: int32
+        upperRiverMile:
+          type: integer
+          format: int32
+        lowerRiverMile:
+          type: integer
+          format: int32
+        state:
           type: integer
           format: int32
     upload:

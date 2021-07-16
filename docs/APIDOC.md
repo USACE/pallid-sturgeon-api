@@ -2,13 +2,31 @@
 
 Table of Contents
 - [Pallid Sturgeon API](#pallidsturgeon-api)
+    - [projects](#projects)
     - [seasons](#seasons)
+    - [segments](#segments)
+    - [bends](#bends)
     - [upload](#upload)
+
+---
+### Projects
+- List Projects \
+  [http://localhost:8080/psapi/projects](http://localhost:8080/psapi/projects)
 
 ---
 ### Seasons
 - List Seasons \
   [http://localhost:8080/psapi/seasons](http://localhost:8080/psapi/seasons)
+
+---
+### Segments
+- List SeasSegmentsons \
+  [http://localhost:8080/psapi/segments](http://localhost:8080/psapi/segments)
+
+---
+### Bends
+- List Bends \
+  [http://localhost:8080/psapi/bends](http://localhost:8080/psapi/bends)
 
 ---
 ### Upload

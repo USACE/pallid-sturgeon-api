@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	"di2e.net/cwbi/pallid_sturgeon_api/server/config"
-	"di2e.net/cwbi/pallid_sturgeon_api/server/models"
+	"github.com/USACE/pallid_sturgeon_api/server/config"
+	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/labstack/echo/v4"
 )
 

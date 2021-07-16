@@ -10,6 +10,32 @@ type Season struct {
 	ProjectCode  *int   `db:"project_code" json:"projectCode"`
 }
 
+type Segment struct {
+	ID             int      `db:"id" json:"id"`
+	Code           int      `db:"code" json:"code"`
+	Description    *string  `db:"description" json:"description"`
+	Type           string   `db:"type" json:"type"`
+	RiverCode      int      `db:"river_code" json:"riverCode"`
+	UpperRiverMile *float64 `db:"upper_river_mile" json:"upperRiverMile"`
+	LowerRiverMile *float64 `db:"lower_river_mile" json:"lowerRiverMile"`
+	Rpma           *int     `db:"rpma" json:"rpma"`
+}
+
+type Bend struct {
+	ID             int      `db:"id" json:"id"`
+	BendNumber     int      `db:"bend_number" json:"bendNumber"`
+	Description    *string  `db:"description" json:"description"`
+	SegmentCode    int      `db:"segment_code" json:"segmentCode"`
+	UpperRiverMile *float64 `db:"upper_river_mile" json:"upperRiverMile"`
+	LowerRiverMile *float64 `db:"lower_river_mile" json:"lowerRiverMile"`
+	State          string   `db:"state" json:"state"`
+}
+
+type Project struct {
+	Code        int    `db:"code" json:"code"`
+	Description string `db:"description" json:"description"`
+}
+
 type Upload struct {
 	SiteUpload         []UploadSite         `json:"siteUpload"`
 	FishUpload         []UploadFish         `json:"fishUpload"`

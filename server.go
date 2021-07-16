@@ -3,13 +3,13 @@ package main
 import (
 	//"log"
 
-	//. "di2e.net/cwbi/pallid_sturgeon_api/server/auth"
+	//. "github.com/USACE/pallid_sturgeon_api/server/auth"
 
 	"log"
 
-	"di2e.net/cwbi/pallid_sturgeon_api/server/config"
-	"di2e.net/cwbi/pallid_sturgeon_api/server/handlers"
-	"di2e.net/cwbi/pallid_sturgeon_api/server/stores"
+	"github.com/USACE/pallid_sturgeon_api/server/config"
+	"github.com/USACE/pallid_sturgeon_api/server/handlers"
+	"github.com/USACE/pallid_sturgeon_api/server/stores"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -53,7 +53,10 @@ func main() {
 	//r := mux.NewRouter()
 
 	e.GET(urlContext+"/version", PallidSturgeonH.Version)
+	e.GET(urlContext+"/projects", PallidSturgeonH.GetProjects)
 	e.GET(urlContext+"/seasons", PallidSturgeonH.GetSeasons)
+	e.GET(urlContext+"/segments", PallidSturgeonH.GetSegments)
+	e.GET(urlContext+"/bends", PallidSturgeonH.GetBends)
 	e.GET(urlContext+"/fishDataSummary", PallidSturgeonH.GetFishDataSummary)
 	e.GET(urlContext+"/uploadSessionId", PallidSturgeonH.GetUploadSessionId)
 	e.POST(urlContext+"/upload", PallidSturgeonH.Upload)

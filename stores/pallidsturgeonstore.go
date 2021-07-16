@@ -3,8 +3,8 @@ package stores
 import (
 	"database/sql"
 
-	"di2e.net/cwbi/pallid_sturgeon_api/server/config"
-	"di2e.net/cwbi/pallid_sturgeon_api/server/models"
+	"github.com/USACE/pallid_sturgeon_api/server/config"
+	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/godror/godror"
 )
 
@@ -13,10 +13,29 @@ type PallidSturgeonStore struct {
 	config *config.AppConfig
 }
 
-var seasonsSql = "select * from season_lk order by id"
+func (s *PallidSturgeonStore) GetProjects() ([]models.Project, error) {
+	rows, err := s.db.Query("select * from project_lk order by code")
+
+	projects := []models.Project{}
+	if err != nil {
+		return projects, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		project := models.Project{}
+		err = rows.Scan(&project.Code, &project.Description)
+		if err != nil {
+			return nil, err
+		}
+		projects = append(projects, project)
+	}
+
+	return projects, err
+}
 
 func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
-	rows, err := s.db.Query(seasonsSql)
+	rows, err := s.db.Query("select * from season_lk order by id")
 
 	seasons := []models.Season{}
 	if err != nil {
@@ -34,6 +53,48 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 	}
 
 	return seasons, err
+}
+
+func (s *PallidSturgeonStore) GetSegments() ([]models.Segment, error) {
+	rows, err := s.db.Query("select * from segment_lk order by id")
+
+	segments := []models.Segment{}
+	if err != nil {
+		return segments, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		segment := models.Segment{}
+		err = rows.Scan(&segment.ID, &segment.Code, &segment.Description, &segment.Type, &segment.RiverCode, &segment.UpperRiverMile, &segment.LowerRiverMile, &segment.Rpma)
+		if err != nil {
+			return nil, err
+		}
+		segments = append(segments, segment)
+	}
+
+	return segments, err
+}
+
+func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
+	rows, err := s.db.Query("select * from bend_river_mile_lk order by id")
+
+	bends := []models.Bend{}
+	if err != nil {
+		return bends, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		bend := models.Bend{}
+		err = rows.Scan(&bend.ID, &bend.BendNumber, &bend.Description, &bend.SegmentCode, &bend.UpperRiverMile, &bend.LowerRiverMile, &bend.State)
+		if err != nil {
+			return nil, err
+		}
+		bends = append(bends, bend)
+	}
+
+	return bends, err
 }
 
 var fishDataSummarySql = "SELECT bait FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3))"

@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"di2e.net/cwbi/pallid_sturgeon_api/server/models"
-	"di2e.net/cwbi/pallid_sturgeon_api/server/stores"
+	"github.com/USACE/pallid_sturgeon_api/server/models"
+	"github.com/USACE/pallid_sturgeon_api/server/stores"
 	"github.com/labstack/echo/v4"
 )
 
@@ -18,12 +18,37 @@ func (ps *PallidSturgeonHandler) Version(c echo.Context) error {
 	return c.String(http.StatusOK, "Pallid Sturgeon API v0.01")
 }
 
+func (sd *PallidSturgeonHandler) GetProjects(c echo.Context) error {
+	projects, err := sd.Store.GetProjects()
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, projects)
+}
+
 func (sd *PallidSturgeonHandler) GetSeasons(c echo.Context) error {
 	seasons, err := sd.Store.GetSeasons()
 	if err != nil {
 		return err
 	}
 	return c.JSON(http.StatusOK, seasons)
+}
+
+func (sd *PallidSturgeonHandler) GetSegments(c echo.Context) error {
+	segments, err := sd.Store.GetSegments()
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, segments)
+}
+
+
+func (sd *PallidSturgeonHandler) GetBends(c echo.Context) error {
+	bends, err := sd.Store.GetBends()
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, bends)
 }
 
 func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {

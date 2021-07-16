@@ -10,7 +10,7 @@ import (
 
 	_ "github.com/godror/godror"
 
-	"di2e.net/cwbi/pallid_sturgeon_api/server/config"
+	"github.com/USACE/pallid_sturgeon_api/server/config"
 )
 
 func InitStores(appConfig *config.AppConfig) (*PallidSturgeonStore, error) {

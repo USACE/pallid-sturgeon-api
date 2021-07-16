@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"di2e.net/cwbi/pallid_sturgeon_api/server/models"
-	"di2e.net/cwbi/pallid_sturgeon_api/server/stores"
+	"github.com/USACE/pallid_sturgeon_api/server/models"
+	"github.com/USACE/pallid_sturgeon_api/server/stores"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 )
