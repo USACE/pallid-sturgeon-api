@@ -7,7 +7,12 @@ Table of Contents
     - [segments](#segments)
     - [bends](#bends)
     - [upload](#upload)
-
+    - [fishDataSummary](#fishDataSummary)
+    - [suppDataSummary](#suppDataSummary)
+    - [missouriDataSummary](#missouriDataSummary
+    - [geneticDataSummary](#geneticDataSummary
+    - [searchDataSummary](#searchDataSummary
+)
 ---
 ### Projects
 - List Projects \
@@ -27,6 +32,31 @@ Table of Contents
 ### Bends
 - List Bends \
   [http://localhost:8080/psapi/bends](http://localhost:8080/psapi/bends)
+
+---
+### FishDataSummary
+- List fishDataSummary \
+  [http://localhost:8080/psapi/fishDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5)
+
+---
+### SuppDataSummary
+- List suppDataSummary \
+  [http://localhost:8080/psapi/suppDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5](http://localhost:8080/psapi/suppDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5)
+
+---
+### MissouriDataSummary
+- List missouriDataSummary \
+  [http://localhost:8080/psapi/missouriDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5](http://localhost:8080/psapi/missouriDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5)
+
+---
+### GeneticDataSummary
+- List missouriDataSummary \
+  [http://localhost:8080/psapi/geneticDataSummary?year=2020&officeCode=KC&project=2&fromDate=06%2F12%2F2020&toDate=06%2F12%2F2020&page=0&size=5](http://localhost:8080/psapi/geneticDataSummary?year=2020&officeCode=KC&project=2&fromDate=06%2F12%2F2020&toDate=06%2F12%2F2020&page=0&size=5)
+
+---
+### SearchDataSummary
+- List missouriDataSummary \
+  [http://localhost:8080/psapi/searchDataSummary?orderby=se_id%20desc&page=0&size=5](http://localhost:8080/psapi/searchDataSummary?orderby=se_id%20desc&page=0&size=5)
 
 ---
 ### Upload
