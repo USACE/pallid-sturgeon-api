@@ -1,0 +1,9 @@
+version: "3"
+services:
+    pallid-api:
+        image: pallid-sturgeon-api:latest
+        env_file:
+            - envvars.list
+        ports:
+          - "700:80"
+          - "701:8080"
