@@ -14,7 +14,7 @@ import (
 )
 
 func InitStores(appConfig *config.AppConfig) (*PallidSturgeonStore, error) {
-	dburl := fmt.Sprintf("user=%s password=%s connectString=%s:%s/%s poolMaxSessions=50 poolSessionTimeout=42s",
+	dburl := fmt.Sprintf("user=\"%s\" password=\"%s\" connectString=\"%s:%s/%s\" poolMaxSessions=50 poolSessionTimeout=42s",
 		appConfig.Dbuser, appConfig.Dbpass, appConfig.Dbhost, appConfig.Dbport, appConfig.Dbname)
 	db, err := sql.Open("godror", dburl)
 	if err != nil {
