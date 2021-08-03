@@ -9,9 +9,9 @@ Table of Contents
     - [upload](#upload)
     - [fishDataSummary](#fishDataSummary)
     - [suppDataSummary](#suppDataSummary)
-    - [missouriDataSummary](#missouriDataSummary
-    - [geneticDataSummary](#geneticDataSummary
-    - [searchDataSummary](#searchDataSummary
+    - [missouriDataSummary](#missouriDataSummary)
+    - [geneticDataSummary](#geneticDataSummary)
+    - [searchDataSummary](#searchDataSummary)
 )
 ---
 ### Projects
