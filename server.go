@@ -68,5 +68,6 @@ func main() {
 	e.POST(urlContext+"/moriverUpload", PallidSturgeonH.MoriverUpload)
 	e.POST(urlContext+"/telemetryUpload", PallidSturgeonH.TelemetryUpload)
 	e.POST(urlContext+"/storeProcedure/:uploadSessionId", PallidSturgeonH.CallStoreProcedures)
-	e.Logger.Fatal(e.Start(":8080"))
+	// e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Debug(e.Start(":8080"))
 }
