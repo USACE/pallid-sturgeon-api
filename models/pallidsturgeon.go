@@ -36,6 +36,117 @@ type Project struct {
 	Description string `db:"description" json:"description"`
 }
 
+type FishSummaryWithCount struct {
+	Items      []FishSummary `json:"items"`
+	TotalCount int           `json:"totalCount"`
+}
+
+type FishSummary struct {
+	UniqueID       int     `db:"mr_id" json:"uniqueID"`
+	FishID         int     `db:"f_id" json:"fishId"`
+	Year           int     `db:"year" json:"year"`
+	FieldOffice    string  `db:"field_office_code" json:"fieldOffice"`
+	Project        int     `db:"project_code" json:"project"`
+	Segment        int     `db:"segment_code" json:"segment"`
+	Season         string  `db:"season_code" json:"season"`
+	Bend           int     `db:"bend_number" json:"bend"`
+	Bendrn         string  `db:"bend_r_or_n" json:"bendrn"`
+	BendRiverMile  float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	Panelhook      string  `db:"panelhook" json:"panelhook"`
+	Species        string  `db:"species_code" json:"species"`
+	HatcheryOrigin string  `db:"hatchery_origin_code" json:"hatcheryOrigin"`
+	CheckedBy      string  `db:"checkby" json:"checkedby"`
+}
+
+type SuppSummaryWithCount struct {
+	Items      []SuppSummary `json:"items"`
+	TotalCount int           `json:"totalCount"`
+}
+
+type SuppSummary struct {
+	FishCode       string  `db:"fish_code" json:"fishCode"`
+	UniqueID       int     `db:"mr_id" json:"uniqueID"`
+	FishID         int     `db:"f_id" json:"fishId"`
+	Year           int     `db:"year" json:"year"`
+	SuppID         int     `db:"sid_display" json:"suppId"`
+	FieldOffice    string  `db:"field_office_code" json:"fieldOffice"`
+	Project        int     `db:"project_code" json:"project"`
+	Segment        int     `db:"segment_code" json:"segment"`
+	Season         string  `db:"season_code" json:"season"`
+	Bend           int     `db:"bend_number" json:"bend"`
+	Bendrn         string  `db:"bend_r_or_n" json:"bendrn"`
+	BendRiverMile  float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	HatcheryOrigin string  `db:"hatchery_origin_code" json:"hatcheryOrigin"`
+	CheckedBy      string  `db:"checkby" json:"checkedby"`
+}
+
+type MissouriSummaryWithCount struct {
+	Items      []MissouriSummary `json:"items"`
+	TotalCount int               `json:"totalCount"`
+}
+
+type MissouriSummary struct {
+	UniqueID      int       `db:"mr_id" json:"uniqueID"`
+	Year          int       `db:"year" json:"year"`
+	FieldOffice   string    `db:"field_office_code" json:"fieldOffice"`
+	Project       int       `db:"project_code" json:"project"`
+	Segment       int       `db:"segment_code" json:"segment"`
+	Season        string    `db:"season_code" json:"season"`
+	Bend          int       `db:"bend_number" json:"bend"`
+	Bendrn        string    `db:"bend_r_or_n" json:"bendrn"`
+	BendRiverMile float64   `db:"bend_river_mile" json:"bendRiverMile"`
+	Subsample     int       `db:"subsample" json:"subsample"`
+	Pass          int       `db:"subsample_pass" json:"pass"`
+	SetDate       time.Time `db:"set_date" json:"setDate"`
+	Conductivity  *string   `db:"conductivity" json:"conductivity"`
+	CheckedBy     string    `db:"checkby" json:"checkedby"`
+}
+
+type GeneticSummaryWithCount struct {
+	Items      []GeneticSummary `json:"items"`
+	TotalCount int              `json:"totalCount"`
+}
+
+type GeneticSummary struct {
+	Year               int       `db:"year" json:"year"`
+	FieldOffice        string    `db:"field_office_code" json:"fieldOffice"`
+	Project            int       `db:"project_code" json:"project"`
+	SturgeonType       string    `db:"sturgeon_type" json:"sturgeonType"`
+	GeneticsVialNumber string    `db:"genetics_vial_number" json:"GeneticsVialNumber"`
+	PitTag             string    `db:"pit_tag" json:"pitTag"`
+	River              string    `db:"river" json:"river"`
+	RiverMile          float64   `db:"river_mile" json:"riverMile"`
+	State              string    `db:"state" json:"state"`
+	SetDate            time.Time `db:"set_date" json:"setDate"`
+	Broodstock         string    `db:"broodstock_yn" json:"broodstock"`
+	HatchWild          string    `db:"hatchwild_yn" json:"hatchWild"`
+	SpeciesID          string    `db:"speciesid_yn" json:"speciesId"`
+	Archive            string    `db:"archive_yn" json:"archive"`
+}
+
+type SearchSummaryWithCount struct {
+	Items      []SearchSummary `json:"items"`
+	TotalCount int             `json:"totalCount"`
+}
+
+type SearchSummary struct {
+	SeID           int     `db:"se_id" json:"seId"`
+	SearchDate     string  `db:"Search_date" json:"searchDate"`
+	Recorder       string  `db:"recorder" json:"recorder"`
+	SearchTypeCode string  `db:"search_type_code" json:"searchTypeCode"`
+	StartTime      string  `db:"start_time" json:"startTime"`
+	StartLatitude  float64 `db:"start_latitude" json:"startLatitude"`
+	StartLongitude float64 `db:"start_longitude" json:"startLongitude"`
+	StopTime       string  `db:"stop_time" json:"stopTime"`
+	StopLatitude   float64 `db:"stop_latitude" json:"stopLatitude"`
+	StopLongitude  float64 `db:"stop_longitude" json:"stopLongitude"`
+	SeFID          string  `db:"se_fid" json:"seFid"`
+	DsID           int     `db:"ds_id" json:"dsId"`
+	SiteFID        string  `db:"site_fid" json:"siteFid"`
+	Temp           *string `db:"temp" json:"temp"`
+	Conductivity   *string `db:"conductivity" json:"conductivity"`
+}
+
 type Upload struct {
 	SiteUpload         []UploadSite         `json:"siteUpload"`
 	FishUpload         []UploadFish         `json:"fishUpload"`

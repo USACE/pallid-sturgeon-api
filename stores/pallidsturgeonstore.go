@@ -2,6 +2,8 @@ package stores
 
 import (
 	"database/sql"
+	"fmt"
+	"strconv"
 
 	"github.com/USACE/pallid_sturgeon_api/server/config"
 	"github.com/USACE/pallid_sturgeon_api/server/models"
@@ -97,32 +99,291 @@ func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
 	return bends, err
 }
 
-var fishDataSummarySql = "SELECT bait FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3))"
+var fishDataSummarySql = `SELECT mr_id, f_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, panelhook, species_code, hatchery_origin_code, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-func (s *PallidSturgeonStore) GetFishDataSummary() ([]models.UploadFish, error) {
-	uploadFishes := []models.UploadFish{}
-	dbQuery, err := s.db.Prepare(fishDataSummarySql)
+var fishDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetFishDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.FishSummaryWithCount, error) {
+	fishSummariesWithCount := models.FishSummaryWithCount{}
+	countQuery, err := s.db.Prepare(fishDataSummaryCountSql)
 	if err != nil {
-		return uploadFishes, err
+		return fishSummariesWithCount, err
 	}
-	defer dbQuery.Close()
 
-	rows, err := dbQuery.Query(2021, "MO", 1)
+	countrows, err := countQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
-		return uploadFishes, err
+		return fishSummariesWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&fishSummariesWithCount.TotalCount)
+		if err != nil {
+			return fishSummariesWithCount, err
+		}
+	}
+
+	fishSummaries := []models.FishSummary{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id"
+	}
+	fishDataSummarySqlWithSearch := fishDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(fishDataSummarySqlWithSearch)
+	if err != nil {
+		return fishSummariesWithCount, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return fishSummariesWithCount, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		uploadFish := models.UploadFish{}
-		err = rows.Scan(&uploadFish.Bait)
+		fishSummary := models.FishSummary{}
+		err = rows.Scan(&fishSummary.UniqueID, &fishSummary.FishID, &fishSummary.Year, &fishSummary.FieldOffice, &fishSummary.Project,
+			&fishSummary.Segment, &fishSummary.Season, &fishSummary.Bend, &fishSummary.Bendrn, &fishSummary.BendRiverMile, &fishSummary.Panelhook,
+			&fishSummary.Species, &fishSummary.HatcheryOrigin, &fishSummary.CheckedBy)
 		if err != nil {
-			return nil, err
+			return fishSummariesWithCount, err
 		}
-		uploadFishes = append(uploadFishes, uploadFish)
+		fishSummaries = append(fishSummaries, fishSummary)
 	}
 
-	return uploadFishes, err
+	fishSummariesWithCount.Items = fishSummaries
+
+	return fishSummariesWithCount, err
+}
+
+var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, year, sid_display, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, hatchery_origin_code, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+var suppDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.SuppSummaryWithCount, error) {
+	suppSummariesWithCount := models.SuppSummaryWithCount{}
+	countQuery, err := s.db.Prepare(suppDataSummaryCountSql)
+	if err != nil {
+		return suppSummariesWithCount, err
+	}
+
+	countrows, err := countQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return suppSummariesWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&suppSummariesWithCount.TotalCount)
+		if err != nil {
+			return suppSummariesWithCount, err
+		}
+	}
+
+	suppSummaries := []models.SuppSummary{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id"
+	}
+	suppDataSummarySqlWithSearch := suppDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(suppDataSummarySqlWithSearch)
+	if err != nil {
+		return suppSummariesWithCount, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return suppSummariesWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		summary := models.SuppSummary{}
+		err = rows.Scan(&summary.FishCode, &summary.UniqueID, &summary.FishID, &summary.SuppID, &summary.Year,
+			&summary.FieldOffice, &summary.Project, &summary.Segment, &summary.Season, &summary.Bend, &summary.Bendrn,
+			&summary.BendRiverMile, &summary.HatcheryOrigin, &summary.CheckedBy)
+		if err != nil {
+			return suppSummariesWithCount, err
+		}
+		suppSummaries = append(suppSummaries, summary)
+	}
+
+	suppSummariesWithCount.Items = suppSummaries
+
+	return suppSummariesWithCount, err
+}
+
+var missouriDataSummarySql = `SELECT mr_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, subsample, subsample_pass, set_Date, conductivity, checkby FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+var missouriDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetMissouriDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.MissouriSummaryWithCount, error) {
+	missouriSummariesWithCount := models.MissouriSummaryWithCount{}
+	countQuery, err := s.db.Prepare(missouriDataSummaryCountSql)
+	if err != nil {
+		return missouriSummariesWithCount, err
+	}
+
+	countrows, err := countQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return missouriSummariesWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&missouriSummariesWithCount.TotalCount)
+		if err != nil {
+			return missouriSummariesWithCount, err
+		}
+	}
+
+	missouriSummaries := []models.MissouriSummary{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id"
+	}
+	missouriDataSummarySqlWithSearch := missouriDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(missouriDataSummarySqlWithSearch)
+	if err != nil {
+		return missouriSummariesWithCount, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return missouriSummariesWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		summary := models.MissouriSummary{}
+		err = rows.Scan(&summary.UniqueID, &summary.Year, &summary.FieldOffice, &summary.Project, &summary.Segment,
+			&summary.Season, &summary.Bend, &summary.Bendrn, &summary.BendRiverMile,
+			&summary.Subsample, &summary.Pass, &summary.SetDate, &summary.Conductivity, &summary.CheckedBy)
+		if err != nil {
+			return missouriSummariesWithCount, err
+		}
+		missouriSummaries = append(missouriSummaries, summary)
+	}
+
+	missouriSummariesWithCount.Items = missouriSummaries
+
+	return missouriSummariesWithCount, err
+}
+
+var geneticDataSummarySql = `SELECT year,field_office_code,project_code,genetics_vial_number,pit_tag,river,river_mile,
+							state,set_date,broodstock_yn,hatchwild_yn,Speciesid_yn,archive_yn FROM table (pallid_data_api.genetic_datasummary_fnc(:1, :2, :3, to_date(:4,'MM/DD/YYYY'), to_date(:5,'MM/DD/YYYY'), :6, :7, :8, :9))`
+
+var geneticDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.genetic_datasummary_fnc(:1, :2, :3, to_date(:4,'MM/DD/YYYY'), to_date(:5,'MM/DD/YYYY'), :6, :7, :8, :9))`
+
+func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode string, project string, fromDate string, toDate string, broodstock string, hatchwild string, speciesid string, archive string, queryParams models.SearchParams) (models.GeneticSummaryWithCount, error) {
+	geneticSummariesWithCount := models.GeneticSummaryWithCount{}
+	countQuery, err := s.db.Prepare(geneticDataSummaryCountSql)
+	if err != nil {
+		return geneticSummariesWithCount, err
+	}
+
+	countrows, err := countQuery.Query(year, officeCode, project, fromDate, toDate, broodstock, hatchwild, hatchwild, speciesid)
+	if err != nil {
+		return geneticSummariesWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&geneticSummariesWithCount.TotalCount)
+		if err != nil {
+			return geneticSummariesWithCount, err
+		}
+	}
+
+	geneticSummaries := []models.GeneticSummary{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "genetics_vial_number"
+	}
+	geneticDataSummarySqlWithSearch := geneticDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(geneticDataSummarySqlWithSearch)
+	if err != nil {
+		return geneticSummariesWithCount, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, fromDate, toDate, broodstock, hatchwild, hatchwild, speciesid)
+	if err != nil {
+		return geneticSummariesWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		summary := models.GeneticSummary{}
+		err = rows.Scan(&summary.Year, &summary.FieldOffice, &summary.Project, &summary.GeneticsVialNumber,
+			&summary.PitTag, &summary.River, &summary.RiverMile, &summary.State, &summary.SetDate, &summary.Broodstock,
+			&summary.HatchWild, &summary.SpeciesID, &summary.Archive)
+		if err != nil {
+			return geneticSummariesWithCount, err
+		}
+		geneticSummaries = append(geneticSummaries, summary)
+	}
+
+	geneticSummariesWithCount.Items = geneticSummaries
+
+	return geneticSummariesWithCount, err
+}
+
+var searchDataSummarySql = `SELECT se_id,Search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude,
+							stop_longitude,se_fid,ds_id,site_fid,temp,conductivity FROM ds_Search`
+
+var searchDataSummaryCountSql = `SELECT count(*) FROM ds_Search`
+
+func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchParams) (models.SearchSummaryWithCount, error) {
+	searchSummariesWithCount := models.SearchSummaryWithCount{}
+	countQuery, err := s.db.Prepare(searchDataSummaryCountSql)
+	if err != nil {
+		return searchSummariesWithCount, err
+	}
+
+	countrows, err := countQuery.Query()
+	if err != nil {
+		return searchSummariesWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&searchSummariesWithCount.TotalCount)
+		if err != nil {
+			return searchSummariesWithCount, err
+		}
+	}
+
+	searchSummaries := []models.SearchSummary{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "se_id"
+	}
+	searchDataSummarySqlWithSearch := searchDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(searchDataSummarySqlWithSearch)
+	if err != nil {
+		return searchSummariesWithCount, err
+	}
+
+	rows, err := dbQuery.Query()
+	if err != nil {
+		return searchSummariesWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		summary := models.SearchSummary{}
+		err = rows.Scan(&summary.SeID, &summary.SearchDate, &summary.Recorder, &summary.SearchTypeCode, &summary.StartTime,
+			&summary.StartLatitude, &summary.StartLongitude, &summary.StopTime, &summary.StopLatitude, &summary.StopLongitude, &summary.SeFID,
+			&summary.DsID, &summary.SiteFID, &summary.Temp, &summary.Conductivity)
+		if err != nil {
+			return searchSummariesWithCount, err
+		}
+		searchSummaries = append(searchSummaries, summary)
+	}
+
+	searchSummariesWithCount.Items = searchSummaries
+
+	return searchSummariesWithCount, err
 }
 
 var nextUploadSessionIdSql = `SELECT upload_session_seq.nextval from dual`

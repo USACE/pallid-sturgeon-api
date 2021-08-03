@@ -8,12 +8,10 @@ type JwtClaim struct {
 }
 
 type SearchParams struct {
-	Page        int    `json:"page"`
-	PageSize    int    `json:"size"`
-	OrderBy     string `json:"orderBy"`
-	Filter      string `json:"filter"`
-	PhaseType   string `json:"phaseType"`
-	PhaseStatus string `json:"phaseStatus"`
+	Page     int    `json:"page"`
+	PageSize int    `json:"size"`
+	OrderBy  string `json:"orderBy"`
+	Filter   string `json:"filter"`
 }
 
 // type User struct {
