@@ -23,7 +23,7 @@ Set the following environment variables and type `go run root/main.go` from the 
     "DB_PASS": "",
     "DB_NAME": "",
     "LIB_DIR": "",
-    "DB_HOST": "localhost",
+    "DB_HOST": "",
     "DB_PORT": "1521",
     "IPPK": "${workspaceFolder}/props/local.pem",
 
