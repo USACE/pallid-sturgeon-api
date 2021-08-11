@@ -50,6 +50,123 @@ func (sd *PallidSturgeonHandler) GetBends(c echo.Context) error {
 	return c.JSON(http.StatusOK, bends)
 }
 
+func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {
+	tableId, fieldId := c.QueryParam("tableId"), c.QueryParam("fieldId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return err
+	}
+	dataSummary, err := sd.Store.GetFishDataEntries(tableId, fieldId, queryParams)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) SaveFishDataEntry(c echo.Context) error {
+	fishData := models.UploadFish{}
+	if err := c.Bind(&fishData); err != nil {
+		return err
+	}
+	id, err := sd.Store.SaveFishDataEntry(fishData)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateFishDataEntry(c echo.Context) error {
+
+	fishData := models.UploadFish{}
+	if err := c.Bind(&fishData); err != nil {
+		return err
+	}
+	_, err := sd.Store.UpdateFishDataEntry(fishData)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetMoriverDataEntries(c echo.Context) error {
+	tableId, fieldId := c.QueryParam("tableId"), c.QueryParam("fieldId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return err
+	}
+	dataSummary, err := sd.Store.GetMoriverDataEntries(tableId, fieldId, queryParams)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
+	moriverData := models.UploadMoriver{}
+	if err := c.Bind(&moriverData); err != nil {
+		return err
+	}
+	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
+
+	moriverData := models.UploadMoriver{}
+	if err := c.Bind(&moriverData); err != nil {
+		return err
+	}
+	_, err := sd.Store.UpdateMoriverDataEntry(moriverData)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) error {
+	tableId, fieldId, geneticsVial, pitTag := c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("geneticsVial"), c.QueryParam("pitTag")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return err
+	}
+	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, queryParams)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error {
+	supplementalData := models.UploadSupplemental{}
+	if err := c.Bind(&supplementalData); err != nil {
+		return err
+	}
+	id, err := sd.Store.SaveSupplementalDataEntry(supplementalData)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) error {
+
+	supplementalData := models.UploadSupplemental{}
+	if err := c.Bind(&supplementalData); err != nil {
+		return err
+	}
+	_, err := sd.Store.UpdateSupplementalDataEntry(supplementalData)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
 func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {
 	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
