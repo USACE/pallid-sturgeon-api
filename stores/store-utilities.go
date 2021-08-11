@@ -1,7 +1,6 @@
 package stores
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -14,20 +13,22 @@ import (
 )
 
 func InitStores(appConfig *config.AppConfig) (*PallidSturgeonStore, error) {
-	dburl := fmt.Sprintf("user=\"%s\" password=\"%s\" connectString=\"%s:%s/%s\" poolMaxSessions=50 poolSessionTimeout=42s",
-		appConfig.Dbuser, appConfig.Dbpass, appConfig.Dbhost, appConfig.Dbport, appConfig.Dbname)
-	db, err := sql.Open("godror", dburl)
+
+	connectString := fmt.Sprintf("%s:%s/%s", appConfig.Dbhost, appConfig.Dbport, appConfig.Dbname)
+	db, err := sqlx.Connect(
+		"godror",
+		"user="+appConfig.Dbuser+" password="+appConfig.Dbpass+" connectString="+connectString,
+	)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-	//defer db.Close()
 
 	ss := PallidSturgeonStore{
 		db:     db,
 		config: appConfig,
 	}
-
+  
 	return &ss, nil
 }
 

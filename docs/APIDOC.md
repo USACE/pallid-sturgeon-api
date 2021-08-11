@@ -6,6 +6,9 @@ Table of Contents
     - [seasons](#seasons)
     - [segments](#segments)
     - [bends](#bends)
+    - [fishDataEntry](#fishDataEntry)
+    - [moriverDataEntry](#moriverDataEntry)
+    - [supplementalDataEntry](#supplementalDataEntry)
     - [upload](#upload)
     - [fishDataSummary](#fishDataSummary)
     - [suppDataSummary](#suppDataSummary)
@@ -33,9 +36,51 @@ Table of Contents
   [http://localhost:8080/psapi/bends](http://localhost:8080/psapi/bends)
 
 ---
-### FishDataSummary
-- List fishDataSummary \
-  [http://localhost:8080/psapi/fishDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5)
+### FishDataEntry
+- List fishDataEntry \
+  [http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create fishDataEntry \
+  `http://localhost:8080/psapi/fishDataEntry`
+    - Example `POST` body
+        ```
+        {}
+- Update fishDataEntry \
+  `http://localhost:8080/psapi/fishDataEntry`
+    - Example `PUT` body
+        ```
+        {}
+---
+### MoriverDataEntry
+- List moriverDataEntry \
+  [http://localhost:8080/psapi/moriverDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/moriverDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create moriverDataEntry \
+  `http://localhost:8080/psapi/moriverDataEntry`
+    - Example `POST` body
+        ```
+        {}
+- Update moriverDataEntry \
+  `http://localhost:8080/psapi/moriverDataEntry`
+    - Example `PUT` body
+        ```
+        {}
+---
+### SupplementalDataEntry
+- List supplementalDataEntry \
+  [http://localhost:8080/psapi/supplementalDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/supplementalDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create supplementalDataEntry \
+  `http://localhost:8080/psapi/supplementalDataEntry`
+    - Example `POST` body
+        ```
+        {}
+- Update supplementalDataEntry \
+  `http://localhost:8080/psapi/supplementalDataEntry`
+    - Example `PUT` body
+        ```
+        {}
+---
+### MoriverDataSummary
+- List moriverDataSummary \
+  [http://localhost:8080/psapi/moriverDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5](http://localhost:8080/psapi/moriverDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5)
 
 ---
 ### SuppDataSummary

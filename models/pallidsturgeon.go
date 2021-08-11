@@ -179,15 +179,47 @@ type UploadSite struct {
 	UploadFilename  string    `db:"upload_filename" json:"uploadFilename"`
 }
 
+type FishDataEntryWithCount struct {
+	Items      []UploadFish `json:"items"`
+	TotalCount int          `json:"totalCount"`
+}
+
+type FishDataEntry struct {
+	Fid         int      `db:"f_id" json:"fid"`
+	Ffid        string   `db:"f_fid" json:"ffid"`
+	Fieldoffice string   `db:"field_office_code" json:"fieldOffice"`
+	Project     *int     `db:"project_code" json:"project"`
+	Segment     *int     `db:"segment_code" json:"segment"`
+	UniqueID    *int     `db:"uniqueidentifier" json:"uniqueID"`
+	Id          *int     `db:"id" json:"id"`
+	Panelhook   string   `db:"panelhook" json:"panelhook"`
+	Bait        string   `db:"bait" json:"bait"`
+	Species     string   `db:"species_code" json:"species"`
+	Length      *float32 `db:"length" json:"length"`
+	Weight      *float32 `db:"weight" json:"weight"`
+	Fishcount   *int     `db:"fish_count" json:"fishcount"`
+	Otolith     string   `db:"otolith" json:"otolith"`
+	Rayspine    string   `db:"rayspine" json:"rayspine"`
+	Scale       string   `db:"scale" json:"scale"`
+	Ftprefix    string   `db:"ft_prefix_code" json:"ftprefix"`
+	Ftnum       string   `db:"ft_number" json:"ftnum"`
+	Ftmr        string   `db:"ft_mr_code" json:"ftmr"`
+	MrID        *int     `db:"mr_id" json:"mrId"`
+}
+
 type UploadFish struct {
+	Id              *int      `db:"id" json:"id"`
 	SiteID          int       `db:"site_id" json:"siteId"`
 	FFid            string    `db:"f_fid" json:"fFid"`
 	MrFid           string    `db:"mr_fid" json:"mrFid"`
+	Fid             int       `db:"f_id" json:"fid"`
+	Ffid            string    `db:"f_fid" json:"ffid"`
+	MrID            *int      `db:"mr_id" json:"mrId"`
 	Panelhook       string    `db:"panelhook" json:"panelhook"`
 	Bait            string    `db:"bait" json:"bait"`
 	Species         string    `db:"species" json:"species"`
-	Length          float32   `db:"length" json:"length"`
-	Weight          float32   `db:"weight" json:"weight"`
+	Length          *float32  `db:"length" json:"length"`
+	Weight          *float32  `db:"weight" json:"weight"`
 	Fishcount       int       `db:"fishcount" json:"fishcount"`
 	FinCurl         string    `db:"fin_curl" json:"finCurl"`
 	Otolith         string    `db:"otolith" json:"otolith"`
@@ -201,6 +233,10 @@ type UploadFish struct {
 	UploadSessionId int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy      string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename  string    `db:"upload_filename" json:"uploadFilename"`
+	Project         *int      `db:"project_code" json:"project"`
+	UniqueID        *int      `db:"uniqueidentifier" json:"uniqueID"`
+	Segment         *int      `db:"segment_code" json:"segment"`
+	Fieldoffice     string    `db:"field_office_code" json:"fieldOffice"`
 }
 
 type UploadSearch struct {
@@ -264,16 +300,24 @@ type UploadProcedure struct {
 	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
 }
 
+type SupplementalDataEntryWithCount struct {
+	Items      []UploadSupplemental `json:"items"`
+	TotalCount int                  `json:"totalCount"`
+}
+
 type UploadSupplemental struct {
+	Id                 *int      `db:"id" json:"id"`
+	Fid                int       `db:"f_id" json:"fid"`
 	SiteID             int       `db:"site_id" json:"siteId"`
 	FFid               string    `db:"f_fid" json:"fFid"`
+	MrId               string    `db:"mr_id" json:"mrId"`
 	MrFid              string    `db:"mr_fid" json:"mrFid"`
 	Tagnumber          string    `db:"tagnumber" json:"tagnumber"`
 	Pitrn              string    `db:"pitrn" json:"pitrn"`
 	Scuteloc           string    `db:"scuteloc" json:"scuteloc"`
-	Scutenum           float64   `db:"scutenum" json:"scutenum"`
+	Scutenum           *float64  `db:"scutenum" json:"scutenum"`
 	Scuteloc2          string    `db:"scuteloc2" json:"scuteloc2"`
-	Scutenum2          float64   `db:"scutenum2" json:"scutenum2"`
+	Scutenum2          *float64  `db:"scutenum2" json:"scutenum2"`
 	Elhv               string    `db:"elhv" json:"elhv"`
 	Elcolor            string    `db:"elcolor" json:"elcolor"`
 	Erhv               string    `db:"erhv" json:"erhv"`
@@ -282,21 +326,21 @@ type UploadSupplemental struct {
 	Dangler            string    `db:"dangler" json:"dangler"`
 	Genetic            string    `db:"genetic" json:"genetic"`
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
-	Broodstock         float64   `db:"broodstock" json:"broodstock"`
-	HatchWild          float64   `db:"hatch_wild" json:"hatchWild"`
-	SpeciesId          int       `db:"species_id" json:"speciesId"`
-	Archive            int       `db:"archive" json:"archive"`
-	Head               float64   `db:"head" json:"head"`
-	Snouttomouth       float64   `db:"snouttomouth" json:"snouttomouth"`
-	Inter              float64   `db:"inter" json:"inter"`
-	Mouthwidth         float64   `db:"mouthwidth" json:"mouthwidth"`
-	MIb                float64   `db:"m_ib" json:"mIb"`
-	LOb                float64   `db:"l_ob" json:"lOb"`
-	LIb                float64   `db:"l_ib" json:"lIb"`
-	RIb                float64   `db:"r_ib" json:"rIb"`
-	ROb                float64   `db:"r_ob" json:"rOb"`
-	Anal               float64   `db:"anal" json:"anal"`
-	Dorsal             float64   `db:"dorsal" json:"dorsal"`
+	Broodstock         *float64  `db:"broodstock" json:"broodstock"`
+	HatchWild          *float64  `db:"hatch_wild" json:"hatchWild"`
+	SpeciesId          *int      `db:"species_id" json:"speciesId"`
+	Archive            *int      `db:"archive" json:"archive"`
+	Head               *float64  `db:"head" json:"head"`
+	Snouttomouth       *float64  `db:"snouttomouth" json:"snouttomouth"`
+	Inter              *float64  `db:"inter" json:"inter"`
+	Mouthwidth         *float64  `db:"mouthwidth" json:"mouthwidth"`
+	MIb                *float64  `db:"m_ib" json:"mIb"`
+	LOb                *float64  `db:"l_ob" json:"lOb"`
+	LIb                *float64  `db:"l_ib" json:"lIb"`
+	RIb                *float64  `db:"r_ib" json:"rIb"`
+	ROb                *float64  `db:"r_ob" json:"rOb"`
+	Anal               *float64  `db:"anal" json:"anal"`
+	Dorsal             *float64  `db:"dorsal" json:"dorsal"`
 	Status             string    `db:"status" json:"status"`
 	HatcheryOrigin     string    `db:"hatchery_origin" json:"hatcheryOrigin"`
 	Sex                string    `db:"sex" json:"sex"`
@@ -312,29 +356,36 @@ type UploadSupplemental struct {
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
 }
 
+type MoriverDataEntryWithCount struct {
+	Items      []UploadMoriver `json:"items"`
+	TotalCount int             `json:"totalCount"`
+}
+
 type UploadMoriver struct {
 	SiteID           int       `db:"site_id" json:"siteId"`
 	SiteFid          string    `db:"site_fid" json:"siteFid"`
+	MrID             int       `db:"mr_id" json:"mrId"`
 	MrFid            string    `db:"mr_fid" json:"mrFid"`
 	Season           string    `db:"season" json:"season"`
 	Setdate          time.Time `db:"setdate" json:"setdate"`
 	Subsample        float64   `db:"subsample" json:"subsample"`
 	Subsamplepass    float64   `db:"subsamplepass" json:"subsamplepass"`
+	SubsampleROrN    string    `db:"subsample_r_or_n" json:"subsampleROrN"`
 	Subsamplen       string    `db:"subsamplen" json:"subsamplen"`
 	Recorder         string    `db:"recorder" json:"recorder"`
 	Gear             string    `db:"gear" json:"gear"`
 	GearType         string    `db:"gear_type" json:"gearType"`
-	Temp             float64   `db:"temp" json:"temp"`
-	Turbidity        float64   `db:"turbidity" json:"turbidity"`
-	Conductivity     float64   `db:"conductivity" json:"conductivity"`
-	Do               float64   `db:"do" json:"do"`
-	Distance         float64   `db:"distance" json:"distance"`
-	Width            float64   `db:"width" json:"width"`
-	Netrivermile     float64   `db:"netrivermile" json:"netrivermile"`
+	Temp             *float64  `db:"temp" json:"temp"`
+	Turbidity        *float64  `db:"turbidity" json:"turbidity"`
+	Conductivity     *float64  `db:"conductivity" json:"conductivity"`
+	Do               *float64  `db:"do" json:"do"`
+	Distance         *float64  `db:"distance" json:"distance"`
+	Width            *float64  `db:"width" json:"width"`
+	Netrivermile     *float64  `db:"netrivermile" json:"netrivermile"`
 	Structurenumber  string    `db:"structurenumber" json:"structurenumber"`
 	Usgs             string    `db:"usgs" json:"usgs"`
-	Riverstage       float64   `db:"riverstage" json:"riverstage"`
-	Discharge        float64   `db:"discharge" json:"discharge"`
+	Riverstage       *float64  `db:"riverstage" json:"riverstage"`
+	Discharge        *float64  `db:"discharge" json:"discharge"`
 	U1               string    `db:"u1" json:"u1"`
 	U2               string    `db:"u2" json:"u2"`
 	U3               string    `db:"u3" json:"u3"`
@@ -353,34 +404,38 @@ type UploadMoriver struct {
 	SetSite2         string    `db:"set_site_2" json:"setSite_2"`
 	SetSite3         string    `db:"set_site_3" json:"setSite_3"`
 	StartTime        string    `db:"starttime" json:"startTime"`
-	StartLatitude    float64   `db:"startlatitude" json:"startLatitude"`
-	StartLongitude   float64   `db:"startlongitude" json:"startLongitude"`
+	StartLatitude    *float64  `db:"startlatitude" json:"startLatitude"`
+	StartLongitude   *float64  `db:"startlongitude" json:"startLongitude"`
 	StopTime         string    `db:"stoptime" json:"stopTime"`
-	StopLatitude     float64   `db:"stoplatitude" json:"stopLatitude"`
-	StopLongitude    float64   `db:"stop_longitude" json:"stopLongitude"`
-	Depth1           float64   `db:"depth1" json:"depth1"`
-	Velocitybot1     float64   `db:"velocitybot1" json:"velocitybot1"`
-	Velocity08_1     float64   `db:"velocity08_1" json:"velocity08_1"`
-	Velocity02or06_1 float64   `db:"velocity02or06_1" json:"velocity02or06_1"`
-	Depth2           float64   `db:"depth2" json:"depth2"`
-	Velocitybot2     float64   `db:"velocitybot2" json:"velocitybot2"`
-	Velocity08_2     float64   `db:"velocity08_2" json:"velocity08_2"`
-	Velocity02or06_2 float64   `db:"velocity02or06_2" json:"velocity02or06_2"`
-	Depth3           float64   `db:"depth3" json:"depth3"`
-	Velocitybot3     float64   `db:"velocitybot3" json:"velocitybot3"`
-	Velocity08_3     float64   `db:"velocity08_3" json:"velocity08_3"`
-	Velocity02or06_3 float64   `db:"velocity02or06_3" json:"velocity02or06_3"`
-	Watervel         float64   `db:"watervel" json:"watervel"`
-	Cobble           float64   `db:"cobble" json:"cobble"`
-	Organic          float64   `db:"organic" json:"organic"`
-	Silt             float64   `db:"silt" json:"silt"`
-	Sand             float64   `db:"sand" json:"sand"`
-	Gravel           float64   `db:"gravel" json:"gravel"`
+	StopLatitude     *float64  `db:"stoplatitude" json:"stopLatitude"`
+	StopLongitude    *float64  `db:"stop_longitude" json:"stopLongitude"`
+	Depth1           *float64  `db:"depth1" json:"depth1"`
+	Velocitybot1     *float64  `db:"velocitybot1" json:"velocitybot1"`
+	Velocity08_1     *float64  `db:"velocity08_1" json:"velocity08_1"`
+	Velocity02or06_1 *float64  `db:"velocity02or06_1" json:"velocity02or06_1"`
+	Depth2           *float64  `db:"depth2" json:"depth2"`
+	Velocitybot2     *float64  `db:"velocitybot2" json:"velocitybot2"`
+	Velocity08_2     *float64  `db:"velocity08_2" json:"velocity08_2"`
+	Velocity02or06_2 *float64  `db:"velocity02or06_2" json:"velocity02or06_2"`
+	Depth3           *float64  `db:"depth3" json:"depth3"`
+	Velocitybot3     *float64  `db:"velocitybot3" json:"velocitybot3"`
+	Velocity08_3     *float64  `db:"velocity08_3" json:"velocity08_3"`
+	Velocity02or06_3 *float64  `db:"velocity02or06_3" json:"velocity02or06_3"`
+	Watervel         *float64  `db:"watervel" json:"watervel"`
+	Cobble           *float64  `db:"cobble" json:"cobble"`
+	Organic          *float64  `db:"organic" json:"organic"`
+	Silt             *float64  `db:"silt" json:"silt"`
+	Sand             *float64  `db:"sand" json:"sand"`
+	Gravel           *float64  `db:"gravel" json:"gravel"`
 	Comments         string    `db:"comments" json:"comments"`
-	Complete         float64   `db:"complete" json:"complete"`
+	Complete         *float64  `db:"complete" json:"complete"`
 	Checkby          string    `db:"checkby" json:"checkby"`
 	NoTurbidity      string    `db:"no_turbidity" json:"noTurbidity"`
 	NoVelocity       string    `db:"no_velocity" json:"noVelocity"`
+	EditInitials     string    `db:"edit_initials" json:"editInitials"`
+	Project          *int      `db:"project_code" json:"project"`
+	FieldOffice      string    `db:"field_office_code" json:"fieldOffice"`
+	Segment          *int      `db:"segment_code" json:"segment"`
 	LastUpdated      time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`

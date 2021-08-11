@@ -8,10 +8,11 @@ import (
 	"github.com/USACE/pallid_sturgeon_api/server/config"
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/godror/godror"
+	"github.com/jmoiron/sqlx"
 )
 
 type PallidSturgeonStore struct {
-	db     *sql.DB
+	db     *sqlx.DB
 	config *config.AppConfig
 }
 
@@ -97,6 +98,583 @@ func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
 	}
 
 	return bends, err
+}
+
+var fishDataEntriesByFidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id fROM ds_fish where f_id = :1`
+
+var fishDataEntriesCountByFidSql = `SELECT count(*) FROM ds_fish where f_id = :1`
+
+var fishDataEntriesByFfidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id FROM ds_fish where f_fid = :1`
+
+var fishDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_fish where f_fid = :1`
+
+func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string, queryParams models.SearchParams) (models.FishDataEntryWithCount, error) {
+	fishDataEntryWithCount := models.FishDataEntryWithCount{}
+	query := ""
+	queryWithCount := ""
+	id := ""
+
+	if tableId != "" {
+		query = fishDataEntriesByFidSql
+		queryWithCount = fishDataEntriesCountByFidSql
+		id = tableId
+	}
+
+	if fieldId != "" {
+		query = fishDataEntriesByFfidSql
+		queryWithCount = fishDataEntriesCountByFfidSql
+		id = fieldId
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
+	if err != nil {
+		return fishDataEntryWithCount, err
+	}
+
+	countrows, err := countQuery.Query(id)
+	if err != nil {
+		return fishDataEntryWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&fishDataEntryWithCount.TotalCount)
+		if err != nil {
+			return fishDataEntryWithCount, err
+		}
+	}
+
+	fishEntries := []models.UploadFish{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "f_id"
+	}
+	fishDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(fishDataEntriesSqlWithSearch)
+	if err != nil {
+		return fishDataEntryWithCount, err
+	}
+
+	rows, err := dbQuery.Query(id)
+	if err != nil {
+		return fishDataEntryWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		fishDataEntry := models.UploadFish{}
+		err = rows.Scan(&fishDataEntry.Fid, &fishDataEntry.Ffid, &fishDataEntry.Fieldoffice, &fishDataEntry.Project, &fishDataEntry.Segment, &fishDataEntry.UniqueID, &fishDataEntry.Id, &fishDataEntry.Panelhook,
+			&fishDataEntry.Bait, &fishDataEntry.Species, &fishDataEntry.Length, &fishDataEntry.Weight, &fishDataEntry.Fishcount, &fishDataEntry.Otolith, &fishDataEntry.Rayspine,
+			&fishDataEntry.Scale, &fishDataEntry.Ftprefix, &fishDataEntry.Ftnum, &fishDataEntry.Ftmr, &fishDataEntry.MrID)
+		if err != nil {
+			return fishDataEntryWithCount, err
+		}
+		fishEntries = append(fishEntries, fishDataEntry)
+	}
+
+	fishDataEntryWithCount.Items = fishEntries
+
+	return fishDataEntryWithCount, err
+}
+
+var insertFishDataSql = `insert into ds_fish(f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) returning id`
+
+func (s *PallidSturgeonStore) SaveFishDataEntry(fishDataEntry models.UploadFish) (int, error) {
+	var f_id int
+	err := s.db.QueryRow(insertFishDataSql, fishDataEntry.Ffid, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
+		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
+		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.MrID).Scan(&f_id)
+	return f_id, err
+}
+
+var updateFishDataSql = `UPDATE ds_fish
+SET   f_fid = $2,
+	  field_office_code = $3,
+	  project_code = $4,
+	  segment_code = $5,
+	  uniqueidentifier = $6,
+	  id = $7,
+	  panelhook = $8,
+	  bait = $9,
+	  species_code = $10,
+	  length = $11,
+	  weight = $12,
+	  fish_count = = $13,
+	  otolith = $14,
+	  rayspine = $15,
+	  scale = = $16,
+	  ft_prefix_code = $7,
+	  ft_number = $18,
+	  ft_mr_code = $19,
+	  mr_id = $20
+WHERE f_id = $1 returning f_id`
+
+func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFish) (int, error) {
+	var f_id int
+	err := s.db.QueryRow(updateFishDataSql, fishDataEntry.Fid, fishDataEntry.Ffid, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
+		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
+		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.MrID).Scan(&f_id)
+	return f_id, err
+}
+
+var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,field_office_code,project_code,segment_code,season_code,set_date, subsample, subsample_pass, 
+	subsample_r_or_n, recorder, gear_code, gear_type_code, temp, turbidity, conductivity, do,
+	distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
+	u1, u2, u3, u4, u5, u6, u7, macro_code, meso_code, habitat_r_or_n, qc,
+	micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
+	start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
+	depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
+	depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
+	depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
+	water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
+	comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
+		$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,
+		$51,$52,$53,$54,$55,$56,$57,$58,$59,$60,$61,$62,$63,$64,$65,$66,$67,$68) returning mr_id`
+
+func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.UploadMoriver) (int, error) {
+	var mr_id int
+	err := s.db.QueryRow(insertMoriverDataSql, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
+		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.Setdate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
+		moriverDataEntry.SubsampleROrN, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
+		moriverDataEntry.Distance, moriverDataEntry.Width, moriverDataEntry.Netrivermile, moriverDataEntry.Structurenumber, moriverDataEntry.Usgs, moriverDataEntry.Riverstage, moriverDataEntry.Discharge,
+		moriverDataEntry.U1, moriverDataEntry.U2, moriverDataEntry.U3, moriverDataEntry.U4, moriverDataEntry.U5, moriverDataEntry.U6, moriverDataEntry.U7, moriverDataEntry.Macro, moriverDataEntry.Meso, moriverDataEntry.Habitatrn, moriverDataEntry.Qc,
+		moriverDataEntry.MicroStructure, moriverDataEntry.StructureFlow, moriverDataEntry.StructureMod, moriverDataEntry.SetSite1, moriverDataEntry.SetSite2, moriverDataEntry.SetSite3,
+		moriverDataEntry.StartTime, moriverDataEntry.StartLatitude, moriverDataEntry.StartLongitude, moriverDataEntry.StopTime, moriverDataEntry.StopLatitude, moriverDataEntry.StopLongitude,
+		moriverDataEntry.Depth1, moriverDataEntry.Velocitybot1, moriverDataEntry.Velocity08_1, moriverDataEntry.Velocity02or06_1,
+		moriverDataEntry.Depth2, moriverDataEntry.Velocitybot2, moriverDataEntry.Velocity08_2, moriverDataEntry.Velocity02or06_2,
+		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
+		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
+		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials).Scan(&mr_id)
+	return mr_id, err
+}
+
+var updateMoriverDataSql = `UPDATE ds_moriver
+SET   mr_fid,site_id = $1,field_office_code = $1,project_code = $2,segment_code = $3,season_code = $4,set_date = $5, subsample = $6, subsample_pass = $7, 
+	subsample_r_or_n = $8, recorder = $9, gear_code = $10, gear_type_code = $11, temp = $12, turbidity = $13, conductivity = $14, do = $15,
+	distance = $16, width = $17, net_river_mile = $18, structure_number = $19, usgs = $20, river_stage = $21, discharge = $22,
+	u1 = $23, u2 = $24, u3 = $25, u4 = $26, u5 = $27, u6 = $28, u7 = $29, macro_code = $30, meso_code = $31, habitat_r_or_n = $32, qc = $33,
+	micro_structure = $34, structure_flow = $35, structure_mod = $36, set_site_1 = $37, set_site_2 = $38, set_site_3 = $39,
+	start_time = $40, start_latitude = $41, start_longitude = $42, stop_time = $43, stop_latitude = $44, stop_longitude = $45, 
+	depth_1 = $46, velocity_bottom_1 = $47, velocity_mid_1 = $48, velocity_top_1 = $49,
+	depth_2 = $50, velocity_bottom_2 = $51, velocity_mid_2 = $52, velocity_top_2 = $53,
+	depth_3 = $54, velocity_bottom_3 = $55, velocity_mid_3 = $56, velocity_top_3 = $57, 
+	water_velocity = $58, cobble_estimation_code = $59, organic_estimation_code = $60, silt = $61, sand = $62, gravel = $63,
+	comments = $64, complete = $65, checkby = $66, turbidity_ind = $67, velocity_ind = $68, edit_initials = $69
+WHERE mr_id = $1 returning mr_id`
+
+func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.UploadMoriver) (int, error) {
+	var mr_id int
+	err := s.db.QueryRow(updateSupplementalDataSql, moriverDataEntry.MrID,
+		moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
+		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.Setdate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
+		moriverDataEntry.SubsampleROrN, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
+		moriverDataEntry.Distance, moriverDataEntry.Width, moriverDataEntry.Netrivermile, moriverDataEntry.Structurenumber, moriverDataEntry.Usgs, moriverDataEntry.Riverstage, moriverDataEntry.Discharge,
+		moriverDataEntry.U1, moriverDataEntry.U2, moriverDataEntry.U3, moriverDataEntry.U4, moriverDataEntry.U5, moriverDataEntry.U6, moriverDataEntry.U7, moriverDataEntry.Macro, moriverDataEntry.Meso, moriverDataEntry.Habitatrn, moriverDataEntry.Qc,
+		moriverDataEntry.MicroStructure, moriverDataEntry.StructureFlow, moriverDataEntry.StructureMod, moriverDataEntry.SetSite1, moriverDataEntry.SetSite2, moriverDataEntry.SetSite3,
+		moriverDataEntry.StartTime, moriverDataEntry.StartLatitude, moriverDataEntry.StartLongitude, moriverDataEntry.StopTime, moriverDataEntry.StopLatitude, moriverDataEntry.StopLongitude,
+		moriverDataEntry.Depth1, moriverDataEntry.Velocitybot1, moriverDataEntry.Velocity08_1, moriverDataEntry.Velocity02or06_1,
+		moriverDataEntry.Depth2, moriverDataEntry.Velocitybot2, moriverDataEntry.Velocity08_2, moriverDataEntry.Velocity02or06_2,
+		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
+		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
+		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials).Scan(&mr_id)
+	return mr_id, err
+}
+
+var moriverDataEntriesByFidSql = `select mr_fid,mr_id,site_id,field_office_code,project_code,segment_code,season_code,set_date, subsample, subsample_pass, 
+									subsample_r_or_n, recorder, gear_code, gear_type_code, temp, turbidity, conductivity, do,
+									distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
+									u1, u2, u3, u4, u5, u6, u7, macro_code, meso_code, habitat_r_or_n, qc,
+									micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
+									start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
+									depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
+									depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
+									depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
+									water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
+									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials from ds_moriver where mr_id = :1`
+
+var moriverDataEntriesCountByFidSql = `SELECT count(*) FROM ds_moriver where mr_id = :1`
+
+var moriverDataEntriesByFfidSql = `select mr_fid,mr_id,site_id,field_office_code,project_code,segment_code,season_code,set_date, subsample, subsample_pass, 
+									subsample_r_or_n, recorder, gear_code, gear_type_code, temp, turbidity, conductivity, do,
+									distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
+									u1, u2, u3, u4, u5, u6, u7, macro_code, meso_code, habitat_r_or_n, qc,
+									micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
+									start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
+									depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
+									depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
+									depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
+									water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
+									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials from ds_moriver where mr_fid = :1`
+
+var moriverDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_moriver where mr_fid = :1`
+
+func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId string, queryParams models.SearchParams) (models.MoriverDataEntryWithCount, error) {
+	moriverDataEntryWithCount := models.MoriverDataEntryWithCount{}
+	query := ""
+	queryWithCount := ""
+	id := ""
+
+	if tableId != "" {
+		query = moriverDataEntriesByFidSql
+		queryWithCount = moriverDataEntriesCountByFidSql
+		id = tableId
+	}
+
+	if fieldId != "" {
+		query = moriverDataEntriesByFfidSql
+		queryWithCount = moriverDataEntriesCountByFfidSql
+		id = fieldId
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
+	if err != nil {
+		return moriverDataEntryWithCount, err
+	}
+
+	countrows, err := countQuery.Query(id)
+	if err != nil {
+		return moriverDataEntryWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&moriverDataEntryWithCount.TotalCount)
+		if err != nil {
+			return moriverDataEntryWithCount, err
+		}
+	}
+
+	moriverEntries := []models.UploadMoriver{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id"
+	}
+	moriverDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(moriverDataEntriesSqlWithSearch)
+	if err != nil {
+		return moriverDataEntryWithCount, err
+	}
+
+	rows, err := dbQuery.Query(id)
+	if err != nil {
+		return moriverDataEntryWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		moriverDataEntry := models.UploadMoriver{}
+		err = rows.Scan(&moriverDataEntry.MrFid, &moriverDataEntry.MrID, &moriverDataEntry.SiteID, &moriverDataEntry.FieldOffice,
+			&moriverDataEntry.Project, &moriverDataEntry.Segment, &moriverDataEntry.Season, &moriverDataEntry.Setdate, &moriverDataEntry.Subsample, &moriverDataEntry.Subsamplepass,
+			&moriverDataEntry.SubsampleROrN, &moriverDataEntry.Recorder, &moriverDataEntry.Gear, &moriverDataEntry.GearType, &moriverDataEntry.Temp, &moriverDataEntry.Turbidity, &moriverDataEntry.Conductivity, &moriverDataEntry.Do,
+			&moriverDataEntry.Distance, &moriverDataEntry.Width, &moriverDataEntry.Netrivermile, &moriverDataEntry.Structurenumber, &moriverDataEntry.Usgs, &moriverDataEntry.Riverstage, &moriverDataEntry.Discharge,
+			&moriverDataEntry.U1, &moriverDataEntry.U2, &moriverDataEntry.U3, &moriverDataEntry.U4, &moriverDataEntry.U5, &moriverDataEntry.U6, &moriverDataEntry.U7, &moriverDataEntry.Macro, &moriverDataEntry.Meso, &moriverDataEntry.Habitatrn, &moriverDataEntry.Qc,
+			&moriverDataEntry.MicroStructure, &moriverDataEntry.StructureFlow, &moriverDataEntry.StructureMod, &moriverDataEntry.SetSite1, &moriverDataEntry.SetSite2, &moriverDataEntry.SetSite3,
+			&moriverDataEntry.StartTime, &moriverDataEntry.StartLatitude, &moriverDataEntry.StartLongitude, &moriverDataEntry.StopTime, &moriverDataEntry.StopLatitude, &moriverDataEntry.StopLongitude,
+			&moriverDataEntry.Depth1, &moriverDataEntry.Velocitybot1, &moriverDataEntry.Velocity08_1, &moriverDataEntry.Velocity02or06_1,
+			&moriverDataEntry.Depth2, &moriverDataEntry.Velocitybot2, &moriverDataEntry.Velocity08_2, &moriverDataEntry.Velocity02or06_2,
+			&moriverDataEntry.Depth3, &moriverDataEntry.Velocitybot3, &moriverDataEntry.Velocity08_3, &moriverDataEntry.Velocity02or06_3,
+			&moriverDataEntry.Watervel, &moriverDataEntry.Cobble, &moriverDataEntry.Organic, &moriverDataEntry.Silt, &moriverDataEntry.Sand, &moriverDataEntry.Gravel,
+			&moriverDataEntry.Comments, &moriverDataEntry.Complete, &moriverDataEntry.Checkby, &moriverDataEntry.NoTurbidity, &moriverDataEntry.NoVelocity, &moriverDataEntry.EditInitials)
+		if err != nil {
+			return moriverDataEntryWithCount, err
+		}
+		moriverEntries = append(moriverEntries, moriverDataEntry)
+	}
+
+	moriverDataEntryWithCount.Items = moriverEntries
+
+	return moriverDataEntryWithCount, err
+}
+
+var insertSupplementalDataSql = `insert into ds_fish(f_fid, mr_id,
+	tag_number, pit_r_n_or_z, 
+	scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
+	el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
+	genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+	head, snouttomouth, inter, mouthwidth, m_ib,
+	l_ob, l_ib, r_ib, 
+	r_ob, anal, dorsal, status, hatchery_origin_code, 
+	sex_code, stage,  recapture, photo,
+	genetic_needs, other_tag_info,
+	comments) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
+		$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40) returning f_id`
+
+func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
+	var f_id int
+	err := s.db.QueryRow(insertSupplementalDataSql, supplementalDataEntry.Fid,
+		supplementalDataEntry.FFid,
+		supplementalDataEntry.MrId,
+		supplementalDataEntry.Tagnumber,
+		supplementalDataEntry.Pitrn,
+		supplementalDataEntry.Scuteloc,
+		supplementalDataEntry.Scutenum,
+		supplementalDataEntry.Scuteloc2,
+		supplementalDataEntry.Scutenum2,
+		supplementalDataEntry.Elhv,
+		supplementalDataEntry.Elcolor,
+		supplementalDataEntry.Erhv,
+		supplementalDataEntry.Ercolor,
+		supplementalDataEntry.Cwtyn,
+		supplementalDataEntry.Dangler,
+		supplementalDataEntry.Genetic,
+		supplementalDataEntry.GeneticsVialNumber,
+		supplementalDataEntry.Broodstock,
+		supplementalDataEntry.HatchWild,
+		supplementalDataEntry.SpeciesId,
+		supplementalDataEntry.Archive,
+		supplementalDataEntry.Head,
+		supplementalDataEntry.Snouttomouth,
+		supplementalDataEntry.Inter,
+		supplementalDataEntry.Mouthwidth,
+		supplementalDataEntry.MIb,
+		supplementalDataEntry.LOb,
+		supplementalDataEntry.LIb,
+		supplementalDataEntry.RIb,
+		supplementalDataEntry.ROb,
+		supplementalDataEntry.Anal,
+		supplementalDataEntry.Dorsal,
+		supplementalDataEntry.Status,
+		supplementalDataEntry.HatcheryOrigin,
+		supplementalDataEntry.Sex,
+		supplementalDataEntry.Stage,
+		supplementalDataEntry.Recapture,
+		supplementalDataEntry.Photo,
+		supplementalDataEntry.GeneticNeeds,
+		supplementalDataEntry.OtherTagInfo,
+		supplementalDataEntry.Comments).Scan(&f_id)
+	return f_id, err
+}
+
+var updateSupplementalDataSql = `UPDATE ds_fish
+SET   f_fid = $2,mr_id = $3,tag_number = $4, pit_r_n_or_z = $5, scute_location_code = $6, 
+		scute_number = $7, scute_location_2_code  = $8, scute_number_2 = $9, el_hvx_code = $10, el_color_code = $11, er_hvx_code = $12, 
+		er_color_code = $13, cwt_y_or_n  = $14, dangler_n = $15, genetic_y_n_or_u = $16, genetics_vial_number = $17,
+		genetic_broodstock_ind = $18, genetic_hatch_wild_ind = $19, genetic_species_id = $20, genetic_archive_ind = $21, 
+		head = $22, snouttomouth = $23, inter = $24, mouthwidth = $25, m_ib = $26, l_ob = $27, l_ib = $28, r_ib = $29, 
+		r_ob = $30, anal = $31, dorsal = $32, status = $33, hatchery_origin_code = $34, ex_code = $35, stage = $36,  recapture = $37, 
+		photo = $38, genetic_needs = $39, other_tag_info = $40, comments = $41
+WHERE f_id = $1 returning f_id`
+
+func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
+	var f_id int
+	err := s.db.QueryRow(updateSupplementalDataSql, supplementalDataEntry.Fid,
+		supplementalDataEntry.FFid,
+		supplementalDataEntry.MrId,
+		supplementalDataEntry.Tagnumber,
+		supplementalDataEntry.Pitrn,
+		supplementalDataEntry.Scuteloc,
+		supplementalDataEntry.Scutenum,
+		supplementalDataEntry.Scuteloc2,
+		supplementalDataEntry.Scutenum2,
+		supplementalDataEntry.Elhv,
+		supplementalDataEntry.Elcolor,
+		supplementalDataEntry.Erhv,
+		supplementalDataEntry.Ercolor,
+		supplementalDataEntry.Cwtyn,
+		supplementalDataEntry.Dangler,
+		supplementalDataEntry.Genetic,
+		supplementalDataEntry.GeneticsVialNumber,
+		supplementalDataEntry.Broodstock,
+		supplementalDataEntry.HatchWild,
+		supplementalDataEntry.SpeciesId,
+		supplementalDataEntry.Archive,
+		supplementalDataEntry.Head,
+		supplementalDataEntry.Snouttomouth,
+		supplementalDataEntry.Inter,
+		supplementalDataEntry.Mouthwidth,
+		supplementalDataEntry.MIb,
+		supplementalDataEntry.LOb,
+		supplementalDataEntry.LIb,
+		supplementalDataEntry.RIb,
+		supplementalDataEntry.ROb,
+		supplementalDataEntry.Anal,
+		supplementalDataEntry.Dorsal,
+		supplementalDataEntry.Status,
+		supplementalDataEntry.HatcheryOrigin,
+		supplementalDataEntry.Sex,
+		supplementalDataEntry.Stage,
+		supplementalDataEntry.Recapture,
+		supplementalDataEntry.Photo,
+		supplementalDataEntry.GeneticNeeds,
+		supplementalDataEntry.OtherTagInfo,
+		supplementalDataEntry.Comments).Scan(&f_id)
+	return f_id, err
+}
+
+var supplementalDataEntriesByFidSql = `select f_id, f_fid, mr_id,
+										tag_number, pit_r_n_or_z, 
+										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
+										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
+										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										head, snouttomouth, inter, mouthwidth, m_ib,
+										l_ob, l_ib, r_ib, 
+										r_ob, anal, dorsal, status, hatchery_origin_code, 
+										sex_code, stage,  recapture, photo,
+										genetic_needs, other_tag_info,
+										comments from ds_supplemental where f_id = :1`
+
+var supplementalDataEntriesCountByFidSql = `SELECT count(*) FROM ds_supplemental where f_id = :1`
+
+var supplementalDataEntriesByFfidSql = `select f_id, f_fid, mr_id,
+										tag_number, pit_r_n_or_z, 
+										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
+										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
+										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										head, snouttomouth, inter, mouthwidth, m_ib,
+										l_ob, l_ib, r_ib, 
+										r_ob, anal, dorsal, status, hatchery_origin_code, 
+										sex_code, stage,  recapture, photo,
+										genetic_needs, other_tag_info,
+										comments from ds_supplemental where f_fid = :1`
+
+var supplementalDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_supplemental where f_fid = :1`
+
+var supplementalDataEntriesByGeneticsVialSql = `select f_id, f_fid, mr_id,
+										tag_number, pit_r_n_or_z, 
+										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
+										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
+										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										head, snouttomouth, inter, mouthwidth, m_ib,
+										l_ob, l_ib, r_ib, 
+										r_ob, anal, dorsal, status, hatchery_origin_code, 
+										sex_code, stage,  recapture, photo,
+										genetic_needs, other_tag_info,
+										comments from ds_supplemental where genetics_vial_number = :1`
+
+var supplementalDataEntriesCountByGeneticsVialSql = `SELECT count(*) FROM ds_supplemental where genetics_vial_number = :1`
+
+var supplementalDataEntriesByGeneticsPitTagSql = `select f_id, f_fid, mr_id,
+										tag_number, pit_r_n_or_z, 
+										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
+										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
+										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										head, snouttomouth, inter, mouthwidth, m_ib,
+										l_ob, l_ib, r_ib, 
+										r_ob, anal, dorsal, status, hatchery_origin_code, 
+										sex_code, stage,  recapture, photo,
+										genetic_needs, other_tag_info,
+										comments from ds_supplemental where tag_number = :1`
+
+var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) FROM ds_supplemental where tag_number = :1`
+
+func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId string, geneticsVial string, pitTag string, queryParams models.SearchParams) (models.SupplementalDataEntryWithCount, error) {
+	supplementalDataEntryWithCount := models.SupplementalDataEntryWithCount{}
+	query := ""
+	queryWithCount := ""
+	id := ""
+
+	if tableId != "" {
+		query = supplementalDataEntriesByFidSql
+		queryWithCount = supplementalDataEntriesCountByFidSql
+		id = tableId
+	}
+
+	if fieldId != "" {
+		query = moriverDataEntriesByFfidSql
+		queryWithCount = moriverDataEntriesCountByFfidSql
+		id = fieldId
+	}
+
+	if geneticsVial != "" {
+		query = supplementalDataEntriesByGeneticsVialSql
+		queryWithCount = supplementalDataEntriesCountByGeneticsVialSql
+		id = geneticsVial
+	}
+
+	if pitTag != "" {
+		query = supplementalDataEntriesByGeneticsPitTagSql
+		queryWithCount = supplementalDataEntriesCountByPitTagSql
+		id = pitTag
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
+	if err != nil {
+		return supplementalDataEntryWithCount, err
+	}
+
+	countrows, err := countQuery.Query(id)
+	if err != nil {
+		return supplementalDataEntryWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&supplementalDataEntryWithCount.TotalCount)
+		if err != nil {
+			return supplementalDataEntryWithCount, err
+		}
+	}
+
+	supplementalEntries := []models.UploadSupplemental{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id"
+	}
+	supplementalDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(supplementalDataEntriesSqlWithSearch)
+	if err != nil {
+		return supplementalDataEntryWithCount, err
+	}
+
+	rows, err := dbQuery.Query(id)
+	if err != nil {
+		return supplementalDataEntryWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		supplementalDataEntry := models.UploadSupplemental{}
+		err = rows.Scan(
+			&supplementalDataEntry.Fid,
+			&supplementalDataEntry.FFid,
+			&supplementalDataEntry.MrId,
+			&supplementalDataEntry.Tagnumber,
+			&supplementalDataEntry.Pitrn,
+			&supplementalDataEntry.Scuteloc,
+			&supplementalDataEntry.Scutenum,
+			&supplementalDataEntry.Scuteloc2,
+			&supplementalDataEntry.Scutenum2,
+			&supplementalDataEntry.Elhv,
+			&supplementalDataEntry.Elcolor,
+			&supplementalDataEntry.Erhv,
+			&supplementalDataEntry.Ercolor,
+			&supplementalDataEntry.Cwtyn,
+			&supplementalDataEntry.Dangler,
+			&supplementalDataEntry.Genetic,
+			&supplementalDataEntry.GeneticsVialNumber,
+			&supplementalDataEntry.Broodstock,
+			&supplementalDataEntry.HatchWild,
+			&supplementalDataEntry.SpeciesId,
+			&supplementalDataEntry.Archive,
+			&supplementalDataEntry.Head,
+			&supplementalDataEntry.Snouttomouth,
+			&supplementalDataEntry.Inter,
+			&supplementalDataEntry.Mouthwidth,
+			&supplementalDataEntry.MIb,
+			&supplementalDataEntry.LOb,
+			&supplementalDataEntry.LIb,
+			&supplementalDataEntry.RIb,
+			&supplementalDataEntry.ROb,
+			&supplementalDataEntry.Anal,
+			&supplementalDataEntry.Dorsal,
+			&supplementalDataEntry.Status,
+			&supplementalDataEntry.HatcheryOrigin,
+			&supplementalDataEntry.Sex,
+			&supplementalDataEntry.Stage,
+			&supplementalDataEntry.Recapture,
+			&supplementalDataEntry.Photo,
+			&supplementalDataEntry.GeneticNeeds,
+			&supplementalDataEntry.OtherTagInfo,
+			&supplementalDataEntry.Comments)
+		if err != nil {
+			return supplementalDataEntryWithCount, err
+		}
+		supplementalEntries = append(supplementalEntries, supplementalDataEntry)
+	}
+
+	supplementalDataEntryWithCount.Items = supplementalEntries
+
+	return supplementalDataEntryWithCount, err
 }
 
 var fishDataSummarySql = `SELECT mr_id, f_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, panelhook, species_code, hatchery_origin_code, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
