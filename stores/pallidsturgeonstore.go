@@ -943,7 +943,6 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchPara
 	if err != nil {
 		return searchSummariesWithCount, err
 	}
-	defer rows.Close()
 
 	for rows.Next() {
 		summary := models.SearchSummary{}
@@ -956,6 +955,7 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchPara
 		searchSummaries = append(searchSummaries, summary)
 	}
 
+	defer rows.Close()
 	searchSummariesWithCount.Items = searchSummaries
 
 	return searchSummariesWithCount, err
