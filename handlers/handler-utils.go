@@ -38,6 +38,12 @@ func marshalQuery(c echo.Context) (models.SearchParams, error) {
 		orderby = ordebyString
 	}
 
+	filterString := c.QueryParam("filter")
+
+	if filterString != "" && filterString != "undefined" {
+		filter = filterString
+	}
+
 	return models.SearchParams{
 		Page:     page,
 		PageSize: size,

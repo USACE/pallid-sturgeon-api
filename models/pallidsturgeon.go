@@ -210,7 +210,6 @@ type FishDataEntry struct {
 type UploadFish struct {
 	Id              *int      `db:"id" json:"id"`
 	SiteID          int       `db:"site_id" json:"siteId"`
-	FFid            string    `db:"f_fid" json:"fFid"`
 	MrFid           string    `db:"mr_fid" json:"mrFid"`
 	Fid             int       `db:"f_id" json:"fid"`
 	Ffid            string    `db:"f_fid" json:"ffid"`
@@ -307,6 +306,7 @@ type SupplementalDataEntryWithCount struct {
 
 type UploadSupplemental struct {
 	Id                 *int      `db:"id" json:"id"`
+	Sid                int       `db:"s_id" json:"sid"`
 	Fid                int       `db:"f_id" json:"fid"`
 	SiteID             int       `db:"site_id" json:"siteId"`
 	FFid               string    `db:"f_fid" json:"fFid"`

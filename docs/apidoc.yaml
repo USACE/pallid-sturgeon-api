@@ -826,6 +826,12 @@ paths:
           description: The size
           schema:
             type: integer
+        - name: filter
+          in: query
+          required: false
+          description: The filter
+          schema:
+            type: string
       responses:
         '200':
           description: Array of SearchSummaries
