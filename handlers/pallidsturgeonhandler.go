@@ -26,6 +26,22 @@ func (sd *PallidSturgeonHandler) GetProjects(c echo.Context) error {
 	return c.JSON(http.StatusOK, projects)
 }
 
+func (sd *PallidSturgeonHandler) GetRoles(c echo.Context) error {
+	roles, err := sd.Store.GetRoles()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, roles)
+}
+
+func (sd *PallidSturgeonHandler) GetFieldOffices(c echo.Context) error {
+	fieldOffices, err := sd.Store.GetFieldOffices()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, fieldOffices)
+}
+
 func (sd *PallidSturgeonHandler) GetSeasons(c echo.Context) error {
 	seasons, err := sd.Store.GetSeasons()
 	if err != nil {

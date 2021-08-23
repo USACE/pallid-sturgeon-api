@@ -18,8 +18,10 @@ import (
 
 const (
 	PUBLIC = iota
-	PM
-	TM
+	ADMIN
+	OFFICEADMIN
+	OFFICEUSER
+	READONLY
 )
 
 type Auth struct {
@@ -31,7 +33,7 @@ var verifyKeys []*rsa.PublicKey
 
 /*
 Authorize Options:
-1) Public - All CAC Users
+1) Public - All KEYCLOAK Users
 2) PM - Project Manager
 3) TM - Team Member
 */
@@ -50,19 +52,29 @@ func (a *Auth) Authorize(handler echo.HandlerFunc, roles ...int) echo.HandlerFun
 		if err != nil {
 			return err
 		}
+		role, err := a.Store.GetUserRoleOffice(user.Email)
+		if err != nil {
+			return err
+		}
 		c.Set("SDUSER", user)
 		switch {
-		case contains(roles, TM):
-			for _, role := range claims.Roles {
-				if role == "PM" || role == "TM" {
-					return handler(c)
-				}
+		case contains(roles, PUBLIC):
+			return handler(c)
+		case contains(roles, ADMIN):
+			if role.Role == "ADMINISTRATOR" {
+				return handler(c)
 			}
-		case contains(roles, PM):
-			for _, role := range claims.Roles {
-				if role == "PM" {
-					return handler(c)
-				}
+		case contains(roles, OFFICEADMIN):
+			if role.Role == "OFFICE ADMIN" {
+				return handler(c)
+			}
+		case contains(roles, OFFICEUSER):
+			if role.Role == "OFFICE USER" {
+				return handler(c)
+			}
+		case contains(roles, READONLY):
+			if role.Role == "READONLY" {
+				return handler(c)
 			}
 		}
 		return echo.NewHTTPError(http.StatusUnauthorized, "")
@@ -100,10 +112,11 @@ func (a *Auth) marshalJwt(tokenString string) (models.JwtClaim, error) {
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		jwtUser := models.JwtClaim{
-			Sub:   claims["sub"].(string),
-			Name:  claims["name"].(string),
-			Email: claims["email"].(string),
-			Roles: claims["roles"].([]interface{}),
+			//CacUid:    claims["cacUID"].(string),
+			Name:      claims["name"].(string),
+			Email:     claims["email"].(string),
+			FirstName: claims["given_name"].(string),
+			LastName:  claims["family_name"].(string),
 		}
 		return jwtUser, nil
 	} else {
@@ -146,10 +159,12 @@ func marshalJwts(tokenString string) (models.JwtClaim, error) {
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		jwtUser := models.JwtClaim{
-			Sub:   claims["sub"].(string),
-			Name:  claims["name"].(string),
-			Email: claims["email"].(string),
-			Roles: claims["roles"].([]interface{}),
+			CacUid:    claims["sub"].(string),
+			Name:      claims["name"].(string),
+			Email:     claims["email"].(string),
+			Roles:     claims["roles"].([]interface{}),
+			FirstName: claims["given_name"].(string),
+			LastName:  claims["family_name"].(string),
 		}
 		return jwtUser, nil
 	} else {
