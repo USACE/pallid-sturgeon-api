@@ -734,7 +734,7 @@ func (s *PallidSturgeonStore) GetFishDataSummary(year string, officeCode string,
 	return fishSummariesWithCount, err
 }
 
-var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, year, sid_display, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, hatchery_origin_code, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, hatchery_origin_code, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var suppDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
