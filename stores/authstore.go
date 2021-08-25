@@ -80,6 +80,7 @@ func (auth *AuthStore) GetUserFromJwt(jwtClaims models.JwtClaim) (models.User, e
 		}
 		count += 1
 	}
+
 	if count == 0 {
 		user = models.User{
 			UserName:  jwtClaims.Email,

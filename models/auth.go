@@ -1,7 +1,7 @@
 package models
 
 type JwtClaim struct {
-	CacUid    string
+	CacUid    *string
 	Name      string
 	Email     string
 	FirstName string
@@ -26,16 +26,16 @@ type SearchParams struct {
 // }
 
 type User struct {
-	ID         int    `db:"id" json:"id"`
-	UserName   string `db:"user_name" json:"userName"`
-	FirstName  string `db:"first_name" json:"firstName"`
-	LastName   string `db:"last_name" json:"lastName"`
-	Email      string `db:"email" json:"email"`
-	CacUid     string `db:"edipi" json:"cacUid"`
-	RoleID     int    `db:"role_id" json:"roleId"`
-	OfficeID   int    `db:"office_id" json:"officeId"`
-	Role       string `db:"description" json:"role"`
-	OfficeCode string `db:"code" json:"officeCode"`
+	ID         int     `db:"id" json:"id"`
+	UserName   string  `db:"user_name" json:"userName"`
+	FirstName  string  `db:"first_name" json:"firstName"`
+	LastName   string  `db:"last_name" json:"lastName"`
+	Email      string  `db:"email" json:"email"`
+	CacUid     *string `db:"edipi" json:"cacUid"`
+	RoleID     int     `db:"role_id" json:"roleId"`
+	OfficeID   int     `db:"office_id" json:"officeId"`
+	Role       string  `db:"description" json:"role"`
+	OfficeCode string  `db:"code" json:"officeCode"`
 }
 
 type UserRoleOffice struct {

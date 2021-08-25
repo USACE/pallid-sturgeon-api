@@ -159,7 +159,7 @@ func marshalJwts(tokenString string) (models.JwtClaim, error) {
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		jwtUser := models.JwtClaim{
-			CacUid:    claims["sub"].(string),
+			CacUid:    claims["sub"].(*string),
 			Name:      claims["name"].(string),
 			Email:     claims["email"].(string),
 			Roles:     claims["roles"].([]interface{}),
