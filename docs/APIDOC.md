@@ -6,6 +6,7 @@ Table of Contents
     - [seasons](#seasons)
     - [segments](#segments)
     - [bends](#bends)
+    - [siteDataEntry](#siteDataEntry)
     - [fishDataEntry](#fishDataEntry)
     - [moriverDataEntry](#moriverDataEntry)
     - [supplementalDataEntry](#supplementalDataEntry)
@@ -36,6 +37,43 @@ Table of Contents
   [http://localhost:8080/psapi/bends](http://localhost:8080/psapi/bends)
 
 ---
+### SiteDataEntry
+- List siteDataEntry \
+  [http://localhost:8080/psapi/siteDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create siteDataEntry \
+  `http://localhost:8080/psapi/siteDataEntry`
+    - Example `POST` body
+        ```
+      {
+        "siteFid": "F-1",
+        "siteYear": 2013,
+        "fieldOffice": "SD",
+        "project": "1",
+        "segment": "7",
+        "season": "ST",
+        "sampleUnitTypeCode": "B",
+        "bendrn": "R",
+        "editInitials": "DG",
+        "comments": "changed year"
+      }
+- Update siteDataEntry \
+  `http://localhost:8080/psapi/siteDataEntry`
+    - Example `PUT` body
+        ```
+      {
+        "siteId": 10122,
+        "siteFid": "F-1",
+        "siteYear": 2013,
+        "fieldOffice": "SD",
+        "project": "1",
+        "segment": "7",
+        "season": "ST",
+        "sampleUnitTypeCode": "B",
+        "bendrn": "R",
+        "editInitials": "DG",
+        "comments": "changed year2"
+      }
+---
 ### FishDataEntry
 - List fishDataEntry \
   [http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
@@ -64,7 +102,8 @@ Table of Contents
           "scale": "",
           "ftprefix": "",
           "ftnum": "",
-          "ftmr": ""
+          "ftmr": "",
+          "editInitials": "DG"
         }
 - Update fishDataEntry \
   `http://localhost:8080/psapi/fishDataEntry`
@@ -92,7 +131,8 @@ Table of Contents
           "scale": "",
           "ftprefix": "",
           "ftnum": "",
-          "ftmr": ""
+          "ftmr": "",
+          "editInitials": "DG"
         }
 ---
 ### MoriverDataEntry
@@ -173,7 +213,7 @@ Table of Contents
 				  "checkby": "",
 				  "noTurbidity": "",
 				  "noVelocity": "",
-				  "editInitials": ""
+				  "editInitials": "DG"
 				}
 - Update moriverDataEntry \
   `http://localhost:8080/psapi/moriverDataEntry`
@@ -251,7 +291,7 @@ Table of Contents
 				  "checkby": "",
 				  "noTurbidity": "",
 				  "noVelocity": "",
-				  "editInitials": ""
+				  "editInitials": "DG"
 				}
 ---
 ### SupplementalDataEntry
@@ -302,7 +342,8 @@ Table of Contents
           "photo": "",
           "geneticNeeds": "",
           "otherTagInfo": "",
-          "comments": "-\r\n"
+          "comments": "-\r\n",
+          "editInitials": "DG"
         }
 - Update supplementalDataEntry \
   `http://localhost:8080/psapi/supplementalDataEntry`
@@ -350,7 +391,8 @@ Table of Contents
           "photo": "",
           "geneticNeeds": "",
           "otherTagInfo": "",
-          "comments": "-\r\n"
+          "comments": "-\r\n",
+          "editInitials": "DG"
         }
 ---
 ### MoriverDataSummary
