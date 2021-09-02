@@ -443,7 +443,8 @@ Table of Contents
               "bendrn": "N",
               "bendRiverMile": 4.8,
               "comments": "test",
-              "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv"
+              "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv",
+              "editInitials": "DG"
             }
           ],
           "fishUpload": [
@@ -465,7 +466,8 @@ Table of Contents
               "ftmr": "L",
               "ftprefix": "BC",
               "comments": "test",
-              "uploadFilename": "fish_datasheet_20210617_1900_59.csv"
+              "uploadFilename": "fish_datasheet_20210617_1900_59.csv",
+              "editInitials": "DG"
             }
           ],
           "searchUpload":[
@@ -486,7 +488,8 @@ Table of Contents
               "stopLongitude": -88,
               "temp": 30,
               "conductivity": 22,
-              "uploadFilename": "search_effort_20210617_1900_59.csv"
+              "uploadFilename": "search_effort_20210617_1900_59.csv",
+              "editInitials": "DG"
             }
           ],
           "telemetryUpload": [
@@ -510,7 +513,8 @@ Table of Contents
                 "sand": 1,
                 "gravel": 1,
                 "comments": "comments",
-                "uploadFilename": "telemetry_20210617_1900_59.csv"
+                "uploadFilename": "telemetry_20210617_1900_59.csv",
+                "editInitials": "DG"
               }
           ],
           "procedureUpload": [
@@ -545,7 +549,8 @@ Table of Contents
                 "expectedSpawnYear": 1,
                 "ltrasoundGonadLength": 1,
                 "gonadCondition": "1",
-                "uploadFilename": "procedure_20210617_1900_59.csv"
+                "uploadFilename": "procedure_20210617_1900_59.csv",
+                "editInitials": "DG"
               }
           ],
           "supplementalUpload": [
@@ -591,7 +596,8 @@ Table of Contents
                 "geneticNeeds": "geneticNeeds",
                 "otherTagInfo": "otherTagInfo",
                 "comments": "comments",
-                "uploadFilename": "supplemental_20210617_1900_59.csv"
+                "uploadFilename": "supplemental_20210617_1900_59.csv",
+                "editInitials": "DG"
               }
           ],
           "moriverUpload": [
@@ -664,7 +670,8 @@ Table of Contents
                 "checkby": "che",
                 "noTurbidity": "n",
                 "noVelocity": "n",
-                "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv"
+                "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv",
+               "editInitials": "DG"
               }
           ]
         }
