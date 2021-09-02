@@ -101,11 +101,123 @@ func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
 	return bends, err
 }
 
-var fishDataEntriesByFidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id fROM ds_fish where f_id = :1`
+var siteDataEntriesSql = `SELECT site_id, site_fid, year, field_office_code, project_code,
+segment_code, season_code, sample_unit_type_code, bend_r_or_n, comments, edit_initials, uploaded_by fROM ds_site where year = :1`
+
+var siteDataEntriesCountSql = `SELECT count(*) FROM ds_site where year = :1`
+
+func (s *PallidSturgeonStore) GetSiteDataEntries(year string, projectCode string, segmentCode string, seasonCode string, bendrn string, queryParams models.SearchParams) (models.SiteDataEntryWithCount, error) {
+	siteDataEntryWithCount := models.SiteDataEntryWithCount{}
+	query := siteDataEntriesSql
+	queryWithCount := siteDataEntriesCountSql
+
+	if projectCode != "" {
+		query = query + fmt.Sprintf(" and project_code = '%s' ", projectCode)
+		queryWithCount = queryWithCount + fmt.Sprintf(" and project_code = '%s' ", projectCode)
+	}
+
+	if segmentCode != "" {
+		query = query + fmt.Sprintf(" and segment_code = '%s' ", segmentCode)
+		queryWithCount = queryWithCount + fmt.Sprintf(" and segment_code = '%s' ", segmentCode)
+	}
+
+	if seasonCode != "" {
+		query = query + fmt.Sprintf(" and season_code = '%s' ", seasonCode)
+		queryWithCount = queryWithCount + fmt.Sprintf(" and season_code = '%s' ", seasonCode)
+	}
+
+	if bendrn != "" {
+		query = query + fmt.Sprintf(" and bend_r_or_n = '%s' ", bendrn)
+		queryWithCount = queryWithCount + fmt.Sprintf(" and bend_r_or_n = '%s' ", bendrn)
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
+	if err != nil {
+		return siteDataEntryWithCount, err
+	}
+
+	countrows, err := countQuery.Query(year)
+	if err != nil {
+		return siteDataEntryWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&siteDataEntryWithCount.TotalCount)
+		if err != nil {
+			return siteDataEntryWithCount, err
+		}
+	}
+
+	siteEntries := []models.UploadSite{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "site_id"
+	}
+	fishDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(fishDataEntriesSqlWithSearch)
+	if err != nil {
+		return siteDataEntryWithCount, err
+	}
+
+	rows, err := dbQuery.Query(year)
+	if err != nil {
+		return siteDataEntryWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		siteDataEntry := models.UploadSite{}
+		err = rows.Scan(&siteDataEntry.SiteID, &siteDataEntry.SiteFID, &siteDataEntry.SiteYear, &siteDataEntry.FieldOffice, &siteDataEntry.Project,
+			&siteDataEntry.Segment, &siteDataEntry.Season, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.Bendrn, &siteDataEntry.Comments, &siteDataEntry.EditInitials, &siteDataEntry.UploadedBy)
+		if err != nil {
+			return siteDataEntryWithCount, err
+		}
+		siteEntries = append(siteEntries, siteDataEntry)
+	}
+
+	siteDataEntryWithCount.Items = siteEntries
+
+	return siteDataEntryWithCount, err
+}
+
+var insertSiteDataSql = `insert into ds_site (site_fid, year, field_office_code, project_code,
+	segment_code, season_code, sample_unit_type_code, bend_r_or_n, comments, edit_initials, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12) returning site_id into :13`
+
+func (s *PallidSturgeonStore) SaveSiteDataEntry(sitehDataEntry models.UploadSite) (int, error) {
+	var id int
+	_, err := s.db.Exec(insertSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
+		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.Comments, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
+
+	return id, err
+}
+
+var updateSiteDataSql = `UPDATE ds_site
+SET   site_fid = :2,
+	  year = :3,
+	  field_office_code = :4,
+	  project_code = :5,
+	  segment_code = :6,
+	  season_code = :7,
+	  sample_unit_type_code = :8,
+	  bend_r_or_n = :9,
+	  comments = :10,
+	  edit_initials = :11,
+	  last_updated = :12, 
+	  uploaded_by = :13
+WHERE site_id = :1`
+
+func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.UploadSite) error {
+	_, err := s.db.Exec(updateSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
+		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.Comments, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.SiteID)
+	return err
+}
+
+var fishDataEntriesByFidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by fROM ds_fish where f_id = :1`
 
 var fishDataEntriesCountByFidSql = `SELECT count(*) FROM ds_fish where f_id = :1`
 
-var fishDataEntriesByFfidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id FROM ds_fish where f_fid = :1`
+var fishDataEntriesByFfidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by FROM ds_fish where f_fid = :1`
 
 var fishDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_fish where f_fid = :1`
 
@@ -166,7 +278,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 		fishDataEntry := models.UploadFish{}
 		err = rows.Scan(&fishDataEntry.Fid, &fishDataEntry.Ffid, &fishDataEntry.Fieldoffice, &fishDataEntry.Project, &fishDataEntry.Segment, &fishDataEntry.UniqueID, &fishDataEntry.Id, &fishDataEntry.Panelhook,
 			&fishDataEntry.Bait, &fishDataEntry.Species, &fishDataEntry.Length, &fishDataEntry.Weight, &fishDataEntry.Fishcount, &fishDataEntry.Otolith, &fishDataEntry.Rayspine,
-			&fishDataEntry.Scale, &fishDataEntry.Ftprefix, &fishDataEntry.Ftnum, &fishDataEntry.Ftmr, &fishDataEntry.MrID)
+			&fishDataEntry.Scale, &fishDataEntry.Ftprefix, &fishDataEntry.Ftnum, &fishDataEntry.Ftmr, &fishDataEntry.MrID, &fishDataEntry.EditInitials, &fishDataEntry.LastEditComment, &fishDataEntry.UploadedBy)
 		if err != nil {
 			return fishDataEntryWithCount, err
 		}
@@ -178,13 +290,13 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	return fishDataEntryWithCount, err
 }
 
-var insertFishDataSql = `insert into ds_fish (f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19) returning f_id into :20`
+var insertFishDataSql = `insert into ds_fish (f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23) returning f_id into :24`
 
 func (s *PallidSturgeonStore) SaveFishDataEntry(fishDataEntry models.UploadFish) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertFishDataSql, fishDataEntry.Ffid, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
-		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.MrID, sql.Out{Dest: &id})
+		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.MrID, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy, sql.Out{Dest: &id})
 
 	return id, err
 }
@@ -207,13 +319,17 @@ SET   f_fid = :2,
 	  scale = :16,
 	  ft_prefix_code = :17,
 	  ft_number = :18,
-	  ft_mr_code = :19
+	  ft_mr_code = :19,
+	  edit_initials = :20,
+	  last_edit_comment = :21,
+	  last_updated = :22, 
+	  uploaded_by = :23
 WHERE f_id = :1`
 
 func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFish) error {
 	_, err := s.db.Exec(updateFishDataSql, fishDataEntry.Ffid, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
-		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.Fid)
+		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy, fishDataEntry.Fid)
 	return err
 }
 
@@ -227,9 +343,9 @@ var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,field_office_c
 	depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
 	depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
 	water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
-	comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
+	comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
 		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49,:50,
-		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71) returning mr_id into :72`
+		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71,:72,:73,:74) returning mr_id into :75`
 
 func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.UploadMoriver) (int, error) {
 	var id int
@@ -244,7 +360,7 @@ func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.Uploa
 		moriverDataEntry.Depth2, moriverDataEntry.Velocitybot2, moriverDataEntry.Velocity08_2, moriverDataEntry.Velocity02or06_2,
 		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
 		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
-		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, sql.Out{Dest: &id})
+		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, sql.Out{Dest: &id})
 	return id, err
 }
 
@@ -259,7 +375,10 @@ SET  project_code = :2,segment_code = :3,season_code = :4,set_date = :5, subsamp
 	depth_2 = :50, velocity_bottom_2 = :51, velocity_mid_2 = :52, velocity_top_2 = :53,
 	depth_3 = :54, velocity_bottom_3 = :55, velocity_mid_3 = :56, velocity_top_3 = :57, 
 	water_velocity = :58, cobble_estimation_code = :59, organic_estimation_code = :60, silt = :61, sand = :62, gravel = :63,
-	comments = :64, complete = :65, checkby = :66, turbidity_ind = :67, velocity_ind = :68, edit_initials = :69,  mr_fid= :70, site_id = :71, field_office_code = :72
+	comments = :64, complete = :65, checkby = :66, turbidity_ind = :67, velocity_ind = :68, edit_initials = :69,  mr_fid= :70, site_id = :71, field_office_code = :72,
+	last_edit_comment = :73,
+	last_updated = :74, 
+	uploaded_by = :75
 WHERE mr_id = :1`
 
 func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.UploadMoriver) error {
@@ -274,7 +393,7 @@ func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.Upl
 		moriverDataEntry.Depth2, moriverDataEntry.Velocitybot2, moriverDataEntry.Velocity08_2, moriverDataEntry.Velocity02or06_2,
 		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
 		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
-		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice, moriverDataEntry.MrID)
+		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice, moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, moriverDataEntry.MrID)
 	return err
 }
 
@@ -288,7 +407,7 @@ var moriverDataEntriesByFidSql = `select mr_fid,mr_id,site_id,field_office_code,
 									depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
 									depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
 									water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
-									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials from ds_moriver where mr_id = :1`
+									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, uploaded_by from ds_moriver where mr_id = :1`
 
 var moriverDataEntriesCountByFidSql = `SELECT count(*) FROM ds_moriver where mr_id = :1`
 
@@ -302,7 +421,7 @@ var moriverDataEntriesByFfidSql = `select mr_fid,mr_id,site_id,field_office_code
 									depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
 									depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
 									water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
-									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials from ds_moriver where mr_fid = :1`
+									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, uploaded_by from ds_moriver where mr_fid = :1`
 
 var moriverDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_moriver where mr_fid = :1`
 
@@ -372,7 +491,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 			&moriverDataEntry.Depth2, &moriverDataEntry.Velocitybot2, &moriverDataEntry.Velocity08_2, &moriverDataEntry.Velocity02or06_2,
 			&moriverDataEntry.Depth3, &moriverDataEntry.Velocitybot3, &moriverDataEntry.Velocity08_3, &moriverDataEntry.Velocity02or06_3,
 			&moriverDataEntry.Watervel, &moriverDataEntry.Cobble, &moriverDataEntry.Organic, &moriverDataEntry.Silt, &moriverDataEntry.Sand, &moriverDataEntry.Gravel,
-			&moriverDataEntry.Comments, &moriverDataEntry.Complete, &moriverDataEntry.Checkby, &moriverDataEntry.NoTurbidity, &moriverDataEntry.NoVelocity, &moriverDataEntry.EditInitials)
+			&moriverDataEntry.Comments, &moriverDataEntry.Complete, &moriverDataEntry.Checkby, &moriverDataEntry.NoTurbidity, &moriverDataEntry.NoVelocity, &moriverDataEntry.EditInitials, &moriverDataEntry.LastEditComment, &moriverDataEntry.UploadedBy)
 		if err != nil {
 			return moriverDataEntryWithCount, err
 		}
@@ -394,8 +513,8 @@ var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,
 	r_ob, anal, dorsal, status, hatchery_origin_code, 
 	sex_code, stage,  recapture, photo,
 	genetic_needs, other_tag_info,
-	comments) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41) returning s_id into :42`
+	comments,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45) returning s_id into :46`
 
 func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
 	var id int
@@ -440,7 +559,12 @@ func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry mo
 		supplementalDataEntry.Photo,
 		supplementalDataEntry.GeneticNeeds,
 		supplementalDataEntry.OtherTagInfo,
-		supplementalDataEntry.Comments, sql.Out{Dest: &id})
+		supplementalDataEntry.Comments,
+		supplementalDataEntry.EditInitials,
+		supplementalDataEntry.LastEditComment,
+		supplementalDataEntry.LastUpdated,
+		supplementalDataEntry.UploadedBy,
+		sql.Out{Dest: &id})
 	return id, err
 }
 
@@ -451,7 +575,11 @@ SET   f_fid = :2,mr_id = :3,tag_number = :4, pit_r_n_or_z = :5, scute_location_c
 		genetic_broodstock_ind = :18, genetic_hatch_wild_ind = :19, genetic_species_id = :20, genetic_archive_ind = :21, 
 		head = :22, snouttomouth = :23, inter = :24, mouthwidth = :25, m_ib = :26, l_ob = :27, l_ib = :28, r_ib = :29, 
 		r_ob = :30, anal = :31, dorsal = :32, status = :33, hatchery_origin_code = :34, sex_code = :35, stage = :36,  recapture = :37, 
-		photo = :38, genetic_needs = :39, other_tag_info = :40, comments = :41, f_id = :42
+		photo = :38, genetic_needs = :39, other_tag_info = :40, comments = :41, f_id = :42,
+		edit_initials = :43,
+		last_edit_comment = :44,	
+		last_updated = :45, 
+		uploaded_by = :46
 WHERE f_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) error {
@@ -497,6 +625,10 @@ func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry 
 		supplementalDataEntry.OtherTagInfo,
 		supplementalDataEntry.Comments,
 		supplementalDataEntry.Fid,
+		supplementalDataEntry.EditInitials,
+		supplementalDataEntry.LastEditComment,
+		supplementalDataEntry.LastUpdated,
+		supplementalDataEntry.UploadedBy,
 		supplementalDataEntry.Sid)
 	return err
 }
@@ -511,7 +643,7 @@ var supplementalDataEntriesByFidSql = `select f_id, f_fid, mr_id,
 										r_ob, anal, dorsal, status, hatchery_origin_code, 
 										sex_code, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments from ds_supplemental where f_id = :1`
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_id = :1`
 
 var supplementalDataEntriesCountByFidSql = `SELECT count(*) FROM ds_supplemental where f_id = :1`
 
@@ -525,7 +657,7 @@ var supplementalDataEntriesByFfidSql = `select f_id, f_fid, mr_id,
 										r_ob, anal, dorsal, status, hatchery_origin_code, 
 										sex_code, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments from ds_supplemental where f_fid = :1`
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_fid = :1`
 
 var supplementalDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_supplemental where f_fid = :1`
 
@@ -539,7 +671,7 @@ var supplementalDataEntriesByGeneticsVialSql = `select f_id, f_fid, mr_id,
 										r_ob, anal, dorsal, status, hatchery_origin_code, 
 										sex_code, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments from ds_supplemental where genetics_vial_number = :1`
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where genetics_vial_number = :1`
 
 var supplementalDataEntriesCountByGeneticsVialSql = `SELECT count(*) FROM ds_supplemental where genetics_vial_number = :1`
 
@@ -553,7 +685,7 @@ var supplementalDataEntriesByGeneticsPitTagSql = `select f_id, f_fid, mr_id,
 										r_ob, anal, dorsal, status, hatchery_origin_code, 
 										sex_code, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments from ds_supplemental where tag_number = :1`
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where tag_number = :1`
 
 var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) FROM ds_supplemental where tag_number = :1`
 
@@ -665,7 +797,10 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			&supplementalDataEntry.Photo,
 			&supplementalDataEntry.GeneticNeeds,
 			&supplementalDataEntry.OtherTagInfo,
-			&supplementalDataEntry.Comments)
+			&supplementalDataEntry.Comments,
+			&supplementalDataEntry.EditInitials,
+			&supplementalDataEntry.LastEditComment,
+			&supplementalDataEntry.UploadedBy)
 		if err != nil {
 			return supplementalDataEntryWithCount, err
 		}
@@ -981,8 +1116,8 @@ func (s *PallidSturgeonStore) GetUploadSessionId() (int, error) {
 var insertUploadSiteSql = `insert into upload_site (site_id, site_fid, site_year, fieldoffice_id, 
 	field_office, project_id, project, 
 	segment_id, segment, season_id, season, bend, bendrn, bend_river_mile, comments,
-	last_updated, upload_session_id, uploaded_by, upload_filename)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19)`
+	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20)`
 
 func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error {
 	_, err := s.db.Exec(insertUploadSiteSql,
@@ -1001,6 +1136,7 @@ func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error
 		uploadSite.Bendrn,
 		uploadSite.BendRiverMile,
 		uploadSite.Comments,
+		uploadSite.EditInitials,
 		uploadSite.LastUpdated,
 		uploadSite.UploadSessionId,
 		uploadSite.UploadedBy,
@@ -1012,8 +1148,8 @@ func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error
 
 var insertFishUploadSql = `insert into upload_fish (site_id, f_fid, mr_fid, panelhook, bait, species, length, weight,
 	fishcount, fin_curl, otolith, rayspine, scale, ftprefix, ftnum, ftmr,
-	comments, last_updated, upload_session_id, uploaded_by, upload_filename)
-	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21)`
+	comments, edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)
+	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22)`
 
 func (s *PallidSturgeonStore) SaveFishUpload(uploadFish models.UploadFish) error {
 	_, err := s.db.Exec(insertFishUploadSql,
@@ -1034,6 +1170,7 @@ func (s *PallidSturgeonStore) SaveFishUpload(uploadFish models.UploadFish) error
 		uploadFish.Ftnum,
 		uploadFish.Ftmr,
 		uploadFish.Comments,
+		uploadFish.EditInitials,
 		uploadFish.LastUpdated,
 		uploadFish.UploadSessionId,
 		uploadFish.UploadedBy,
@@ -1044,9 +1181,9 @@ func (s *PallidSturgeonStore) SaveFishUpload(uploadFish models.UploadFish) error
 }
 
 var insertSearchUploadSql = `insert into upload_search(se_fid, ds_id, site_id, site_fid, search_date, recorder, search_type_code, search_day, start_time,  
-		start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, temp, conductivity, last_updated, 
+		start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, temp, conductivity, edit_initials, last_updated, 
 		upload_session_id, uploaded_by, upload_filename)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20)`
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21)`
 
 func (s *PallidSturgeonStore) SaveSearchUpload(uploadSearch models.UploadSearch) error {
 	_, err := s.db.Exec(insertSearchUploadSql,
@@ -1066,6 +1203,7 @@ func (s *PallidSturgeonStore) SaveSearchUpload(uploadSearch models.UploadSearch)
 		uploadSearch.StopLongitude,
 		uploadSearch.Temp,
 		uploadSearch.Conductivity,
+		uploadSearch.EditInitials,
 		uploadSearch.LastUpdated,
 		uploadSearch.UploadSessionId,
 		uploadSearch.UploadedBy,
@@ -1085,11 +1223,11 @@ var insertSupplementalUploadSql = `insert into upload_supplemental (site_id, f_f
 	r_ob, anal, dorsal, status, hatchery_origin, 
 	sex, stage,  recapture, photo,
 	genetic_needs, other_tag_info,
-	comments, 
+	comments, edit_initials, 
 	last_updated, upload_session_id,uploaded_by, upload_filename)
 	
 	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45)`
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46)`
 
 func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.UploadSupplemental) error {
 	_, err := s.db.Exec(insertSupplementalUploadSql,
@@ -1134,6 +1272,7 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 		uploadSupplemental.GeneticNeeds,
 		uploadSupplemental.OtherTagInfo,
 		uploadSupplemental.Comments,
+		uploadSupplemental.EditInitials,
 		uploadSupplemental.LastUpdated,
 		uploadSupplemental.UploadSessionId,
 		uploadSupplemental.UploadedBy,
@@ -1149,8 +1288,8 @@ var insertProcedureUploadSql = `insert into upload_procedure (f_fid, purpose_cod
 	new_frequency_id, sex_code, blood_sample_ind, egg_sample_ind, comments, fish_health_comments,
 	eval_location_code, spawn_code, visual_repro_status_code, ultrasound_repro_status_code,
 	expected_spawn_year, ultrasound_gonad_length, gonad_condition,
-	last_updated, upload_session_id, uploaded_by, upload_filename )                                                        
-values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34)`
+	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)                                                        
+values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35)`
 
 func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadProcedure) error {
 	_, err := s.db.Exec(insertProcedureUploadSql,
@@ -1184,6 +1323,7 @@ func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadP
 		uploadProcedure.ExpectedSpawnYear,
 		uploadProcedure.UltrasoundGonadLength,
 		uploadProcedure.GonadCondition,
+		uploadProcedure.EditInitials,
 		uploadProcedure.LastUpdated,
 		uploadProcedure.UploadSessionId,
 		uploadProcedure.UploadedBy,
@@ -1203,14 +1343,14 @@ var insertMoriverUploadSql = `insert into upload_moriver (site_id, site_fid, mr_
 	depth2, velocitybot2, velocity08_2, velocity02or06_2,
 	depth3, velocitybot3, velocity08_3, velocity02or06_3,
 	watervel, cobble, organic, silt, sand, gravel,
-	comments, last_updated, upload_session_id,
+	comments, edit_initials, last_updated, upload_session_id,
 	uploaded_by, upload_filename, complete, checkby,
 	no_turbidity, no_velocity)
 
 	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,
 		:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,
 		:48,:49,:50,:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,
-		:71,:72)`
+		:71,:72,:73)`
 
 func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriver) error {
 	_, err := s.db.Exec(insertMoriverUploadSql,
@@ -1226,7 +1366,7 @@ func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriv
 		UploadMoriver.Depth2, UploadMoriver.Velocitybot2, UploadMoriver.Velocity08_2, UploadMoriver.Velocity02or06_2,
 		UploadMoriver.Depth3, UploadMoriver.Velocitybot3, UploadMoriver.Velocity08_3, UploadMoriver.Velocity02or06_3,
 		UploadMoriver.Watervel, UploadMoriver.Cobble, UploadMoriver.Organic, UploadMoriver.Silt, UploadMoriver.Sand, UploadMoriver.Gravel,
-		UploadMoriver.Comments, UploadMoriver.LastUpdated, UploadMoriver.UploadSessionId,
+		UploadMoriver.Comments, UploadMoriver.EditInitials, UploadMoriver.LastUpdated, UploadMoriver.UploadSessionId,
 		UploadMoriver.UploadedBy, UploadMoriver.UploadFilename, UploadMoriver.Complete, UploadMoriver.Checkby,
 		UploadMoriver.NoTurbidity, UploadMoriver.NoVelocity,
 	)
@@ -1235,8 +1375,8 @@ func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriv
 }
 
 var insertTelemetryUploadSql = `insert into upload_telemetry(t_fid, se_fid, bend, radio_tag_num, frequency_id_code, capture_time, capture_latitude, capture_longitude,
-	position_confidence, macro_id, meso_id, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, last_updated, upload_session_id, uploaded_by, upload_filename)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23)`
+	position_confidence, macro_id, meso_id, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24)`
 
 func (s *PallidSturgeonStore) SaveTelemetryUpload(uploadTelemetry models.UploadTelemetry) error {
 	_, err := s.db.Exec(insertTelemetryUploadSql,
@@ -1259,6 +1399,7 @@ func (s *PallidSturgeonStore) SaveTelemetryUpload(uploadTelemetry models.UploadT
 		uploadTelemetry.Sand,
 		uploadTelemetry.Gravel,
 		uploadTelemetry.Comments,
+		uploadTelemetry.EditInitials,
 		uploadTelemetry.LastUpdated,
 		uploadTelemetry.UploadSessionId,
 		uploadTelemetry.UploadedBy,

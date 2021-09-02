@@ -50,6 +50,49 @@ func (sd *PallidSturgeonHandler) GetBends(c echo.Context) error {
 	return c.JSON(http.StatusOK, bends)
 }
 
+func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
+	year, projectCode, segmentCode, seasonCode, bendrn := c.QueryParam("year"), c.QueryParam("projectCode"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	dataSummary, err := sd.Store.GetSiteDataEntries(year, projectCode, segmentCode, seasonCode, bendrn, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
+	siteData := models.UploadSite{}
+	if err := c.Bind(&siteData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	siteData.LastUpdated = time.Now()
+	siteData.UploadedBy = "DeeLiang"
+	id, err := sd.Store.SaveSiteDataEntry(siteData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateSiteDataEntry(c echo.Context) error {
+
+	siteData := models.UploadSite{}
+	if err := c.Bind(&siteData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	siteData.LastUpdated = time.Now()
+	siteData.UploadedBy = "DeeLiang"
+	err := sd.Store.UpdateSiteDataEntry(siteData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
 func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {
 	tableId, fieldId := c.QueryParam("tableId"), c.QueryParam("fieldId")
 	queryParams, err := marshalQuery(c)
@@ -68,6 +111,8 @@ func (sd *PallidSturgeonHandler) SaveFishDataEntry(c echo.Context) error {
 	if err := c.Bind(&fishData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	fishData.LastUpdated = time.Now()
+	fishData.UploadedBy = "DeeLiang"
 	id, err := sd.Store.SaveFishDataEntry(fishData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -82,6 +127,8 @@ func (sd *PallidSturgeonHandler) UpdateFishDataEntry(c echo.Context) error {
 	if err := c.Bind(&fishData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	fishData.LastUpdated = time.Now()
+	fishData.UploadedBy = "DeeLiang"
 	err := sd.Store.UpdateFishDataEntry(fishData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -107,6 +154,8 @@ func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
 	if err := c.Bind(&moriverData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	moriverData.LastUpdated = time.Now()
+	moriverData.UploadedBy = "DeeLiang"
 	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -121,6 +170,8 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 	if err := c.Bind(&moriverData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	moriverData.LastUpdated = time.Now()
+	moriverData.UploadedBy = "DeeLiang"
 	err := sd.Store.UpdateMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -146,6 +197,8 @@ func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error
 	if err := c.Bind(&supplementalData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	supplementalData.LastUpdated = time.Now()
+	supplementalData.UploadedBy = "DeeLiang"
 	id, err := sd.Store.SaveSupplementalDataEntry(supplementalData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -160,6 +213,8 @@ func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) err
 	if err := c.Bind(&supplementalData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	supplementalData.LastUpdated = time.Now()
+	supplementalData.UploadedBy = "DeeLiang"
 	err := sd.Store.UpdateSupplementalDataEntry(supplementalData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())

@@ -6,6 +6,7 @@ Table of Contents
     - [seasons](#seasons)
     - [segments](#segments)
     - [bends](#bends)
+    - [siteDataEntry](#siteDataEntry)
     - [fishDataEntry](#fishDataEntry)
     - [moriverDataEntry](#moriverDataEntry)
     - [supplementalDataEntry](#supplementalDataEntry)
@@ -36,6 +37,43 @@ Table of Contents
   [http://localhost:8080/psapi/bends](http://localhost:8080/psapi/bends)
 
 ---
+### SiteDataEntry
+- List siteDataEntry \
+  [http://localhost:8080/psapi/siteDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create siteDataEntry \
+  `http://localhost:8080/psapi/siteDataEntry`
+    - Example `POST` body
+        ```
+      {
+        "siteFid": "F-1",
+        "siteYear": 2013,
+        "fieldOffice": "SD",
+        "project": "1",
+        "segment": "7",
+        "season": "ST",
+        "sampleUnitTypeCode": "B",
+        "bendrn": "R",
+        "editInitials": "DG",
+        "comments": "changed year"
+      }
+- Update siteDataEntry \
+  `http://localhost:8080/psapi/siteDataEntry`
+    - Example `PUT` body
+        ```
+      {
+        "siteId": 10122,
+        "siteFid": "F-1",
+        "siteYear": 2013,
+        "fieldOffice": "SD",
+        "project": "1",
+        "segment": "7",
+        "season": "ST",
+        "sampleUnitTypeCode": "B",
+        "bendrn": "R",
+        "editInitials": "DG",
+        "comments": "changed year2"
+      }
+---
 ### FishDataEntry
 - List fishDataEntry \
   [http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
@@ -64,7 +102,8 @@ Table of Contents
           "scale": "",
           "ftprefix": "",
           "ftnum": "",
-          "ftmr": ""
+          "ftmr": "",
+          "editInitials": "DG"
         }
 - Update fishDataEntry \
   `http://localhost:8080/psapi/fishDataEntry`
@@ -92,7 +131,8 @@ Table of Contents
           "scale": "",
           "ftprefix": "",
           "ftnum": "",
-          "ftmr": ""
+          "ftmr": "",
+          "editInitials": "DG"
         }
 ---
 ### MoriverDataEntry
@@ -173,7 +213,7 @@ Table of Contents
 				  "checkby": "",
 				  "noTurbidity": "",
 				  "noVelocity": "",
-				  "editInitials": ""
+				  "editInitials": "DG"
 				}
 - Update moriverDataEntry \
   `http://localhost:8080/psapi/moriverDataEntry`
@@ -251,7 +291,7 @@ Table of Contents
 				  "checkby": "",
 				  "noTurbidity": "",
 				  "noVelocity": "",
-				  "editInitials": ""
+				  "editInitials": "DG"
 				}
 ---
 ### SupplementalDataEntry
@@ -302,7 +342,8 @@ Table of Contents
           "photo": "",
           "geneticNeeds": "",
           "otherTagInfo": "",
-          "comments": "-\r\n"
+          "comments": "-\r\n",
+          "editInitials": "DG"
         }
 - Update supplementalDataEntry \
   `http://localhost:8080/psapi/supplementalDataEntry`
@@ -350,7 +391,8 @@ Table of Contents
           "photo": "",
           "geneticNeeds": "",
           "otherTagInfo": "",
-          "comments": "-\r\n"
+          "comments": "-\r\n",
+          "editInitials": "DG"
         }
 ---
 ### MoriverDataSummary
@@ -401,7 +443,8 @@ Table of Contents
               "bendrn": "N",
               "bendRiverMile": 4.8,
               "comments": "test",
-              "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv"
+              "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv",
+              "editInitials": "DG"
             }
           ],
           "fishUpload": [
@@ -423,7 +466,8 @@ Table of Contents
               "ftmr": "L",
               "ftprefix": "BC",
               "comments": "test",
-              "uploadFilename": "fish_datasheet_20210617_1900_59.csv"
+              "uploadFilename": "fish_datasheet_20210617_1900_59.csv",
+              "editInitials": "DG"
             }
           ],
           "searchUpload":[
@@ -444,7 +488,8 @@ Table of Contents
               "stopLongitude": -88,
               "temp": 30,
               "conductivity": 22,
-              "uploadFilename": "search_effort_20210617_1900_59.csv"
+              "uploadFilename": "search_effort_20210617_1900_59.csv",
+              "editInitials": "DG"
             }
           ],
           "telemetryUpload": [
@@ -468,7 +513,8 @@ Table of Contents
                 "sand": 1,
                 "gravel": 1,
                 "comments": "comments",
-                "uploadFilename": "telemetry_20210617_1900_59.csv"
+                "uploadFilename": "telemetry_20210617_1900_59.csv",
+                "editInitials": "DG"
               }
           ],
           "procedureUpload": [
@@ -503,7 +549,8 @@ Table of Contents
                 "expectedSpawnYear": 1,
                 "ltrasoundGonadLength": 1,
                 "gonadCondition": "1",
-                "uploadFilename": "procedure_20210617_1900_59.csv"
+                "uploadFilename": "procedure_20210617_1900_59.csv",
+                "editInitials": "DG"
               }
           ],
           "supplementalUpload": [
@@ -549,7 +596,8 @@ Table of Contents
                 "geneticNeeds": "geneticNeeds",
                 "otherTagInfo": "otherTagInfo",
                 "comments": "comments",
-                "uploadFilename": "supplemental_20210617_1900_59.csv"
+                "uploadFilename": "supplemental_20210617_1900_59.csv",
+                "editInitials": "DG"
               }
           ],
           "moriverUpload": [
@@ -622,7 +670,8 @@ Table of Contents
                 "checkby": "che",
                 "noTurbidity": "n",
                 "noVelocity": "n",
-                "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv"
+                "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv",
+               "editInitials": "DG"
               }
           ]
         }

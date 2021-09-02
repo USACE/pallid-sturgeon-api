@@ -103,6 +103,124 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /siteDataEntry:
+    get:
+      summary: List Site Entries
+      operationId: GetSiteEntries
+      tags:
+        - siteEntries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: projectCode
+          in: query
+          required: false
+          description: The project code
+          schema:
+            type: string
+        - name: segmentCode
+          in: query
+          required: false
+          description: The segment code
+          schema:
+            type: string
+        - name: seasonCode
+          in: query
+          required: false
+          description: The season code
+          schema:
+            type: string
+        - name: bendrn
+          in: query
+          required: false
+          description: The bendrn
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of siteDataEntries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/uploadSite"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                /upload:
+    post:
+      tags:
+      - "saveSiteEntries"
+      summary: "Create Site Entries"
+      description: ""
+      operationId: "saveSiteEntries"
+      requestBody:
+        description: "object of site entries"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadSite"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 
+    put:
+      tags:
+      - "updateSiteEntries"
+      summary: "Update Site Entries"
+      description: ""
+      operationId: "updateSiteEntries"
+      requestBody:
+        description: "object of site entries"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadSite"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 
   /fishDataEntry:
     get:
       summary: List Fish Entries
