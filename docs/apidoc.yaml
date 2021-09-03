@@ -1666,6 +1666,9 @@ components:
     upload:
       type: object
       properties:
+        editInitials:
+          type: string
+          maxLength: 1
         siteUpload:
           type: array
           items:
@@ -1691,6 +1694,76 @@ components:
           items:
             $ref: "#/components/schemas/uploadSupplemental"
         moriverUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadMoriver"
+    uploadSiteData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSite"
+    uploadFishData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadFish"
+    uploadTelemetryData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadTelemetry"
+    uploadSearchData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSearch"
+    uploadProcedureData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadProcedure"
+    uploadSupplementalData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSupplemental"
+    uploadMoriverData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
           type: array
           items:
             $ref: "#/components/schemas/uploadMoriver"
@@ -1739,7 +1812,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadFilename
       properties:
         siteId:
           type: integer
@@ -1791,7 +1863,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadFilename
       properties:
         siteId:
           type: integer
@@ -1849,7 +1920,6 @@ components:
       type: object
       required:
         - tFid
-        - uploadFilename
       properties:
         tFid:
           type: string
@@ -1904,7 +1974,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadFilename
       properties:
         siteId:
           type: integer
@@ -1954,7 +2023,6 @@ components:
       type: object
       required:
         - id
-        - uploadFilename
       properties:
         id:
           type: integer
@@ -2055,7 +2123,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadFilename
       properties:
         siteId:
           type: integer
@@ -2175,7 +2242,6 @@ components:
       type: object
       required:
         - siteId
-        - uploadFilename
       properties:
         siteId:
           type: integer

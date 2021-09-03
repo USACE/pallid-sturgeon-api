@@ -355,69 +355,83 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	for _, uploadSite := range uploads.SiteUpload {
+	for _, uploadSite := range uploads.SiteUpload.Items {
 		uploadSite.LastUpdated = time.Now()
 		uploadSite.UploadedBy = "DeeLiang"
 		uploadSite.UploadSessionId = sessionId
+		uploadSite.EditInitials = uploads.EditInitials
+		uploadSite.UploadFilename = uploads.SiteUpload.UploadFilename
 		err = sd.Store.SaveSiteUpload(uploadSite)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 	}
 
-	for _, uploadFish := range uploads.FishUpload {
+	for _, uploadFish := range uploads.FishUpload.Items {
 		uploadFish.LastUpdated = time.Now()
 		uploadFish.UploadedBy = "DeeLiang"
 		uploadFish.UploadSessionId = sessionId
+		uploadFish.EditInitials = uploads.EditInitials
+		uploadFish.UploadFilename = uploads.SiteUpload.UploadFilename
 		err = sd.Store.SaveFishUpload(uploadFish)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 	}
 
-	for _, uploadSearch := range uploads.SearchUpload {
+	for _, uploadSearch := range uploads.SearchUpload.Items {
 		uploadSearch.LastUpdated = time.Now()
 		uploadSearch.UploadedBy = "DeeLiang"
 		uploadSearch.UploadSessionId = sessionId
+		uploadSearch.EditInitials = uploads.EditInitials
+		uploadSearch.UploadFilename = uploads.SiteUpload.UploadFilename
 		err = sd.Store.SaveSearchUpload(uploadSearch)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 	}
 
-	for _, uploadSupplemental := range uploads.UploadSupplemental {
+	for _, uploadSupplemental := range uploads.UploadSupplemental.Items {
 		uploadSupplemental.LastUpdated = time.Now()
 		uploadSupplemental.UploadedBy = "DeeLiang"
 		uploadSupplemental.UploadSessionId = sessionId
+		uploadSupplemental.EditInitials = uploads.EditInitials
+		uploadSupplemental.UploadFilename = uploads.SiteUpload.UploadFilename
 		err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 	}
-	for _, uploadProcedure := range uploads.ProcedureUpload {
+	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
 		uploadProcedure.LastUpdated = time.Now()
 		uploadProcedure.UploadedBy = "DeeLiang"
 		uploadProcedure.UploadSessionId = sessionId
+		uploadProcedure.EditInitials = uploads.EditInitials
+		uploadProcedure.UploadFilename = uploads.SiteUpload.UploadFilename
 		err = sd.Store.SaveProcedureUpload(uploadProcedure)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 	}
 
-	for _, uploadMoriver := range uploads.MoriverUpload {
+	for _, uploadMoriver := range uploads.MoriverUpload.Items {
 		uploadMoriver.LastUpdated = time.Now()
 		uploadMoriver.UploadedBy = "DeeLiang"
 		uploadMoriver.UploadSessionId = sessionId
+		uploadMoriver.EditInitials = uploads.EditInitials
+		uploadMoriver.UploadFilename = uploads.SiteUpload.UploadFilename
 		err = sd.Store.SaveMoriverUpload(uploadMoriver)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
 		}
 	}
 
-	for _, uploadTelemetry := range uploads.TelemetryUpload {
+	for _, uploadTelemetry := range uploads.TelemetryUpload.Items {
 		uploadTelemetry.LastUpdated = time.Now()
 		uploadTelemetry.UploadedBy = "DeeLiang"
 		uploadTelemetry.UploadSessionId = sessionId
+		uploadTelemetry.EditInitials = uploads.EditInitials
+		uploadTelemetry.UploadFilename = uploads.SiteUpload.UploadFilename
 		err = sd.Store.SaveTelemetryUpload(uploadTelemetry)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
