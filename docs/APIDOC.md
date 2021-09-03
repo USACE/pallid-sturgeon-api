@@ -429,7 +429,7 @@ Table of Contents
           "editInitials": "DG",
           "siteUpload": {
             "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv",
-            "Items" :[
+            "items" :[
               {
                 "siteId": 0,
                 "siteFid": "F-1",
@@ -451,7 +451,7 @@ Table of Contents
           },
           "fishUpload": {
             "uploadFilename": "fish_datasheet_20210617_1900_59.csv",
-            "Items": [
+            "items": [
               {
                 "siteId": 0,
                 "fFid": "20210617-184105056-001-001",
@@ -475,7 +475,7 @@ Table of Contents
           },
           "searchUpload":{
             "uploadFilename": "search_effort_20210617_1900_59.csv",
-            "Items": [
+            "items": [
               {
                 "siteId": 0,
                 "seFid": "20210617-185747028-001",
@@ -498,7 +498,7 @@ Table of Contents
           },
           "telemetryUpload": {
             "uploadFilename": "telemetry_20210617_1900_59.csv",
-            "Items": [
+            "items": [
               {
                 "tFid": "20210617-185747028-001-001",
                 "seFid": "20210617-185747028-001",
@@ -524,7 +524,7 @@ Table of Contents
           },
           "procedureUpload": {
             "uploadFilename": "procedure_20210617_1900_59.csv",
-            "Items": [
+            "items": [
               {
                 "f_fid": "20210617-184105056-001-001",
                 "purposeCode": "RI",
@@ -561,7 +561,7 @@ Table of Contents
           },
           "supplementalUpload": {
             "uploadFilename": "supplemental_20210617_1900_59.csv",
-            "Items": [
+            "items": [
               {
                 "siteId": 0,
                 "fFid": "20210617-184105056-001-001",
@@ -609,7 +609,7 @@ Table of Contents
           },
           "moriverUpload": {
             "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv",
-            "Items": [
+            "items": [
               {
                 "siteId": 0,
                 "siteFid": "F-1",
