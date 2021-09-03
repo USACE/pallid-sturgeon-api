@@ -812,6 +812,46 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 	return supplementalDataEntryWithCount, err
 }
 
+var fishDataSummaryFullDataSql = `select * FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) ([]map[string]string, error) {
+	dbQuery, err := s.db.Prepare(fishDataSummaryFullDataSql)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	data := make(map[string]string)
+
+	fishSummaries := make([]map[string]string, 0)
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		for i, colName := range cols {
+			data[colName] = columns[i]
+		}
+
+		fishSummaries = append(fishSummaries, data)
+	}
+
+	return fishSummaries, err
+}
+
 var fishDataSummarySql = `SELECT mr_id, f_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, panelhook, species_code, hatchery_origin_code, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var fishDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
@@ -867,6 +907,46 @@ func (s *PallidSturgeonStore) GetFishDataSummary(year string, officeCode string,
 	fishSummariesWithCount.Items = fishSummaries
 
 	return fishSummariesWithCount, err
+}
+
+var suppDataSummaryFullDataSql = `select * FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) ([]map[string]string, error) {
+	dbQuery, err := s.db.Prepare(suppDataSummaryFullDataSql)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	data := make(map[string]string)
+
+	suppSummaries := make([]map[string]string, 0)
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		for i, colName := range cols {
+			data[colName] = columns[i]
+		}
+
+		suppSummaries = append(suppSummaries, data)
+	}
+
+	return suppSummaries, err
 }
 
 var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, hatchery_origin_code, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
@@ -926,6 +1006,46 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 	return suppSummariesWithCount, err
 }
 
+var missouriDataSummaryFullDataSql = `SELECT * FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) ([]map[string]string, error) {
+	dbQuery, err := s.db.Prepare(missouriDataSummaryFullDataSql)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	data := make(map[string]string)
+
+	missouriSummaries := make([]map[string]string, 0)
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		for i, colName := range cols {
+			data[colName] = columns[i]
+		}
+
+		missouriSummaries = append(missouriSummaries, data)
+	}
+
+	return missouriSummaries, err
+}
+
 var missouriDataSummarySql = `SELECT mr_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, subsample, subsample_pass, set_Date, conductivity, checkby FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var missouriDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
@@ -981,6 +1101,46 @@ func (s *PallidSturgeonStore) GetMissouriDataSummary(year string, officeCode str
 	missouriSummariesWithCount.Items = missouriSummaries
 
 	return missouriSummariesWithCount, err
+}
+
+var geneticDataSummaryFullDataSql = `SELECT * FROM table (pallid_data_api.genetic_datasummary_fnc(:1, :2, :3, to_date(:4,'MM/DD/YYYY'), to_date(:5,'MM/DD/YYYY'), :6, :7, :8, :9))`
+
+func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode string, project string, fromDate string, toDate string, broodstock string, hatchwild string, speciesid string, archive string) ([]map[string]string, error) {
+	dbQuery, err := s.db.Prepare(geneticDataSummaryFullDataSql)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, fromDate, toDate, broodstock, hatchwild, hatchwild, speciesid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	data := make(map[string]string)
+
+	geneticSummaries := make([]map[string]string, 0)
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		for i, colName := range cols {
+			data[colName] = columns[i]
+		}
+
+		geneticSummaries = append(geneticSummaries, data)
+	}
+
+	return geneticSummaries, err
 }
 
 var geneticDataSummarySql = `SELECT year,field_office_code,project_code,genetics_vial_number,pit_tag,river,river_mile,
@@ -1039,6 +1199,39 @@ func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode stri
 	geneticSummariesWithCount.Items = geneticSummaries
 
 	return geneticSummariesWithCount, err
+}
+
+func (s *PallidSturgeonStore) GetFullSearchDataSummary() ([]map[string]string, error) {
+	rows, err := s.db.Queryx("SELECT * FROM ds_search")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	data := make(map[string]string)
+
+	searchSummaries := make([]map[string]string, 0)
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		for i, colName := range cols {
+			data[colName] = columns[i]
+		}
+
+		searchSummaries = append(searchSummaries, data)
+	}
+
+	return searchSummaries, err
 }
 
 var searchDataSummarySql = `SELECT se_id,search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude, stop_longitude,se_fid,ds_id,site_fid,temp,conductivity FROM ds_search`
