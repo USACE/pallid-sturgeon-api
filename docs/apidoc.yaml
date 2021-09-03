@@ -531,6 +531,85 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /fishFullDataSummary:
+    get:
+      summary: List Full Fish Summaries
+      operationId: GetFullFishSummaries
+      tags:
+        - fullFishSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of fishSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/fishSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /fishDataSummary:
     get:
       summary: List Fish Summaries
@@ -622,6 +701,85 @@ paths:
             application/json:    
               schema:
                 $ref: "#/components/schemas/fishSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /suppFullDataSummary:
+    get:
+      summary: List Full Supp Summaries
+      operationId: GetFullSuppSummaries
+      tags:
+        - suppFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/suppSummary"
         default:
           description: unexpected error
           content:
@@ -725,6 +883,85 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /missouriFullDataSummary:
+    get:
+      summary: List Full Missouri Summaries
+      operationId: GetMissouriFullSummaries
+      tags:
+        - missouriFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/missouriSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /missouriDataSummary:
     get:
       summary: List Missouri Summaries
@@ -822,6 +1059,85 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /geneticFullDataSummary:
+    get:
+      summary: List Full Genetic Summaries
+      operationId: GetFullGeneticSummaries
+      tags:
+        - geneticFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: broodstock
+          in: query
+          required: false
+          description: The broodstock
+          schema:
+            type: string
+        - name: hatchwild
+          in: query
+          required: false
+          description: The hatchwild
+          schema:
+            type: string
+        - name: speciesId
+          in: query
+          required: false
+          description: The speciesId
+          schema:
+            type: string
+        - name: archive
+          in: query
+          required: false
+          description: The archive
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of GeneticSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/geneticSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /geneticDataSummary:
     get:
       summary: List Genetic Summaries
@@ -913,6 +1229,30 @@ paths:
             application/json:    
               schema:
                 $ref: "#/components/schemas/geneticSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /searchFullDataSummary:
+    get:
+      summary: List Full Search Summaries
+      operationId: GetFullSearchSummaries
+      tags:
+        - searchFullSummaries
+      responses:
+        '200':
+          description: Array of SearchSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/searchSummary"
         default:
           description: unexpected error
           content:
