@@ -158,18 +158,24 @@ type SearchSummary struct {
 }
 
 type Upload struct {
-	SiteUpload         []UploadSite         `json:"siteUpload"`
-	FishUpload         []UploadFish         `json:"fishUpload"`
-	SearchUpload       []UploadSearch       `json:"searchUpload"`
-	ProcedureUpload    []UploadProcedure    `json:"procedureUpload"`
-	UploadSupplemental []UploadSupplemental `json:"uploadSupplemental"`
-	MoriverUpload      []UploadMoriver      `json:"moriverUpload"`
-	TelemetryUpload    []UploadTelemetry    `json:"telemetryUpload"`
+	EditInitials       string                 `db:"edit_initials" json:"editInitials"`
+	SiteUpload         UploadSiteData         `json:"siteUpload"`
+	FishUpload         UploadFishData         `json:"fishUpload"`
+	SearchUpload       UploadSearchData       `json:"searchUpload"`
+	ProcedureUpload    UploadProcedureData    `json:"procedureUpload"`
+	UploadSupplemental UploadSupplementalData `json:"uploadSupplemental"`
+	MoriverUpload      UploadMoriverData      `json:"moriverUpload"`
+	TelemetryUpload    UploadTelemetryData    `json:"telemetryUpload"`
 }
 
 type SiteDataEntryWithCount struct {
 	Items      []UploadSite `json:"items"`
 	TotalCount int          `json:"totalCount"`
+}
+
+type UploadSiteData struct {
+	Items          []UploadSite `json:"items"`
+	UploadFilename string       `db:"upload_filename" json:"uploadFilename"`
 }
 
 type UploadSite struct {
@@ -199,6 +205,11 @@ type UploadSite struct {
 type FishDataEntryWithCount struct {
 	Items      []UploadFish `json:"items"`
 	TotalCount int          `json:"totalCount"`
+}
+
+type UploadFishData struct {
+	Items          []UploadFish `json:"items"`
+	UploadFilename string       `db:"upload_filename" json:"uploadFilename"`
 }
 
 // type FishDataEntry struct {
@@ -257,6 +268,11 @@ type UploadFish struct {
 	Fieldoffice     string    `db:"field_office_code" json:"fieldOffice"`
 }
 
+type UploadSearchData struct {
+	Items          []UploadSearch `json:"items"`
+	UploadFilename string         `db:"upload_filename" json:"uploadFilename"`
+}
+
 type UploadSearch struct {
 	SiteID          int       `db:"site_id" json:"siteId"`
 	SeFid           string    `db:"se_fid" json:"seFid"`
@@ -280,6 +296,11 @@ type UploadSearch struct {
 	UploadSessionId int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy      string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename  string    `db:"upload_filename" json:"uploadFilename"`
+}
+
+type UploadProcedureData struct {
+	Items          []UploadProcedure `json:"items"`
+	UploadFilename string            `db:"upload_filename" json:"uploadFilename"`
 }
 
 type UploadProcedure struct {
@@ -325,6 +346,11 @@ type UploadProcedure struct {
 type SupplementalDataEntryWithCount struct {
 	Items      []UploadSupplemental `json:"items"`
 	TotalCount int                  `json:"totalCount"`
+}
+
+type UploadSupplementalData struct {
+	Items          []UploadSupplemental `json:"items"`
+	UploadFilename string               `db:"upload_filename" json:"uploadFilename"`
 }
 
 type UploadSupplemental struct {
@@ -384,6 +410,11 @@ type UploadSupplemental struct {
 type MoriverDataEntryWithCount struct {
 	Items      []UploadMoriver `json:"items"`
 	TotalCount int             `json:"totalCount"`
+}
+
+type UploadMoriverData struct {
+	Items          []UploadMoriver `json:"items"`
+	UploadFilename string          `db:"upload_filename" json:"uploadFilename"`
 }
 
 type UploadMoriver struct {
@@ -466,6 +497,11 @@ type UploadMoriver struct {
 	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
+}
+
+type UploadTelemetryData struct {
+	Items          []UploadTelemetry `json:"items"`
+	UploadFilename string            `db:"upload_filename" json:"uploadFilename"`
 }
 
 type UploadTelemetry struct {

@@ -426,73 +426,79 @@ Table of Contents
     - Example `POST` body
         ```
         {
-          "siteUpload": [
-            {
-              "siteId": 0,
-              "siteFid": "F-1",
-              "siteYear": 2021,
-              "fieldofficeID": "SD",
-              "fieldOffice": "KC - Kansas City",
-              "projectId": 1,
-              "project": "1 - Pallid Sturgeon Population Assessment",
-              "segmentId": 28,
-              "segment": "28 - Osage River",
-              "seasonId": "A0",
-              "season": "A0 - Age 0",
-              "bend": 2,
-              "bendrn": "N",
-              "bendRiverMile": 4.8,
-              "comments": "test",
-              "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv",
-              "editInitials": "DG"
-            }
-          ],
-          "fishUpload": [
-            {
-              "siteId": 0,
-              "fFid": "20210617-184105056-001-001",
-              "mrFid": "20210617-184105056-001",
-              "panelhook": "1",
-              "bait": "W",
-              "species": "PDSG",
-              "length": 2,
-              "weight": 2,
-              "fishcount": 1,
-              "finCurl": "Y",
-              "otolith": "D",
-              "rayspine": "X",
-              "scale": "X",
-              "ftnum": "45678",
-              "ftmr": "L",
-              "ftprefix": "BC",
-              "comments": "test",
-              "uploadFilename": "fish_datasheet_20210617_1900_59.csv",
-              "editInitials": "DG"
-            }
-          ],
-          "searchUpload":[
-            {
-              "siteId": 0,
-              "seFid": "20210617-185747028-001",
-              "dsId": 1,
-              "siteFid": "F-1",
-              "searchDate": "2021-06-17T00:00:00Z",
-              "recorder": "NR",
-              "searchTypeCode": "BS",
-              "searchDay": 12345678,
-              "startTime": "18:58:06",
-              "startLatitude": 50,
-              "startLongitude": -88,
-              "stopTime": "18:58:08",
-              "stopLatitud": 50,
-              "stopLongitude": -88,
-              "temp": 30,
-              "conductivity": 22,
-              "uploadFilename": "search_effort_20210617_1900_59.csv",
-              "editInitials": "DG"
-            }
-          ],
-          "telemetryUpload": [
+          "editInitials": "DG",
+          "siteUpload": {
+            "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv",
+            "Items" :[
+              {
+                "siteId": 0,
+                "siteFid": "F-1",
+                "siteYear": 2021,
+                "fieldofficeID": "SD",
+                "fieldOffice": "KC - Kansas City",
+                "projectId": 1,
+                "project": "1 - Pallid Sturgeon Population Assessment",
+                "segmentId": 28,
+                "segment": "28 - Osage River",
+                "seasonId": "A0",
+                "season": "A0 - Age 0",
+                "bend": 2,
+                "bendrn": "N",
+                "bendRiverMile": 4.8,
+                "comments": "test"
+              }
+            ]
+          },
+          "fishUpload": {
+            "uploadFilename": "fish_datasheet_20210617_1900_59.csv",
+            "Items": [
+              {
+                "siteId": 0,
+                "fFid": "20210617-184105056-001-001",
+                "mrFid": "20210617-184105056-001",
+                "panelhook": "1",
+                "bait": "W",
+                "species": "PDSG",
+                "length": 2,
+                "weight": 2,
+                "fishcount": 1,
+                "finCurl": "Y",
+                "otolith": "D",
+                "rayspine": "X",
+                "scale": "X",
+                "ftnum": "45678",
+                "ftmr": "L",
+                "ftprefix": "BC",
+                "comments": "test"
+              }
+            ]
+          },
+          "searchUpload":{
+            "uploadFilename": "search_effort_20210617_1900_59.csv",
+            "Items": [
+              {
+                "siteId": 0,
+                "seFid": "20210617-185747028-001",
+                "dsId": 1,
+                "siteFid": "F-1",
+                "searchDate": "2021-06-17T00:00:00Z",
+                "recorder": "NR",
+                "searchTypeCode": "BS",
+                "searchDay": 12345678,
+                "startTime": "18:58:06",
+                "startLatitude": 50,
+                "startLongitude": -88,
+                "stopTime": "18:58:08",
+                "stopLatitud": 50,
+                "stopLongitude": -88,
+                "temp": 30,
+                "conductivity": 22
+              }
+            ]
+          },
+          "telemetryUpload": {
+            "uploadFilename": "telemetry_20210617_1900_59.csv",
+            "Items": [
               {
                 "tFid": "20210617-185747028-001-001",
                 "seFid": "20210617-185747028-001",
@@ -512,12 +518,13 @@ Table of Contents
                 "silt": 1,
                 "sand": 1,
                 "gravel": 1,
-                "comments": "comments",
-                "uploadFilename": "telemetry_20210617_1900_59.csv",
-                "editInitials": "DG"
+                "comments": "comments"
               }
-          ],
-          "procedureUpload": [
+            ]
+          },
+          "procedureUpload": {
+            "uploadFilename": "procedure_20210617_1900_59.csv",
+            "Items": [
               {
                 "f_fid": "20210617-184105056-001-001",
                 "purposeCode": "RI",
@@ -548,12 +555,13 @@ Table of Contents
                 "ultrasoundReproStatusCode": "R",
                 "expectedSpawnYear": 1,
                 "ltrasoundGonadLength": 1,
-                "gonadCondition": "1",
-                "uploadFilename": "procedure_20210617_1900_59.csv",
-                "editInitials": "DG"
+                "gonadCondition": "1"
               }
-          ],
-          "supplementalUpload": [
+            ]
+          },
+          "supplementalUpload": {
+            "uploadFilename": "supplemental_20210617_1900_59.csv",
+            "Items": [
               {
                 "siteId": 0,
                 "fFid": "20210617-184105056-001-001",
@@ -595,12 +603,13 @@ Table of Contents
                 "photo": "p",
                 "geneticNeeds": "geneticNeeds",
                 "otherTagInfo": "otherTagInfo",
-                "comments": "comments",
-                "uploadFilename": "supplemental_20210617_1900_59.csv",
-                "editInitials": "DG"
+                "comments": "comments"
               }
-          ],
-          "moriverUpload": [
+            ]
+          },
+          "moriverUpload": {
+            "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv",
+            "Items": [
               {
                 "siteId": 0,
                 "siteFid": "F-1",
@@ -669,11 +678,10 @@ Table of Contents
                 "complete": 1,
                 "checkby": "che",
                 "noTurbidity": "n",
-                "noVelocity": "n",
-                "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv",
-               "editInitials": "DG"
+                "noVelocity": "n"
               }
-          ]
+            ]
+          }
         }
         
     - Example `POST` response
