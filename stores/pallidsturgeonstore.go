@@ -2,7 +2,10 @@ package stores
 
 import (
 	"database/sql"
+	"encoding/csv"
 	"fmt"
+	"log"
+	"os"
 	"strconv"
 	"strings"
 
@@ -36,6 +39,48 @@ func (s *PallidSturgeonStore) GetProjects() ([]models.Project, error) {
 	}
 
 	return projects, err
+}
+
+func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
+	rows, err := s.db.Query("select * from field_office_lk order by id")
+
+	fieldOffices := []models.FieldOffice{}
+	if err != nil {
+		return fieldOffices, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		fieldOffice := models.FieldOffice{}
+		err = rows.Scan(&fieldOffice.ID, &fieldOffice.Code, &fieldOffice.Description, &fieldOffice.State)
+		if err != nil {
+			return nil, err
+		}
+		fieldOffices = append(fieldOffices, fieldOffice)
+	}
+
+	return fieldOffices, err
+}
+
+func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, error) {
+	rows, err := s.db.Query("select * from sample_unit_type_lk order by code")
+
+	sampleUnitTypes := []models.SampleUnitType{}
+	if err != nil {
+		return sampleUnitTypes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		sampleUnitType := models.SampleUnitType{}
+		err = rows.Scan(&sampleUnitType.Code, &sampleUnitType.Description)
+		if err != nil {
+			return nil, err
+		}
+		sampleUnitTypes = append(sampleUnitTypes, sampleUnitType)
+	}
+
+	return sampleUnitTypes, err
 }
 
 func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
@@ -814,24 +859,31 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 
 var fishDataSummaryFullDataSql = `select * FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) ([]map[string]string, error) {
+func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
 	dbQuery, err := s.db.Prepare(fishDataSummaryFullDataSql)
 	if err != nil {
-		return nil, err
+		log.Fatal("Cannot create to file", err)
 	}
 
 	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
-		return nil, err
+		log.Fatal("Cannot create to file", err)
 	}
 	defer rows.Close()
 
 	cols, _ := rows.Columns()
 
-	data := make(map[string]string)
+	file, err := os.Create("FishDataSummary.csv")
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
 
-	fishSummaries := make([]map[string]string, 0)
+	defer file.Close()
 
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	var counter = 0
 	for rows.Next() {
 
 		columns := make([]string, len(cols))
@@ -842,14 +894,24 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 
 		rows.Scan(columnPointers...)
 
+		data := make([]string, 0)
 		for i, colName := range cols {
-			data[colName] = columns[i]
+			if counter == 0 {
+				data = append(data, colName)
+			} else {
+				data = append(data, columns[i])
+			}
 		}
 
-		fishSummaries = append(fishSummaries, data)
+		counter++
+
+		err := writer.Write(data)
+		if err != nil {
+			log.Fatal("Cannot write to file", err)
+		}
 	}
 
-	return fishSummaries, err
+	return file.Name(), err
 }
 
 var fishDataSummarySql = `SELECT mr_id, f_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, panelhook, species_code, hatchery_origin_code, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
@@ -911,23 +973,31 @@ func (s *PallidSturgeonStore) GetFishDataSummary(year string, officeCode string,
 
 var suppDataSummaryFullDataSql = `select * FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) ([]map[string]string, error) {
+func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
 	dbQuery, err := s.db.Prepare(suppDataSummaryFullDataSql)
 	if err != nil {
-		return nil, err
+		return "Cannot create file", err
 	}
 
 	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
-		return nil, err
+		return "Cannot create file", err
 	}
 	defer rows.Close()
 
 	cols, _ := rows.Columns()
 
-	data := make(map[string]string)
+	file, err := os.Create("SupplementalDataSummary.csv")
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
 
-	suppSummaries := make([]map[string]string, 0)
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	var counter = 0
 
 	for rows.Next() {
 
@@ -939,14 +1009,24 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 
 		rows.Scan(columnPointers...)
 
+		data := make([]string, 0)
 		for i, colName := range cols {
-			data[colName] = columns[i]
+			if counter == 0 {
+				data = append(data, colName)
+			} else {
+				data = append(data, columns[i])
+			}
 		}
 
-		suppSummaries = append(suppSummaries, data)
+		counter++
+
+		err := writer.Write(data)
+		if err != nil {
+			log.Fatal("Cannot write to file", err)
+		}
 	}
 
-	return suppSummaries, err
+	return file.Name(), err
 }
 
 var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, hatchery_origin_code, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
@@ -1008,23 +1088,31 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 
 var missouriDataSummaryFullDataSql = `SELECT * FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) ([]map[string]string, error) {
+func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
 	dbQuery, err := s.db.Prepare(missouriDataSummaryFullDataSql)
 	if err != nil {
-		return nil, err
+		return "Cannot create file", err
 	}
 
 	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
-		return nil, err
+		return "Cannot create file", err
 	}
 	defer rows.Close()
 
 	cols, _ := rows.Columns()
 
-	data := make(map[string]string)
+	file, err := os.Create("MissouriDataSummary.csv")
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
 
-	missouriSummaries := make([]map[string]string, 0)
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	var counter = 0
 
 	for rows.Next() {
 
@@ -1036,14 +1124,24 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 
 		rows.Scan(columnPointers...)
 
+		data := make([]string, 0)
 		for i, colName := range cols {
-			data[colName] = columns[i]
+			if counter == 0 {
+				data = append(data, colName)
+			} else {
+				data = append(data, columns[i])
+			}
 		}
 
-		missouriSummaries = append(missouriSummaries, data)
+		counter++
+
+		err := writer.Write(data)
+		if err != nil {
+			log.Fatal("Cannot write to file", err)
+		}
 	}
 
-	return missouriSummaries, err
+	return file.Name(), err
 }
 
 var missouriDataSummarySql = `SELECT mr_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, subsample, subsample_pass, set_Date, conductivity, checkby FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
@@ -1105,23 +1203,31 @@ func (s *PallidSturgeonStore) GetMissouriDataSummary(year string, officeCode str
 
 var geneticDataSummaryFullDataSql = `SELECT * FROM table (pallid_data_api.genetic_datasummary_fnc(:1, :2, :3, to_date(:4,'MM/DD/YYYY'), to_date(:5,'MM/DD/YYYY'), :6, :7, :8, :9))`
 
-func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode string, project string, fromDate string, toDate string, broodstock string, hatchwild string, speciesid string, archive string) ([]map[string]string, error) {
+func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode string, project string, fromDate string, toDate string, broodstock string, hatchwild string, speciesid string, archive string) (string, error) {
 	dbQuery, err := s.db.Prepare(geneticDataSummaryFullDataSql)
 	if err != nil {
-		return nil, err
+		return "Cannot create file", err
 	}
 
 	rows, err := dbQuery.Query(year, officeCode, project, fromDate, toDate, broodstock, hatchwild, hatchwild, speciesid)
 	if err != nil {
-		return nil, err
+		return "Cannot create file", err
 	}
 	defer rows.Close()
 
 	cols, _ := rows.Columns()
 
-	data := make(map[string]string)
+	file, err := os.Create("GeneticDataSummary.csv")
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
 
-	geneticSummaries := make([]map[string]string, 0)
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	var counter = 0
 
 	for rows.Next() {
 
@@ -1133,14 +1239,24 @@ func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode 
 
 		rows.Scan(columnPointers...)
 
+		data := make([]string, 0)
 		for i, colName := range cols {
-			data[colName] = columns[i]
+			if counter == 0 {
+				data = append(data, colName)
+			} else {
+				data = append(data, columns[i])
+			}
 		}
 
-		geneticSummaries = append(geneticSummaries, data)
+		counter++
+
+		err := writer.Write(data)
+		if err != nil {
+			log.Fatal("Cannot write to file", err)
+		}
 	}
 
-	return geneticSummaries, err
+	return file.Name(), err
 }
 
 var geneticDataSummarySql = `SELECT year,field_office_code,project_code,genetics_vial_number,pit_tag,river,river_mile,
@@ -1201,18 +1317,26 @@ func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode stri
 	return geneticSummariesWithCount, err
 }
 
-func (s *PallidSturgeonStore) GetFullSearchDataSummary() ([]map[string]string, error) {
+func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
 	rows, err := s.db.Queryx("SELECT * FROM ds_search")
 	if err != nil {
-		return nil, err
+		return "Cannot create file", err
 	}
 	defer rows.Close()
 
 	cols, _ := rows.Columns()
 
-	data := make(map[string]string)
+	file, err := os.Create("SearchDataSummary.csv")
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
 
-	searchSummaries := make([]map[string]string, 0)
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	var counter = 0
 
 	for rows.Next() {
 
@@ -1224,14 +1348,24 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary() ([]map[string]string, e
 
 		rows.Scan(columnPointers...)
 
+		data := make([]string, 0)
 		for i, colName := range cols {
-			data[colName] = columns[i]
+			if counter == 0 {
+				data = append(data, colName)
+			} else {
+				data = append(data, columns[i])
+			}
 		}
 
-		searchSummaries = append(searchSummaries, data)
+		counter++
+
+		err := writer.Write(data)
+		if err != nil {
+			log.Fatal("Cannot write to file", err)
+		}
 	}
 
-	return searchSummaries, err
+	return file.Name(), err
 }
 
 var searchDataSummarySql = `SELECT se_id,search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude, stop_longitude,se_fid,ds_id,site_fid,temp,conductivity FROM ds_search`

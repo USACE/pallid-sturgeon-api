@@ -56,6 +56,8 @@ func main() {
 	e.GET(urlContext+"/projects", PallidSturgeonH.GetProjects)
 	e.GET(urlContext+"/seasons", PallidSturgeonH.GetSeasons)
 	e.GET(urlContext+"/segments", PallidSturgeonH.GetSegments)
+	e.GET(urlContext+"/fieldOffices", PallidSturgeonH.GetFieldOffices)
+	e.GET(urlContext+"/sampleUnitTypes", PallidSturgeonH.GetSampleUnitTypes)
 	e.GET(urlContext+"/bends", PallidSturgeonH.GetBends)
 	e.GET(urlContext+"/siteDataEntry", PallidSturgeonH.GetSiteDataEntries)
 	e.POST(urlContext+"/siteDataEntry", PallidSturgeonH.SaveSiteDataEntry)
