@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -246,6 +247,7 @@ func (sd *PallidSturgeonHandler) GetFullFishDataSummary(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	defer os.Remove(fileName)
 	return c.Inline(fileName, fileName)
 }
 
@@ -269,6 +271,7 @@ func (sd *PallidSturgeonHandler) GetFullSuppDataSummary(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	defer os.Remove(fileName)
 	return c.Inline(fileName, fileName)
 }
 
@@ -292,6 +295,7 @@ func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) erro
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	defer os.Remove(fileName)
 	return c.Inline(fileName, fileName)
 }
 
@@ -315,6 +319,8 @@ func (sd *PallidSturgeonHandler) GetFullGeneticDataSummary(c echo.Context) error
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
+	defer os.Remove(fileName)
 	return c.Inline(fileName, fileName)
 }
 
@@ -338,6 +344,7 @@ func (sd *PallidSturgeonHandler) GetFullSearchDataSummary(c echo.Context) error 
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	defer os.Remove(fileName)
 	return c.Inline(fileName, fileName)
 }
 
