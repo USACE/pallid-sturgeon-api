@@ -914,7 +914,7 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -924,7 +924,15 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 
 		data := make([]string, 0)
 		for i := range cols {
-			data = append(data, columns[i])
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+			data = append(data, v)
 		}
 
 		err := writer.Write(data)
@@ -1029,7 +1037,7 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -1040,7 +1048,15 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 		data := make([]string, 0)
 
 		for i := range cols {
-			data = append(data, columns[i])
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+			data = append(data, v)
 		}
 
 		err := writer.Write(data)
@@ -1145,7 +1161,7 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -1155,7 +1171,15 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 
 		data := make([]string, 0)
 		for i := range cols {
-			data = append(data, columns[i])
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+			data = append(data, v)
 		}
 
 		err := writer.Write(data)
@@ -1260,7 +1284,7 @@ func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode 
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -1270,7 +1294,15 @@ func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode 
 
 		data := make([]string, 0)
 		for i := range cols {
-			data = append(data, columns[i])
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+			data = append(data, v)
 		}
 
 		err := writer.Write(data)
@@ -1369,7 +1401,7 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -1380,7 +1412,15 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
 		data := make([]string, 0)
 
 		for i := range cols {
-			data = append(data, columns[i])
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+			data = append(data, v)
 		}
 
 		err := writer.Write(data)
@@ -1483,7 +1523,7 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -1493,7 +1533,15 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 
 		data := make([]string, 0)
 		for i := range cols {
-			data = append(data, columns[i])
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+			data = append(data, v)
 		}
 
 		err := writer.Write(data)
@@ -1552,7 +1600,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -1563,6 +1611,15 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 		data := make(map[string]string)
 
 		for i, colName := range cols {
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+
 			words := strings.Split(strings.ToLower(colName), "_")
 			var convertedColName = words[0]
 			if len(words) > 1 {
@@ -1570,7 +1627,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 				convertedColName = words[0] + word2
 			}
 
-			data[convertedColName] = columns[i]
+			data[convertedColName] = v
 		}
 
 		telemetrySummaries = append(telemetrySummaries, data)
@@ -1617,7 +1674,7 @@ func (s *PallidSturgeonStore) GetFullProcedureDataSummary(year string, officeCod
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -1628,7 +1685,15 @@ func (s *PallidSturgeonStore) GetFullProcedureDataSummary(year string, officeCod
 		data := make([]string, 0)
 
 		for i := range cols {
-			data = append(data, columns[i])
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+			data = append(data, v)
 		}
 
 		err := writer.Write(data)
@@ -1687,7 +1752,7 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 
 	for rows.Next() {
 
-		columns := make([]string, len(cols))
+		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
 			columnPointers[i] = &columns[i]
@@ -1698,6 +1763,15 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 		data := make(map[string]string)
 
 		for i, colName := range cols {
+			var v string
+			val := columns[i]
+
+			if val == nil {
+				v = ""
+			} else {
+				v = fmt.Sprintf("%v", val)
+			}
+
 			words := strings.Split(strings.ToLower(colName), "_")
 			var convertedColName = words[0]
 			if len(words) > 1 {
@@ -1705,7 +1779,7 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 				convertedColName = words[0] + word2
 			}
 
-			data[convertedColName] = columns[i]
+			data[convertedColName] = v
 		}
 
 		procedureSummaries = append(procedureSummaries, data)
