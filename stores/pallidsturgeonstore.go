@@ -62,6 +62,27 @@ func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
 	return fieldOffices, err
 }
 
+func (s *PallidSturgeonStore) GetSampleMethods() ([]models.SampleMethod, error) {
+	rows, err := s.db.Query("select * from sample_method_lk order by code")
+
+	sampleMethods := []models.SampleMethod{}
+	if err != nil {
+		return sampleMethods, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		sampleMethod := models.SampleMethod{}
+		err = rows.Scan(&sampleMethod.Code, &sampleMethod.Description)
+		if err != nil {
+			return nil, err
+		}
+		sampleMethods = append(sampleMethods, sampleMethod)
+	}
+
+	return sampleMethods, err
+}
+
 func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, error) {
 	rows, err := s.db.Query("select * from sample_unit_type_lk order by code")
 
@@ -883,7 +904,14 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	var counter = 0
+	//save header
+	data := make([]string, 0)
+	data = append(data, cols...)
+	err = writer.Write(data)
+	if err != nil {
+		log.Fatal("Cannot write to file", err)
+	}
+
 	for rows.Next() {
 
 		columns := make([]string, len(cols))
@@ -895,15 +923,9 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 		rows.Scan(columnPointers...)
 
 		data := make([]string, 0)
-		for i, colName := range cols {
-			if counter == 0 {
-				data = append(data, colName)
-			} else {
-				data = append(data, columns[i])
-			}
+		for i := range cols {
+			data = append(data, columns[i])
 		}
-
-		counter++
 
 		err := writer.Write(data)
 		if err != nil {
@@ -997,7 +1019,13 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	var counter = 0
+	//save header
+	data := make([]string, 0)
+	data = append(data, cols...)
+	err = writer.Write(data)
+	if err != nil {
+		log.Fatal("Cannot write to file", err)
+	}
 
 	for rows.Next() {
 
@@ -1010,15 +1038,10 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 		rows.Scan(columnPointers...)
 
 		data := make([]string, 0)
-		for i, colName := range cols {
-			if counter == 0 {
-				data = append(data, colName)
-			} else {
-				data = append(data, columns[i])
-			}
-		}
 
-		counter++
+		for i := range cols {
+			data = append(data, columns[i])
+		}
 
 		err := writer.Write(data)
 		if err != nil {
@@ -1112,7 +1135,13 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	var counter = 0
+	//save header
+	data := make([]string, 0)
+	data = append(data, cols...)
+	err = writer.Write(data)
+	if err != nil {
+		log.Fatal("Cannot write to file", err)
+	}
 
 	for rows.Next() {
 
@@ -1125,15 +1154,9 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 		rows.Scan(columnPointers...)
 
 		data := make([]string, 0)
-		for i, colName := range cols {
-			if counter == 0 {
-				data = append(data, colName)
-			} else {
-				data = append(data, columns[i])
-			}
+		for i := range cols {
+			data = append(data, columns[i])
 		}
-
-		counter++
 
 		err := writer.Write(data)
 		if err != nil {
@@ -1227,7 +1250,13 @@ func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode 
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	var counter = 0
+	//save header
+	data := make([]string, 0)
+	data = append(data, cols...)
+	err = writer.Write(data)
+	if err != nil {
+		log.Fatal("Cannot write to file", err)
+	}
 
 	for rows.Next() {
 
@@ -1240,15 +1269,9 @@ func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode 
 		rows.Scan(columnPointers...)
 
 		data := make([]string, 0)
-		for i, colName := range cols {
-			if counter == 0 {
-				data = append(data, colName)
-			} else {
-				data = append(data, columns[i])
-			}
+		for i := range cols {
+			data = append(data, columns[i])
 		}
-
-		counter++
 
 		err := writer.Write(data)
 		if err != nil {
@@ -1336,7 +1359,13 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	var counter = 0
+	//save header
+	data := make([]string, 0)
+	data = append(data, cols...)
+	err = writer.Write(data)
+	if err != nil {
+		log.Fatal("Cannot write to file", err)
+	}
 
 	for rows.Next() {
 
@@ -1349,15 +1378,10 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
 		rows.Scan(columnPointers...)
 
 		data := make([]string, 0)
-		for i, colName := range cols {
-			if counter == 0 {
-				data = append(data, colName)
-			} else {
-				data = append(data, columns[i])
-			}
-		}
 
-		counter++
+		for i := range cols {
+			data = append(data, columns[i])
+		}
 
 		err := writer.Write(data)
 		if err != nil {
@@ -1421,6 +1445,275 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchPara
 	searchSummariesWithCount.Items = searchSummaries
 
 	return searchSummariesWithCount, err
+}
+
+var telemetryDataSummaryFullDataSql = `select * FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
+	dbQuery, err := s.db.Prepare(telemetryDataSummaryFullDataSql)
+	if err != nil {
+		return "Cannot create file", err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return "Cannot create file", err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	file, err := os.Create("TelemetryDataSummary.csv")
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
+
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	//save header
+	data := make([]string, 0)
+	data = append(data, cols...)
+	err = writer.Write(data)
+	if err != nil {
+		log.Fatal("Cannot write to file", err)
+	}
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		data := make([]string, 0)
+		for i := range cols {
+			data = append(data, columns[i])
+		}
+
+		err := writer.Write(data)
+		if err != nil {
+			log.Fatal("Cannot write to file", err)
+		}
+	}
+
+	return file.Name(), err
+}
+
+var telemetryDataSummarySql = `select * FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+var telemetryDataSummaryCountSql = `select count(*) FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.SummaryWithCount, error) {
+	telemetrySummaryWithCount := models.SummaryWithCount{}
+	countQuery, err := s.db.Prepare(telemetryDataSummaryCountSql)
+	if err != nil {
+		return telemetrySummaryWithCount, err
+	}
+
+	countrows, err := countQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return telemetrySummaryWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&telemetrySummaryWithCount.TotalCount)
+		if err != nil {
+			return telemetrySummaryWithCount, err
+		}
+	}
+
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "t_id"
+	}
+	telemetryDataEntriesSqlWithSearch := telemetryDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+
+	dbQuery, err := s.db.Prepare(telemetryDataEntriesSqlWithSearch)
+	if err != nil {
+		return telemetrySummaryWithCount, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return telemetrySummaryWithCount, err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	telemetrySummaries := make([]map[string]string, 0)
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		data := make(map[string]string)
+
+		for i, colName := range cols {
+			words := strings.Split(strings.ToLower(colName), "_")
+			var convertedColName = words[0]
+			if len(words) > 1 {
+				word2 := strings.ToUpper(string(words[1][0])) + words[1][1:]
+				convertedColName = words[0] + word2
+			}
+
+			data[convertedColName] = columns[i]
+		}
+
+		telemetrySummaries = append(telemetrySummaries, data)
+	}
+
+	telemetrySummaryWithCount.Items = telemetrySummaries
+
+	return telemetrySummaryWithCount, err
+}
+
+var procedureDataSummaryFullDataSql = `select * FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetFullProcedureDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
+	dbQuery, err := s.db.Prepare(procedureDataSummaryFullDataSql)
+	if err != nil {
+		return "Cannot create file", err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return "Cannot create file", err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	file, err := os.Create("ProcedureDataSummary.csv")
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
+
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	//save header
+	data := make([]string, 0)
+	data = append(data, cols...)
+	err = writer.Write(data)
+	if err != nil {
+		log.Fatal("Cannot write to file", err)
+	}
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		data := make([]string, 0)
+
+		for i := range cols {
+			data = append(data, columns[i])
+		}
+
+		err := writer.Write(data)
+		if err != nil {
+			log.Fatal("Cannot write to file", err)
+		}
+	}
+
+	return file.Name(), err
+}
+
+var procedureDataSummarySql = `select * FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+var procedureDataSummaryCountSql = `select count(*) FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.SummaryWithCount, error) {
+	procedureSummaryWithCount := models.SummaryWithCount{}
+	countQuery, err := s.db.Prepare(procedureDataSummaryCountSql)
+	if err != nil {
+		return procedureSummaryWithCount, err
+	}
+
+	countrows, err := countQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return procedureSummaryWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&procedureSummaryWithCount.TotalCount)
+		if err != nil {
+			return procedureSummaryWithCount, err
+		}
+	}
+
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id"
+	}
+	procedureDataEntriesSqlWithSearch := procedureDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+
+	dbQuery, err := s.db.Prepare(procedureDataEntriesSqlWithSearch)
+	if err != nil {
+		return procedureSummaryWithCount, err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return procedureSummaryWithCount, err
+	}
+	defer rows.Close()
+
+	cols, _ := rows.Columns()
+
+	procedureSummaries := make([]map[string]string, 0)
+
+	for rows.Next() {
+
+		columns := make([]string, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+
+		rows.Scan(columnPointers...)
+
+		data := make(map[string]string)
+
+		for i, colName := range cols {
+			words := strings.Split(strings.ToLower(colName), "_")
+			var convertedColName = words[0]
+			if len(words) > 1 {
+				word2 := strings.ToUpper(string(words[1][0])) + words[1][1:]
+				convertedColName = words[0] + word2
+			}
+
+			data[convertedColName] = columns[i]
+		}
+
+		procedureSummaries = append(procedureSummaries, data)
+	}
+
+	procedureSummaryWithCount.Items = procedureSummaries
+
+	return procedureSummaryWithCount, err
 }
 
 var nextUploadSessionIdSql = `SELECT upload_session_seq.nextval from dual`

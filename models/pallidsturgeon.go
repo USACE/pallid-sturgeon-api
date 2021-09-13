@@ -17,6 +17,11 @@ type FieldOffice struct {
 	State       string `db:"state" json:"state"`
 }
 
+type SampleMethod struct {
+	Code        string `db:"code" json:"code"`
+	Description string `db:"description" json:"description"`
+}
+
 type SampleUnitType struct {
 	Code        string `db:"code" json:"code"`
 	Description string `db:"description" json:"description"`
@@ -167,6 +172,11 @@ type SearchSummary struct {
 	Conductivity    *string `db:"conductivity" json:"conductivity"`
 	EditInitials    string  `db:"edit_initials" json:"editInitials"`
 	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
+}
+
+type SummaryWithCount struct {
+	Items      []map[string]string `json:"items"`
+	TotalCount int                 `json:"totalCount"`
 }
 
 type Upload struct {

@@ -79,6 +79,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /sampleMethods:
+    get:
+      summary: List sampleMethods
+      operationId: GetSampleMethods
+      tags:
+        - sampleMethods
+      responses:
+        '200':
+          description: Array of sampleMethods
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/sampleMethod"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /sampleUnitTypes:
     get:
       summary: List sampleUnitTypes
@@ -1356,6 +1380,358 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /telemetryFullDataSummary:
+    get:
+      summary: List Full Telemetry Summaries
+      operationId: GetFullTelemetrySummaries
+      tags:
+        - telemetryFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /telemetryDataSummary:
+    get:
+      summary: List Telemetry Summaries
+      operationId: GetTelemetrySummaries
+      tags:
+        - telemetrySummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /procedureFullDataSummary:
+    get:
+      summary: List Full Procedure Summaries
+      operationId: GetFullProcedureSummaries
+      tags:
+        - procedureFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /procedureDataSummary:
+    get:
+      summary: List Procedure Summaries
+      operationId: GetProcedureSummaries
+      tags:
+        - procedureSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /upload:
     post:
       tags:
@@ -1429,6 +1805,16 @@ components:
         description:
           type: string
         state:
+          type: string
+    sampleMethod:
+      type: object
+      required:
+        - code
+        - description
+      properties:
+        code:
+          type: string
+        description:
           type: string
     sampleUnitType:
       type: object

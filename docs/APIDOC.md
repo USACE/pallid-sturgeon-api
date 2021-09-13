@@ -3,6 +3,9 @@
 Table of Contents
 - [Pallid Sturgeon API](#pallidsturgeon-api)
     - [projects](#projects)
+    - [sampleMethods](#sampleMethods)
+    - [sampleUnitTypes](#sampleUnitTypes)
+    - [fieldOffices](#fieldOffices)
     - [seasons](#seasons)
     - [segments](#segments)
     - [bends](#bends)
@@ -20,6 +23,21 @@ Table of Contents
 ### Projects
 - List Projects \
   [http://localhost:8080/psapi/projects](http://localhost:8080/psapi/projects)
+
+---
+### SampleMethods
+- List SampleMethods \
+  [http://localhost:8080/psapi/sampleMethods](http://localhost:8080/psapi/sampleMethods)
+
+---
+### SampleUnitTypes
+- List SampleUnitTypes \
+  [http://localhost:8080/psapi/sampleUnitTypes](http://localhost:8080/psapi/sampleUnitTypes)
+
+---
+### FieldOffices
+- List FieldOffices \
+  [http://localhost:8080/psapi/fieldOffices](http://localhost:8080/psapi/fieldOffices)
 
 ---
 ### Seasons
