@@ -28,7 +28,7 @@ func InitStores(appConfig *config.AppConfig) (*PallidSturgeonStore, error) {
 		db:     db,
 		config: appConfig,
 	}
-  
+
 	return &ss, nil
 }
 

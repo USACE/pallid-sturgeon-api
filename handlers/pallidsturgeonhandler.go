@@ -43,6 +43,14 @@ func (sd *PallidSturgeonHandler) GetFieldOffices(c echo.Context) error {
 	return c.JSON(http.StatusOK, fieldOffices)
 }
 
+func (sd *PallidSturgeonHandler) GetSampleMethods(c echo.Context) error {
+	sampleMethods, err := sd.Store.GetSampleMethods()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, sampleMethods)
+}
+
 func (sd *PallidSturgeonHandler) GetSampleUnitTypes(c echo.Context) error {
 	sampleUnitTypes, err := sd.Store.GetSampleUnitTypes()
 	if err != nil {
@@ -358,6 +366,54 @@ func (sd *PallidSturgeonHandler) GetSearchDataSummary(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) GetTelemetryDataSummary(c echo.Context) error {
+	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	dataSummary, err := sd.Store.GetTelemetryDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) GetFullTelemetryDataSummary(c echo.Context) error {
+	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+
+	fileName, err := sd.Store.GetFullTelemetryDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
+}
+
+func (sd *PallidSturgeonHandler) GetProcedureDataSummary(c echo.Context) error {
+	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	dataSummary, err := sd.Store.GetProcedureDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) GetFullProcedureDataSummary(c echo.Context) error {
+	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+
+	fileName, err := sd.Store.GetFullProcedureDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
 }
 
 func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
