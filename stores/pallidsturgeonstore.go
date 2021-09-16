@@ -1439,7 +1439,13 @@ var searchDataSummaryCountSql = `SELECT count(*) FROM ds_search`
 func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchParams) (models.SearchSummaryWithCount, error) {
 	searchSummariesWithCount := models.SearchSummaryWithCount{}
 
-	countrows, err := s.db.Queryx(searchDataSummaryCountSql)
+	filterQuery := ""
+	if queryParams.Filter != "" {
+		filter := "'%" + strings.ToUpper(queryParams.Filter) + "%'"
+		filterQuery = fmt.Sprintf(" where se_id like %s or TO_CHAR(search_date, 'MM/DD/YYYY') like %s or UPPER(recorder) like %s or UPPER(search_type_code) like %s or start_time like %s  or start_time like %s  or stop_time like %s  or stop_latitude like %s  or stop_longitude like %s or stop_longitude like %s or se_fid like %s or ds_id like %s or site_fid like %s or temp like %s or conductivity like %s", filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter)
+	}
+
+	countrows, err := s.db.Queryx(searchDataSummaryCountSql + filterQuery)
 	if err != nil {
 		return searchSummariesWithCount, err
 	}
@@ -1455,12 +1461,6 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchPara
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "se_id"
-	}
-
-	filterQuery := ""
-	if queryParams.Filter != "" {
-		filter := "'%" + strings.ToUpper(queryParams.Filter) + "%'"
-		filterQuery = fmt.Sprintf(" where se_id like %s or TO_CHAR(search_date, 'MM/DD/YYYY') like %s or UPPER(recorder) like %s or UPPER(search_type_code) like %s or start_time like %s  or start_time like %s  or stop_time like %s  or stop_latitude like %s  or stop_longitude like %s or stop_longitude like %s or se_fid like %s or ds_id like %s or site_fid like %s or temp like %s or conductivity like %s", filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter)
 	}
 
 	searchDataSummarySqlWithSearch := searchDataSummarySql + filterQuery + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
