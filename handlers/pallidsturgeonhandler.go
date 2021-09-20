@@ -51,14 +51,6 @@ func (sd *PallidSturgeonHandler) GetSeasons(c echo.Context) error {
 	return c.JSON(http.StatusOK, seasons)
 }
 
-func (sd *PallidSturgeonHandler) GetFieldOffices(c echo.Context) error {
-	fieldOffices, err := sd.Store.GetFieldOffices()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-	return c.JSON(http.StatusOK, fieldOffices)
-}
-
 func (sd *PallidSturgeonHandler) GetSampleMethods(c echo.Context) error {
 	sampleMethods, err := sd.Store.GetSampleMethods()
 	if err != nil {

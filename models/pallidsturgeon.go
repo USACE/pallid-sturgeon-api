@@ -7,13 +7,6 @@ type Role struct {
 	Description string `db:"description" json:"description"`
 }
 
-type FieldOffice struct {
-	ID          int    `db:"id" json:"id"`
-	Code        string `db:"code" json:"code"`
-	Description string `db:"description" json:"description"`
-	State       string `db:"state" json:"state"`
-}
-
 type Season struct {
 	ID           int    `db:"id" json:"id"`
 	Code         string `db:"code" json:"code"`
