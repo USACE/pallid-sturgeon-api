@@ -14,11 +14,11 @@ type UserHandler struct {
 
 func (u *UserHandler) AddUserRoleOffice(c echo.Context) error {
 	var err error
-	uUserRoleOffice := models.UserRoleOffice{}
-	if err := c.Bind(&uUserRoleOffice); err != nil {
+	userRoleOffice := models.UserRoleOffice{}
+	if err := c.Bind(&userRoleOffice); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	err = u.Store.AddUserRoleOffice(uUserRoleOffice)
+	err = u.Store.AddUserRoleOffice(userRoleOffice)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

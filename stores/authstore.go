@@ -56,7 +56,7 @@ func InitAuthStore(appConfig *config.AppConfig) (*AuthStore, error) {
 	ss := AuthStore{
 		db: db,
 	}
-
+	
 	return &ss, nil
 }
 
