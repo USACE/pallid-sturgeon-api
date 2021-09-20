@@ -27,6 +27,7 @@ func (s *PallidSturgeonStore) GetProjects() ([]models.Project, error) {
 	if err != nil {
 		return projects, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		project := models.Project{}
@@ -36,7 +37,6 @@ func (s *PallidSturgeonStore) GetProjects() ([]models.Project, error) {
 		}
 		projects = append(projects, project)
 	}
-	defer rows.Close()
 
 	return projects, err
 }
@@ -132,6 +132,7 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 	if err != nil {
 		return seasons, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		season := models.Season{}
@@ -141,7 +142,6 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 		}
 		seasons = append(seasons, season)
 	}
-	defer rows.Close()
 
 	return seasons, err
 }
@@ -153,6 +153,7 @@ func (s *PallidSturgeonStore) GetSegments() ([]models.Segment, error) {
 	if err != nil {
 		return segments, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		segment := models.Segment{}
@@ -162,7 +163,6 @@ func (s *PallidSturgeonStore) GetSegments() ([]models.Segment, error) {
 		}
 		segments = append(segments, segment)
 	}
-	defer rows.Close()
 
 	return segments, err
 }
@@ -174,6 +174,7 @@ func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
 	if err != nil {
 		return bends, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		bend := models.Bend{}
@@ -183,7 +184,6 @@ func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
 		}
 		bends = append(bends, bend)
 	}
-	defer rows.Close()
 
 	return bends, err
 }
@@ -335,6 +335,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	if err != nil {
 		return fishDataEntryWithCount, err
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&fishDataEntryWithCount.TotalCount)
@@ -342,7 +343,6 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 			return fishDataEntryWithCount, err
 		}
 	}
-	defer countrows.Close()
 
 	fishEntries := []models.UploadFish{}
 	offset := queryParams.PageSize * queryParams.Page
@@ -359,6 +359,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	if err != nil {
 		return fishDataEntryWithCount, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		fishDataEntry := models.UploadFish{}
@@ -370,7 +371,6 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 		}
 		fishEntries = append(fishEntries, fishDataEntry)
 	}
-	defer rows.Close()
 
 	fishDataEntryWithCount.Items = fishEntries
 
@@ -539,6 +539,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	if err != nil {
 		return moriverDataEntryWithCount, err
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&moriverDataEntryWithCount.TotalCount)
@@ -546,7 +547,6 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 			return moriverDataEntryWithCount, err
 		}
 	}
-	defer countrows.Close()
 
 	moriverEntries := []models.UploadMoriver{}
 	offset := queryParams.PageSize * queryParams.Page
@@ -563,6 +563,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	if err != nil {
 		return moriverDataEntryWithCount, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		moriverDataEntry := models.UploadMoriver{}
@@ -583,7 +584,6 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 		}
 		moriverEntries = append(moriverEntries, moriverDataEntry)
 	}
-	defer rows.Close()
 
 	moriverDataEntryWithCount.Items = moriverEntries
 
@@ -815,6 +815,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 	if err != nil {
 		return supplementalDataEntryWithCount, err
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&supplementalDataEntryWithCount.TotalCount)
@@ -822,7 +823,6 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			return supplementalDataEntryWithCount, err
 		}
 	}
-	defer countrows.Close()
 
 	supplementalEntries := []models.UploadSupplemental{}
 	offset := queryParams.PageSize * queryParams.Page
@@ -839,6 +839,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 	if err != nil {
 		return supplementalDataEntryWithCount, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		supplementalDataEntry := models.UploadSupplemental{}
@@ -892,7 +893,6 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 		}
 		supplementalEntries = append(supplementalEntries, supplementalDataEntry)
 	}
-	defer rows.Close()
 
 	supplementalDataEntryWithCount.Items = supplementalEntries
 
@@ -980,6 +980,7 @@ func (s *PallidSturgeonStore) GetFishDataSummary(year string, officeCode string,
 	if err != nil {
 		return fishSummariesWithCount, err
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&fishSummariesWithCount.TotalCount)
@@ -987,7 +988,6 @@ func (s *PallidSturgeonStore) GetFishDataSummary(year string, officeCode string,
 			return fishSummariesWithCount, err
 		}
 	}
-	defer countrows.Close()
 
 	fishSummaries := []models.FishSummary{}
 	offset := queryParams.PageSize * queryParams.Page
@@ -1004,6 +1004,7 @@ func (s *PallidSturgeonStore) GetFishDataSummary(year string, officeCode string,
 	if err != nil {
 		return fishSummariesWithCount, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		fishSummary := models.FishSummary{}
@@ -1015,7 +1016,6 @@ func (s *PallidSturgeonStore) GetFishDataSummary(year string, officeCode string,
 		}
 		fishSummaries = append(fishSummaries, fishSummary)
 	}
-	defer rows.Close()
 
 	fishSummariesWithCount.Items = fishSummaries
 
@@ -1104,6 +1104,7 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 	if err != nil {
 		return suppSummariesWithCount, err
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&suppSummariesWithCount.TotalCount)
@@ -1111,7 +1112,6 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 			return suppSummariesWithCount, err
 		}
 	}
-	defer countrows.Close()
 
 	suppSummaries := []models.SuppSummary{}
 	offset := queryParams.PageSize * queryParams.Page
@@ -1128,6 +1128,7 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 	if err != nil {
 		return suppSummariesWithCount, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		summary := models.SuppSummary{}
@@ -1139,7 +1140,6 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 		}
 		suppSummaries = append(suppSummaries, summary)
 	}
-	defer rows.Close()
 
 	suppSummariesWithCount.Items = suppSummaries
 
@@ -1227,6 +1227,7 @@ func (s *PallidSturgeonStore) GetMissouriDataSummary(year string, officeCode str
 	if err != nil {
 		return missouriSummariesWithCount, err
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&missouriSummariesWithCount.TotalCount)
@@ -1234,7 +1235,6 @@ func (s *PallidSturgeonStore) GetMissouriDataSummary(year string, officeCode str
 			return missouriSummariesWithCount, err
 		}
 	}
-	defer countrows.Close()
 
 	missouriSummaries := []models.MissouriSummary{}
 	offset := queryParams.PageSize * queryParams.Page
@@ -1251,6 +1251,7 @@ func (s *PallidSturgeonStore) GetMissouriDataSummary(year string, officeCode str
 	if err != nil {
 		return missouriSummariesWithCount, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		summary := models.MissouriSummary{}
@@ -1262,7 +1263,6 @@ func (s *PallidSturgeonStore) GetMissouriDataSummary(year string, officeCode str
 		}
 		missouriSummaries = append(missouriSummaries, summary)
 	}
-	defer rows.Close()
 
 	missouriSummariesWithCount.Items = missouriSummaries
 
@@ -1351,6 +1351,7 @@ func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode stri
 	if err != nil {
 		return geneticSummariesWithCount, err
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&geneticSummariesWithCount.TotalCount)
@@ -1358,7 +1359,6 @@ func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode stri
 			return geneticSummariesWithCount, err
 		}
 	}
-	defer countrows.Close()
 
 	geneticSummaries := []models.GeneticSummary{}
 	offset := queryParams.PageSize * queryParams.Page
@@ -1375,6 +1375,7 @@ func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode stri
 	if err != nil {
 		return geneticSummariesWithCount, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		summary := models.GeneticSummary{}
@@ -1386,7 +1387,6 @@ func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode stri
 		}
 		geneticSummaries = append(geneticSummaries, summary)
 	}
-	defer rows.Close()
 
 	geneticSummariesWithCount.Items = geneticSummaries
 
@@ -1501,8 +1501,8 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchPara
 		}
 		searchSummaries = append(searchSummaries, summary)
 	}
-	defer rows.Close()
 
+	defer rows.Close()
 	searchSummariesWithCount.Items = searchSummaries
 
 	return searchSummariesWithCount, err
@@ -1818,12 +1818,12 @@ func (s *PallidSturgeonStore) GetUploadSessionId() (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	defer rows.Close()
 
 	var nextUploadSessionId int
 	for rows.Next() {
 		rows.Scan(&nextUploadSessionId)
 	}
-	defer rows.Close()
 
 	return nextUploadSessionId, err
 }
