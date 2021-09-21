@@ -41,6 +41,27 @@ func (s *PallidSturgeonStore) GetProjects() ([]models.Project, error) {
 	return projects, err
 }
 
+func (s *PallidSturgeonStore) GetRoles() ([]models.Role, error) {
+	rows, err := s.db.Query("select * from role_lk order by id")
+
+	roles := []models.Role{}
+	if err != nil {
+		return roles, err
+	}
+
+	for rows.Next() {
+		role := models.Role{}
+		err = rows.Scan(&role.ID, &role.Description)
+		if err != nil {
+			return nil, err
+		}
+		roles = append(roles, role)
+	}
+	defer rows.Close()
+
+	return roles, err
+}
+
 func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
 	rows, err := s.db.Query("select * from field_office_lk order by id")
 

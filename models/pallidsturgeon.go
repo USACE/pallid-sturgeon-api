@@ -2,6 +2,11 @@ package models
 
 import "time"
 
+type Role struct {
+	ID          int    `db:"id" json:"id"`
+	Description string `db:"description" json:"description"`
+}
+
 type Season struct {
 	ID           int    `db:"id" json:"id"`
 	Code         string `db:"code" json:"code"`
