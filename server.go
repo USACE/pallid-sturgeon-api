@@ -103,5 +103,5 @@ func main() {
 	e.POST(urlContext+"/telemetryUpload", PallidSturgeonH.TelemetryUpload)
 	e.POST(urlContext+"/storeProcedure/:uploadSessionId", PallidSturgeonH.CallStoreProcedures)
 	// e.Logger.Fatal(e.Start(":8080"))
-	e.Logger.Debug(e.Start(":8989"))
+	e.Logger.Debug(e.Start(":8080"))
 }
