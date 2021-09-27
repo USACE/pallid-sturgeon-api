@@ -31,6 +31,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /fieldOfficeSegments:
+    get:
+      summary: List fieldOfficeSegments
+      operationId: GetFieldOfficeSegments
+      tags:
+        - fieldOfficeSegments
+      responses:
+        '200':
+          description: Array of fieldOfficeSegments
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/fieldOfficeSegment"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /fieldOffices:
     get:
       summary: List fieldOffices
@@ -175,6 +199,70 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /downloadInfo:
+    get:
+      summary: Download Info
+      operationId: GetDownloadInfo
+      tags:
+        - downloadInfo
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: The id
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: downloadInfo
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/downloadInfo"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                /upload:
+  /downloadZip:
+    get:
+      summary: Download Zip
+      operationId: downloadZip
+      tags:
+        - downloadZip
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: The id
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: downloadZip
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/downloadZip"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                /upload:
   /siteDataEntry:
     get:
       summary: List Site Entries
@@ -597,6 +685,121 @@ paths:
       responses:
         '201':
           description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /errorCount:
+    get:
+      summary: List errorCounts
+      operationId: GetErrorCounts
+      tags:
+        - errorCounts
+      responses:
+        '200':
+          description: Array of errorCounts
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/errorCount"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /usgNoVialNumbers:
+    get:
+      summary: List usgNoVialNumbers
+      operationId: GetUsgNoVialNumbers
+      tags:
+        - usgNoVialNumbers
+      responses:
+        '200':
+          description: Array of usgNoVialNumbers
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/usgNoVialNumber"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /unapprovedDataSheets:
+    get:
+      summary: List unapprovedDataSheets
+      operationId: GetUnapprovedDataSheets
+      tags:
+        - unapprovedDataSheets
+      responses:
+        '200':
+          description: Array of unapprovedDataSheets
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/unapprovedDataSheet"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /uncheckedDataSheets:
+    get:
+      summary: List uncheckedDataSheets
+      operationId: GetUncheckedDataSheets
+      tags:
+        - uncheckedDataSheets
+      parameters:
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of uncheckedDataSheets
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/uncheckedDataSheet"
         default:
           description: unexpected error
           content:
