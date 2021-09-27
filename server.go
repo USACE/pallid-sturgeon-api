@@ -3,7 +3,7 @@ package main
 import (
 	//"log"
 
-	. "github.com/USACE/pallid_sturgeon_api/server/auth"
+	//. "github.com/USACE/pallid_sturgeon_api/server/auth"
 
 	"log"
 
@@ -19,24 +19,23 @@ var urlContext string = "/psapi"
 
 func main() {
 	appconfig := config.GetEnv()
-	auth := Auth{}
+	//auth := Auth{}
 
-	//err := LoadVerificationKeys(appconfig.IPPK)
-	err := auth.LoadVerificationKey(appconfig.IPPK)
-	if err != nil {
-		log.Fatalf("Unable to load a verification key:%s.\nShutting down.", err)
-	}
+	// err := auth.LoadVerificationKey(appconfig.IPPK)
+	// if err != nil {
+	// 	log.Fatalf("Unable to load a verification key:%s.\nShutting down.", err)
+	// }
 	pallidSturgeonStore, err := stores.InitStores(appconfig)
 	if err != nil {
 		log.Printf("Unable to connect to the Main Pallid Sturgeon database: %s", err)
 	}
 
-	authStore, err := stores.InitAuthStore(appconfig)
-	if err != nil {
-		log.Printf("Unable to connect to the Auth database: %s", err)
-	}
+	// authStore, err := stores.InitAuthStore(appconfig)
+	// if err != nil {
+	// 	log.Printf("Unable to connect to the Auth database: %s", err)
+	// }
 
-	auth.Store = authStore
+	// auth.Store = authStore
 
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -46,18 +45,13 @@ func main() {
 		Store: pallidSturgeonStore,
 	}
 
-	userH := handlers.UserHandler{
-		Store: authStore,
-	}
+	// userH := handlers.UserHandler{
+	// 	Store: authStore,
+	// }
 
 	e.GET(urlContext+"/version", PallidSturgeonH.Version)
 
-	//user roles
-	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
-	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, PUBLIC))
-	e.POST(urlContext+"/userRoleOffice", userH.AddUserRoleOffice)
-
-	e.GET(urlContext+"/projects", auth.Authorize(PallidSturgeonH.GetProjects, PUBLIC))
+	e.GET(urlContext+"/projects", PallidSturgeonH.GetProjects)
 	e.GET(urlContext+"/roles", PallidSturgeonH.GetRoles)
 	e.GET(urlContext+"/fieldOffices", PallidSturgeonH.GetFieldOffices)
 	e.GET(urlContext+"/seasons", PallidSturgeonH.GetSeasons)
@@ -102,6 +96,69 @@ func main() {
 	e.POST(urlContext+"/moriverUpload", PallidSturgeonH.MoriverUpload)
 	e.POST(urlContext+"/telemetryUpload", PallidSturgeonH.TelemetryUpload)
 	e.POST(urlContext+"/storeProcedure/:uploadSessionId", PallidSturgeonH.CallStoreProcedures)
+	e.GET(urlContext+"/errorCount", PallidSturgeonH.GetErrorCount)
+	e.GET(urlContext+"/usgNoVialNumbers", PallidSturgeonH.GetUsgNoVialNumbers)
+	e.GET(urlContext+"/unapprovedDataSheets", PallidSturgeonH.GetUnapprovedDataSheets)
+	e.GET(urlContext+"/uncheckedDataSheets", PallidSturgeonH.GetUncheckedDataSheets)
+	e.GET(urlContext+"/downloadInfo", PallidSturgeonH.GetDownloadInfo)
+	e.GET(urlContext+"/downloadZip", PallidSturgeonH.GetDownloadZip)
+
+	// e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
+	// e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, PUBLIC))
+	// e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, PUBLIC))
+
+	// e.GET(urlContext+"/projects", auth.Authorize(PallidSturgeonH.GetProjects, PUBLIC))
+	// e.GET(urlContext+"/roles", auth.Authorize(PallidSturgeonH.GetRoles, PUBLIC))
+	// e.GET(urlContext+"/fieldOffices", auth.Authorize(PallidSturgeonH.GetFieldOffices, PUBLIC))
+	// e.GET(urlContext+"/seasons", auth.Authorize(PallidSturgeonH.GetSeasons, PUBLIC))
+	// e.GET(urlContext+"/segments", auth.Authorize(PallidSturgeonH.GetSegments, PUBLIC))
+	// e.GET(urlContext+"/fieldOffices", auth.Authorize(PallidSturgeonH.GetFieldOffices, PUBLIC))
+	// e.GET(urlContext+"/sampleMethods", auth.Authorize(PallidSturgeonH.GetSampleMethods, PUBLIC))
+	// e.GET(urlContext+"/sampleUnitTypes", auth.Authorize(PallidSturgeonH.GetSampleUnitTypes, PUBLIC))
+	// e.GET(urlContext+"/bends", auth.Authorize(PallidSturgeonH.GetBends, PUBLIC))
+	// e.GET(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.GetSiteDataEntries, PUBLIC))
+	// e.POST(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.SaveSiteDataEntry, PUBLIC))
+	// e.PUT(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.UpdateSiteDataEntry, PUBLIC))
+	// e.GET(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.GetFishDataEntries, PUBLIC))
+	// e.POST(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.SaveFishDataEntry, PUBLIC))
+	// e.PUT(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.UpdateFishDataEntry, PUBLIC))
+	// e.GET(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.GetMoriverDataEntries, PUBLIC))
+	// e.POST(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.SaveMoriverDataEntry, PUBLIC))
+	// e.PUT(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.UpdateMoriverDataEntry, PUBLIC))
+	// e.GET(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.GetSupplementalDataEntries, PUBLIC))
+	// e.POST(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.SaveSupplementalDataEntry, PUBLIC))
+	// e.PUT(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.UpdateSupplementalDataEntry, PUBLIC))
+	// e.GET(urlContext+"/fishFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullFishDataSummary, PUBLIC))
+	// e.GET(urlContext+"/fishDataSummary", auth.Authorize(PallidSturgeonH.GetFishDataSummary, PUBLIC))
+	// e.GET(urlContext+"/suppFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullSuppDataSummary, PUBLIC))
+	// e.GET(urlContext+"/suppDataSummary", auth.Authorize(PallidSturgeonH.GetSuppDataSummary, PUBLIC))
+	// e.GET(urlContext+"/missouriFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullMissouriDataSummary, PUBLIC))
+	// e.GET(urlContext+"/missouriDataSummary", auth.Authorize(PallidSturgeonH.GetMissouriDataSummary, PUBLIC))
+	// e.GET(urlContext+"/geneticFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullGeneticDataSummary, PUBLIC))
+	// e.GET(urlContext+"/geneticDataSummary", auth.Authorize(PallidSturgeonH.GetGeneticDataSummary, PUBLIC))
+	// e.GET(urlContext+"/searchFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullSearchDataSummary, PUBLIC))
+	// e.GET(urlContext+"/searchDataSummary", auth.Authorize(PallidSturgeonH.GetSearchDataSummary, PUBLIC))
+	// e.GET(urlContext+"/telemetryFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullTelemetryDataSummary, PUBLIC))
+	// e.GET(urlContext+"/telemetryDataSummary", auth.Authorize(PallidSturgeonH.GetTelemetryDataSummary, PUBLIC))
+	// e.GET(urlContext+"/procedureFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullProcedureDataSummary, PUBLIC))
+	// e.GET(urlContext+"/procedureDataSummary", auth.Authorize(PallidSturgeonH.GetProcedureDataSummary, PUBLIC))
+	// e.GET(urlContext+"/uploadSessionId", auth.Authorize(PallidSturgeonH.GetUploadSessionId, PUBLIC))
+	// e.POST(urlContext+"/upload", auth.Authorize(PallidSturgeonH.Upload, PUBLIC))
+	// e.POST(urlContext+"/siteUpload", auth.Authorize(PallidSturgeonH.SiteUpload, PUBLIC))
+	// e.POST(urlContext+"/fishUpload", auth.Authorize(PallidSturgeonH.FishUpload, PUBLIC))
+	// e.POST(urlContext+"/searchUpload", auth.Authorize(PallidSturgeonH.SearchUpload, PUBLIC))
+	// e.POST(urlContext+"/supplementalUpload", auth.Authorize(PallidSturgeonH.SupplementalUpload, PUBLIC))
+	// e.POST(urlContext+"/procedureUpload", auth.Authorize(PallidSturgeonH.ProcedureUpload, PUBLIC))
+	// e.POST(urlContext+"/moriverUpload", auth.Authorize(PallidSturgeonH.MoriverUpload, PUBLIC))
+	// e.POST(urlContext+"/telemetryUpload", auth.Authorize(PallidSturgeonH.TelemetryUpload, PUBLIC))
+	// e.POST(urlContext+"/storeProcedure/:uploadSessionId", auth.Authorize(PallidSturgeonH.CallStoreProcedures, PUBLIC))
+	// e.POST(urlContext+"/errorCount", auth.Authorize(PallidSturgeonH.GetErrorCount, PUBLIC))
+	// e.POST(urlContext+"/usgNoVialNumbers", auth.Authorize(PallidSturgeonH.GetUsgNoVialNumbers, PUBLIC))
+	// e.POST(urlContext+"/unapprovedDataSheets", auth.Authorize(PallidSturgeonH.GetUnapprovedDataSheets, PUBLIC))
+	// e.POST(urlContext+"/uncheckedDataSheets", auth.Authorize(PallidSturgeonH.GetUncheckedDataSheets, PUBLIC))
+	// e.GET(urlContext+"/downloadInfo", auth.Authorize(PallidSturgeonH.GetDownloadInfo))
+	// e.GET(urlContext+"/downloadZip", auth.Authorize(PallidSturgeonH.GetDownloadZip))
+
 	// e.Logger.Fatal(e.Start(":8080"))
 	e.Logger.Debug(e.Start(":8080"))
 }

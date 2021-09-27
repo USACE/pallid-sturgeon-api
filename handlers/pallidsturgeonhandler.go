@@ -20,7 +20,14 @@ func (ps *PallidSturgeonHandler) Version(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetProjects(c echo.Context) error {
-	projects, err := sd.Store.GetProjects()
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+	projects, err := sd.Store.GetProjects("MO")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -68,7 +75,14 @@ func (sd *PallidSturgeonHandler) GetSampleUnitTypes(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSegments(c echo.Context) error {
-	segments, err := sd.Store.GetSegments()
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+	segments, err := sd.Store.GetSegments("MO")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -89,7 +103,15 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetSiteDataEntries(year, projectCode, segmentCode, seasonCode, bendrn, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetSiteDataEntries(year, "MO", projectCode, segmentCode, seasonCode, bendrn, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -102,7 +124,10 @@ func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	siteData.LastUpdated = time.Now()
-	siteData.UploadedBy = "DeeLiang"
+	// user := c.Get("PSUSER").(models.User)
+	// siteData.UploadedBy = "Dee Liang"
+
+	siteData.UploadedBy = "Dee Liang"
 	id, err := sd.Store.SaveSiteDataEntry(siteData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -118,7 +143,9 @@ func (sd *PallidSturgeonHandler) UpdateSiteDataEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	siteData.LastUpdated = time.Now()
-	siteData.UploadedBy = "DeeLiang"
+	// user := c.Get("PSUSER").(models.User)
+	// siteData.UploadedBy = "Dee Liang"
+	siteData.UploadedBy = "Dee Liang"
 	err := sd.Store.UpdateSiteDataEntry(siteData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -132,7 +159,15 @@ func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetFishDataEntries(tableId, fieldId, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetFishDataEntries(tableId, fieldId, "MO", queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -145,7 +180,9 @@ func (sd *PallidSturgeonHandler) SaveFishDataEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	fishData.LastUpdated = time.Now()
-	fishData.UploadedBy = "DeeLiang"
+	// user := c.Get("PSUSER").(models.User)
+	// fishData.UploadedBy = "Dee Liang"
+	fishData.UploadedBy = "Dee Liang"
 	id, err := sd.Store.SaveFishDataEntry(fishData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -161,7 +198,8 @@ func (sd *PallidSturgeonHandler) UpdateFishDataEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	fishData.LastUpdated = time.Now()
-	fishData.UploadedBy = "DeeLiang"
+	//user := c.Get("PSUSER").(models.User)
+	fishData.UploadedBy = "Dee Liang"
 	err := sd.Store.UpdateFishDataEntry(fishData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -175,7 +213,15 @@ func (sd *PallidSturgeonHandler) GetMoriverDataEntries(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetMoriverDataEntries(tableId, fieldId, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetMoriverDataEntries(tableId, fieldId, "MO", queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -188,7 +234,9 @@ func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	moriverData.LastUpdated = time.Now()
-	moriverData.UploadedBy = "DeeLiang"
+	// user := c.Get("PSUSER").(models.User)
+	// moriverData.UploadedBy = "Dee Liang"
+	moriverData.UploadedBy = "Dee Liang"
 	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -204,7 +252,8 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	moriverData.LastUpdated = time.Now()
-	moriverData.UploadedBy = "DeeLiang"
+	//user := c.Get("PSUSER").(models.User)
+	moriverData.UploadedBy = "Dee Liang"
 	err := sd.Store.UpdateMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -218,7 +267,15 @@ func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) erro
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, "MO", queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -231,7 +288,9 @@ func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	supplementalData.LastUpdated = time.Now()
-	supplementalData.UploadedBy = "DeeLiang"
+	// user := c.Get("PSUSER").(models.User)
+	// supplementalData.UploadedBy = "Dee Liang"
+	supplementalData.UploadedBy = "Dee Liang"
 	id, err := sd.Store.SaveSupplementalDataEntry(supplementalData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -247,7 +306,9 @@ func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) err
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	supplementalData.LastUpdated = time.Now()
-	supplementalData.UploadedBy = "DeeLiang"
+	// user := c.Get("PSUSER").(models.User)
+	// supplementalData.UploadedBy = "Dee Liang"
+	supplementalData.UploadedBy = "Dee Liang"
 	err := sd.Store.UpdateSupplementalDataEntry(supplementalData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -256,9 +317,16 @@ func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) err
 }
 
 func (sd *PallidSturgeonHandler) GetFullFishDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
-	fileName, err := sd.Store.GetFullFishDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	fileName, err := sd.Store.GetFullFishDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -268,12 +336,20 @@ func (sd *PallidSturgeonHandler) GetFullFishDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetFishDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetFishDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -281,9 +357,16 @@ func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullSuppDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
-	fileName, err := sd.Store.GetFullSuppDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	fileName, err := sd.Store.GetFullSuppDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -292,12 +375,20 @@ func (sd *PallidSturgeonHandler) GetFullSuppDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSuppDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetSuppDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetSuppDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -305,9 +396,16 @@ func (sd *PallidSturgeonHandler) GetSuppDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
-	fileName, err := sd.Store.GetFullMissouriDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	fileName, err := sd.Store.GetFullMissouriDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -316,12 +414,20 @@ func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) erro
 }
 
 func (sd *PallidSturgeonHandler) GetMissouriDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetMissouriDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetMissouriDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -329,9 +435,16 @@ func (sd *PallidSturgeonHandler) GetMissouriDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullGeneticDataSummary(c echo.Context) error {
-	year, officeCode, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("fromDate"), c.QueryParam("toDate"), c.QueryParam("broodstock"), c.QueryParam("hatchwild"), c.QueryParam("speciesId"), c.QueryParam("archive")
+	year, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("fromDate"), c.QueryParam("toDate"), c.QueryParam("broodstock"), c.QueryParam("hatchwild"), c.QueryParam("speciesId"), c.QueryParam("archive")
 
-	fileName, err := sd.Store.GetFullGeneticDataSummary(year, officeCode, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive)
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	fileName, err := sd.Store.GetFullGeneticDataSummary(year, "MO", project, fromDate, toDate, broodstock, hatchwild, speciesId, archive)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -341,12 +454,20 @@ func (sd *PallidSturgeonHandler) GetFullGeneticDataSummary(c echo.Context) error
 }
 
 func (sd *PallidSturgeonHandler) GetGeneticDataSummary(c echo.Context) error {
-	year, officeCode, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("fromDate"), c.QueryParam("toDate"), c.QueryParam("broodstock"), c.QueryParam("hatchwild"), c.QueryParam("speciesId"), c.QueryParam("archive")
+	year, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("fromDate"), c.QueryParam("toDate"), c.QueryParam("broodstock"), c.QueryParam("hatchwild"), c.QueryParam("speciesId"), c.QueryParam("archive")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetGeneticDataSummary(year, officeCode, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetGeneticDataSummary(year, "MO", project, fromDate, toDate, broodstock, hatchwild, speciesId, archive, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -377,12 +498,20 @@ func (sd *PallidSturgeonHandler) GetSearchDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetTelemetryDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetTelemetryDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	dataSummary, err := sd.Store.GetTelemetryDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -390,9 +519,16 @@ func (sd *PallidSturgeonHandler) GetTelemetryDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullTelemetryDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
-	fileName, err := sd.Store.GetFullTelemetryDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	fileName, err := sd.Store.GetFullTelemetryDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -401,12 +537,19 @@ func (sd *PallidSturgeonHandler) GetFullTelemetryDataSummary(c echo.Context) err
 }
 
 func (sd *PallidSturgeonHandler) GetProcedureDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetProcedureDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate, queryParams)
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+	dataSummary, err := sd.Store.GetProcedureDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -414,9 +557,16 @@ func (sd *PallidSturgeonHandler) GetProcedureDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullProcedureDataSummary(c echo.Context) error {
-	year, officeCode, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("officeCode"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
-	fileName, err := sd.Store.GetFullProcedureDataSummary(year, officeCode, project, approved, season, spice, month, fromDate, toDate)
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	fileName, err := sd.Store.GetFullProcedureDataSummary(year, "MO", project, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -444,9 +594,12 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
+	//user := c.Get("PSUSER").(models.User)
+
 	for _, uploadSite := range uploads.SiteUpload.Items {
 		uploadSite.LastUpdated = time.Now()
-		uploadSite.UploadedBy = "DeeLiang"
+		//uploadSite.UploadedBy = "Dee Liang"
+		uploadSite.UploadedBy = "Dee Liang"
 		uploadSite.UploadSessionId = sessionId
 		uploadSite.EditInitials = uploads.EditInitials
 		uploadSite.UploadFilename = uploads.SiteUpload.UploadFilename
@@ -458,7 +611,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadFish := range uploads.FishUpload.Items {
 		uploadFish.LastUpdated = time.Now()
-		uploadFish.UploadedBy = "DeeLiang"
+		uploadFish.UploadedBy = "Dee Liang"
 		uploadFish.UploadSessionId = sessionId
 		uploadFish.EditInitials = uploads.EditInitials
 		uploadFish.UploadFilename = uploads.SiteUpload.UploadFilename
@@ -470,7 +623,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadSearch := range uploads.SearchUpload.Items {
 		uploadSearch.LastUpdated = time.Now()
-		uploadSearch.UploadedBy = "DeeLiang"
+		uploadSearch.UploadedBy = "Dee Liang"
 		uploadSearch.UploadSessionId = sessionId
 		uploadSearch.EditInitials = uploads.EditInitials
 		uploadSearch.UploadFilename = uploads.SiteUpload.UploadFilename
@@ -482,7 +635,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadSupplemental := range uploads.UploadSupplemental.Items {
 		uploadSupplemental.LastUpdated = time.Now()
-		uploadSupplemental.UploadedBy = "DeeLiang"
+		uploadSupplemental.UploadedBy = "Dee Liang"
 		uploadSupplemental.UploadSessionId = sessionId
 		uploadSupplemental.EditInitials = uploads.EditInitials
 		uploadSupplemental.UploadFilename = uploads.SiteUpload.UploadFilename
@@ -493,7 +646,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
 		uploadProcedure.LastUpdated = time.Now()
-		uploadProcedure.UploadedBy = "DeeLiang"
+		uploadProcedure.UploadedBy = "Dee Liang"
 		uploadProcedure.UploadSessionId = sessionId
 		uploadProcedure.EditInitials = uploads.EditInitials
 		uploadProcedure.UploadFilename = uploads.SiteUpload.UploadFilename
@@ -505,7 +658,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadMoriver := range uploads.MoriverUpload.Items {
 		uploadMoriver.LastUpdated = time.Now()
-		uploadMoriver.UploadedBy = "DeeLiang"
+		uploadMoriver.UploadedBy = "Dee Liang"
 		uploadMoriver.UploadSessionId = sessionId
 		uploadMoriver.EditInitials = uploads.EditInitials
 		uploadMoriver.UploadFilename = uploads.SiteUpload.UploadFilename
@@ -517,7 +670,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadTelemetry := range uploads.TelemetryUpload.Items {
 		uploadTelemetry.LastUpdated = time.Now()
-		uploadTelemetry.UploadedBy = "DeeLiang"
+		uploadTelemetry.UploadedBy = "Dee Liang"
 		uploadTelemetry.UploadSessionId = sessionId
 		uploadTelemetry.EditInitials = uploads.EditInitials
 		uploadTelemetry.UploadFilename = uploads.SiteUpload.UploadFilename
@@ -527,7 +680,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		}
 	}
 
-	procedureOut, err := sd.Store.CallStoreProcedures("DeeLiang", sessionId)
+	procedureOut, err := sd.Store.CallStoreProcedures("Dee Liang", sessionId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -543,7 +696,9 @@ func (sd *PallidSturgeonHandler) SiteUpload(c echo.Context) error {
 	}
 	for _, uploadSite := range uploadSites {
 		uploadSite.LastUpdated = time.Now()
-		uploadSite.UploadedBy = "DeeLiang"
+		// user := c.Get("PSUSER").(models.User)
+		// uploadSite.UploadedBy = "Dee Liang"
+		uploadSite.UploadedBy = "Dee Liang"
 		err = sd.Store.SaveSiteUpload(uploadSite)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -561,7 +716,9 @@ func (sd *PallidSturgeonHandler) FishUpload(c echo.Context) error {
 	}
 	for _, uploadFish := range uploadFishs {
 		uploadFish.LastUpdated = time.Now()
-		uploadFish.UploadedBy = "DeeLiang"
+		// user := c.Get("PSUSER").(models.User)
+		// uploadFish.UploadedBy = "Dee Liang"
+		uploadFish.UploadedBy = "Dee Liang"
 		err = sd.Store.SaveFishUpload(uploadFish)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -579,7 +736,9 @@ func (sd *PallidSturgeonHandler) SearchUpload(c echo.Context) error {
 	}
 	for _, uploadSearch := range uploadSearches {
 		uploadSearch.LastUpdated = time.Now()
-		uploadSearch.UploadedBy = "DeeLiang"
+		// user := c.Get("PSUSER").(models.User)
+		// uploadSearch.UploadedBy = "Dee Liang"
+		uploadSearch.UploadedBy = "Dee Liang"
 		err = sd.Store.SaveSearchUpload(uploadSearch)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -597,7 +756,9 @@ func (sd *PallidSturgeonHandler) SupplementalUpload(c echo.Context) error {
 	}
 	for _, uploadSupplemental := range uploadSupplementals {
 		uploadSupplemental.LastUpdated = time.Now()
-		uploadSupplemental.UploadedBy = "DeeLiang"
+		// user := c.Get("PSUSER").(models.User)
+		// uploadSupplemental.UploadedBy = "Dee Liang"
+		uploadSupplemental.UploadedBy = "Dee Liang"
 		err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -615,7 +776,9 @@ func (sd *PallidSturgeonHandler) ProcedureUpload(c echo.Context) error {
 	}
 	for _, uploadProcedure := range uploadProcedures {
 		uploadProcedure.LastUpdated = time.Now()
-		uploadProcedure.UploadedBy = "DeeLiang"
+		// user := c.Get("PSUSER").(models.User)
+		// uploadProcedure.UploadedBy = "Dee Liang"
+		uploadProcedure.UploadedBy = "Dee Liang"
 		err = sd.Store.SaveProcedureUpload(uploadProcedure)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -633,7 +796,9 @@ func (sd *PallidSturgeonHandler) MoriverUpload(c echo.Context) error {
 	}
 	for _, uploadMoriver := range UploadMorivers {
 		uploadMoriver.LastUpdated = time.Now()
-		uploadMoriver.UploadedBy = "DeeLiang"
+		// user := c.Get("PSUSER").(models.User)
+		// uploadMoriver.UploadedBy = "Dee Liang"
+		uploadMoriver.UploadedBy = "Dee Liang"
 		err = sd.Store.SaveMoriverUpload(uploadMoriver)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -651,7 +816,9 @@ func (sd *PallidSturgeonHandler) TelemetryUpload(c echo.Context) error {
 	}
 	for _, uploadTelemetry := range uploadTelemetrys {
 		uploadTelemetry.LastUpdated = time.Now()
-		uploadTelemetry.UploadedBy = "DeeLiang"
+		// user := c.Get("PSUSER").(models.User)
+		// uploadTelemetry.UploadedBy = "Dee Liang"
+		uploadTelemetry.UploadedBy = "Dee Liang"
 		err = sd.Store.SaveTelemetryUpload(uploadTelemetry)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -669,10 +836,88 @@ func (sd *PallidSturgeonHandler) CallStoreProcedures(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	procedureOut, err := sd.Store.CallStoreProcedures("DeeLiang", id)
+	//user := c.Get("PSUSER").(models.User)
+	//procedureOut, err := sd.Store.CallStoreProcedures(user.FirstName+" "+user.LastName, id)
+	procedureOut, err := sd.Store.CallStoreProcedures("Dee Liang", id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, procedureOut)
+}
+
+func (sd *PallidSturgeonHandler) GetErrorCount(c echo.Context) error {
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+	errorCounts, err := sd.Store.GetErrorCount("MO")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, errorCounts)
+}
+
+func (sd *PallidSturgeonHandler) GetUsgNoVialNumbers(c echo.Context) error {
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+	usgNoVialNumbers, err := sd.Store.GetUsgNoVialNumbers("MO")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, usgNoVialNumbers)
+}
+
+func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
+
+	usgNoVialNumbers, err := sd.Store.GetUnapprovedDataSheets()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, usgNoVialNumbers)
+}
+
+func (sd *PallidSturgeonHandler) GetUncheckedDataSheets(c echo.Context) error {
+
+	queryParams, err := marshalQuery(c)
+	// user := c.Get("PSUSER").(models.User)
+
+	// userInfo, err := sd.Store.GetUser(user.Email)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+	uncheckedDataSheets, err := sd.Store.GetUncheckedDataSheets("MO", queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, uncheckedDataSheets)
+}
+
+func (sd *PallidSturgeonHandler) GetDownloadInfo(c echo.Context) error {
+	id := c.QueryParam("id")
+
+	downloadInfo, err := sd.Store.GetDownloadInfo(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, downloadInfo)
+}
+
+func (sd *PallidSturgeonHandler) GetDownloadZip(c echo.Context) error {
+	id := c.QueryParam("id")
+
+	downloadZipName, err := sd.Store.GetDownloadZip(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	defer os.Remove(downloadZipName)
+	return c.Inline(downloadZipName, downloadZipName)
 }
