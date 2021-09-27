@@ -573,3 +573,24 @@ type ProcedureOut struct {
 	SiteMatch         int    `json:"siteMatch"`
 	NoSiteIDMsg       string `json:"noSiteIDMsg"`
 }
+
+type UsgNoVialNumber struct {
+	Fp                 string `db:"fp" json:"fp"`
+	SpeciesCode        string `db:"species_code" json:"speciesCode"`
+	FID                int    `db:"f_id" json:"fId"`
+	MrID               int    `db:"mr_id" json:"mrID"`
+	MrsiteID           int    `db:"mrsite_id" json:"mrsiteId"`
+	SSiteID            int    `db:"s_site_id" json:"sSiteID"`
+	FFID               string `db:"f_fid" json:"fFId"`
+	GeneticsVialNumber string `db:"genetics_vial_number" json:"GeneticsVialNumber"`
+}
+
+type ErrorCount struct {
+	Year  int `db:"year" json:"year"`
+	Count int `db:"count(el.el_id)" json:"count"`
+}
+
+type DownloadInfo struct {
+	Name        string `db:"name" json:"name"`
+	DisplayName string `db:"display_name" json:"displayName"`
+}

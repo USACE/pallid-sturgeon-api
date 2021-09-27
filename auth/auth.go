@@ -56,7 +56,7 @@ func (a *Auth) Authorize(handler echo.HandlerFunc, roles ...int) echo.HandlerFun
 		if err != nil {
 			return err
 		}
-		c.Set("SDUSER", user)
+		c.Set("PSUSER", user)
 		switch {
 		case contains(roles, PUBLIC):
 			return handler(c)

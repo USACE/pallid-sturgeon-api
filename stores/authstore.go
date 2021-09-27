@@ -23,8 +23,6 @@ var userSql = "select id, edipi, username, email, first_name,last_name from user
 
 var insertUserSql = "insert into users_t (username,email,first_name,last_name,edipi) values (:1,:2,:3,:4,:5)"
 
-var getUserSql = "select * from users_t where email=:1"
-
 var getUsersSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description, f.code from users_t u
 							inner join user_role_office_lk uro on uro.user_id = u.id
 							inner join role_lk r on r.id = uro.role_id
@@ -56,7 +54,7 @@ func InitAuthStore(appConfig *config.AppConfig) (*AuthStore, error) {
 	ss := AuthStore{
 		db: db,
 	}
-	
+
 	return &ss, nil
 }
 
@@ -99,29 +97,6 @@ func (auth *AuthStore) GetUserFromJwt(jwtClaims models.JwtClaim) (models.User, e
 func (auth *AuthStore) AddUser(user models.User) error {
 	_, err := auth.db.Exec(insertUserSql, user.UserName, user.Email, user.FirstName, user.LastName, user.CacUid)
 	return err
-}
-
-func (auth *AuthStore) GetUser(email string) (models.User, error) {
-	user := models.User{}
-	selectQuery, err := auth.db.Prepare(getUserSql)
-	if err != nil {
-		return user, err
-	}
-
-	rows, err := selectQuery.Query(email)
-	if err != nil {
-		return user, err
-	}
-
-	for rows.Next() {
-		err = rows.Scan(&user.ID, &user.UserName, &user.FirstName, &user.LastName, &user.Email)
-		if err != nil {
-			return user, err
-		}
-	}
-	defer rows.Close()
-
-	return user, err
 }
 
 func (auth *AuthStore) GetUserAccessRequests() ([]models.User, error) {
