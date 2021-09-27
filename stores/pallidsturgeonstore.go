@@ -2350,13 +2350,45 @@ var unapprovedDataSheetsSql = `select
 							and ds.project_code != 2
 							order by ds.FIELD_OFFICE_CODE, ds.project_code, ds.segment_code, ds.bend_number`
 
-func (s *PallidSturgeonStore) GetUnapprovedDataSheets() ([]map[string]string, error) {
+var unapprovedDataSheetsCountSql = `select 
+							count(*)
+							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_site ds
+							where m.site_id = ds.site_id (+)
+							and ds.segment_code = s.code (+)
+							and DS.PROJECT_code = P.CODE (+)
+							and DS.FIELD_OFFICE_CODE = F.CODE
+							and m.mr_id = asv.mr_id (+)
+							and asv.ch = 'Unapproved'
+							-- and m.checkby is not null
+							and asv.cb = 'YES'
+							-- and asv.co = 'Complete'  
+							-- and nvl(m.complete,0) = 1
+							-- and nvl(m.approved,0) = 0
+							and ds.project_code != 2
+							order by ds.FIELD_OFFICE_CODE, ds.project_code, ds.segment_code, ds.bend_number`
+
+func (s *PallidSturgeonStore) GetUnapprovedDataSheets() (models.SummaryWithCount, error) {
+
+	unapprovedDataSheetsWithCount := models.SummaryWithCount{}
+
+	countrows, err := s.db.Query(unapprovedDataSheetsCountSql)
+	if err != nil {
+		return unapprovedDataSheetsWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&unapprovedDataSheetsWithCount.TotalCount)
+		if err != nil {
+			return unapprovedDataSheetsWithCount, err
+		}
+	}
 
 	unapprovedDataSheets := make([]map[string]string, 0)
 
 	rows, err := s.db.Query(unapprovedDataSheetsSql)
 	if err != nil {
-		return unapprovedDataSheets, err
+		return unapprovedDataSheetsWithCount, err
 	}
 	defer rows.Close()
 
@@ -2397,7 +2429,9 @@ func (s *PallidSturgeonStore) GetUnapprovedDataSheets() ([]map[string]string, er
 		unapprovedDataSheets = append(unapprovedDataSheets, data)
 	}
 
-	return unapprovedDataSheets, err
+	unapprovedDataSheetsWithCount.Items = unapprovedDataSheets
+
+	return unapprovedDataSheetsWithCount, err
 }
 
 var uncheckedDataSheetsSql = `select 

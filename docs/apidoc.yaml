@@ -3079,6 +3079,11 @@ components:
         uploadFilename:
           type: string
           maxLength: 200
+    errorCount:
+        year:
+          type: number
+        count:
+          type: number
     Error:
       type: object
       required:
