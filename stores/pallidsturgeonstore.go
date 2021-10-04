@@ -351,6 +351,10 @@ func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.UploadSi
 	return err
 }
 
+var fishDataEntriesSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by fROM ds_fish where field_office_code = :1`
+
+var fishDataEntriesCountSql = `SELECT count(*) FROM ds_fish where field_office_code = :1`
+
 var fishDataEntriesByFidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by fROM ds_fish where f_id = :1 and field_office_code = :2`
 
 var fishDataEntriesCountByFidSql = `SELECT count(*) FROM ds_fish where f_id = :1 and field_office_code = :2`
@@ -377,15 +381,29 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 		id = fieldId
 	}
 
+	if fieldId == "" && tableId == "" {
+		query = fishDataEntriesSql
+		queryWithCount = fishDataEntriesCountSql
+	}
+
 	countQuery, err := s.db.Prepare(queryWithCount)
 	if err != nil {
 		return fishDataEntryWithCount, err
 	}
 
-	countrows, err := countQuery.Query(id, officeCode)
-	if err != nil {
-		return fishDataEntryWithCount, err
+	var countrows *sql.Rows
+	if id == "" {
+		countrows, err = countQuery.Query(officeCode)
+		if err != nil {
+			return fishDataEntryWithCount, err
+		}
+	} else {
+		countrows, err = countQuery.Query(id, officeCode)
+		if err != nil {
+			return fishDataEntryWithCount, err
+		}
 	}
+
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -406,9 +424,17 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 		return fishDataEntryWithCount, err
 	}
 
-	rows, err := dbQuery.Query(id, officeCode)
-	if err != nil {
-		return fishDataEntryWithCount, err
+	var rows *sql.Rows
+	if id == "" {
+		rows, err = dbQuery.Query(officeCode)
+		if err != nil {
+			return fishDataEntryWithCount, err
+		}
+	} else {
+		rows, err = dbQuery.Query(id, officeCode)
+		if err != nil {
+			return fishDataEntryWithCount, err
+		}
 	}
 	defer rows.Close()
 
