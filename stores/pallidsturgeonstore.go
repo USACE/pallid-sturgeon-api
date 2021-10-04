@@ -363,7 +363,11 @@ var fishDataEntriesByFfidSql = `SELECT f_id,f_fid,field_office_code,project_code
 
 var fishDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_fish where f_fid = :1 and field_office_code = :2`
 
-func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string, officeCode string, queryParams models.SearchParams) (models.FishDataEntryWithCount, error) {
+var fishDataEntriesByMridSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by FROM ds_fish where mr_id = :1 and field_office_code = :2`
+
+var fishDataEntriesCountByMridSql = `SELECT count(*) FROM ds_fish where mr_id = :1 and field_office_code = :2`
+
+func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string, mrId string, officeCode string, queryParams models.SearchParams) (models.FishDataEntryWithCount, error) {
 	fishDataEntryWithCount := models.FishDataEntryWithCount{}
 	query := ""
 	queryWithCount := ""
@@ -381,7 +385,13 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 		id = fieldId
 	}
 
-	if fieldId == "" && tableId == "" {
+	if mrId != "" {
+		query = fishDataEntriesByMridSql
+		queryWithCount = fishDataEntriesCountByMridSql
+		id = mrId
+	}
+
+	if fieldId == "" && tableId == "" && mrId == "" {
 		query = fishDataEntriesSql
 		queryWithCount = fishDataEntriesCountSql
 	}

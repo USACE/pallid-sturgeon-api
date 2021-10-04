@@ -154,7 +154,7 @@ func (sd *PallidSturgeonHandler) UpdateSiteDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {
-	tableId, fieldId := c.QueryParam("tableId"), c.QueryParam("fieldId")
+	tableId, fieldId, mrId := c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("mrId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -167,7 +167,7 @@ func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {
 	// 	return c.JSON(http.StatusInternalServerError, err.Error())
 	// }
 
-	dataSummary, err := sd.Store.GetFishDataEntries(tableId, fieldId, "MO", queryParams)
+	dataSummary, err := sd.Store.GetFishDataEntries(tableId, fieldId, mrId, "MO", queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
