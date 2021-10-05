@@ -205,13 +205,6 @@ paths:
       operationId: GetDownloadInfo
       tags:
         - downloadInfo
-      parameters:
-        - name: id
-          in: query
-          required: false
-          description: The id
-          schema:
-            type: integer
       responses:
         '200':
           description: downloadInfo
@@ -237,13 +230,6 @@ paths:
       operationId: downloadZip
       tags:
         - downloadZip
-      parameters:
-        - name: id
-          in: query
-          required: false
-          description: The id
-          schema:
-            type: integer
       responses:
         '200':
           description: downloadZip

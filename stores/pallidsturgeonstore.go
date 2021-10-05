@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"os"
 	"strconv"
 	"strings"
@@ -2591,13 +2593,9 @@ func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, que
 	return uncheckedDataSheetsWithCount, err
 }
 
-func (s *PallidSturgeonStore) GetDownloadZip(id string) (string, error) {
-	query, err := s.db.Prepare("SELECT content FROM media_tbl where md_id = :1")
-	if err != nil {
-		return "", err
-	}
+func (s *PallidSturgeonStore) GetDownloadZip() (string, error) {
 
-	rows, err := query.Query(id)
+	rows, err := s.db.Query("SELECT content FROM media_tbl where md_id in (select max(md_id) from media_tbl)")
 	if err != nil {
 		return "", err
 	}
@@ -2608,7 +2606,7 @@ func (s *PallidSturgeonStore) GetDownloadZip(id string) (string, error) {
 		rows.Scan(&data)
 	}
 
-	downloadInfo, err := s.GetDownloadInfo(id)
+	downloadInfo, err := s.GetDownloadInfo()
 	if err != nil {
 		return "", err
 	}
@@ -2632,14 +2630,28 @@ func (s *PallidSturgeonStore) GetDownloadZip(id string) (string, error) {
 
 }
 
-func (s *PallidSturgeonStore) GetDownloadInfo(id string) (models.DownloadInfo, error) {
-	downloadInfo := models.DownloadInfo{}
-	query, err := s.db.Prepare("SELECT name, display_name FROM media_tbl where md_id = :1")
-	if err != nil {
-		return downloadInfo, err
-	}
+var uploadDownloadInfoSql = `insert into media_tbl (md_id, name, display_name, mime_type, content) values ((select max(md_id)+1 from media_tbl),:1,:2,:3,:4) returning md_id into :5`
 
-	rows, err := query.Query(id)
+func (s *PallidSturgeonStore) UploadDownloadZip(file *multipart.FileHeader) (int, error) {
+	var id int
+	fileContent, _ := file.Open()
+	byteContainer, err := ioutil.ReadAll(fileContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	last5 := file.Filename[len(file.Filename)-9:]
+	words := strings.Split(last5, "_")
+	numbers := strings.Split(words[2], ".")
+	version := "Version " + words[0] + "." + words[1] + "." + numbers[0]
+	_, err = s.db.Exec(uploadDownloadInfoSql, file.Filename, version, "application/x-zip-compressed", byteContainer, sql.Out{Dest: &id})
+
+	return id, err
+}
+
+func (s *PallidSturgeonStore) GetDownloadInfo() (models.DownloadInfo, error) {
+	downloadInfo := models.DownloadInfo{}
+
+	rows, err := s.db.Query("SELECT name, display_name FROM media_tbl where md_id in (select max(md_id) from media_tbl)")
 	if err != nil {
 		return downloadInfo, err
 	}

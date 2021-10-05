@@ -19,7 +19,7 @@ var urlContext string = "/psapi"
 
 func main() {
 	appconfig := config.GetEnv()
-	//auth := Auth{}
+	// auth := Auth{}
 
 	// err := auth.LoadVerificationKey(appconfig.IPPK)
 	// if err != nil {
@@ -100,6 +100,7 @@ func main() {
 	e.GET(urlContext+"/usgNoVialNumbers", PallidSturgeonH.GetUsgNoVialNumbers)
 	e.GET(urlContext+"/unapprovedDataSheets", PallidSturgeonH.GetUnapprovedDataSheets)
 	e.GET(urlContext+"/uncheckedDataSheets", PallidSturgeonH.GetUncheckedDataSheets)
+	e.POST(urlContext+"/uploadDownloadZip", PallidSturgeonH.UploadDownloadZip)
 	e.GET(urlContext+"/downloadInfo", PallidSturgeonH.GetDownloadInfo)
 	e.GET(urlContext+"/downloadZip", PallidSturgeonH.GetDownloadZip)
 
