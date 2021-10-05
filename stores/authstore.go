@@ -205,23 +205,23 @@ func (auth *AuthStore) GetUsersByRoleType(roleType string) ([]models.User, error
 
 func (auth *AuthStore) AddUserRoleOffice(userRoleOffice models.UserRoleOffice) error {
 	_, err := auth.db.Exec(insertUserRoleOfficeSql, userRoleOffice.UserID, userRoleOffice.RoleID, userRoleOffice.OfficeID)
-	if err == nil {
-		message := []byte("Your role request has been approved.")
+	// if err == nil {
+	// 	message := []byte("Your role request has been approved.")
 
-		user, userErr := auth.GetUserById(userRoleOffice.UserID)
-		if userErr != nil {
-			log.Print("Unable to send email.", userErr)
-		}
-		to := []string{
-			user.Email,
-		}
+	// 	user, userErr := auth.GetUserById(userRoleOffice.UserID)
+	// 	if userErr != nil {
+	// 		log.Print("Unable to send email.", userErr)
+	// 	}
+	// 	to := []string{
+	// 		user.Email,
+	// 	}
 
-		from := auth.config.EmailFrom
-		emailErr := auth.SendEmail(message, to, from)
-		if emailErr != nil {
-			log.Print("Unable to send email.", emailErr)
-		}
-	}
+	// 	from := auth.config.EmailFrom
+	// 	emailErr := auth.SendEmail(message, to, from)
+	// 	if emailErr != nil {
+	// 		log.Print("Unable to send email.", emailErr)
+	// 	}
+	// }
 
 	return err
 }
@@ -246,24 +246,24 @@ func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, e
 	}
 	defer rows.Close()
 
-	if userRoleOffice.OfficeCode == "" {
-		message := []byte("There is a new user role request. Please login to appove or deny the request.")
-		users, adminUserLoadErr := auth.GetUsersByRoleType("ADMINISTRATOR")
-		if adminUserLoadErr != nil {
-			log.Print("Unable to send email.", adminUserLoadErr)
-		}
+	// if userRoleOffice.OfficeCode == "" {
+	// 	message := []byte("There is a new user role request. Please login to appove or deny the request.")
+	// 	users, adminUserLoadErr := auth.GetUsersByRoleType("ADMINISTRATOR")
+	// 	if adminUserLoadErr != nil {
+	// 		log.Print("Unable to send email.", adminUserLoadErr)
+	// 	}
 
-		to := make([]string, 0)
-		for _, user := range users {
-			to = append(to, user.Email)
-		}
+	// 	to := make([]string, 0)
+	// 	for _, user := range users {
+	// 		to = append(to, user.Email)
+	// 	}
 
-		from := auth.config.EmailFrom
-		emailErr := auth.SendEmail(message, to, from)
-		if emailErr != nil {
-			log.Print("Unable to send email.", emailErr)
-		}
-	}
+	// 	from := auth.config.EmailFrom
+	// 	emailErr := auth.SendEmail(message, to, from)
+	// 	if emailErr != nil {
+	// 		log.Print("Unable to send email.", emailErr)
+	// 	}
+	// }
 
 	return userRoleOffice, err
 }
