@@ -3,7 +3,7 @@ package stores
 import (
 	"fmt"
 	//"log"
-	"net/smtp"
+	//"net/smtp"
 
 	"github.com/USACE/pallid_sturgeon_api/server/config"
 	"github.com/USACE/pallid_sturgeon_api/server/models"
