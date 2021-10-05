@@ -268,16 +268,16 @@ func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, e
 	return userRoleOffice, err
 }
 
-func (s *AuthStore) SendEmail(message []byte, to []string, from string) error {
-	// Authentication.
-	auth := smtp.PlainAuth("", from, s.config.EmailPassword, s.config.SmtpHost)
+// func (s *AuthStore) SendEmail(message []byte, to []string, from string) error {
+// 	// Authentication.
+// 	auth := smtp.PlainAuth("", from, s.config.EmailPassword, s.config.SmtpHost)
 
-	// Sending email.
-	err := smtp.SendMail(s.config.SmtpHost+":"+s.config.SmtpPort, auth, from, to, message)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	fmt.Println("Email Sent Successfully!")
-	return nil
-}
+// 	// Sending email.
+// 	err := smtp.SendMail(s.config.SmtpHost+":"+s.config.SmtpPort, auth, from, to, message)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return err
+// 	}
+// 	fmt.Println("Email Sent Successfully!")
+// 	return nil
+// }
