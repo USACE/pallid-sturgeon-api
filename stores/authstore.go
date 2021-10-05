@@ -2,7 +2,7 @@ package stores
 
 import (
 	"fmt"
-	"log"
+	//"log"
 	"net/smtp"
 
 	"github.com/USACE/pallid_sturgeon_api/server/config"
@@ -63,7 +63,7 @@ func InitAuthStore(appConfig *config.AppConfig) (*AuthStore, error) {
 
 	ss := AuthStore{
 		db:     db,
-		config: appConfig,
+		//config: appConfig,
 	}
 
 	return &ss, nil
