@@ -12,7 +12,7 @@ import (
 
 type AuthStore struct {
 	db     *sqlx.DB
-	config *config.AppConfig
+	//config *config.AppConfig
 }
 
 var userSql = "select id, edipi, username, email, first_name,last_name from users_t where email=:1"
