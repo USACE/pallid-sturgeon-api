@@ -902,9 +902,21 @@ func (sd *PallidSturgeonHandler) GetUncheckedDataSheets(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetDownloadInfo(c echo.Context) error {
-	id := c.QueryParam("id")
+	downloadInfo, err := sd.Store.GetDownloadInfo()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, downloadInfo)
+}
 
-	downloadInfo, err := sd.Store.GetDownloadInfo(id)
+func (sd *PallidSturgeonHandler) UploadDownloadZip(c echo.Context) error {
+	form, err := c.MultipartForm()
+	if err != nil {
+		return err
+	}
+	files := form.File["file"]
+
+	downloadInfo, err := sd.Store.UploadDownloadZip(files[0])
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -912,9 +924,8 @@ func (sd *PallidSturgeonHandler) GetDownloadInfo(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetDownloadZip(c echo.Context) error {
-	id := c.QueryParam("id")
 
-	downloadZipName, err := sd.Store.GetDownloadZip(id)
+	downloadZipName, err := sd.Store.GetDownloadZip()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

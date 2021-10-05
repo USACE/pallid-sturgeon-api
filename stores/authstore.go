@@ -2,6 +2,8 @@ package stores
 
 import (
 	"fmt"
+	"log"
+	"net/smtp"
 
 	"github.com/USACE/pallid_sturgeon_api/server/config"
 	"github.com/USACE/pallid_sturgeon_api/server/models"
@@ -9,10 +11,13 @@ import (
 )
 
 type AuthStore struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	config *config.AppConfig
 }
 
 var userSql = "select id, edipi, username, email, first_name,last_name from users_t where email=:1"
+
+var userByIdSql = "select id, edipi, username, email, first_name,last_name from users_t where id=:1"
 
 // var userSql = `select id,username,email,rate,
 // 				(select bool_or(is_admin)
@@ -28,6 +33,11 @@ var getUsersSql = `select u.id, u.username, u.first_name, u.last_name, u.email, 
 							inner join role_lk r on r.id = uro.role_id
 							inner join field_office_lk f on f.id = uro.office_id
                     order by u.last_name`
+
+var getUsersByRoleTypeSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description from users_t u
+						inner join user_role_office_lk uro on uro.user_id = u.id
+						inner join role_lk r on r.id = uro.role_id
+						where r.description = :1`
 
 var getUserAccessRequestSql = "select id, username, first_name, last_name, email from users_t where id not in (select user_id from user_role_office_lk) order by last_name"
 
@@ -52,7 +62,8 @@ func InitAuthStore(appConfig *config.AppConfig) (*AuthStore, error) {
 	}
 
 	ss := AuthStore{
-		db: db,
+		db:     db,
+		config: appConfig,
 	}
 
 	return &ss, nil
@@ -141,8 +152,77 @@ func (auth *AuthStore) GetUsers() ([]models.User, error) {
 	return users, err
 }
 
+func (auth *AuthStore) GetUserById(id int) (models.User, error) {
+	user := models.User{}
+
+	countQuery, err := auth.db.Prepare(userByIdSql)
+	if err != nil {
+		return user, err
+	}
+
+	countrows, err := countQuery.Query(id)
+	if err != nil {
+		return user, err
+	}
+	count := 0
+	for countrows.Next() {
+		err = countrows.Scan(&user.ID, &user.CacUid, &user.UserName, &user.Email, &user.FirstName, &user.LastName)
+		if err != nil {
+			return user, err
+		}
+		count += 1
+	}
+
+	defer countrows.Close()
+	return user, err
+}
+
+func (auth *AuthStore) GetUsersByRoleType(roleType string) ([]models.User, error) {
+	users := []models.User{}
+
+	selectQuery, err := auth.db.Prepare(getUsersByRoleTypeSql)
+	if err != nil {
+		return users, err
+	}
+
+	rows, err := selectQuery.Query(roleType)
+	if err != nil {
+		return users, err
+	}
+
+	for rows.Next() {
+		user := models.User{}
+		err = rows.Scan(&user.ID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Role)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, user)
+	}
+	defer rows.Close()
+
+	return users, err
+}
+
 func (auth *AuthStore) AddUserRoleOffice(userRoleOffice models.UserRoleOffice) error {
 	_, err := auth.db.Exec(insertUserRoleOfficeSql, userRoleOffice.UserID, userRoleOffice.RoleID, userRoleOffice.OfficeID)
+	if err == nil {
+		message := []byte("Your role request has been approved.")
+
+		user, userErr := auth.GetUserById(userRoleOffice.UserID)
+		if userErr != nil {
+			log.Print("Unable to send email.", userErr)
+		}
+		to := []string{
+			user.Email,
+		}
+
+		from := auth.config.EmailFrom
+		emailErr := auth.SendEmail(message, to, from)
+		if emailErr != nil {
+			log.Print("Unable to send email.", emailErr)
+		}
+	}
+
 	return err
 }
 
@@ -166,5 +246,38 @@ func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, e
 	}
 	defer rows.Close()
 
+	if userRoleOffice.OfficeCode == "" {
+		message := []byte("There is a new user role request. Please login to appove or deny the request.")
+		users, adminUserLoadErr := auth.GetUsersByRoleType("ADMINISTRATOR")
+		if adminUserLoadErr != nil {
+			log.Print("Unable to send email.", adminUserLoadErr)
+		}
+
+		to := make([]string, 0)
+		for _, user := range users {
+			to = append(to, user.Email)
+		}
+
+		from := auth.config.EmailFrom
+		emailErr := auth.SendEmail(message, to, from)
+		if emailErr != nil {
+			log.Print("Unable to send email.", emailErr)
+		}
+	}
+
 	return userRoleOffice, err
+}
+
+func (s *AuthStore) SendEmail(message []byte, to []string, from string) error {
+	// Authentication.
+	auth := smtp.PlainAuth("", from, s.config.EmailPassword, s.config.SmtpHost)
+
+	// Sending email.
+	err := smtp.SendMail(s.config.SmtpHost+":"+s.config.SmtpPort, auth, from, to, message)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	fmt.Println("Email Sent Successfully!")
+	return nil
 }
