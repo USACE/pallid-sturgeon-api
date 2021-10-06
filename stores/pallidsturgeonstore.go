@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/USACE/pallid_sturgeon_api/server/config"
 	"github.com/USACE/pallid_sturgeon_api/server/models"
@@ -2630,7 +2631,7 @@ func (s *PallidSturgeonStore) GetDownloadZip() (string, error) {
 
 }
 
-var uploadDownloadInfoSql = `insert into media_tbl (md_id, name, display_name, mime_type, content) values ((select max(md_id)+1 from media_tbl),:1,:2,:3,:4) returning md_id into :5`
+var uploadDownloadInfoSql = `insert into media_tbl (md_id, name, display_name, mime_type, content, last_updated) values ((select max(md_id)+1 from media_tbl),:1,:2,:3,:4,:5) returning md_id into :6`
 
 func (s *PallidSturgeonStore) UploadDownloadZip(file *multipart.FileHeader) (int, error) {
 	var id int
@@ -2643,7 +2644,8 @@ func (s *PallidSturgeonStore) UploadDownloadZip(file *multipart.FileHeader) (int
 	words := strings.Split(last5, "_")
 	numbers := strings.Split(words[2], ".")
 	version := "Version " + words[0] + "." + words[1] + "." + numbers[0]
-	_, err = s.db.Exec(uploadDownloadInfoSql, file.Filename, version, "application/x-zip-compressed", byteContainer, sql.Out{Dest: &id})
+	lastUpdated := time.Now()
+	_, err = s.db.Exec(uploadDownloadInfoSql, file.Filename, version, "application/x-zip-compressed", byteContainer, lastUpdated, sql.Out{Dest: &id})
 
 	return id, err
 }
@@ -2651,14 +2653,14 @@ func (s *PallidSturgeonStore) UploadDownloadZip(file *multipart.FileHeader) (int
 func (s *PallidSturgeonStore) GetDownloadInfo() (models.DownloadInfo, error) {
 	downloadInfo := models.DownloadInfo{}
 
-	rows, err := s.db.Query("SELECT name, display_name FROM media_tbl where md_id in (select max(md_id) from media_tbl)")
+	rows, err := s.db.Query("SELECT name, display_name, last_updated FROM media_tbl where md_id in (select max(md_id) from media_tbl)")
 	if err != nil {
 		return downloadInfo, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		rows.Scan(&downloadInfo.Name, &downloadInfo.DisplayName)
+		rows.Scan(&downloadInfo.Name, &downloadInfo.DisplayName, &downloadInfo.LastUpdated)
 	}
 
 	return downloadInfo, err
