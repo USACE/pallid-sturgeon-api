@@ -593,4 +593,5 @@ type ErrorCount struct {
 type DownloadInfo struct {
 	Name        string `db:"name" json:"name"`
 	DisplayName string `db:"display_name" json:"displayName"`
+	LastUpdated string `db:"last_updated" json:"lastUpdated"`
 }
