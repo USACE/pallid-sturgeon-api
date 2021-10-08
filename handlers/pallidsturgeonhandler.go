@@ -268,14 +268,7 @@ func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) erro
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	// user := c.Get("PSUSER").(models.User)
-
-	// userInfo, err := sd.Store.GetUser(user.Email)
-	// if err != nil {
-	// 	return c.JSON(http.StatusInternalServerError, err.Error())
-	// }
-
-	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, "MO", queryParams)
+	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

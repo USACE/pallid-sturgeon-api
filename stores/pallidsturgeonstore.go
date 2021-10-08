@@ -820,9 +820,9 @@ var supplementalDataEntriesByFidSql = `select f_id, f_fid, mr_id,
 										r_ob, anal, dorsal, status, hatchery_origin_code, 
 										sex_code, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_id = :1 and field_office_code = :2`
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_id = :1 `
 
-var supplementalDataEntriesCountByFidSql = `SELECT count(*) FROM ds_supplemental where f_id = :1 and field_office_code = :2`
+var supplementalDataEntriesCountByFidSql = `SELECT count(*) FROM ds_supplemental where f_id = :1`
 
 var supplementalDataEntriesByFfidSql = `select f_id, f_fid, mr_id,
 										tag_number, pit_r_n_or_z, 
@@ -834,9 +834,9 @@ var supplementalDataEntriesByFfidSql = `select f_id, f_fid, mr_id,
 										r_ob, anal, dorsal, status, hatchery_origin_code, 
 										sex_code, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_fid = :1 and field_office_code = :2`
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_fid = :1`
 
-var supplementalDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_supplemental where f_fid = :1 and field_office_code = :2`
+var supplementalDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_supplemental where f_fid = :1`
 
 var supplementalDataEntriesByGeneticsVialSql = `select f_id, f_fid, mr_id,
 										tag_number, pit_r_n_or_z, 
@@ -848,9 +848,9 @@ var supplementalDataEntriesByGeneticsVialSql = `select f_id, f_fid, mr_id,
 										r_ob, anal, dorsal, status, hatchery_origin_code, 
 										sex_code, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where genetics_vial_number = :1 and field_office_code = :2`
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where genetics_vial_number = :1 `
 
-var supplementalDataEntriesCountByGeneticsVialSql = `SELECT count(*) FROM ds_supplemental where genetics_vial_number = :1 and field_office_code = :2`
+var supplementalDataEntriesCountByGeneticsVialSql = `SELECT count(*) FROM ds_supplemental where genetics_vial_number = :1`
 
 var supplementalDataEntriesByGeneticsPitTagSql = `select f_id, f_fid, mr_id,
 										tag_number, pit_r_n_or_z, 
@@ -862,11 +862,11 @@ var supplementalDataEntriesByGeneticsPitTagSql = `select f_id, f_fid, mr_id,
 										r_ob, anal, dorsal, status, hatchery_origin_code, 
 										sex_code, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where tag_number = :1 and field_office_code = :2`
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where tag_number = :1 `
 
-var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) FROM ds_supplemental where tag_number = :1 and field_office_code = :2`
+var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) FROM ds_supplemental where tag_number = :1 `
 
-func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId string, geneticsVial string, pitTag string, fieldOfficeCode string, queryParams models.SearchParams) (models.SupplementalDataEntryWithCount, error) {
+func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId string, geneticsVial string, pitTag string, queryParams models.SearchParams) (models.SupplementalDataEntryWithCount, error) {
 	supplementalDataEntryWithCount := models.SupplementalDataEntryWithCount{}
 	query := ""
 	queryWithCount := ""
@@ -901,7 +901,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 		return supplementalDataEntryWithCount, err
 	}
 
-	countrows, err := countQuery.Query(id, fieldOfficeCode)
+	countrows, err := countQuery.Query(id)
 	if err != nil {
 		return supplementalDataEntryWithCount, err
 	}
@@ -925,7 +925,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 		return supplementalDataEntryWithCount, err
 	}
 
-	rows, err := dbQuery.Query(id, fieldOfficeCode)
+	rows, err := dbQuery.Query(id)
 	if err != nil {
 		return supplementalDataEntryWithCount, err
 	}
