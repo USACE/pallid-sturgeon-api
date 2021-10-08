@@ -866,7 +866,21 @@ var supplementalDataEntriesByGeneticsPitTagSql = `select f_id, f_fid, mr_id,
 
 var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) FROM ds_supplemental where tag_number = :1 `
 
-func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId string, geneticsVial string, pitTag string, queryParams models.SearchParams) (models.SupplementalDataEntryWithCount, error) {
+var supplementalDataEntriesByMrIdSql = `select f_id, f_fid, mr_id,
+										tag_number, pit_r_n_or_z, 
+										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
+										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
+										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										head, snouttomouth, inter, mouthwidth, m_ib,
+										l_ob, l_ib, r_ib, 
+										r_ob, anal, dorsal, status, hatchery_origin_code, 
+										sex_code, stage,  recapture, photo,
+										genetic_needs, other_tag_info,
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where mr_id = :1 `
+
+var supplementalDataEntriesCountByMrIdSql = `SELECT count(*) FROM ds_supplemental where mr_id = :1 `
+
+func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId string, geneticsVial string, pitTag string, mrId string, queryParams models.SearchParams) (models.SupplementalDataEntryWithCount, error) {
 	supplementalDataEntryWithCount := models.SupplementalDataEntryWithCount{}
 	query := ""
 	queryWithCount := ""
@@ -894,6 +908,12 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 		query = supplementalDataEntriesByGeneticsPitTagSql
 		queryWithCount = supplementalDataEntriesCountByPitTagSql
 		id = pitTag
+	}
+
+	if mrId != "" {
+		query = supplementalDataEntriesByMrIdSql
+		queryWithCount = supplementalDataEntriesCountByMrIdSql
+		id = mrId
 	}
 
 	countQuery, err := s.db.Prepare(queryWithCount)
