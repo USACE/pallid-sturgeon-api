@@ -2516,7 +2516,8 @@ var uncheckedDataSheetsSql = `select
 								and ds.project_code != 2
 								and M.MR_ID NOT IN (SELECT MR_ID 
 													FROM DS_FISH
-													WHERE species_code = 'BAFI')`
+													WHERE species_code = 'BAFI')
+								and m.field_office_code is not null`
 
 var uncheckedDataSheetsCountSql = `select 
 								count(*)
@@ -2531,7 +2532,8 @@ var uncheckedDataSheetsCountSql = `select
 								and ds.project_code != 2
 								and M.MR_ID NOT IN (SELECT MR_ID 
 													FROM DS_FISH
-													WHERE species_code = 'BAFI')`
+													WHERE species_code = 'BAFI')
+								and m.field_office_code is not null`
 
 func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, queryParams models.SearchParams) (models.SummaryWithCount, error) {
 
