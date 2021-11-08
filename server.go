@@ -49,7 +49,7 @@ func main() {
 		Store: authStore,
 	}
 
-	e.GET(urlContext+"/version", auth.Authorize(PallidSturgeonH.Version, PUBLIC))
+	e.GET(urlContext+"/version", PallidSturgeonH.Version)
 
 	e.GET(urlContext+"/projects", auth.Authorize(PallidSturgeonH.GetProjects, PUBLIC))
 	e.GET(urlContext+"/roles", auth.Authorize(PallidSturgeonH.GetRoles, PUBLIC))
@@ -104,9 +104,9 @@ func main() {
 	e.GET(urlContext+"/downloadInfo", auth.Authorize(PallidSturgeonH.GetDownloadInfo, PUBLIC))
 	e.GET(urlContext+"/downloadZip", auth.Authorize(PallidSturgeonH.GetDownloadZip, PUBLIC))
 
-	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
-	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, PUBLIC))
-	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, PUBLIC))
+	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, ADMIN))
+	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))
+	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, ADMIN))
 
 	// e.Logger.Fatal(e.Start(":8080"))
 	e.Logger.Debug(e.Start(":8080"))

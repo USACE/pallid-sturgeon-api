@@ -16,7 +16,7 @@ type PallidSturgeonHandler struct {
 }
 
 func (ps *PallidSturgeonHandler) Version(c echo.Context) error {
-	return c.String(http.StatusOK, "Pallid Sturgeon API v0.01")
+	return c.String(http.StatusOK, "Pallid Sturgeon API v0.02")
 }
 
 func (sd *PallidSturgeonHandler) GetProjects(c echo.Context) error {
