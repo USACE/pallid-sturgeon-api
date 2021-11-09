@@ -18,13 +18,13 @@
         "maxStructFields": -1
       },
       "env": {
-        "DB_USER": "",
+        "DB_USER": "PSPA",
         "DB_PASS": "",
         "DB_NAME": "MAE1DEV",
         "LIB_DIR": "/usr/local/app/oracle/instantclient_21_1",
         "DB_HOST": "host.docker.internal",
         "DB_PORT": "1521",
-        "IPPK": "${workspaceFolder}/props/local.pem"
+        "IPPK": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3x6skH4N3yHZyZ3mzGubw58mjxb62ZaMfc7gkKkeQMxgxPsLtOcaoW5lg4wIYXpOOW1Mn7Iw3azsQViXZJ9cmrKqf15ebs2/TBhkkxukq1QkhBtER+ywSfEUTPOikVgBYo2F6UGsxtbiNaiav/cPA49u1vSAbEVRcy4q2Ny7wxwMteuGnDtem1gdJQH2OycgQ6yQ4ZcAeejCiTAflu9EXSVqWN4WUkzqxH1aAo0c83G+BMlP/uRGbfO6OX7EFHRzWHca+J/c7BqXXxY8dHOTu0towtdunXlD2R/m1mHI1BKKcoI8jxwgC9BtxH6AFev1dhnBGs0sDHb2CzmF0dovMQIDAQAB"
       },
       "args": []
     }

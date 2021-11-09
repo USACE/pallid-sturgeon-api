@@ -3,11 +3,8 @@ package auth
 import (
 	"crypto/rsa"
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	"github.com/USACE/pallid_sturgeon_api/server/models"
@@ -28,8 +25,6 @@ type Auth struct {
 	Store     *stores.AuthStore
 	VerifyKey *rsa.PublicKey
 }
-
-var verifyKeys []*rsa.PublicKey
 
 /*
 Authorize Options:
@@ -81,20 +76,8 @@ func (a *Auth) Authorize(handler echo.HandlerFunc, roles ...int) echo.HandlerFun
 	}
 }
 
-func loadKeyFile(filePath string) (*rsa.PublicKey, error) {
-	publicKeyBytes, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-	return jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
-}
-
-func (a *Auth) LoadVerificationKey(filePath string) error {
-	publicKeyBytes, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return err
-	}
-	pk, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
+func (a *Auth) LoadVerificationKey(publicKey string) error {
+	pk, err := jwt.ParseRSAPublicKeyFromPEM([]byte("-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----"))
 	if err != nil {
 		return err
 	}
@@ -115,54 +98,6 @@ func (a *Auth) marshalJwt(tokenString string) (models.JwtClaim, error) {
 			//CacUid:    claims["cacUID"].(string),
 			Name:      claims["name"].(string),
 			Email:     claims["email"].(string),
-			FirstName: claims["given_name"].(string),
-			LastName:  claims["family_name"].(string),
-		}
-		return jwtUser, nil
-	} else {
-		return models.JwtClaim{}, errors.New("Invalid Token")
-	}
-}
-
-func LoadVerificationKeys(fieldPath string) error {
-	files, err := ioutil.ReadDir(fieldPath)
-	if err != nil {
-		return err
-	}
-	for _, v := range files {
-		if ext := filepath.Ext(v.Name()); ext == ".pem" {
-			fmt.Printf("Loading Public Key: %s\n", v.Name())
-			pk, err := loadKeyFile(fieldPath + "/" + v.Name())
-			if err != nil {
-				return err
-			}
-			verifyKeys = append(verifyKeys, pk)
-		}
-	}
-	return nil
-}
-
-func marshalJwts(tokenString string) (models.JwtClaim, error) {
-	var token *jwt.Token = nil
-	var err error
-	for _, verificationKey := range verifyKeys {
-		token, err = jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return verificationKey, nil
-		})
-		if err == nil {
-			break
-		}
-	}
-
-	if token == nil {
-		return models.JwtClaim{}, errors.New("Invalid Token")
-	}
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		jwtUser := models.JwtClaim{
-			CacUid:    claims["sub"].(*string),
-			Name:      claims["name"].(string),
-			Email:     claims["email"].(string),
-			Roles:     claims["roles"].([]interface{}),
 			FirstName: claims["given_name"].(string),
 			LastName:  claims["family_name"].(string),
 		}
