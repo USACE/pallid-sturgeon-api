@@ -3,9 +3,16 @@
 Table of Contents
 - [Pallid Sturgeon API](#pallidsturgeon-api)
     - [projects](#projects)
+    - [sampleMethods](#sampleMethods)
+    - [sampleUnitTypes](#sampleUnitTypes)
+    - [fieldOffices](#fieldOffices)
     - [seasons](#seasons)
     - [segments](#segments)
     - [bends](#bends)
+    - [siteDataEntry](#siteDataEntry)
+    - [fishDataEntry](#fishDataEntry)
+    - [moriverDataEntry](#moriverDataEntry)
+    - [supplementalDataEntry](#supplementalDataEntry)
     - [upload](#upload)
     - [fishDataSummary](#fishDataSummary)
     - [suppDataSummary](#suppDataSummary)
@@ -16,6 +23,21 @@ Table of Contents
 ### Projects
 - List Projects \
   [http://localhost:8080/psapi/projects](http://localhost:8080/psapi/projects)
+
+---
+### SampleMethods
+- List SampleMethods \
+  [http://localhost:8080/psapi/sampleMethods](http://localhost:8080/psapi/sampleMethods)
+
+---
+### SampleUnitTypes
+- List SampleUnitTypes \
+  [http://localhost:8080/psapi/sampleUnitTypes](http://localhost:8080/psapi/sampleUnitTypes)
+
+---
+### FieldOffices
+- List FieldOffices \
+  [http://localhost:8080/psapi/fieldOffices](http://localhost:8080/psapi/fieldOffices)
 
 ---
 ### Seasons
@@ -33,9 +55,367 @@ Table of Contents
   [http://localhost:8080/psapi/bends](http://localhost:8080/psapi/bends)
 
 ---
-### FishDataSummary
-- List fishDataSummary \
-  [http://localhost:8080/psapi/fishDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5)
+### SiteDataEntry
+- List siteDataEntry \
+  [http://localhost:8080/psapi/siteDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create siteDataEntry \
+  `http://localhost:8080/psapi/siteDataEntry`
+    - Example `POST` body
+        ```
+      {
+        "siteFid": "F-1",
+        "siteYear": 2013,
+        "fieldOffice": "SD",
+        "project": "1",
+        "segment": "7",
+        "season": "ST",
+        "sampleUnitTypeCode": "B",
+        "bendrn": "R",
+        "editInitials": "DG",
+        "comments": "changed year"
+      }
+- Update siteDataEntry \
+  `http://localhost:8080/psapi/siteDataEntry`
+    - Example `PUT` body
+        ```
+      {
+        "siteId": 10122,
+        "siteFid": "F-1",
+        "siteYear": 2013,
+        "fieldOffice": "SD",
+        "project": "1",
+        "segment": "7",
+        "season": "ST",
+        "sampleUnitTypeCode": "B",
+        "bendrn": "R",
+        "editInitials": "DG",
+        "comments": "changed year2"
+      }
+---
+### FishDataEntry
+- List fishDataEntry \
+  [http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/fishDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create fishDataEntry \
+  `http://localhost:8080/psapi/fishDataEntry`
+    - Example `POST` body
+        ```
+        {
+          "id": "",
+          "siteId": 0,
+          "fieldOffice": "",
+          "project": "",
+          "segment": "",
+          "uniqueID": "",
+          "panelhook": "",
+          "ffid": "20120827-031-01-01-01",
+          "mrId": 950,
+          "bait": "",
+          "species": "WTBS",
+          "length": 101,
+          "weight": "",
+          "fishcount": 1,
+          "finCurl": "",
+          "otolith": "",
+          "rayspine": "",
+          "scale": "",
+          "ftprefix": "",
+          "ftnum": "",
+          "ftmr": "",
+          "editInitials": "DG"
+        }
+- Update fishDataEntry \
+  `http://localhost:8080/psapi/fishDataEntry`
+    - Example `PUT` body
+        ```
+        {
+          "fid": 3000031,
+          "id": "",
+          "siteId": 0,
+          "fieldOffice": "",
+          "project": "",
+          "segment": "",
+          "uniqueID": "",
+          "panelhook": "",
+          "ffid": "20120827-031-01-01-01",
+          "mrId": 950,
+          "bait": "",
+          "species": "WTBS",
+          "length": 101,
+          "weight": "",
+          "fishcount": 1,
+          "finCurl": "",
+          "otolith": "",
+          "rayspine": "",
+          "scale": "",
+          "ftprefix": "",
+          "ftnum": "",
+          "ftmr": "",
+          "editInitials": "DG"
+        }
+---
+### MoriverDataEntry
+- List moriverDataEntry \
+  [http://localhost:8080/psapi/moriverDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/moriverDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create moriverDataEntry \
+  `http://localhost:8080/psapi/moriverDataEntry`
+    - Example `POST` body
+        ```
+        {
+			    "mrFid": "20121113-003-04-01-04",
+				  "siteId": 493,
+					"fieldOffice": "",
+					"project": "",
+				  "segment": "",
+				  "season": "ST",
+				  "setdate": "2012-11-13T00:00:00Z",
+				  "subsample": 4,
+				  "subsamplepass": 1,
+				  "subsampleROrN": "R",
+				  "recorder": "TWH",
+				  "gear": "GN18",
+				  "gearType": "S",
+				  "temp": 5.8,
+				  "turbidity": 23,
+				  "conductivity": "",
+				  "do": "",
+				  "distance": "",
+				  "width": "",
+				  "netrivermile": "",
+				  "structurenumber": "",
+				  "usgs": "",
+				  "riverstage": "",
+				  "discharge": "",
+				  "u1": "",
+				  "u2": "",
+				  "u3": "",
+				  "u4": "",
+				  "u5": "",
+				  "u6": "",
+				  "u7": "",
+				  "macro": "ISB",
+				  "meso": "POOL",
+				  "habitatrn": "R",
+				  "qc": "",
+				  "microStructure": "4",
+				  "structureFlow": "2",
+				  "structureMod": "2",
+				  "setSite_1": "1",
+				  "setSite_2": "5",
+				  "setSite_3": "0",
+				  "startTime": "14:38:12",
+				  "startLatitude": 40.97622,
+				  "startLongitude": -95.82979,
+				  "stopTime": "9:58:25",
+				  "stopLatitude": "",
+				  "stopLongitude": "",
+				  "depth1": 4,
+				  "velocitybot1": "",
+				  "velocity08_1": "",
+				  "velocity02or06_1": "",
+				  "depth2": 4.3,
+				  "velocitybot2": "",
+				  "velocity08_2": "",
+				  "velocity02or06_2": "",
+				  "depth3": 4.2,
+				  "velocitybot3": "",
+				  "velocity08_3": "",
+				  "velocity02or06_3": "",
+				  "watervel": "",
+				  "cobble": "",
+				  "organic": "",
+				  "silt": "",
+				  "sand": "",
+				  "gravel": "",
+				  "comments": "no flow taken in eddy \r\n",
+				  "complete": "",
+				  "checkby": "",
+				  "noTurbidity": "",
+				  "noVelocity": "",
+				  "editInitials": "DG"
+				}
+- Update moriverDataEntry \
+  `http://localhost:8080/psapi/moriverDataEntry`
+    - Example `PUT` body
+        ```
+        {
+          "mrId": 300080,
+			    "mrFid": "20121113-003-04-01-04",
+				  "siteId": 493,
+					"fieldOffice": "",
+					"project": "",
+				  "segment": "",
+				  "season": "ST",
+				  "setdate": "2012-11-13T00:00:00Z",
+				  "subsample": 4,
+				  "subsamplepass": 1,
+				  "subsampleROrN": "R",
+				  "recorder": "TWH",
+				  "gear": "GN18",
+				  "gearType": "S",
+				  "temp": 5.8,
+				  "turbidity": 23,
+				  "conductivity": "",
+				  "do": "",
+				  "distance": "",
+				  "width": "",
+				  "netrivermile": "",
+				  "structurenumber": "",
+				  "usgs": "",
+				  "riverstage": "",
+				  "discharge": "",
+				  "u1": "",
+				  "u2": "",
+				  "u3": "",
+				  "u4": "",
+				  "u5": "",
+				  "u6": "",
+				  "u7": "",
+				  "macro": "ISB",
+				  "meso": "POOL",
+				  "habitatrn": "R",
+				  "qc": "",
+				  "microStructure": "4",
+				  "structureFlow": "2",
+				  "structureMod": "2",
+				  "setSite_1": "1",
+				  "setSite_2": "5",
+				  "setSite_3": "0",
+				  "startTime": "14:38:12",
+				  "startLatitude": 40.97622,
+				  "startLongitude": -95.82979,
+				  "stopTime": "9:58:25",
+				  "stopLatitude": "",
+				  "stopLongitude": "",
+				  "depth1": 4,
+				  "velocitybot1": "",
+				  "velocity08_1": "",
+				  "velocity02or06_1": "",
+				  "depth2": 4.3,
+				  "velocitybot2": "",
+				  "velocity08_2": "",
+				  "velocity02or06_2": "",
+				  "depth3": 4.2,
+				  "velocitybot3": "",
+				  "velocity08_3": "",
+				  "velocity02or06_3": "",
+				  "watervel": "",
+				  "cobble": "",
+				  "organic": "",
+				  "silt": "",
+				  "sand": "",
+				  "gravel": "",
+				  "comments": "no flow taken in eddy \r\n",
+				  "complete": "",
+				  "checkby": "",
+				  "noTurbidity": "",
+				  "noVelocity": "",
+				  "editInitials": "DG"
+				}
+---
+### SupplementalDataEntry
+- List supplementalDataEntry \
+  [http://localhost:8080/psapi/supplementalDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5](http://localhost:8080/psapi/supplementalDataEntry?fieldId=20120827-031-01-01-01&orderby=f_id%20desc&page=0&size=5)
+- Create supplementalDataEntry \
+  `http://localhost:8080/psapi/supplementalDataEntry`
+    - Example `POST` body
+        ```
+        {
+          "fid": 11781,
+          "fFid": "20121024-032-03-01-14-001",
+          "mrId": "2412",
+          "tagnumber": "4706162c09",
+          "pitrn": "N",
+          "scuteloc": "N",
+          "scutenum": "",
+          "scuteloc2": "",
+          "scutenum2": "",
+          "elhv": "",
+          "elcolor": "N",
+          "erhv": "",
+          "ercolor": "N",
+          "cwtyn": "N",
+          "dangler": "N",
+          "genetic": "Y",
+          "geneticsVialNumber": "3860",
+          "broodstock": "",
+          "hatchWild": "",
+          "speciesId": "",
+          "archive": "",
+          "head": "",
+          "snouttomouth": "",
+          "inter": "",
+          "mouthwidth": "",
+          "mIb": "",
+          "lOb": "",
+          "lIb": "",
+          "rIb": "",
+          "rOb": "",
+          "anal": "",
+          "dorsal": "",
+          "status": "",
+          "hatcheryOrigin": "",
+          "sex": "",
+          "stage": "",
+          "recapture": "",
+          "photo": "",
+          "geneticNeeds": "",
+          "otherTagInfo": "",
+          "comments": "-\r\n",
+          "editInitials": "DG"
+        }
+- Update supplementalDataEntry \
+  `http://localhost:8080/psapi/supplementalDataEntry`
+    - Example `PUT` body
+        ```
+        {
+          "sid": 100041,
+          "fid": 11781,
+          "fFid": "20121024-032-03-01-14-001",
+          "mrId": "2412",
+          "tagnumber": "4706162c09",
+          "pitrn": "N",
+          "scuteloc": "N",
+          "scutenum": "",
+          "scuteloc2": "",
+          "scutenum2": "",
+          "elhv": "",
+          "elcolor": "N",
+          "erhv": "",
+          "ercolor": "N",
+          "cwtyn": "N",
+          "dangler": "N",
+          "genetic": "Y",
+          "geneticsVialNumber": "3860",
+          "broodstock": "",
+          "hatchWild": "",
+          "speciesId": "",
+          "archive": "",
+          "head": "",
+          "snouttomouth": "",
+          "inter": "",
+          "mouthwidth": "",
+          "mIb": "",
+          "lOb": "",
+          "lIb": "",
+          "rIb": "",
+          "rOb": "",
+          "anal": "",
+          "dorsal": "",
+          "status": "",
+          "hatcheryOrigin": "",
+          "sex": "",
+          "stage": "",
+          "recapture": "",
+          "photo": "",
+          "geneticNeeds": "",
+          "otherTagInfo": "",
+          "comments": "-\r\n",
+          "editInitials": "DG"
+        }
+---
+### MoriverDataSummary
+- List moriverDataSummary \
+  [http://localhost:8080/psapi/moriverDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5](http://localhost:8080/psapi/moriverDataSummary?year=2021&officeCode=MO&project=1&season=MR&month=10&fromDate=10%2F06%2F2020&toDate=10%2F06%2F2020&orderby=mr_id%20desc&page=0&size=5)
 
 ---
 ### SuppDataSummary
@@ -64,70 +444,79 @@ Table of Contents
     - Example `POST` body
         ```
         {
-          "siteUpload": [
-            {
-              "siteId": 0,
-              "siteFid": "F-1",
-              "siteYear": 2021,
-              "fieldofficeID": "SD",
-              "fieldOffice": "KC - Kansas City",
-              "projectId": 1,
-              "project": "1 - Pallid Sturgeon Population Assessment",
-              "segmentId": 28,
-              "segment": "28 - Osage River",
-              "seasonId": "A0",
-              "season": "A0 - Age 0",
-              "bend": 2,
-              "bendrn": "N",
-              "bendRiverMile": 4.8,
-              "comments": "test",
-              "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv"
-            }
-          ],
-          "fishUpload": [
-            {
-              "siteId": 0,
-              "fFid": "20210617-184105056-001-001",
-              "mrFid": "20210617-184105056-001",
-              "panelhook": "1",
-              "bait": "W",
-              "species": "PDSG",
-              "length": 2,
-              "weight": 2,
-              "fishcount": 1,
-              "finCurl": "Y",
-              "otolith": "D",
-              "rayspine": "X",
-              "scale": "X",
-              "ftnum": "45678",
-              "ftmr": "L",
-              "ftprefix": "BC",
-              "comments": "test",
-              "uploadFilename": "fish_datasheet_20210617_1900_59.csv"
-            }
-          ],
-          "searchUpload":[
-            {
-              "siteId": 0,
-              "seFid": "20210617-185747028-001",
-              "dsId": 1,
-              "siteFid": "F-1",
-              "searchDate": "2021-06-17T00:00:00Z",
-              "recorder": "NR",
-              "searchTypeCode": "BS",
-              "searchDay": 12345678,
-              "startTime": "18:58:06",
-              "startLatitude": 50,
-              "startLongitude": -88,
-              "stopTime": "18:58:08",
-              "stopLatitud": 50,
-              "stopLongitude": -88,
-              "temp": 30,
-              "conductivity": 22,
-              "uploadFilename": "search_effort_20210617_1900_59.csv"
-            }
-          ],
-          "telemetryUpload": [
+          "editInitials": "DG",
+          "siteUpload": {
+            "uploadFilename": "pspa_sites_datasheet_20210617_1900_59.csv",
+            "items" :[
+              {
+                "siteId": 0,
+                "siteFid": "F-1",
+                "siteYear": 2021,
+                "fieldofficeID": "SD",
+                "fieldOffice": "KC - Kansas City",
+                "projectId": 1,
+                "project": "1 - Pallid Sturgeon Population Assessment",
+                "segmentId": 28,
+                "segment": "28 - Osage River",
+                "seasonId": "A0",
+                "season": "A0 - Age 0",
+                "bend": 2,
+                "bendrn": "N",
+                "bendRiverMile": 4.8,
+                "comments": "test"
+              }
+            ]
+          },
+          "fishUpload": {
+            "uploadFilename": "fish_datasheet_20210617_1900_59.csv",
+            "items": [
+              {
+                "siteId": 0,
+                "fFid": "20210617-184105056-001-001",
+                "mrFid": "20210617-184105056-001",
+                "panelhook": "1",
+                "bait": "W",
+                "species": "PDSG",
+                "length": 2,
+                "weight": 2,
+                "fishcount": 1,
+                "finCurl": "Y",
+                "otolith": "D",
+                "rayspine": "X",
+                "scale": "X",
+                "ftnum": "45678",
+                "ftmr": "L",
+                "ftprefix": "BC",
+                "comments": "test"
+              }
+            ]
+          },
+          "searchUpload":{
+            "uploadFilename": "search_effort_20210617_1900_59.csv",
+            "items": [
+              {
+                "siteId": 0,
+                "seFid": "20210617-185747028-001",
+                "dsId": 1,
+                "siteFid": "F-1",
+                "searchDate": "2021-06-17T00:00:00Z",
+                "recorder": "NR",
+                "searchTypeCode": "BS",
+                "searchDay": 12345678,
+                "startTime": "18:58:06",
+                "startLatitude": 50,
+                "startLongitude": -88,
+                "stopTime": "18:58:08",
+                "stopLatitud": 50,
+                "stopLongitude": -88,
+                "temp": 30,
+                "conductivity": 22
+              }
+            ]
+          },
+          "telemetryUpload": {
+            "uploadFilename": "telemetry_20210617_1900_59.csv",
+            "items": [
               {
                 "tFid": "20210617-185747028-001-001",
                 "seFid": "20210617-185747028-001",
@@ -147,11 +536,13 @@ Table of Contents
                 "silt": 1,
                 "sand": 1,
                 "gravel": 1,
-                "comments": "comments",
-                "uploadFilename": "telemetry_20210617_1900_59.csv"
+                "comments": "comments"
               }
-          ],
-          "procedureUpload": [
+            ]
+          },
+          "procedureUpload": {
+            "uploadFilename": "procedure_20210617_1900_59.csv",
+            "items": [
               {
                 "f_fid": "20210617-184105056-001-001",
                 "purposeCode": "RI",
@@ -182,11 +573,13 @@ Table of Contents
                 "ultrasoundReproStatusCode": "R",
                 "expectedSpawnYear": 1,
                 "ltrasoundGonadLength": 1,
-                "gonadCondition": "1",
-                "uploadFilename": "procedure_20210617_1900_59.csv"
+                "gonadCondition": "1"
               }
-          ],
-          "supplementalUpload": [
+            ]
+          },
+          "supplementalUpload": {
+            "uploadFilename": "supplemental_20210617_1900_59.csv",
+            "items": [
               {
                 "siteId": 0,
                 "fFid": "20210617-184105056-001-001",
@@ -228,11 +621,13 @@ Table of Contents
                 "photo": "p",
                 "geneticNeeds": "geneticNeeds",
                 "otherTagInfo": "otherTagInfo",
-                "comments": "comments",
-                "uploadFilename": "supplemental_20210617_1900_59.csv"
+                "comments": "comments"
               }
-          ],
-          "moriverUpload": [
+            ]
+          },
+          "moriverUpload": {
+            "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv",
+            "items": [
               {
                 "siteId": 0,
                 "siteFid": "F-1",
@@ -301,10 +696,10 @@ Table of Contents
                 "complete": 1,
                 "checkby": "che",
                 "noTurbidity": "n",
-                "noVelocity": "n",
-                "uploadFilename":"missouri_river_datasheet_20210617_1900_59.csv"
+                "noVelocity": "n"
               }
-          ]
+            ]
+          }
         }
         
     - Example `POST` response

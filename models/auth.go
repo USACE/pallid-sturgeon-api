@@ -1,10 +1,12 @@
 package models
 
 type JwtClaim struct {
-	Sub   string
-	Name  string
-	Email string
-	Roles []interface{}
+	CacUid    *string
+	Name      string
+	Email     string
+	FirstName string
+	LastName  string
+	Roles     []interface{}
 }
 
 type SearchParams struct {
@@ -24,10 +26,25 @@ type SearchParams struct {
 // }
 
 type User struct {
-	UserID   string `db:"user_id" json:"userId"`
-	UserName string `db:"user_name" json:"userName"`
-	Email    string `db:"email" json:"email"`
-	Deleted  bool   `db:"deleted" json:"-"`
+	ID         int     `db:"id" json:"id"`
+	UserName   string  `db:"user_name" json:"userName"`
+	FirstName  string  `db:"first_name" json:"firstName"`
+	LastName   string  `db:"last_name" json:"lastName"`
+	Email      string  `db:"email" json:"email"`
+	CacUid     *string `db:"edipi" json:"cacUid"`
+	RoleID     int     `db:"role_id" json:"roleId"`
+	OfficeID   int     `db:"office_id" json:"officeId"`
+	Role       string  `db:"description" json:"role"`
+	OfficeCode string  `db:"code" json:"officeCode"`
+}
+
+type UserRoleOffice struct {
+	ID         int    `db:"id" json:"id"`
+	UserID     int    `db:"user_id" json:"userID"`
+	RoleID     int    `db:"role_id" json:"roleId"`
+	OfficeID   int    `db:"office_id" json:"officeId"`
+	Role       string `db:"description" json:"role"`
+	OfficeCode string `db:"code" json:"officeCode"`
 }
 
 type KeyCloakResponse struct {
