@@ -6,6 +6,7 @@ import (
 	//. "github.com/USACE/pallid_sturgeon_api/server/auth"
 
 	"log"
+	"net/http"
 
 	"github.com/USACE/pallid_sturgeon_api/server/config"
 	"github.com/USACE/pallid_sturgeon_api/server/handlers"
@@ -73,5 +74,6 @@ func main() {
 	e.POST(urlContext+"/telemetryUpload", PallidSturgeonH.TelemetryUpload)
 	e.POST(urlContext+"/storeProcedure/:uploadSessionId", PallidSturgeonH.CallStoreProcedures)
 	// e.Logger.Fatal(e.Start(":8080"))
-	e.Logger.Debug(e.Start(":8080"))
+	// e.Logger.Debug(e.Start(":8080"))
+	log.Fatal(http.ListenAndServe(":8080", e))
 }
