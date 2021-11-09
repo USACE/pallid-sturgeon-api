@@ -19,7 +19,7 @@
       },
       "env": {
         "DB_USER": "PSPA",
-        "DB_PASS": "N3w!t3rN!PLv3R!",
+        "DB_PASS": "",
         "DB_NAME": "MAE1DEV",
         "LIB_DIR": "/usr/local/app/oracle/instantclient_21_1",
         "DB_HOST": "host.docker.internal",
