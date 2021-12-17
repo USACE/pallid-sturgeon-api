@@ -109,5 +109,6 @@ func main() {
 	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, ADMIN))
 
 	// e.Logger.Fatal(e.Start(":8080"))
+	// force update
 	e.Logger.Debug(e.Start(":8080"))
 }
