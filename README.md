@@ -25,7 +25,7 @@ Set the following environment variables and type `go run root/main.go` from the 
     "LIB_DIR": "",
     "DB_HOST": "",
     "DB_PORT": "1521",
-    "IPPK": "${workspaceFolder}/props/local.pem",
+    "IPPK": "",
 
 
 Note: When running the API locally, make sure environment variable `LAMBDA` is either **not set** or is set to `LAMBDA=FALSE`.
