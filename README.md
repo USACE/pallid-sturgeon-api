@@ -30,3 +30,4 @@ Set the following environment variables and type `go run root/main.go` from the 
 
 Note: When running the API locally, make sure environment variable `LAMBDA` is either **not set** or is set to `LAMBDA=FALSE`.
 IPPK is NOT in use currently in AWS Dev.
+Use the SIG key when setting IPPK value.
