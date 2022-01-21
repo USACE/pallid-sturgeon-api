@@ -16,9 +16,9 @@ type Season struct {
 }
 
 type FieldOffice struct {
-	ID          int    `db:"id" json:"id"`
-	Code        string `db:"code" json:"code"`
-	Description string `db:"description" json:"description"`
+	ID          int    `db:"FO_ID" json:"id"`
+	Code        string `db:"FIELD_OFFICE_CODE" json:"code"`
+	Description string `db:"FIELD_OFFICE_DESCRIPTION" json:"description"`
 	State       string `db:"state" json:"state"`
 }
 

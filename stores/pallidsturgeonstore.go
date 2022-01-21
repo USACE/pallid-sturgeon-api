@@ -23,10 +23,10 @@ type PallidSturgeonStore struct {
 	config *config.AppConfig
 }
 
-var getUserSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description, f.code from users_t u
+var getUserSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description, f.FIELD_OFFICE_CODE from users_t u
 							inner join user_role_office_lk uro on uro.user_id = u.id
 							inner join role_lk r on r.id = uro.role_id
-							inner join field_office_lk f on f.id = uro.office_id
+							inner join field_office_lk f on f.fo_id = uro.office_id
 				    where email = :1`
 
 func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
@@ -2331,7 +2331,7 @@ var usgNoVialNumberSql = `select fo.description||' : '||p.description as fp,
 							and MR.MR_ID = F.MR_ID (+)
 							and mr.site_id = ds.site_id (+)
 							and DS.PROJECT_ID = P.CODE (+)
-							and DS.FIELDOFFICE = fo.CODE (+)
+							and DS.FIELDOFFICE = fo.FIELD_OFFICE_CODE (+)
 							and ds.SEGMENT_ID = s.code (+)
 
 							and f.SPECIES_ID = 'USG'
@@ -2390,7 +2390,7 @@ var unapprovedDataSheetsSql = `select
 							where m.site_id = ds.site_id (+)
 							and ds.SEGMENT_ID = s.code (+)
 							and DS.PROJECT_ID = P.CODE (+)
-							and DS.FIELDOFFICE = F.CODE
+							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 							and m.mr_id = asv.mr_id (+)
 							and asv.ch = 'Unapproved'
 							-- and m.checkby is not null
@@ -2407,7 +2407,7 @@ var unapprovedDataSheetsCountSql = `select
 							where m.site_id = ds.site_id (+)
 							and ds.SEGMENT_ID = s.code (+)
 							and DS.PROJECT_ID = P.CODE (+)
-							and DS.FIELDOFFICE = F.CODE
+							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 							and m.mr_id = asv.mr_id (+)
 							and asv.ch = 'Unapproved'
 							-- and m.checkby is not null
