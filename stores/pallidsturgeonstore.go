@@ -106,7 +106,7 @@ func (s *PallidSturgeonStore) GetRoles() ([]models.Role, error) {
 }
 
 func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
-	rows, err := s.db.Query("select * from field_office_lk order by id")
+	rows, err := s.db.Query("select * from field_office_lk order by FO_ID")
 
 	fieldOffices := []models.FieldOffice{}
 	if err != nil {
@@ -127,7 +127,7 @@ func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
 }
 
 func (s *PallidSturgeonStore) GetSampleMethods() ([]models.SampleMethod, error) {
-	rows, err := s.db.Query("select * from sample_method_lk order by code")
+	rows, err := s.db.Query("select * from sample_type_lk order by SAMPLE_TYPE_CODE")
 
 	sampleMethods := []models.SampleMethod{}
 	if err != nil {
@@ -148,7 +148,7 @@ func (s *PallidSturgeonStore) GetSampleMethods() ([]models.SampleMethod, error) 
 }
 
 func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, error) {
-	rows, err := s.db.Query("select * from sample_unit_type_lk order by code")
+	rows, err := s.db.Query("select * from sample_unit_type_lk order by SAMPLE_UNIT_TYPE_CODE")
 
 	sampleUnitTypes := []models.SampleUnitType{}
 	if err != nil {
@@ -169,7 +169,7 @@ func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, err
 }
 
 func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
-	rows, err := s.db.Query("select * from season_lk order by id")
+	rows, err := s.db.Query("select * from season_lk order by s_id")
 
 	seasons := []models.Season{}
 	if err != nil {
@@ -191,9 +191,9 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 
 var getSegmentsSql = `select distinct s.* from segment_lk s
 						join field_office_segment_v v
-						on v.SEGMENT_ID = s.code
+						on v.SEGMENT_ID = s.segment_code
 						and v.FIELDOFFICE = :1
-						order by s.id`
+						order by s.s_id`
 
 func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segment, error) {
 	segments := []models.Segment{}
@@ -222,7 +222,7 @@ func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segm
 }
 
 func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
-	rows, err := s.db.Query("select * from bend_river_mile_lk order by id")
+	rows, err := s.db.Query("select * from bend_river_mile_lk order by BRM_ID")
 
 	bends := []models.Bend{}
 	if err != nil {
@@ -2335,7 +2335,7 @@ var usgNoVialNumberSql = `select fo.description||' : '||p.description as fp,
 							and mr.site_id = ds.site_id (+)
 							and DS.PROJECT_ID = P.CODE (+)
 							and DS.FIELDOFFICE = fo.FIELD_OFFICE_CODE (+)
-							and ds.SEGMENT_ID = s.code (+)
+							and ds.SEGMENT_ID = s.segment_code (+)
 
 							and f.SPECIES_ID = 'USG'
 							and Sup.GENETICS_VIAL_NUMBER IS NULL
@@ -2391,7 +2391,7 @@ var unapprovedDataSheetsSql = `select
 							m.gear_code
 							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
 							where m.site_id = ds.site_id (+)
-							and ds.SEGMENT_ID = s.code (+)
+							and ds.SEGMENT_ID = s.segment_code (+)
 							and DS.PROJECT_ID = P.project_code (+)
 							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 							and m.mr_id = asv.mr_id (+)
@@ -2408,7 +2408,7 @@ var unapprovedDataSheetsCountSql = `select
 							count(*)
 							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
 							where m.site_id = ds.site_id (+)
-							and ds.SEGMENT_ID = s.code (+)
+							and ds.SEGMENT_ID = s.segment_code (+)
 							and DS.PROJECT_ID = P.project_code (+)
 							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 							and m.mr_id = asv.mr_id (+)
@@ -2502,7 +2502,7 @@ var uncheckedDataSheetsSql = `select
 								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE, m.gear_code
 								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
-								and ds.SEGMENT_ID = s.code (+)
+								and ds.SEGMENT_ID = s.segment_code (+)
 								and DS.PROJECT_ID = P.project_code (+)
 								and m.mr_id = asv.mr_id (+)  
 								and ds.FIELDOFFICE = :1 
@@ -2518,7 +2518,7 @@ var uncheckedDataSheetsCountSql = `select
 								count(*)
 								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
-								and ds.SEGMENT_ID = s.code (+)
+								and ds.SEGMENT_ID = s.segment_code (+)
 								and DS.PROJECT_ID = p.project_code (+)
 								and m.mr_id = asv.mr_id (+)  
 								and ds.FIELDOFFICE = :1 
