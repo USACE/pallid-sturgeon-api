@@ -683,14 +683,14 @@ var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,
 	TAGNUMBER, PITRN, 
 	SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
 	ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
-	BROODSTOCK, HATCH_WILD, 
+	BROODSTOCK, HATCH_WILD, species_id,
 	head, snouttomouth, inter, mouthwidth, m_ib,
 	l_ob, l_ib, r_ib, 
 	r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
 	SEX, stage,  recapture, photo,
 	genetic_needs, other_tag_info,
 	comments,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44) returning s_id into :46`
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44, :45) returning s_id into :46`
 
 func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
 	var id int
@@ -714,6 +714,7 @@ func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry mo
 		supplementalDataEntry.GeneticsVialNumber,
 		supplementalDataEntry.Broodstock,
 		supplementalDataEntry.HatchWild,
+		supplementalDataEntry.SpeciesId,
 		supplementalDataEntry.Head,
 		supplementalDataEntry.Snouttomouth,
 		supplementalDataEntry.Inter,
