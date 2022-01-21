@@ -54,9 +54,9 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 
 var getProjectsSql = `select distinct p.* from project_lk p
 						join field_office_segment_v v
-						on v.PROJECT_ID = p.code
+						on v.PROJECT_ID = p.project_code
 						and v.FIELDOFFICE = :1
-						order by p.code`
+						order by p.project_code`
 
 func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Project, error) {
 	projects := []models.Project{}
@@ -683,14 +683,14 @@ var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,
 	TAGNUMBER, PITRN, 
 	SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
 	ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
-	BROODSTOCK, HATCH_WILD, 
+	BROODSTOCK, HATCH_WILD, species_id,
 	head, snouttomouth, inter, mouthwidth, m_ib,
 	l_ob, l_ib, r_ib, 
 	r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
 	SEX, stage,  recapture, photo,
 	genetic_needs, other_tag_info,
 	comments,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44) returning s_id into :46`
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44, :45) returning s_id into :46`
 
 func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
 	var id int
@@ -754,7 +754,8 @@ SET   f_fid = :2,mr_id = :3,TAGNUMBER = :4, PITRN = :5, SCUTELOC = :6,
 		edit_initials = :41,
 		last_edit_comment = :42,	
 		last_updated = :43, 
-		uploaded_by = :44
+		uploaded_by = :44,
+		species_id = :45
 WHERE f_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) error {
@@ -802,7 +803,8 @@ func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry 
 		supplementalDataEntry.LastEditComment,
 		supplementalDataEntry.LastUpdated,
 		supplementalDataEntry.UploadedBy,
-		supplementalDataEntry.Sid)
+		supplementalDataEntry.Sid,
+		supplementalDataEntry.SpeciesId)
 	return err
 }
 
@@ -810,7 +812,7 @@ var supplementalDataEntriesByFidSql = `select f_id, f_fid, mr_id,
 										TAGNUMBER, PITRN, 
 										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
 										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
-										BROODSTOCK, HATCH_WILD, 
+										BROODSTOCK, HATCH_WILD, species_id,
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
 										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
@@ -824,7 +826,7 @@ var supplementalDataEntriesByFfidSql = `select f_id, f_fid, mr_id,
 										TAGNUMBER, PITRN, 
 										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
 										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
-										BROODSTOCK, HATCH_WILD, 
+										BROODSTOCK, HATCH_WILD, species_id,
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
 										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
@@ -838,7 +840,7 @@ var supplementalDataEntriesByGeneticsVialSql = `select f_id, f_fid, mr_id,
 										TAGNUMBER, PITRN, 
 										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
 										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
-										BROODSTOCK, HATCH_WILD, 
+										BROODSTOCK, HATCH_WILD, species_id,
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
 										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
@@ -852,7 +854,7 @@ var supplementalDataEntriesByGeneticsPitTagSql = `select f_id, f_fid, mr_id,
 										TAGNUMBER, PITRN, 
 										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
 										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
-										BROODSTOCK, HATCH_WILD, 
+										BROODSTOCK, HATCH_WILD, species_id,
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
 										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
@@ -866,7 +868,7 @@ var supplementalDataEntriesByMrIdSql = `select f_id, f_fid, mr_id,
 										TAGNUMBER, PITRN, 
 										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
 										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
-										BROODSTOCK, HATCH_WILD, 
+										BROODSTOCK, HATCH_WILD, species_id,
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
 										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
@@ -969,6 +971,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			&supplementalDataEntry.GeneticsVialNumber,
 			&supplementalDataEntry.Broodstock,
 			&supplementalDataEntry.HatchWild,
+			&supplementalDataEntry.SpeciesId,
 			&supplementalDataEntry.Head,
 			&supplementalDataEntry.Snouttomouth,
 			&supplementalDataEntry.Inter,
@@ -2035,7 +2038,7 @@ var insertSupplementalUploadSql = `insert into upload_supplemental (site_id, f_f
 	tagnumber, pitrn, 
 	scuteloc, scutenum, scuteloc2, scutenum2, 
 	elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
-	broodstock, hatch_wild, species_id, archive, 
+	broodstock, hatch_wild, species_id,
 	head, snouttomouth, inter, mouthwidth, m_ib,
 	l_ob, l_ib, r_ib, 
 	r_ob, anal, dorsal, status, hatchery_origin, 
@@ -2045,7 +2048,7 @@ var insertSupplementalUploadSql = `insert into upload_supplemental (site_id, f_f
 	last_updated, upload_session_id,uploaded_by, upload_filename)
 	
 	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46)`
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45)`
 
 func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.UploadSupplemental) error {
 	_, err := s.db.Exec(insertSupplementalUploadSql,
@@ -2389,7 +2392,7 @@ var unapprovedDataSheetsSql = `select
 							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
 							where m.site_id = ds.site_id (+)
 							and ds.SEGMENT_ID = s.code (+)
-							and DS.PROJECT_ID = P.CODE (+)
+							and DS.PROJECT_ID = P.project_code (+)
 							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 							and m.mr_id = asv.mr_id (+)
 							and asv.ch = 'Unapproved'
@@ -2406,7 +2409,7 @@ var unapprovedDataSheetsCountSql = `select
 							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
 							where m.site_id = ds.site_id (+)
 							and ds.SEGMENT_ID = s.code (+)
-							and DS.PROJECT_ID = P.CODE (+)
+							and DS.PROJECT_ID = P.project_code (+)
 							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 							and m.mr_id = asv.mr_id (+)
 							and asv.ch = 'Unapproved'
@@ -2500,7 +2503,7 @@ var uncheckedDataSheetsSql = `select
 								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
 								and ds.SEGMENT_ID = s.code (+)
-								and DS.PROJECT_ID = P.CODE (+)
+								and DS.PROJECT_ID = P.project_code (+)
 								and m.mr_id = asv.mr_id (+)  
 								and ds.FIELDOFFICE = :1 
 								and asv.cb = 'Unchecked'
@@ -2516,7 +2519,7 @@ var uncheckedDataSheetsCountSql = `select
 								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
 								and ds.SEGMENT_ID = s.code (+)
-								and DS.PROJECT_ID = P.CODE (+)
+								and DS.PROJECT_ID = p.project_code (+)
 								and m.mr_id = asv.mr_id (+)  
 								and ds.FIELDOFFICE = :1 
 								and asv.cb = 'Unchecked'

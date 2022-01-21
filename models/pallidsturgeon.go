@@ -8,11 +8,11 @@ type Role struct {
 }
 
 type Season struct {
-	ID           int    `db:"id" json:"id"`
-	Code         string `db:"code" json:"code"`
-	Description  string `db:"description" json:"description"`
-	FieldAppFlag string `db:"field_app_flag" json:"fieldAppFlag"`
-	ProjectCode  *int   `db:"PROJECT_ID" json:"projectCode"`
+	ID           int    `db:"s_id" json:"id"`
+	Code         string `db:"season_code" json:"code"`
+	Description  string `db:"season_description" json:"description"`
+	FieldAppFlag string `db:"field_app" json:"fieldAppFlag"`
+	ProjectCode  *int   `db:"PROJECT_CODE" json:"projectCode"`
 }
 
 type FieldOffice struct {
@@ -54,8 +54,8 @@ type Bend struct {
 }
 
 type Project struct {
-	Code        int    `db:"code" json:"code"`
-	Description string `db:"description" json:"description"`
+	Code        int    `db:"project_code" json:"code"`
+	Description string `db:"project_description" json:"description"`
 }
 
 type FishSummaryWithCount struct {
