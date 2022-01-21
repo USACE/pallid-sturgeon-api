@@ -1934,9 +1934,9 @@ func (s *PallidSturgeonStore) GetUploadSessionId() (int, error) {
 
 var insertUploadSiteSql = `insert into upload_site (site_id, site_fid, site_year, fieldoffice_id, 
 	field_office, project_id, project, 
-	segment_id, segment, season_id, season, bend, bendrn, bend_river_mile, comments,
+	segment_id, segment, season_id, season, bend, bendrn, bend_river_mile,
 	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20)`
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19)`
 
 func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error {
 	_, err := s.db.Exec(insertUploadSiteSql,
@@ -1954,7 +1954,6 @@ func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error
 		uploadSite.Bend,
 		uploadSite.Bendrn,
 		uploadSite.BendRiverMile,
-		uploadSite.Comments,
 		uploadSite.EditInitials,
 		uploadSite.LastUpdated,
 		uploadSite.UploadSessionId,
