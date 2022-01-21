@@ -54,8 +54,8 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 
 var getProjectsSql = `select distinct p.* from project_lk p
 						join field_office_segment_v v
-						on v.PROJECT_CODE = p.code
-						and v.field_office_code = :1
+						on v.PROJECT_ID = p.code
+						and v.FIELDOFFICE = :1
 						order by p.code`
 
 func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Project, error) {
@@ -191,8 +191,8 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 
 var getSegmentsSql = `select distinct s.* from segment_lk s
 						join field_office_segment_v v
-						on v.SEGMENT_CODE = s.code
-						and v.field_office_code = :1
+						on v.SEGMENT_ID = s.code
+						and v.FIELDOFFICE = :1
 						order by s.id`
 
 func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segment, error) {
@@ -242,10 +242,10 @@ func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
 	return bends, err
 }
 
-var siteDataEntriesSql = `SELECT site_id, site_fid, year, field_office_code, project_code,
-segment_code, season_code, sample_unit_type_code, bend_r_or_n, comments, edit_initials, uploaded_by fROM ds_site where year = :1 and field_office_code = :2`
+var siteDataEntriesSql = `SELECT site_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
+SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, BENDRN, edit_initials, uploaded_by fROM ds_sites where year = :1 and FIELDOFFICE = :2`
 
-var siteDataEntriesCountSql = `SELECT count(*) FROM ds_site where year = :1 and field_office_code = :2`
+var siteDataEntriesCountSql = `SELECT count(*) FROM ds_sites where year = :1 and FIELDOFFICE = :2`
 
 func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode string, projectCode string, segmentCode string, seasonCode string, bendrn string, queryParams models.SearchParams) (models.SiteDataEntryWithCount, error) {
 	siteDataEntryWithCount := models.SiteDataEntryWithCount{}
@@ -253,23 +253,23 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode st
 	queryWithCount := siteDataEntriesCountSql
 
 	if projectCode != "" {
-		query = query + fmt.Sprintf(" and project_code = '%s' ", projectCode)
-		queryWithCount = queryWithCount + fmt.Sprintf(" and project_code = '%s' ", projectCode)
+		query = query + fmt.Sprintf(" and PROJECT_ID = '%s' ", projectCode)
+		queryWithCount = queryWithCount + fmt.Sprintf(" and PROJECT_ID = '%s' ", projectCode)
 	}
 
 	if segmentCode != "" {
-		query = query + fmt.Sprintf(" and segment_code = '%s' ", segmentCode)
-		queryWithCount = queryWithCount + fmt.Sprintf(" and segment_code = '%s' ", segmentCode)
+		query = query + fmt.Sprintf(" and SEGMENT_ID = '%s' ", segmentCode)
+		queryWithCount = queryWithCount + fmt.Sprintf(" and SEGMENT_ID = '%s' ", segmentCode)
 	}
 
 	if seasonCode != "" {
-		query = query + fmt.Sprintf(" and season_code = '%s' ", seasonCode)
-		queryWithCount = queryWithCount + fmt.Sprintf(" and season_code = '%s' ", seasonCode)
+		query = query + fmt.Sprintf(" and SEASON = '%s' ", seasonCode)
+		queryWithCount = queryWithCount + fmt.Sprintf(" and SEASON = '%s' ", seasonCode)
 	}
 
 	if bendrn != "" {
-		query = query + fmt.Sprintf(" and bend_r_or_n = '%s' ", bendrn)
-		queryWithCount = queryWithCount + fmt.Sprintf(" and bend_r_or_n = '%s' ", bendrn)
+		query = query + fmt.Sprintf(" and BENDRN = '%s' ", bendrn)
+		queryWithCount = queryWithCount + fmt.Sprintf(" and BENDRN = '%s' ", bendrn)
 	}
 
 	countQuery, err := s.db.Prepare(queryWithCount)
@@ -310,7 +310,7 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode st
 	for rows.Next() {
 		siteDataEntry := models.UploadSite{}
 		err = rows.Scan(&siteDataEntry.SiteID, &siteDataEntry.SiteFID, &siteDataEntry.SiteYear, &siteDataEntry.FieldOffice, &siteDataEntry.Project,
-			&siteDataEntry.Segment, &siteDataEntry.Season, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.Bendrn, &siteDataEntry.Comments, &siteDataEntry.EditInitials, &siteDataEntry.UploadedBy)
+			&siteDataEntry.Segment, &siteDataEntry.Season, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.Bendrn, &siteDataEntry.EditInitials, &siteDataEntry.UploadedBy)
 		if err != nil {
 			return siteDataEntryWithCount, err
 		}
@@ -322,53 +322,52 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode st
 	return siteDataEntryWithCount, err
 }
 
-var insertSiteDataSql = `insert into ds_site (site_fid, year, field_office_code, project_code,
-	segment_code, season_code, sample_unit_type_code, bend_r_or_n, comments, edit_initials, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12) returning site_id into :13`
+var insertSiteDataSql = `insert into ds_sites (site_fid, year, FIELDOFFICE, PROJECT_ID,
+	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, BENDRN, edit_initials, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11) returning site_id into :13`
 
 func (s *PallidSturgeonStore) SaveSiteDataEntry(sitehDataEntry models.UploadSite) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
-		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.Comments, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
+		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
 
 	return id, err
 }
 
-var updateSiteDataSql = `UPDATE ds_site
+var updateSiteDataSql = `UPDATE ds_sites
 SET   site_fid = :2,
 	  year = :3,
-	  field_office_code = :4,
-	  project_code = :5,
-	  segment_code = :6,
-	  season_code = :7,
-	  sample_unit_type_code = :8,
-	  bend_r_or_n = :9,
-	  comments = :10,
-	  edit_initials = :11,
-	  last_updated = :12, 
-	  uploaded_by = :13
+	  FIELDOFFICE = :4,
+	  PROJECT_ID = :5,
+	  SEGMENT_ID = :6,
+	  SEASON = :7,
+	  SAMPLE_UNIT_TYPE = :8,
+	  BENDRN = :9,
+	  edit_initials = :10,
+	  last_updated = :11, 
+	  uploaded_by = :12
 WHERE site_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.UploadSite) error {
 	_, err := s.db.Exec(updateSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
-		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.Comments, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.SiteID)
+		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.SiteID)
 	return err
 }
 
-var fishDataEntriesSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by fROM ds_fish where field_office_code = :1`
+var fishDataEntriesSql = `SELECT f_id,f_fid,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,uniqueidentifier,id,panelhook,bait,SPECIES_ID,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, uploaded_by fROM ds_fish where FIELDOFFICE = :1`
 
-var fishDataEntriesCountSql = `SELECT count(*) FROM ds_fish where field_office_code = :1`
+var fishDataEntriesCountSql = `SELECT count(*) FROM ds_fish where FIELDOFFICE = :1`
 
-var fishDataEntriesByFidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by fROM ds_fish where f_id = :1 and field_office_code = :2`
+var fishDataEntriesByFidSql = `SELECT f_id,f_fid,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,uniqueidentifier,id,panelhook,bait,SPECIES_ID,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, uploaded_by fROM ds_fish where f_id = :1 and FIELDOFFICE = :2`
 
-var fishDataEntriesCountByFidSql = `SELECT count(*) FROM ds_fish where f_id = :1 and field_office_code = :2`
+var fishDataEntriesCountByFidSql = `SELECT count(*) FROM ds_fish where f_id = :1 and FIELDOFFICE = :2`
 
-var fishDataEntriesByFfidSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by FROM ds_fish where f_fid = :1 and field_office_code = :2`
+var fishDataEntriesByFfidSql = `SELECT f_id,f_fid,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,uniqueidentifier,id,panelhook,bait,SPECIES_ID,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, uploaded_by FROM ds_fish where f_fid = :1 and FIELDOFFICE = :2`
 
-var fishDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_fish where f_fid = :1 and field_office_code = :2`
+var fishDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_fish where f_fid = :1 and FIELDOFFICE = :2`
 
-var fishDataEntriesByMridSql = `SELECT f_id,f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, uploaded_by FROM ds_fish where mr_id = :1 and field_office_code = :2`
+var fishDataEntriesByMridSql = `SELECT f_id,f_fid,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,uniqueidentifier,id,panelhook,bait,SPECIES_ID,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, uploaded_by FROM ds_fish where mr_id = :1 and FIELDOFFICE = :2`
 
-var fishDataEntriesCountByMridSql = `SELECT count(*) FROM ds_fish where mr_id = :1 and field_office_code = :2`
+var fishDataEntriesCountByMridSql = `SELECT count(*) FROM ds_fish where mr_id = :1 and FIELDOFFICE = :2`
 
 func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string, mrId string, officeCode string, queryParams models.SearchParams) (models.FishDataEntryWithCount, error) {
 	fishDataEntryWithCount := models.FishDataEntryWithCount{}
@@ -467,7 +466,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	return fishDataEntryWithCount, err
 }
 
-var insertFishDataSql = `insert into ds_fish (f_fid,field_office_code,project_code,segment_code,uniqueidentifier,id,panelhook,bait,species_code,length,weight,fish_count,otolith,rayspine,scale,ft_prefix_code,ft_number,ft_mr_code,mr_id,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23) returning f_id into :24`
+var insertFishDataSql = `insert into ds_fish (f_fid,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,uniqueidentifier,id,panelhook,bait,SPECIES_ID,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23) returning f_id into :24`
 
 func (s *PallidSturgeonStore) SaveFishDataEntry(fishDataEntry models.UploadFish) (int, error) {
 	var id int
@@ -480,23 +479,23 @@ func (s *PallidSturgeonStore) SaveFishDataEntry(fishDataEntry models.UploadFish)
 
 var updateFishDataSql = `UPDATE ds_fish
 SET   f_fid = :2,
-	  field_office_code = :3,
-	  project_code = :4,
-	  segment_code = :5,
+	  FIELDOFFICE = :3,
+	  PROJECT_ID = :4,
+	  SEGMENT_ID = :5,
 	  uniqueidentifier = :6,
 	  id = :7,
 	  panelhook = :8,
 	  bait = :9,
-	  species_code = :10,
+	  SPECIES_ID = :10,
 	  length = :11,
 	  weight = :12,
-	  fish_count = :13,
+	  FISHCOUNT = :13,
 	  otolith = :14,
 	  rayspine = :15,
 	  scale = :16,
-	  ft_prefix_code = :17,
-	  ft_number = :18,
-	  ft_mr_code = :19,
+	  FTPREFIX = :17,
+	  FTNUM = :18,
+	  FTMR = :19,
 	  edit_initials = :20,
 	  last_edit_comment = :21,
 	  last_updated = :22, 
@@ -510,16 +509,16 @@ func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFis
 	return err
 }
 
-var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,field_office_code,project_code,segment_code,season_code,set_date, subsample, subsample_pass, 
-	subsample_r_or_n, recorder, gear_code, gear_type_code, temp, turbidity, conductivity, do,
+var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,SEASON,set_date, subsample, subsample_pass, 
+	subsample_r_or_n, recorder, gear_code, GEAR_TYPE, temp, turbidity, conductivity, do,
 	distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
-	u1, u2, u3, u4, u5, u6, u7, macro_code, meso_code, habitat_r_or_n, qc,
+	u1, u2, u3, u4, u5, u6, u7, MACRO_ID, MESO_ID, habitat_r_or_n, qc,
 	micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
 	start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
 	depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
 	depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
 	depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
-	water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
+	water_velocity, cobble_estimation_code, ORGANIC, silt, sand, gravel,
 	comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
 		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49,:50,
 		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71,:72,:73,:74) returning mr_id into :75`
@@ -542,17 +541,17 @@ func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.Uploa
 }
 
 var updateMoriverDataSql = `UPDATE ds_moriver
-SET  project_code = :2,segment_code = :3,season_code = :4,set_date = :5, subsample = :6, subsample_pass = :7, 
-	subsample_r_or_n = :8, recorder = :9, gear_code = :10, gear_type_code = :11, temp = :12, turbidity = :13, conductivity = :14, do = :15,
+SET  PROJECT_ID = :2,SEGMENT_ID = :3,SEASON = :4,set_date = :5, subsample = :6, subsample_pass = :7, 
+	subsample_r_or_n = :8, recorder = :9, gear_code = :10, GEAR_TYPE = :11, temp = :12, turbidity = :13, conductivity = :14, do = :15,
 	distance = :16, width = :17, net_river_mile = :18, structure_number = :19, usgs = :20, river_stage = :21, discharge = :22,
-	u1 = :23, u2 = :24, u3 = :25, u4 = :26, u5 = :27, u6 = :28, u7 = :29, macro_code = :30, meso_code = :31, habitat_r_or_n = :32, qc = :33,
+	u1 = :23, u2 = :24, u3 = :25, u4 = :26, u5 = :27, u6 = :28, u7 = :29, MACRO_ID = :30, MESO_ID = :31, habitat_r_or_n = :32, qc = :33,
 	micro_structure = :34, structure_flow = :35, structure_mod = :36, set_site_1 = :37, set_site_2 = :38, set_site_3 = :39,
 	start_time = :40, start_latitude = :41, start_longitude = :42, stop_time = :43, stop_latitude = :44, stop_longitude = :45, 
 	depth_1 = :46, velocity_bottom_1 = :47, velocity_mid_1 = :48, velocity_top_1 = :49,
 	depth_2 = :50, velocity_bottom_2 = :51, velocity_mid_2 = :52, velocity_top_2 = :53,
 	depth_3 = :54, velocity_bottom_3 = :55, velocity_mid_3 = :56, velocity_top_3 = :57, 
-	water_velocity = :58, cobble_estimation_code = :59, organic_estimation_code = :60, silt = :61, sand = :62, gravel = :63,
-	comments = :64, complete = :65, checkby = :66, turbidity_ind = :67, velocity_ind = :68, edit_initials = :69,  mr_fid= :70, site_id = :71, field_office_code = :72,
+	water_velocity = :58, cobble_estimation_code = :59, ORGANIC = :60, silt = :61, sand = :62, gravel = :63,
+	comments = :64, complete = :65, checkby = :66, turbidity_ind = :67, velocity_ind = :68, edit_initials = :69,  mr_fid= :70, site_id = :71, FIELDOFFICE = :72,
 	last_edit_comment = :73,
 	last_updated = :74, 
 	uploaded_by = :75
@@ -574,33 +573,33 @@ func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.Upl
 	return err
 }
 
-var moriverDataEntriesByFidSql = `select mr_fid,mr_id,site_id,field_office_code,project_code,segment_code,season_code,set_date, subsample, subsample_pass, 
-									subsample_r_or_n, recorder, gear_code, gear_type_code, temp, turbidity, conductivity, do,
+var moriverDataEntriesByFidSql = `select mr_fid,mr_id,site_id,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,SEASON,set_date, subsample, subsample_pass, 
+									subsample_r_or_n, recorder, gear_code, GEAR_TYPE, temp, turbidity, conductivity, do,
 									distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
-									u1, u2, u3, u4, u5, u6, u7, macro_code, meso_code, habitat_r_or_n, qc,
+									u1, u2, u3, u4, u5, u6, u7, MACRO_ID, MESO_ID, habitat_r_or_n, qc,
 									micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
 									start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
 									depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
 									depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
 									depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
-									water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
-									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, uploaded_by from ds_moriver where mr_id = :1 and field_office_code = :2`
+									water_velocity, cobble_estimation_code, ORGANIC, silt, sand, gravel,
+									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, uploaded_by from ds_moriver where mr_id = :1 and FIELDOFFICE = :2`
 
-var moriverDataEntriesCountByFidSql = `SELECT count(*) FROM ds_moriver where mr_id = :1 and field_office_code = :2`
+var moriverDataEntriesCountByFidSql = `SELECT count(*) FROM ds_moriver where mr_id = :1 and FIELDOFFICE = :2`
 
-var moriverDataEntriesByFfidSql = `select mr_fid,mr_id,site_id,field_office_code,project_code,segment_code,season_code,set_date, subsample, subsample_pass, 
-									subsample_r_or_n, recorder, gear_code, gear_type_code, temp, turbidity, conductivity, do,
+var moriverDataEntriesByFfidSql = `select mr_fid,mr_id,site_id,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,SEASON,set_date, subsample, subsample_pass, 
+									subsample_r_or_n, recorder, gear_code, GEAR_TYPE, temp, turbidity, conductivity, do,
 									distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
-									u1, u2, u3, u4, u5, u6, u7, macro_code, meso_code, habitat_r_or_n, qc,
+									u1, u2, u3, u4, u5, u6, u7, MACRO_ID, MESO_ID, habitat_r_or_n, qc,
 									micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
 									start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
 									depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
 									depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
 									depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
-									water_velocity, cobble_estimation_code, organic_estimation_code, silt, sand, gravel,
-									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, uploaded_by from ds_moriver where mr_fid = :1 and field_office_code = :2`
+									water_velocity, cobble_estimation_code, ORGANIC, silt, sand, gravel,
+									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, uploaded_by from ds_moriver where mr_fid = :1 and FIELDOFFICE = :2`
 
-var moriverDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_moriver where mr_fid = :1 and field_office_code = :2`
+var moriverDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_moriver where mr_fid = :1 and FIELDOFFICE = :2`
 
 func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId string, fieldOfficeCode string, queryParams models.SearchParams) (models.MoriverDataEntryWithCount, error) {
 	moriverDataEntryWithCount := models.MoriverDataEntryWithCount{}
@@ -681,17 +680,17 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 }
 
 var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,
-	tag_number, pit_r_n_or_z, 
-	scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
-	el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
-	genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+	TAGNUMBER, PITRN, 
+	SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
+	ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
+	BROODSTOCK, HATCH_WILD, 
 	head, snouttomouth, inter, mouthwidth, m_ib,
 	l_ob, l_ib, r_ib, 
-	r_ob, anal, dorsal, status, hatchery_origin_code, 
-	sex_code, stage,  recapture, photo,
+	r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
+	SEX, stage,  recapture, photo,
 	genetic_needs, other_tag_info,
 	comments,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45) returning s_id into :46`
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44) returning s_id into :46`
 
 func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
 	var id int
@@ -716,7 +715,6 @@ func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry mo
 		supplementalDataEntry.Broodstock,
 		supplementalDataEntry.HatchWild,
 		supplementalDataEntry.SpeciesId,
-		supplementalDataEntry.Archive,
 		supplementalDataEntry.Head,
 		supplementalDataEntry.Snouttomouth,
 		supplementalDataEntry.Inter,
@@ -746,17 +744,17 @@ func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry mo
 }
 
 var updateSupplementalDataSql = `UPDATE ds_supplemental
-SET   f_fid = :2,mr_id = :3,tag_number = :4, pit_r_n_or_z = :5, scute_location_code = :6, 
-		scute_number = :7, scute_location_2_code  = :8, scute_number_2 = :9, el_hvx_code = :10, el_color_code = :11, er_hvx_code = :12, 
-		er_color_code = :13, cwt_y_or_n  = :14, dangler_n = :15, genetic_y_n_or_u = :16, genetics_vial_number = :17,
-		genetic_broodstock_ind = :18, genetic_hatch_wild_ind = :19, genetic_species_id = :20, genetic_archive_ind = :21, 
-		head = :22, snouttomouth = :23, inter = :24, mouthwidth = :25, m_ib = :26, l_ob = :27, l_ib = :28, r_ib = :29, 
-		r_ob = :30, anal = :31, dorsal = :32, status = :33, hatchery_origin_code = :34, sex_code = :35, stage = :36,  recapture = :37, 
-		photo = :38, genetic_needs = :39, other_tag_info = :40, comments = :41, f_id = :42,
-		edit_initials = :43,
-		last_edit_comment = :44,	
-		last_updated = :45, 
-		uploaded_by = :46
+SET   f_fid = :2,mr_id = :3,TAGNUMBER = :4, PITRN = :5, SCUTELOC = :6, 
+		SCUTENUM = :7, SCUTELOC2  = :8, SCUTENUM_2 = :9, ELHV = :10, ELCOLOR = :11, ERHV = :12, 
+		ERCOLOR = :13, CWTYN  = :14, DANGLER = :15, genetic_y_n_or_u = :16, genetics_vial_number = :17,
+		BROODSTOCK = :18, HATCH_WILD = :19, 
+		head = :20, snouttomouth = :21, inter = :22, mouthwidth = :23, m_ib = :24, l_ob = :25, l_ib = :26, r_ib = :27, 
+		r_ob = :28, anal = :29, dorsal = :30, status = :31, HATCHERY_ORIGIN = :32, SEX = :33, stage = :34,  recapture = :35, 
+		photo = :36, genetic_needs = :37, other_tag_info = :38, comments = :39, f_id = :40,
+		edit_initials = :41,
+		last_edit_comment = :42,	
+		last_updated = :43, 
+		uploaded_by = :44
 WHERE f_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) error {
@@ -779,8 +777,6 @@ func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry 
 		supplementalDataEntry.GeneticsVialNumber,
 		supplementalDataEntry.Broodstock,
 		supplementalDataEntry.HatchWild,
-		supplementalDataEntry.SpeciesId,
-		supplementalDataEntry.Archive,
 		supplementalDataEntry.Head,
 		supplementalDataEntry.Snouttomouth,
 		supplementalDataEntry.Inter,
@@ -811,70 +807,70 @@ func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry 
 }
 
 var supplementalDataEntriesByFidSql = `select f_id, f_fid, mr_id,
-										tag_number, pit_r_n_or_z, 
-										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
-										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
-										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										TAGNUMBER, PITRN, 
+										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
+										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
+										BROODSTOCK, HATCH_WILD, 
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
-										r_ob, anal, dorsal, status, hatchery_origin_code, 
-										sex_code, stage,  recapture, photo,
+										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
+										SEX, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
 										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_id = :1 `
 
 var supplementalDataEntriesCountByFidSql = `SELECT count(*) FROM ds_supplemental where f_id = :1`
 
 var supplementalDataEntriesByFfidSql = `select f_id, f_fid, mr_id,
-										tag_number, pit_r_n_or_z, 
-										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
-										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
-										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										TAGNUMBER, PITRN, 
+										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
+										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
+										BROODSTOCK, HATCH_WILD, 
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
-										r_ob, anal, dorsal, status, hatchery_origin_code, 
-										sex_code, stage,  recapture, photo,
+										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
+										SEX, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
 										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_fid = :1`
 
 var supplementalDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_supplemental where f_fid = :1`
 
 var supplementalDataEntriesByGeneticsVialSql = `select f_id, f_fid, mr_id,
-										tag_number, pit_r_n_or_z, 
-										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
-										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
-										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										TAGNUMBER, PITRN, 
+										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
+										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
+										BROODSTOCK, HATCH_WILD, 
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
-										r_ob, anal, dorsal, status, hatchery_origin_code, 
-										sex_code, stage,  recapture, photo,
+										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
+										SEX, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
 										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where genetics_vial_number = :1 `
 
 var supplementalDataEntriesCountByGeneticsVialSql = `SELECT count(*) FROM ds_supplemental where genetics_vial_number = :1`
 
 var supplementalDataEntriesByGeneticsPitTagSql = `select f_id, f_fid, mr_id,
-										tag_number, pit_r_n_or_z, 
-										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
-										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
-										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										TAGNUMBER, PITRN, 
+										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
+										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
+										BROODSTOCK, HATCH_WILD, 
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
-										r_ob, anal, dorsal, status, hatchery_origin_code, 
-										sex_code, stage,  recapture, photo,
+										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
+										SEX, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
-										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where tag_number = :1 `
+										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where TAGNUMBER = :1 `
 
-var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) FROM ds_supplemental where tag_number = :1 `
+var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) FROM ds_supplemental where TAGNUMBER = :1 `
 
 var supplementalDataEntriesByMrIdSql = `select f_id, f_fid, mr_id,
-										tag_number, pit_r_n_or_z, 
-										scute_location_code, scute_number, scute_location_2_code, scute_number_2, 
-										el_hvx_code, el_color_code, er_hvx_code, er_color_code, cwt_y_or_n, dangler_n, genetic_y_n_or_u, genetics_vial_number,
-										genetic_broodstock_ind, genetic_hatch_wild_ind, genetic_species_id, genetic_archive_ind, 
+										TAGNUMBER, PITRN, 
+										SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
+										ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
+										BROODSTOCK, HATCH_WILD, 
 										head, snouttomouth, inter, mouthwidth, m_ib,
 										l_ob, l_ib, r_ib, 
-										r_ob, anal, dorsal, status, hatchery_origin_code, 
-										sex_code, stage,  recapture, photo,
+										r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
+										SEX, stage,  recapture, photo,
 										genetic_needs, other_tag_info,
 										comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where mr_id = :1 `
 
@@ -973,8 +969,6 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			&supplementalDataEntry.GeneticsVialNumber,
 			&supplementalDataEntry.Broodstock,
 			&supplementalDataEntry.HatchWild,
-			&supplementalDataEntry.SpeciesId,
-			&supplementalDataEntry.Archive,
 			&supplementalDataEntry.Head,
 			&supplementalDataEntry.Snouttomouth,
 			&supplementalDataEntry.Inter,
@@ -1075,7 +1069,7 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 	return file.Name(), err
 }
 
-var fishDataSummarySql = `SELECT mr_id, f_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, panelhook, species_code, hatchery_origin_code, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var fishDataSummarySql = `SELECT mr_id, f_id, year, FIELDOFFICE, PROJECT_ID, SEGMENT_ID, SEASON, BEND, BENDRN, bend_river_mile, panelhook, SPECIES_ID, HATCHERY_ORIGIN, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var fishDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -1199,7 +1193,7 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 	return file.Name(), err
 }
 
-var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, hatchery_origin_code, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, FIELDOFFICE, PROJECT_ID, SEGMENT_ID, SEASON, BEND, BENDRN, bend_river_mile, HATCHERY_ORIGIN, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var suppDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -1322,7 +1316,7 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 	return file.Name(), err
 }
 
-var missouriDataSummarySql = `SELECT mr_id, year, field_office_code, project_code, segment_code, season_code, bend_number, bend_r_or_n, bend_river_mile, subsample, subsample_pass, set_Date, conductivity, checkby FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var missouriDataSummarySql = `SELECT mr_id, year, FIELDOFFICE, PROJECT_ID, SEGMENT_ID, SEASON, BEND, BENDRN, bend_river_mile, subsample, subsample_pass, set_Date, conductivity, checkby FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var missouriDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -1445,7 +1439,7 @@ func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode 
 	return file.Name(), err
 }
 
-var geneticDataSummarySql = `SELECT year,field_office_code,project_code,genetics_vial_number,pit_tag,river,river_mile,
+var geneticDataSummarySql = `SELECT year,FIELDOFFICE,PROJECT_ID,genetics_vial_number,pit_tag,river,river_mile,
 							state,set_date,broodstock_yn,hatchwild_yn,Speciesid_yn,archive_yn FROM table (pallid_data_api.genetic_datasummary_fnc(:1, :2, :3, to_date(:4,'MM/DD/YYYY'), to_date(:5,'MM/DD/YYYY'), :6, :7, :8, :9))`
 
 var geneticDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.genetic_datasummary_fnc(:1, :2, :3, to_date(:4,'MM/DD/YYYY'), to_date(:5,'MM/DD/YYYY'), :6, :7, :8, :9))`
@@ -2076,7 +2070,6 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 		uploadSupplemental.Broodstock,
 		uploadSupplemental.HatchWild,
 		uploadSupplemental.SpeciesId,
-		uploadSupplemental.Archive,
 		uploadSupplemental.Head,
 		uploadSupplemental.Snouttomouth,
 		uploadSupplemental.Inter,
@@ -2107,11 +2100,11 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 	return err
 }
 
-var insertProcedureUploadSql = `insert into upload_procedure (f_fid, purpose_code, procedure_date, procedure_start_time, procedure_end_time, procedure_by, 
-	antibiotic_injection_ind, photo_dorsal_ind, photo_ventral_ind, photo_left_ind,
-	old_radio_tag_num, old_frequency_id, dst_serial_num, dst_start_date, dst_start_time, dst_reimplant_ind, new_radio_tag_num,
-	new_frequency_id, sex_code, blood_sample_ind, egg_sample_ind, comments, fish_health_comments,
-	eval_location_code, spawn_code, visual_repro_status_code, ultrasound_repro_status_code,
+var insertProcedureUploadSql = `insert into upload_procedure (f_fid, PURPOSE, SURGERY_DATE, procedure_start_time, procedure_end_time, procedure_by, 
+	ANTIBIOTIC_INJECTION, P_DORSAL, P_VENTRAL, P_LEFT,
+	old_radio_tag_num, OLD_FREQ_ID, dst_serial_num, dst_start_date, dst_start_time, DST_REIMPLANT, new_radio_tag_num,
+	NEW_FREQ_ID, SEX, BLOOD_SAMPLE, EGG_SAMPLE, comments, FISH_HEALTH_COMMENT,
+	EVAL_LOCATION, SPAWN_STATU, VISUAL_REPRO_STATUS, ULTRASOUND_REPRO_STATUS,
 	expected_spawn_year, ultrasound_gonad_length, gonad_condition,
 	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)                                                        
 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35)`
@@ -2282,18 +2275,18 @@ var errorCountSql = `select el.year,count(el.el_id)
 						where NVL(error_fixed,0) = 0
 						and  (case
 						when el.worksheet_type_id = 2 then 
-							(select field_office_code
-							from ds_site
+							(select FIELDOFFICE
+							from ds_sites
 							where site_id = (select site_id
 											from ds_moriver
 											where mr_id = el.worksheet_id))
 						when el.worksheet_type_id = 1 then
 							NULL
 						when el.worksheet_type_id in(3,4) then
-							(select field_office_code
-							from ds_site
+							(select FIELDOFFICE
+							from ds_sites
 							where site_id = (select mr2.site_id
-											from ds_site s2, ds_moriver mr2, ds_fish f2
+											from ds_sites s2, ds_moriver mr2, ds_fish f2
 											where s2.site_id = mr2.site_id
 											and mr2.mr_id = F2.MR_ID
 											and f2.f_id = el.worksheet_id))
@@ -2328,29 +2321,29 @@ func (s *PallidSturgeonStore) GetErrorCount(fieldOfficeCode string) ([]models.Er
 }
 
 var usgNoVialNumberSql = `select fo.description||' : '||p.description as fp,
-							f.species_code, 
+							f.SPECIES_ID, 
 							f.f_id, mr.mr_id, MR.SITE_ID as mrsite_id,   DS.SITE_ID as s_site_id,
 							f.f_fid, Sup.GENETICS_VIAL_NUMBER
 
-							from ds_fish f, ds_supplemental sup, ds_moriver mr, ds_site ds,
+							from ds_fish f, ds_supplemental sup, ds_moriver mr, ds_sites ds,
 							project_lk p, segment_lk s, field_office_lk fo
 
 							where F.F_ID = Sup.F_ID (+)
 							and MR.MR_ID = F.MR_ID (+)
 							and mr.site_id = ds.site_id (+)
-							and DS.PROJECT_code = P.CODE (+)
-							and DS.FIELD_OFFICE_CODE = fo.CODE (+)
-							and ds.segment_code = s.code (+)
+							and DS.PROJECT_ID = P.CODE (+)
+							and DS.FIELDOFFICE = fo.CODE (+)
+							and ds.SEGMENT_ID = s.code (+)
 
-							and f.species_code = 'USG'
+							and f.SPECIES_ID = 'USG'
 							and Sup.GENETICS_VIAL_NUMBER IS NULL
 							and (CASE when :1 != 'ZZ' THEN
-									ds.FIELD_OFFICE_CODE
+									ds.FIELDOFFICE
 								ELSE
 									:2
 								END) = :3
-							and ds.project_code != 2
-							order by ds.FIELD_OFFICE_CODE, ds.project_code, ds.segment_code, ds.bend_number`
+							and ds.PROJECT_ID != 2
+							order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
 
 func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string) ([]models.UsgNoVialNumber, error) {
 	usgNoVialNumbers := []models.UsgNoVialNumber{}
@@ -2382,7 +2375,7 @@ var unapprovedDataSheetsSql = `select
 							asv.ch,
 							f.description||' : '||p.description as fp, 
 							s.description,
-							m.bend_number,
+							m.BEND,
 							m.MR_ID, 
 							m.UNIQUEIDENTIFIER,
 							m.SET_DATE,
@@ -2391,14 +2384,14 @@ var unapprovedDataSheetsSql = `select
 							m.CHECKBY,
 							m.NET_RIVER_MILE,
 							m.site_id,
-							ds.project_code, ds.segment_code, ds.season_code, ds.FIELD_OFFICE_CODE,
-							ds.sample_unit_type_code,
+							ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE,
+							ds.SAMPLE_UNIT_TYPE,
 							m.gear_code
-							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_site ds
+							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
 							where m.site_id = ds.site_id (+)
-							and ds.segment_code = s.code (+)
-							and DS.PROJECT_code = P.CODE (+)
-							and DS.FIELD_OFFICE_CODE = F.CODE
+							and ds.SEGMENT_ID = s.code (+)
+							and DS.PROJECT_ID = P.CODE (+)
+							and DS.FIELDOFFICE = F.CODE
 							and m.mr_id = asv.mr_id (+)
 							and asv.ch = 'Unapproved'
 							-- and m.checkby is not null
@@ -2406,16 +2399,16 @@ var unapprovedDataSheetsSql = `select
 							-- and asv.co = 'Complete'  
 							-- and nvl(m.complete,0) = 1
 							-- and nvl(m.approved,0) = 0
-							and ds.project_code != 2
-							order by ds.FIELD_OFFICE_CODE, ds.project_code, ds.segment_code, ds.bend_number`
+							and ds.PROJECT_ID != 2
+							order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
 
 var unapprovedDataSheetsCountSql = `select 
 							count(*)
-							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_site ds
+							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
 							where m.site_id = ds.site_id (+)
-							and ds.segment_code = s.code (+)
-							and DS.PROJECT_code = P.CODE (+)
-							and DS.FIELD_OFFICE_CODE = F.CODE
+							and ds.SEGMENT_ID = s.code (+)
+							and DS.PROJECT_ID = P.CODE (+)
+							and DS.FIELDOFFICE = F.CODE
 							and m.mr_id = asv.mr_id (+)
 							and asv.ch = 'Unapproved'
 							-- and m.checkby is not null
@@ -2423,8 +2416,8 @@ var unapprovedDataSheetsCountSql = `select
 							-- and asv.co = 'Complete'  
 							-- and nvl(m.complete,0) = 1
 							-- and nvl(m.approved,0) = 0
-							and ds.project_code != 2
-							order by ds.FIELD_OFFICE_CODE, ds.project_code, ds.segment_code, ds.bend_number`
+							and ds.PROJECT_ID != 2
+							order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
 
 func (s *PallidSturgeonStore) GetUnapprovedDataSheets() (models.SummaryWithCount, error) {
 
@@ -2495,7 +2488,7 @@ func (s *PallidSturgeonStore) GetUnapprovedDataSheets() (models.SummaryWithCount
 
 var uncheckedDataSheetsSql = `select 
 								asv.cb,
-								p.description||' : '||s.description||' : Bend '||ds.bend_number as psb,
+								p.description||' : '||s.description||' : Bend '||ds.BEND as psb,
 								m.MR_ID, 
 								m.UNIQUEIDENTIFIER,
 								m.SET_DATE,
@@ -2504,36 +2497,36 @@ var uncheckedDataSheetsSql = `select
 								m.CHECKBY,
 								m.NET_RIVER_MILE,
 								m.site_id,
-								ds.project_code, ds.segment_code, ds.season_code, ds.field_office_code, m.gear_code
-								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_site ds
+								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE, m.gear_code
+								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
-								and ds.segment_code = s.code (+)
-								and DS.PROJECT_code = P.CODE (+)
+								and ds.SEGMENT_ID = s.code (+)
+								and DS.PROJECT_ID = P.CODE (+)
 								and m.mr_id = asv.mr_id (+)  
-								and ds.field_office_code = :1 
+								and ds.FIELDOFFICE = :1 
 								and asv.cb = 'Unchecked'
 								-- and asv.co = 'Complete'
-								and ds.project_code != 2
+								and ds.PROJECT_ID != 2
 								and M.MR_ID NOT IN (SELECT MR_ID 
 													FROM DS_FISH
-													WHERE species_code = 'BAFI')
-								and m.field_office_code is not null`
+													WHERE SPECIES_ID = 'BAFI')
+								and m.FIELDOFFICE is not null`
 
 var uncheckedDataSheetsCountSql = `select 
 								count(*)
-								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_site ds
+								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
-								and ds.segment_code = s.code (+)
-								and DS.PROJECT_code = P.CODE (+)
+								and ds.SEGMENT_ID = s.code (+)
+								and DS.PROJECT_ID = P.CODE (+)
 								and m.mr_id = asv.mr_id (+)  
-								and ds.field_office_code = :1 
+								and ds.FIELDOFFICE = :1 
 								and asv.cb = 'Unchecked'
 								-- and asv.co = 'Complete'
-								and ds.project_code != 2
+								and ds.PROJECT_ID != 2
 								and M.MR_ID NOT IN (SELECT MR_ID 
 													FROM DS_FISH
-													WHERE species_code = 'BAFI')
-								and m.field_office_code is not null`
+													WHERE SPECIES_ID = 'BAFI')
+								and m.FIELDOFFICE is not null`
 
 func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, queryParams models.SearchParams) (models.SummaryWithCount, error) {
 
@@ -2560,7 +2553,7 @@ func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, que
 
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "project_code"
+		queryParams.OrderBy = "PROJECT_ID"
 	}
 	selectQueryWithSearch := uncheckedDataSheetsSql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(selectQueryWithSearch)

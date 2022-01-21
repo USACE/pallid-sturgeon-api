@@ -12,7 +12,7 @@ type Season struct {
 	Code         string `db:"code" json:"code"`
 	Description  string `db:"description" json:"description"`
 	FieldAppFlag string `db:"field_app_flag" json:"fieldAppFlag"`
-	ProjectCode  *int   `db:"project_code" json:"projectCode"`
+	ProjectCode  *int   `db:"PROJECT_ID" json:"projectCode"`
 }
 
 type FieldOffice struct {
@@ -44,10 +44,10 @@ type Segment struct {
 }
 
 type Bend struct {
-	ID             int     `db:"id" json:"id"`
-	BendNumber     int     `db:"bend_number" json:"bendNumber"`
-	Description    *string `db:"description" json:"description"`
-	SegmentCode    int     `db:"segment_code" json:"segmentCode"`
+	ID             int     `db:"BRM_ID" json:"id"`
+	BendNumber     int     `db:"BEND_NUM" json:"bendNumber"`
+	Description    *string `db:"B_DESC" json:"description"`
+	SegmentCode    int     `db:"B_SEGMENT" json:"segmentCode"`
 	UpperRiverMile *string `db:"upper_river_mile" json:"upperRiverMile"`
 	LowerRiverMile *string `db:"lower_river_mile" json:"lowerRiverMile"`
 	State          string  `db:"state" json:"state"`
@@ -67,16 +67,16 @@ type FishSummary struct {
 	UniqueID        int     `db:"mr_id" json:"uniqueID"`
 	FishID          int     `db:"f_id" json:"fishId"`
 	Year            int     `db:"year" json:"year"`
-	FieldOffice     string  `db:"field_office_code" json:"fieldOffice"`
-	Project         int     `db:"project_code" json:"project"`
-	Segment         int     `db:"segment_code" json:"segment"`
-	Season          string  `db:"season_code" json:"season"`
-	Bend            int     `db:"bend_number" json:"bend"`
-	Bendrn          string  `db:"bend_r_or_n" json:"bendrn"`
+	FieldOffice     string  `db:"FIELDOFFICE" json:"fieldOffice"`
+	Project         int     `db:"PROJECT_ID" json:"project"`
+	Segment         int     `db:"SEGMENT_ID" json:"segment"`
+	Season          string  `db:"SEASON" json:"season"`
+	Bend            int     `db:"BEND" json:"bend"`
+	Bendrn          string  `db:"BENDRN" json:"bendrn"`
 	BendRiverMile   float64 `db:"bend_river_mile" json:"bendRiverMile"`
 	Panelhook       string  `db:"panelhook" json:"panelhook"`
-	Species         string  `db:"species_code" json:"species"`
-	HatcheryOrigin  string  `db:"hatchery_origin_code" json:"hatcheryOrigin"`
+	Species         string  `db:"SPECIES_ID" json:"species"`
+	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN" json:"hatcheryOrigin"`
 	CheckedBy       string  `db:"checkby" json:"checkedby"`
 	EditInitials    string  `db:"edit_initials" json:"editInitials"`
 	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
@@ -93,14 +93,14 @@ type SuppSummary struct {
 	FishID          int     `db:"f_id" json:"fishId"`
 	Year            int     `db:"year" json:"year"`
 	SuppID          int     `db:"sid_display" json:"suppId"`
-	FieldOffice     string  `db:"field_office_code" json:"fieldOffice"`
-	Project         int     `db:"project_code" json:"project"`
-	Segment         int     `db:"segment_code" json:"segment"`
-	Season          string  `db:"season_code" json:"season"`
-	Bend            int     `db:"bend_number" json:"bend"`
-	Bendrn          string  `db:"bend_r_or_n" json:"bendrn"`
+	FieldOffice     string  `db:"FIELDOFFICE" json:"fieldOffice"`
+	Project         int     `db:"PROJECT_ID" json:"project"`
+	Segment         int     `db:"SEGMENT_ID" json:"segment"`
+	Season          string  `db:"SEASON" json:"season"`
+	Bend            int     `db:"BEND" json:"bend"`
+	Bendrn          string  `db:"BENDRN" json:"bendrn"`
 	BendRiverMile   float64 `db:"bend_river_mile" json:"bendRiverMile"`
-	HatcheryOrigin  string  `db:"hatchery_origin_code" json:"hatcheryOrigin"`
+	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN" json:"hatcheryOrigin"`
 	CheckedBy       string  `db:"checkby" json:"checkedby"`
 	EditInitials    string  `db:"edit_initials" json:"editInitials"`
 	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
@@ -114,12 +114,12 @@ type MissouriSummaryWithCount struct {
 type MissouriSummary struct {
 	UniqueID        int       `db:"mr_id" json:"uniqueID"`
 	Year            int       `db:"year" json:"year"`
-	FieldOffice     string    `db:"field_office_code" json:"fieldOffice"`
-	Project         int       `db:"project_code" json:"project"`
-	Segment         int       `db:"segment_code" json:"segment"`
-	Season          string    `db:"season_code" json:"season"`
-	Bend            int       `db:"bend_number" json:"bend"`
-	Bendrn          string    `db:"bend_r_or_n" json:"bendrn"`
+	FieldOffice     string    `db:"FIELDOFFICE" json:"fieldOffice"`
+	Project         int       `db:"PROJECT_ID" json:"project"`
+	Segment         int       `db:"SEGMENT_ID" json:"segment"`
+	Season          string    `db:"SEASON" json:"season"`
+	Bend            int       `db:"BEND" json:"bend"`
+	Bendrn          string    `db:"BENDRN" json:"bendrn"`
 	BendRiverMile   float64   `db:"bend_river_mile" json:"bendRiverMile"`
 	Subsample       int       `db:"subsample" json:"subsample"`
 	Pass            int       `db:"subsample_pass" json:"pass"`
@@ -137,8 +137,8 @@ type GeneticSummaryWithCount struct {
 
 type GeneticSummary struct {
 	Year               int       `db:"year" json:"year"`
-	FieldOffice        string    `db:"field_office_code" json:"fieldOffice"`
-	Project            int       `db:"project_code" json:"project"`
+	FieldOffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
+	Project            int       `db:"PROJECT_ID" json:"project"`
 	SturgeonType       string    `db:"sturgeon_type" json:"sturgeonType"`
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"GeneticsVialNumber"`
 	PitTag             string    `db:"pit_tag" json:"pitTag"`
@@ -206,27 +206,25 @@ type UploadSiteData struct {
 }
 
 type UploadSite struct {
-	SiteID             int       `db:"site_id" json:"siteId"`
-	SiteFID            string    `db:"site_fid" json:"siteFid"`
-	SiteYear           int       `db:"site_year" json:"siteYear"`
-	FieldofficeID      string    `db:"fieldoffice_id" json:"fieldofficeId"`
-	FieldOffice        string    `db:"field_office" json:"fieldOffice"`
-	ProjectId          int       `db:"project_id" json:"projectId"`
-	Project            string    `db:"project" json:"project"`
-	SegmentId          int       `db:"segment_id" json:"segmentId"`
-	Segment            string    `db:"segment" json:"segment"`
-	SeasonId           string    `db:"season_id" json:"seasonId"`
-	Season             string    `db:"season" json:"season"`
-	SampleUnitTypeCode string    `db:"sample_unit_type_code" json:"sampleUnitTypeCode"`
-	Bend               int       `db:"bend" json:"bend"`
-	Bendrn             string    `db:"bendrn" json:"bendrn"`
-	BendRiverMile      float64   `db:"bend_river_mile" json:"bendRiverMile"`
-	EditInitials       string    `db:"edit_initials" json:"editInitials"`
-	Comments           string    `db:"comments" json:"comments"`
-	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
-	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+	SiteID          int       `db:"site_id" json:"siteId"`
+	SiteFID         string    `db:"site_fid" json:"siteFid"`
+	SiteYear        int       `db:"site_year" json:"siteYear"`
+	FieldofficeID   string    `db:"fieldoffice_id" json:"fieldofficeId"`
+	FieldOffice     string    `db:"field_office" json:"fieldOffice"`
+	ProjectId       int       `db:"project_id" json:"projectId"`
+	Project         string    `db:"project" json:"project"`
+	SegmentId       int       `db:"segment_id" json:"segmentId"`
+	Segment         string    `db:"segment" json:"segment"`
+	SeasonId        string    `db:"season_id" json:"seasonId"`
+	Season          string    `db:"season" json:"season"`
+	Bend            int       `db:"bend" json:"bend"`
+	Bendrn          string    `db:"bendrn" json:"bendrn"`
+	BendRiverMile   float64   `db:"bend_river_mile" json:"bendRiverMile"`
+	EditInitials    string    `db:"edit_initials" json:"editInitials"`
+	LastUpdated     time.Time `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId int       `db:"upload_session_id" json:"uploadSessionId"`
+	UploadedBy      string    `db:"uploaded_by" json:"uploadedBy"`
+	UploadFilename  string    `db:"upload_filename" json:"uploadFilename"`
 }
 
 type FishDataEntryWithCount struct {
@@ -242,23 +240,23 @@ type UploadFishData struct {
 // type FishDataEntry struct {
 // 	Fid         int      `db:"f_id" json:"fid"`
 // 	Ffid        string   `db:"f_fid" json:"ffid"`
-// 	Fieldoffice string   `db:"field_office_code" json:"fieldOffice"`
-// 	Project     *int     `db:"project_code" json:"project"`
-// 	Segment     *int     `db:"segment_code" json:"segment"`
+// 	Fieldoffice string   `db:"FIELDOFFICE" json:"fieldOffice"`
+// 	Project     *int     `db:"PROJECT_ID" json:"project"`
+// 	Segment     *int     `db:"SEGMENT_ID" json:"segment"`
 // 	UniqueID    *int     `db:"uniqueidentifier" json:"uniqueID"`
 // 	Id          *int     `db:"id" json:"id"`
 // 	Panelhook   string   `db:"panelhook" json:"panelhook"`
 // 	Bait        string   `db:"bait" json:"bait"`
-// 	Species     string   `db:"species_code" json:"species"`
+// 	Species     string   `db:"SPECIES_ID" json:"species"`
 // 	Length      *float32 `db:"length" json:"length"`
 // 	Weight      *float32 `db:"weight" json:"weight"`
-// 	Fishcount   *int     `db:"fish_count" json:"fishcount"`
+// 	Fishcount   *int     `db:"FISHCOUNT" json:"fishcount"`
 // 	Otolith     string   `db:"otolith" json:"otolith"`
 // 	Rayspine    string   `db:"rayspine" json:"rayspine"`
 // 	Scale       string   `db:"scale" json:"scale"`
-// 	Ftprefix    string   `db:"ft_prefix_code" json:"ftprefix"`
-// 	Ftnum       string   `db:"ft_number" json:"ftnum"`
-// 	Ftmr        string   `db:"ft_mr_code" json:"ftmr"`
+// 	Ftprefix    string   `db:"FTPREFIX" json:"ftprefix"`
+// 	Ftnum       string   `db:"FTNUM" json:"ftnum"`
+// 	Ftmr        string   `db:"FTMR" json:"ftmr"`
 // 	MrID        *int     `db:"mr_id" json:"mrId"`
 // }
 
@@ -289,10 +287,10 @@ type UploadFish struct {
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
 	UploadedBy      string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename  string    `db:"upload_filename" json:"uploadFilename"`
-	Project         *int      `db:"project_code" json:"project"`
+	Project         *int      `db:"PROJECT_ID" json:"project"`
 	UniqueID        *int      `db:"uniqueidentifier" json:"uniqueID"`
-	Segment         *int      `db:"segment_code" json:"segment"`
-	Fieldoffice     string    `db:"field_office_code" json:"fieldOffice"`
+	Segment         *int      `db:"SEGMENT_ID" json:"segment"`
+	Fieldoffice     string    `db:"FIELDOFFICE" json:"fieldOffice"`
 }
 
 type UploadSearchData struct {
@@ -333,32 +331,32 @@ type UploadProcedureData struct {
 type UploadProcedure struct {
 	Id                        int       `db:"id" json:"id"`
 	FFid                      string    `db:"f_fid" json:"f_fid"`
-	PurposeCode               string    `db:"purpose_code" json:"purposeCode"`
-	ProcedurDate              time.Time `db:"procedure_date" json:"procedurDate"`
+	PurposeCode               string    `db:"PURPOSE" json:"purposeCode"`
+	ProcedurDate              time.Time `db:"SURGERY_DATE" json:"procedurDate"`
 	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
 	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
 	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
-	AntibioticInjectionInd    int       `db:"antibiotic_injection_ind" json:"antibioticInjectionInd"`
-	PhotoDorsalInd            int       `db:"photo_dorsal_ind" json:"photoDorsalInd"`
-	PhotoVentralInd           int       `db:"photo_ventral_ind" json:"photoVentralInd"`
-	PhotoLeftInd              int       `db:"photo_left_ind" json:"photoLeftInd"`
+	AntibioticInjectionInd    int       `db:"ANTIBIOTIC_INJECTION" json:"antibioticInjectionInd"`
+	PhotoDorsalInd            int       `db:"P_DORSAL" json:"photoDorsalInd"`
+	PhotoVentralInd           int       `db:"P_VENTRAL" json:"photoVentralInd"`
+	PhotoLeftInd              int       `db:"P_LEFT" json:"photoLeftInd"`
 	OldRadioTagNum            int       `db:"old_radio_tag_num" json:"oldRadioTagNum"`
-	OldFrequencyId            int       `db:"old_frequency_id" json:"oldFrequencyId"`
+	OldFrequencyId            int       `db:"OLD_FREQ_ID" json:"oldFrequencyId"`
 	DstSerialNum              int       `db:"dst_serial_num" json:"dstSerialNum"`
 	DstStartDate              time.Time `db:"dst_start_date" json:"dstStartDate"`
 	DstStartTime              string    `db:"dst_start_time" json:"dstStartTime"`
-	DstReimplantInd           int       `db:"dst_reimplant_ind" json:"dstReimplantInd"`
+	DstReimplantInd           int       `db:"DST_REIMPLANT" json:"dstReimplantInd"`
 	NewRadioTagNum            int       `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId            int       `db:"new_frequency_id" json:"newFrequencyId"`
-	SexCode                   string    `db:"sex_code" json:"sexCode"`
-	BloodSampleInd            int       `db:"blood_sample_ind" json:"bloodSampleInd"`
-	EggSampleInd              int       `db:"egg_sample_ind" json:"eggSampleInd"`
+	NewFrequencyId            int       `db:"NEW_FREQ_ID" json:"newFrequencyId"`
+	SexCode                   string    `db:"SEX" json:"sexCode"`
+	BloodSampleInd            int       `db:"BLOOD_SAMPLE" json:"bloodSampleInd"`
+	EggSampleInd              int       `db:"EGG_SAMPLE" json:"eggSampleInd"`
 	Comments                  string    `db:"comments" json:"comments"`
-	FishHealthComments        string    `db:"fish_health_comments" json:"fishHealthComments"`
-	EvalLocationCode          string    `db:"eval_location_code" json:"evalLocationCode"`
-	SpawnCode                 string    `db:"spawn_code" json:"spawnCode"`
-	VisualReproStatusCode     string    `db:"visual_repro_status_code" json:"visualReproStatusCode"`
-	UltrasoundReproStatusCode string    `db:"ultrasound_repro_status_code" json:"ultrasoundReproStatusCode"`
+	FishHealthComments        string    `db:"FISH_HEALTH_COMMENT" json:"fishHealthComments"`
+	EvalLocationCode          string    `db:"EVAL_LOCATION" json:"evalLocationCode"`
+	SpawnCode                 string    `db:"SPAWN_STATU" json:"spawnCode"`
+	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatusCode"`
+	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatusCode"`
 	ExpectedSpawnYear         int       `db:"expected_spawn_year" json:"expectedSpawnYear"`
 	UltrasoundGonadLength     float64   `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
 	GonadCondition            string    `db:"gonad_condition" json:"gonadCondition"`
@@ -405,7 +403,6 @@ type UploadSupplemental struct {
 	Broodstock         *string   `db:"broodstock" json:"broodstock"`
 	HatchWild          *string   `db:"hatch_wild" json:"hatchWild"`
 	SpeciesId          *int      `db:"species_id" json:"speciesId"`
-	Archive            *int      `db:"archive" json:"archive"`
 	Head               *string   `db:"head" json:"head"`
 	Snouttomouth       *string   `db:"snouttomouth" json:"snouttomouth"`
 	Inter              *string   `db:"inter" json:"inter"`
@@ -517,9 +514,9 @@ type UploadMoriver struct {
 	NoVelocity       string    `db:"no_velocity" json:"noVelocity"`
 	EditInitials     string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment  string    `db:"last_edit_comment" json:"lastEditComment"`
-	Project          *int      `db:"project_code" json:"project"`
-	FieldOffice      string    `db:"field_office_code" json:"fieldOffice"`
-	Segment          *int      `db:"segment_code" json:"segment"`
+	Project          *int      `db:"PROJECT_ID" json:"project"`
+	FieldOffice      string    `db:"FIELDOFFICE" json:"fieldOffice"`
+	Segment          *int      `db:"SEGMENT_ID" json:"segment"`
 	LastUpdated      time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
@@ -576,7 +573,7 @@ type ProcedureOut struct {
 
 type UsgNoVialNumber struct {
 	Fp                 string `db:"fp" json:"fp"`
-	SpeciesCode        string `db:"species_code" json:"speciesCode"`
+	SpeciesCode        string `db:"SPECIES_ID" json:"speciesCode"`
 	FID                int    `db:"f_id" json:"fId"`
 	MrID               int    `db:"mr_id" json:"mrID"`
 	MrsiteID           int    `db:"mrsite_id" json:"mrsiteId"`
