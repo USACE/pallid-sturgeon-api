@@ -54,9 +54,9 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 
 var getProjectsSql = `select distinct p.* from project_lk p
 						join field_office_segment_v v
-						on v.PROJECT_ID = p.code
+						on v.PROJECT_ID = p.project_code
 						and v.FIELDOFFICE = :1
-						order by p.code`
+						order by p.project_code`
 
 func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Project, error) {
 	projects := []models.Project{}
@@ -2389,7 +2389,7 @@ var unapprovedDataSheetsSql = `select
 							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
 							where m.site_id = ds.site_id (+)
 							and ds.SEGMENT_ID = s.code (+)
-							and DS.PROJECT_ID = P.CODE (+)
+							and DS.PROJECT_ID = P.project_code (+)
 							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 							and m.mr_id = asv.mr_id (+)
 							and asv.ch = 'Unapproved'
@@ -2406,7 +2406,7 @@ var unapprovedDataSheetsCountSql = `select
 							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
 							where m.site_id = ds.site_id (+)
 							and ds.SEGMENT_ID = s.code (+)
-							and DS.PROJECT_ID = P.CODE (+)
+							and DS.PROJECT_ID = P.project_code (+)
 							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 							and m.mr_id = asv.mr_id (+)
 							and asv.ch = 'Unapproved'
@@ -2500,7 +2500,7 @@ var uncheckedDataSheetsSql = `select
 								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
 								and ds.SEGMENT_ID = s.code (+)
-								and DS.PROJECT_ID = P.CODE (+)
+								and DS.PROJECT_ID = P.project_code (+)
 								and m.mr_id = asv.mr_id (+)  
 								and ds.FIELDOFFICE = :1 
 								and asv.cb = 'Unchecked'
@@ -2516,7 +2516,7 @@ var uncheckedDataSheetsCountSql = `select
 								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
 								and ds.SEGMENT_ID = s.code (+)
-								and DS.PROJECT_ID = P.CODE (+)
+								and DS.PROJECT_ID = p.project_code (+)
 								and m.mr_id = asv.mr_id (+)  
 								and ds.FIELDOFFICE = :1 
 								and asv.cb = 'Unchecked'
