@@ -23,21 +23,21 @@ type FieldOffice struct {
 }
 
 type SampleMethod struct {
-	Code        string `db:"code" json:"code"`
-	Description string `db:"description" json:"description"`
+	Code        string `db:"SAMPLE_TYPE_CODE" json:"code"`
+	Description string `db:"SAMPLE_TYPE_DESCRIPTION" json:"description"`
 }
 
 type SampleUnitType struct {
-	Code        string `db:"code" json:"code"`
-	Description string `db:"description" json:"description"`
+	Code        string `db:"SAMPLE_UNIT_TYPE_CODE" json:"code"`
+	Description string `db:"SAMPLE_UNIT_TYPE_DESCRIPTION" json:"description"`
 }
 
 type Segment struct {
-	ID             int     `db:"id" json:"id"`
-	Code           int     `db:"code" json:"code"`
-	Description    *string `db:"description" json:"description"`
-	Type           string  `db:"type" json:"type"`
-	RiverCode      int     `db:"river_code" json:"riverCode"`
+	ID             int     `db:"s_id" json:"id"`
+	Code           int     `db:"segment_code" json:"code"`
+	Description    *string `db:"segment_description" json:"description"`
+	Type           string  `db:"segment_type" json:"type"`
+	RiverCode      int     `db:"river" json:"riverCode"`
 	UpperRiverMile *string `db:"upper_river_mile" json:"upperRiverMile"`
 	LowerRiverMile *string `db:"lower_river_mile" json:"lowerRiverMile"`
 	Rpma           *int    `db:"rpma" json:"rpma"`
