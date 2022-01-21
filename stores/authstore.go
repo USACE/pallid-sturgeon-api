@@ -11,7 +11,7 @@ import (
 )
 
 type AuthStore struct {
-	db     *sqlx.DB
+	db *sqlx.DB
 	//config *config.AppConfig
 }
 
@@ -28,10 +28,10 @@ var userByIdSql = "select id, edipi, username, email, first_name,last_name from 
 
 var insertUserSql = "insert into users_t (username,email,first_name,last_name,edipi) values (:1,:2,:3,:4,:5)"
 
-var getUsersSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description, f.code from users_t u
+var getUsersSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description, f.FIELD_OFFICE_CODE from users_t u
 							inner join user_role_office_lk uro on uro.user_id = u.id
 							inner join role_lk r on r.id = uro.role_id
-							inner join field_office_lk f on f.id = uro.office_id
+							inner join field_office_lk f on f.fo_id = uro.office_id
                     order by u.last_name`
 
 var getUsersByRoleTypeSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description from users_t u
@@ -43,10 +43,10 @@ var getUserAccessRequestSql = "select id, username, first_name, last_name, email
 
 var insertUserRoleOfficeSql = "insert into user_role_office_lk (id,user_id,role_id,office_id) values (user_role_office_seq.nextval,:1,:2,:3)"
 
-var getUserRoleOfficeSql = `select uro.id, uro.user_id, uro.role_id, uro.office_id, r.description, f.code from user_role_office_lk uro 
+var getUserRoleOfficeSql = `select uro.id, uro.user_id, uro.role_id, uro.office_id, r.description, f.FIELD_OFFICE_CODE from user_role_office_lk uro 
 							inner join users_t u on u.id = uro.user_id
 							inner join role_lk r on r.id = uro.role_id
-							inner join field_office_lk f on f.id = uro.office_id
+							inner join field_office_lk f on f.fo_id = uro.office_id
 							where u.email = :1`
 
 func InitAuthStore(appConfig *config.AppConfig) (*AuthStore, error) {
@@ -62,7 +62,7 @@ func InitAuthStore(appConfig *config.AppConfig) (*AuthStore, error) {
 	}
 
 	ss := AuthStore{
-		db:     db,
+		db: db,
 		//config: appConfig,
 	}
 
