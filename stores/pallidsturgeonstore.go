@@ -2322,8 +2322,8 @@ func (s *PallidSturgeonStore) GetErrorCount(fieldOfficeCode string) ([]models.Er
 	return errorCounts, err
 }
 
-var usgNoVialNumberSql = `select fo.description||' : '||p.description as fp,
-							f.SPECIES_ID, 
+var usgNoVialNumberSql = `select fo.field_office_description||' : '||p.project_description as fp,
+							f.species, 
 							f.f_id, mr.mr_id, MR.SITE_ID as mrsite_id,   DS.SITE_ID as s_site_id,
 							f.f_fid, Sup.GENETICS_VIAL_NUMBER
 
@@ -2333,11 +2333,11 @@ var usgNoVialNumberSql = `select fo.description||' : '||p.description as fp,
 							where F.F_ID = Sup.F_ID (+)
 							and MR.MR_ID = F.MR_ID (+)
 							and mr.site_id = ds.site_id (+)
-							and DS.PROJECT_ID = P.CODE (+)
+							and DS.PROJECT_ID = P.PROJECT_CODE (+)
 							and DS.FIELDOFFICE = fo.FIELD_OFFICE_CODE (+)
 							and ds.SEGMENT_ID = s.segment_code (+)
 
-							and f.SPECIES_ID = 'USG'
+							and f.species = 'USG'
 							and Sup.GENETICS_VIAL_NUMBER IS NULL
 							and (CASE when :1 != 'ZZ' THEN
 									ds.FIELDOFFICE

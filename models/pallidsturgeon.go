@@ -574,7 +574,7 @@ type ProcedureOut struct {
 
 type UsgNoVialNumber struct {
 	Fp                 string `db:"fp" json:"fp"`
-	SpeciesCode        string `db:"SPECIES_ID" json:"speciesCode"`
+	SpeciesCode        string `db:"SPECIES" json:"speciesCode"`
 	FID                int    `db:"f_id" json:"fId"`
 	MrID               int    `db:"mr_id" json:"mrID"`
 	MrsiteID           int    `db:"mrsite_id" json:"mrsiteId"`
