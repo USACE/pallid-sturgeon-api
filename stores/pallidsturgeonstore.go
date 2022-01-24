@@ -2490,28 +2490,28 @@ func (s *PallidSturgeonStore) GetUnapprovedDataSheets() (models.SummaryWithCount
 
 var uncheckedDataSheetsSql = `select 
 								asv.cb,
-								p.description||' : '||s.description||' : Bend '||ds.BEND as psb,
+								p.project_description||' : '||s.SEGMENT_DESCRIPTION||' : Bend '||ds.BEND as psb,
 								m.MR_ID, 
 								m.UNIQUEIDENTIFIER,
-								m.SET_DATE,
+								m.SETDATE,
 								m.SUBSAMPLE,
 								m.RECORDER,
 								m.CHECKBY,
-								m.NET_RIVER_MILE,
+								m.NETRIVERMILE,
 								m.site_id,
-								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE, m.gear_code
+								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE, m.gear
 								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
 								and ds.SEGMENT_ID = s.segment_code (+)
 								and DS.PROJECT_ID = P.project_code (+)
 								and m.mr_id = asv.mr_id (+)  
-								and ds.FIELDOFFICE = :1 
+								and ds.FIELDOFFICE = :1
 								and asv.cb = 'Unchecked'
 								-- and asv.co = 'Complete'
 								and ds.PROJECT_ID != 2
 								and M.MR_ID NOT IN (SELECT MR_ID 
 													FROM DS_FISH
-													WHERE SPECIES_ID = 'BAFI')
+													WHERE SPECIES = 'BAFI')
 								and m.FIELDOFFICE is not null`
 
 var uncheckedDataSheetsCountSql = `select 
