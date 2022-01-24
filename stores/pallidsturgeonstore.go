@@ -2515,20 +2515,20 @@ var uncheckedDataSheetsSql = `select
 								and m.FIELDOFFICE is not null`
 
 var uncheckedDataSheetsCountSql = `select 
-								count(*)
-								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
-								where m.site_id = ds.site_id (+)
-								and ds.SEGMENT_ID = s.segment_code (+)
-								and DS.PROJECT_ID = p.project_code (+)
-								and m.mr_id = asv.mr_id (+)  
-								and ds.FIELDOFFICE = :1 
-								and asv.cb = 'Unchecked'
-								-- and asv.co = 'Complete'
-								and ds.PROJECT_ID != 2
-								and M.MR_ID NOT IN (SELECT MR_ID 
-													FROM DS_FISH
-													WHERE SPECIES_ID = 'BAFI')
-								and m.FIELDOFFICE is not null`
+									count(*)
+									from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
+									where m.site_id = ds.site_id (+)
+									and ds.segment_id = s.segment_code (+)
+									and DS.PROJECT_ID = p.project_code (+)
+									and m.mr_id = asv.mr_id (+)  
+									and ds.FIELDOFFICE = :1 
+									and asv.cb = 'Unchecked'
+									-- and asv.co = 'Complete'
+									and ds.PROJECT_ID != 2
+									and M.MR_ID NOT IN (SELECT MR_ID 
+														FROM DS_FISH
+														WHERE SPECIES = 'BAFI')
+									and m.FIELDOFFICE is not null`
 
 func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, queryParams models.SearchParams) (models.SummaryWithCount, error) {
 
