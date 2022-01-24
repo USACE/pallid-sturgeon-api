@@ -2489,10 +2489,8 @@ func (s *PallidSturgeonStore) GetUnapprovedDataSheets() (models.SummaryWithCount
 }
 
 var uncheckedDataSheetsSql = `select 
-								asv.ch,
-								f.field_office_description||' : '||p.project_description as fp, 
-								s.segment_description,
-								m.BEND,
+								asv.cb,
+								p.project_description||' : '||s.segment_description||' : Bend '||ds.BEND as psb,
 								m.MR_ID, 
 								m.UNIQUEIDENTIFIER,
 								m.SETDATE,
@@ -2501,23 +2499,20 @@ var uncheckedDataSheetsSql = `select
 								m.CHECKBY,
 								m.NETRIVERMILE,
 								m.site_id,
-								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE,
-								ds.SAMPLE_UNIT_TYPE,
-								m.gear
-								from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
+								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE, m.gear
+								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
 								where m.site_id = ds.site_id (+)
 								and ds.SEGMENT_ID = s.segment_code (+)
 								and DS.PROJECT_ID = P.project_code (+)
-								and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
-								and m.mr_id = asv.mr_id (+)
-								and asv.ch = 'Unapproved'
-								-- and m.checkby is not null
-								and asv.cb = 'YES'
-								-- and asv.co = 'Complete'  
-								-- and nvl(m.complete,0) = 1
-								-- and nvl(m.approved,0) = 0
+								and m.mr_id = asv.mr_id (+)  
+								and ds.FIELDOFFICE = :1 
+								and asv.cb = 'Unchecked'
+								-- and asv.co = 'Complete'
 								and ds.PROJECT_ID != 2
-								order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
+								and M.MR_ID NOT IN (SELECT MR_ID 
+													FROM DS_FISH
+													WHERE SPECIES = 'BAFI')
+								and m.FIELDOFFICE is not null`
 
 var uncheckedDataSheetsCountSql = `select 
 									count(*)
