@@ -53,9 +53,9 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 }
 
 var getProjectsSql = `select distinct p.* from project_lk p
-						join field_office_segment_v v
-						on v.PROJECT_ID = p.project_code
-						and v.FIELDOFFICE = :1
+						join fieldoffice_segment_v v
+						on v.PROJECT_CODE = p.project_code
+						and v.FIELD_OFFICE_CODE = :1
 						order by p.project_code`
 
 func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Project, error) {
@@ -106,7 +106,7 @@ func (s *PallidSturgeonStore) GetRoles() ([]models.Role, error) {
 }
 
 func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
-	rows, err := s.db.Query("select * from field_office_lk order by FO_ID")
+	rows, err := s.db.Query("select FO_ID, FIELD_OFFICE_CODE, FIELD_OFFICE_DESCRIPTION, STATE from field_office_lk order by FO_ID")
 
 	fieldOffices := []models.FieldOffice{}
 	if err != nil {
@@ -169,7 +169,7 @@ func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, err
 }
 
 func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
-	rows, err := s.db.Query("select * from season_lk order by s_id")
+	rows, err := s.db.Query("select s_id, season_code, season_description, field_app, PROJECT_CODE from season_lk order by s_id")
 
 	seasons := []models.Season{}
 	if err != nil {
@@ -189,10 +189,10 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 	return seasons, err
 }
 
-var getSegmentsSql = `select distinct s.* from segment_lk s
-						join field_office_segment_v v
-						on v.SEGMENT_ID = s.segment_code
-						and v.FIELDOFFICE = :1
+var getSegmentsSql = `select distinct s.s_id, s.segment_code, s.segment_description, s.segment_type, s.river, s.upper_river_mile, s.lower_river_mile, s.rpma from segment_lk s
+						join fieldoffice_segment_v v
+						on v.SEGMENT_CODE = s.segment_code
+						and v.FIELD_OFFICE_CODE = :1
 						order by s.s_id`
 
 func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segment, error) {
@@ -222,7 +222,7 @@ func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segm
 }
 
 func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
-	rows, err := s.db.Query("select * from bend_river_mile_lk order by BRM_ID")
+	rows, err := s.db.Query("select BRM_ID, BEND_NUM, B_DESC, B_SEGMENT, upper_river_mile, lower_river_mile, state from bend_river_mile_lk order by BRM_ID")
 
 	bends := []models.Bend{}
 	if err != nil {
@@ -1935,7 +1935,7 @@ func (s *PallidSturgeonStore) GetUploadSessionId() (int, error) {
 	return nextUploadSessionId, err
 }
 
-var insertUploadSiteSql = `insert into upload_site (site_id, site_fid, site_year, fieldoffice_id, 
+var insertUploadSiteSql = `insert into upload_sites (site_id, site_fid, site_year, fieldoffice_id, 
 	field_office, project_id, project, 
 	segment_id, segment, season_id, season, bend, bendrn, bend_river_mile,
 	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)
@@ -2374,35 +2374,35 @@ func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string) ([]mod
 }
 
 var unapprovedDataSheetsSql = `select 
-							asv.ch,
-							f.description||' : '||p.description as fp, 
-							s.description,
-							m.BEND,
-							m.MR_ID, 
-							m.UNIQUEIDENTIFIER,
-							m.SET_DATE,
-							m.SUBSAMPLE,
-							m.RECORDER,
-							m.CHECKBY,
-							m.NET_RIVER_MILE,
-							m.site_id,
-							ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE,
-							ds.SAMPLE_UNIT_TYPE,
-							m.gear_code
-							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
-							where m.site_id = ds.site_id (+)
-							and ds.SEGMENT_ID = s.segment_code (+)
-							and DS.PROJECT_ID = P.project_code (+)
-							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
-							and m.mr_id = asv.mr_id (+)
-							and asv.ch = 'Unapproved'
-							-- and m.checkby is not null
-							and asv.cb = 'YES'
-							-- and asv.co = 'Complete'  
-							-- and nvl(m.complete,0) = 1
-							-- and nvl(m.approved,0) = 0
-							and ds.PROJECT_ID != 2
-							order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
+								asv.ch,
+								f.field_office_description||' : '||p.project_description as fp, 
+								s.segment_description,
+								m.BEND,
+								m.MR_ID, 
+								m.UNIQUEIDENTIFIER,
+								m.SETDATE,
+								m.SUBSAMPLE,
+								m.RECORDER,
+								m.CHECKBY,
+								m.NETRIVERMILE,
+								m.site_id,
+								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE,
+								ds.SAMPLE_UNIT_TYPE,
+								m.gear
+								from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
+								where m.site_id = ds.site_id (+)
+								and ds.SEGMENT_ID = s.segment_code (+)
+								and DS.PROJECT_ID = P.project_code (+)
+								and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
+								and m.mr_id = asv.mr_id (+)
+								and asv.ch = 'Unapproved'
+								-- and m.checkby is not null
+								and asv.cb = 'YES'
+								-- and asv.co = 'Complete'  
+								-- and nvl(m.complete,0) = 1
+								-- and nvl(m.approved,0) = 0
+								and ds.PROJECT_ID != 2
+								order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
 
 var unapprovedDataSheetsCountSql = `select 
 							count(*)
