@@ -67,16 +67,16 @@ type FishSummary struct {
 	UniqueID        int     `db:"mr_id" json:"uniqueID"`
 	FishID          int     `db:"f_id" json:"fishId"`
 	Year            int     `db:"year" json:"year"`
-	FieldOffice     string  `db:"FIELDOFFICE" json:"fieldOffice"`
-	Project         int     `db:"PROJECT_ID" json:"project"`
-	Segment         int     `db:"SEGMENT_ID" json:"segment"`
-	Season          string  `db:"SEASON" json:"season"`
-	Bend            int     `db:"BEND" json:"bend"`
-	Bendrn          string  `db:"BENDRN" json:"bendrn"`
+	FieldOffice     string  `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
+	Project         int     `db:"PROJECT_CODE" json:"project"`
+	Segment         int     `db:"SEGMENT_CODE" json:"segment"`
+	Season          string  `db:"SEASON_CODE" json:"season"`
+	Bend            int     `db:"BEND_NUMBER" json:"bend"`
+	Bendrn          string  `db:"BEND_R_OR_N" json:"bendrn"`
 	BendRiverMile   float64 `db:"bend_river_mile" json:"bendRiverMile"`
 	Panelhook       string  `db:"panelhook" json:"panelhook"`
-	Species         string  `db:"SPECIES_ID" json:"species"`
-	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN" json:"hatcheryOrigin"`
+	Species         string  `db:"SPECIES_CODE" json:"species"`
+	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN_CODE" json:"hatcheryOrigin"`
 	CheckedBy       string  `db:"checkby" json:"checkedby"`
 	EditInitials    string  `db:"edit_initials" json:"editInitials"`
 	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
@@ -93,14 +93,14 @@ type SuppSummary struct {
 	FishID          int     `db:"f_id" json:"fishId"`
 	Year            int     `db:"year" json:"year"`
 	SuppID          int     `db:"sid_display" json:"suppId"`
-	FieldOffice     string  `db:"FIELDOFFICE" json:"fieldOffice"`
-	Project         int     `db:"PROJECT_ID" json:"project"`
-	Segment         int     `db:"SEGMENT_ID" json:"segment"`
-	Season          string  `db:"SEASON" json:"season"`
-	Bend            int     `db:"BEND" json:"bend"`
-	Bendrn          string  `db:"BENDRN" json:"bendrn"`
+	FieldOffice     string  `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
+	Project         int     `db:"PROJECT_CODE" json:"project"`
+	Segment         int     `db:"SEGMENT_CODE" json:"segment"`
+	Season          string  `db:"SEASON_CODE" json:"season"`
+	Bend            int     `db:"BEND_NUMBER" json:"bend"`
+	Bendrn          string  `db:"BEND_R_OR_N" json:"bendrn"`
 	BendRiverMile   float64 `db:"bend_river_mile" json:"bendRiverMile"`
-	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN" json:"hatcheryOrigin"`
+	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN_CODE" json:"hatcheryOrigin"`
 	CheckedBy       string  `db:"checkby" json:"checkedby"`
 	EditInitials    string  `db:"edit_initials" json:"editInitials"`
 	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
@@ -114,12 +114,12 @@ type MissouriSummaryWithCount struct {
 type MissouriSummary struct {
 	UniqueID        int       `db:"mr_id" json:"uniqueID"`
 	Year            int       `db:"year" json:"year"`
-	FieldOffice     string    `db:"FIELDOFFICE" json:"fieldOffice"`
-	Project         int       `db:"PROJECT_ID" json:"project"`
-	Segment         int       `db:"SEGMENT_ID" json:"segment"`
-	Season          string    `db:"SEASON" json:"season"`
-	Bend            int       `db:"BEND" json:"bend"`
-	Bendrn          string    `db:"BENDRN" json:"bendrn"`
+	FieldOffice     string    `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
+	Project         int       `db:"PROJECT_CODE" json:"project"`
+	Segment         int       `db:"SEGMENT_CODE" json:"segment"`
+	Season          string    `db:"SEASON_CODE" json:"season"`
+	Bend            int       `db:"BEND_NUMBER" json:"bend"`
+	Bendrn          string    `db:"BEND_R_OR_N" json:"bendrn"`
 	BendRiverMile   float64   `db:"bend_river_mile" json:"bendRiverMile"`
 	Subsample       int       `db:"subsample" json:"subsample"`
 	Pass            int       `db:"subsample_pass" json:"pass"`
@@ -137,8 +137,8 @@ type GeneticSummaryWithCount struct {
 
 type GeneticSummary struct {
 	Year               int       `db:"year" json:"year"`
-	FieldOffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
-	Project            int       `db:"PROJECT_ID" json:"project"`
+	FieldOffice        string    `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
+	Project            int       `db:"PROJECT_CODE" json:"project"`
 	SturgeonType       string    `db:"sturgeon_type" json:"sturgeonType"`
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"GeneticsVialNumber"`
 	PitTag             string    `db:"pit_tag" json:"pitTag"`
