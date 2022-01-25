@@ -1072,7 +1072,7 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 	return file.Name(), err
 }
 
-var fishDataSummarySql = `SELECT mr_id, f_id, year, FIELDOFFICE, PROJECT_ID, SEGMENT_ID, SEASON, BEND, BENDRN, bend_river_mile, panelhook, SPECIES_ID, HATCHERY_ORIGIN, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var fishDataSummarySql = `SELECT mr_id, f_id, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, panelhook, SPECIES_CODE, HATCHERY_ORIGIN_CODE, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var fishDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -1196,7 +1196,7 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 	return file.Name(), err
 }
 
-var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, FIELDOFFICE, PROJECT_ID, SEGMENT_ID, SEASON, BEND, BENDRN, bend_river_mile, HATCHERY_ORIGIN, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, HATCHERY_ORIGIN_CODE, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var suppDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -1319,7 +1319,7 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 	return file.Name(), err
 }
 
-var missouriDataSummarySql = `SELECT mr_id, year, FIELDOFFICE, PROJECT_ID, SEGMENT_ID, SEASON, BEND, BENDRN, bend_river_mile, subsample, subsample_pass, set_Date, conductivity, checkby FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var missouriDataSummarySql = `SELECT mr_id, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, subsample, subsample_pass, set_Date, conductivity, checkby FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var missouriDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -1442,7 +1442,7 @@ func (s *PallidSturgeonStore) GetFullGeneticDataSummary(year string, officeCode 
 	return file.Name(), err
 }
 
-var geneticDataSummarySql = `SELECT year,FIELDOFFICE,PROJECT_ID,genetics_vial_number,pit_tag,river,river_mile,
+var geneticDataSummarySql = `SELECT year,FIELD_OFFICE_CODE,PROJECT_CODE,genetics_vial_number,pit_tag,river,river_mile,
 							state,set_date,broodstock_yn,hatchwild_yn,Speciesid_yn,archive_yn FROM table (pallid_data_api.genetic_datasummary_fnc(:1, :2, :3, to_date(:4,'MM/DD/YYYY'), to_date(:5,'MM/DD/YYYY'), :6, :7, :8, :9))`
 
 var geneticDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.genetic_datasummary_fnc(:1, :2, :3, to_date(:4,'MM/DD/YYYY'), to_date(:5,'MM/DD/YYYY'), :6, :7, :8, :9))`
