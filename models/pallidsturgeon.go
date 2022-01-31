@@ -206,6 +206,7 @@ type UploadSiteData struct {
 }
 
 type UploadSite struct {
+	BrmID              int       `db:"brm_id" json:"brmId"`
 	SiteID             int       `db:"site_id" json:"siteId"`
 	SiteFID            string    `db:"site_fid" json:"siteFid"`
 	SiteYear           int       `db:"site_year" json:"siteYear"`
@@ -221,6 +222,34 @@ type UploadSite struct {
 	Bend               int       `db:"bend" json:"bend"`
 	Bendrn             string    `db:"bendrn" json:"bendrn"`
 	BendRiverMile      float64   `db:"bend_river_mile" json:"bendRiverMile"`
+	EditInitials       string    `db:"edit_initials" json:"editInitials"`
+	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
+	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
+	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+}
+
+type SitesWithCount struct {
+	Items      []Sites `json:"items"`
+	TotalCount int     `json:"totalCount"`
+}
+
+type Sites struct {
+	SiteID             int       `db:"site_id" json:"siteId"`
+	SiteFID            string    `db:"site_fid" json:"siteFid"`
+	SiteYear           int       `db:"site_year" json:"siteYear"`
+	FieldofficeID      string    `db:"fieldoffice_id" json:"fieldofficeId"`
+	FieldOffice        string    `db:"field_office" json:"fieldOffice"`
+	ProjectId          int       `db:"project_id" json:"projectId"`
+	Project            string    `db:"project" json:"project"`
+	SegmentId          int       `db:"segment_id" json:"segmentId"`
+	Segment            string    `db:"segment" json:"segment"`
+	SeasonId           string    `db:"season_id" json:"seasonId"`
+	Season             string    `db:"season" json:"season"`
+	SampleUnitTypeCode string    `db:"SAMPLE_UNIT_TYPE" json:"sampleUnitTypeCode"`
+	Bend               int       `db:"bend" json:"bend"`
+	Bendrn             string    `db:"bendrn" json:"bendrn"`
+	BendRiverMile      float64   `db:"brm_id" json:"bendRiverMile"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`
 	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
@@ -314,7 +343,7 @@ type UploadSearch struct {
 	StopTime        string    `db:"stop_time" json:"stopTime"`
 	StopLatitude    float64   `db:"stop_latitude" json:"stopLatitude"`
 	StopLongitude   float64   `db:"stop_longitude" json:"stopLongitude"`
-	Temp            float64   `db:"temp" json:"temp"`
+	Temp            string    `db:"temp" json:"temp"`
 	Conductivity    float64   `db:"conductivity" json:"conductivity"`
 	EditInitials    string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`

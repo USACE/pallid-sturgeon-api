@@ -242,13 +242,13 @@ func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
 	return bends, err
 }
 
-var siteDataEntriesSql = `SELECT site_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
+var siteDataEntriesSql = `SELECT brm_id, site_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
 SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, BENDRN, edit_initials, uploaded_by fROM ds_sites where year = :1 and FIELDOFFICE = :2`
 
 var siteDataEntriesCountSql = `SELECT count(*) FROM ds_sites where year = :1 and FIELDOFFICE = :2`
 
-func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode string, projectCode string, segmentCode string, seasonCode string, bendrn string, queryParams models.SearchParams) (models.SiteDataEntryWithCount, error) {
-	siteDataEntryWithCount := models.SiteDataEntryWithCount{}
+func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode string, projectCode string, segmentCode string, seasonCode string, bendrn string, queryParams models.SearchParams) (models.SitesWithCount, error) {
+	siteDataEntryWithCount := models.SitesWithCount{}
 	query := siteDataEntriesSql
 	queryWithCount := siteDataEntriesCountSql
 
@@ -290,7 +290,7 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode st
 		}
 	}
 
-	siteEntries := []models.UploadSite{}
+	siteEntries := []models.Sites{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "site_id"
@@ -308,8 +308,8 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode st
 	defer rows.Close()
 
 	for rows.Next() {
-		siteDataEntry := models.UploadSite{}
-		err = rows.Scan(&siteDataEntry.SiteID, &siteDataEntry.SiteFID, &siteDataEntry.SiteYear, &siteDataEntry.FieldOffice, &siteDataEntry.Project,
+		siteDataEntry := models.Sites{}
+		err = rows.Scan(&siteDataEntry.BendRiverMile, &siteDataEntry.SiteID, &siteDataEntry.SiteFID, &siteDataEntry.SiteYear, &siteDataEntry.FieldOffice, &siteDataEntry.Project,
 			&siteDataEntry.Segment, &siteDataEntry.Season, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.Bendrn, &siteDataEntry.EditInitials, &siteDataEntry.UploadedBy)
 		if err != nil {
 			return siteDataEntryWithCount, err
@@ -322,12 +322,12 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode st
 	return siteDataEntryWithCount, err
 }
 
-var insertSiteDataSql = `insert into ds_sites (site_fid, year, FIELDOFFICE, PROJECT_ID,
-	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, BENDRN, edit_initials, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11) returning site_id into :13`
+var insertSiteDataSql = `insert into ds_sites (brm_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
+	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, BENDRN, edit_initials, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12) returning site_id into :13`
 
-func (s *PallidSturgeonStore) SaveSiteDataEntry(sitehDataEntry models.UploadSite) (int, error) {
+func (s *PallidSturgeonStore) SaveSiteDataEntry(sitehDataEntry models.Sites) (int, error) {
 	var id int
-	_, err := s.db.Exec(insertSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
+	_, err := s.db.Exec(insertSiteDataSql, sitehDataEntry.BendRiverMile, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
 		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
 
 	return id, err
@@ -344,12 +344,13 @@ SET   site_fid = :2,
 	  BENDRN = :9,
 	  edit_initials = :10,
 	  last_updated = :11, 
-	  uploaded_by = :12
+	  uploaded_by = :12,
+	  brm_id = :13
 WHERE site_id = :1`
 
-func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.UploadSite) error {
+func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.Sites) error {
 	_, err := s.db.Exec(updateSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
-		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.SiteID)
+		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.BendRiverMile, sitehDataEntry.SiteID)
 	return err
 }
 
