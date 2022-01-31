@@ -249,7 +249,7 @@ type Sites struct {
 	SampleUnitTypeCode string    `db:"SAMPLE_UNIT_TYPE" json:"sampleUnitTypeCode"`
 	Bend               int       `db:"bend" json:"bend"`
 	Bendrn             string    `db:"bendrn" json:"bendrn"`
-	BendRiverMile      float64   `db:"brm_id" json:"bendRiverMile"`
+	BendRiverMile      *string   `db:"brm_id" json:"bendRiverMile"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`
 	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
