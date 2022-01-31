@@ -119,7 +119,7 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
-	siteData := models.UploadSite{}
+	siteData := models.Sites{}
 	if err := c.Bind(&siteData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -137,7 +137,7 @@ func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
 
 func (sd *PallidSturgeonHandler) UpdateSiteDataEntry(c echo.Context) error {
 
-	siteData := models.UploadSite{}
+	siteData := models.Sites{}
 	if err := c.Bind(&siteData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
