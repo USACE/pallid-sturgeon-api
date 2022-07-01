@@ -1958,7 +1958,7 @@ func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error
 		uploadSite.Bend,
 		uploadSite.Bendrn,
 		uploadSite.BendRiverMile,
-		uploadSite.Comments
+		uploadSite.Comments,
 		uploadSite.EditInitials,
 		uploadSite.LastUpdated,
 		uploadSite.UploadSessionId,
