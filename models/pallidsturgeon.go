@@ -218,10 +218,11 @@ type UploadSite struct {
 	Segment            string    `db:"segment" json:"segment"`
 	SeasonId           string    `db:"season_id" json:"seasonId"`
 	Season             string    `db:"season" json:"season"`
-	SampleUnitTypeCode string    `db:"SAMPLE_UNIT_TYPE" json:"sampleUnitTypeCode"`
+	SampleUnitTypeCode string    `db:"sample_unit_type" json:"sampleUnitTypeCode"`
 	Bend               int       `db:"bend" json:"bend"`
 	Bendrn             string    `db:"bendrn" json:"bendrn"`
 	BendRiverMile      float64   `db:"bend_river_mile" json:"bendRiverMile"`
+	Comments           string    `db:"comments" json:"comments"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`
 	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
@@ -362,7 +363,7 @@ type UploadProcedure struct {
 	Id                        int       `db:"id" json:"id"`
 	FFid                      string    `db:"f_fid" json:"f_fid"`
 	PurposeCode               string    `db:"PURPOSE" json:"purposeCode"`
-	ProcedurDate              time.Time `db:"SURGERY_DATE" json:"procedurDate"`
+	ProcedureDate             time.Time `db:"PROCEDURE_DATE" json:"procedureDate"`
 	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
 	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
 	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
@@ -384,7 +385,7 @@ type UploadProcedure struct {
 	Comments                  string    `db:"comments" json:"comments"`
 	FishHealthComments        string    `db:"FISH_HEALTH_COMMENT" json:"fishHealthComments"`
 	EvalLocationCode          string    `db:"EVAL_LOCATION" json:"evalLocationCode"`
-	SpawnCode                 string    `db:"SPAWN_STATU" json:"spawnCode"`
+	SpawnStatus               string    `db:"SPAWN_STATUS" json:"spawnCode"`
 	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatusCode"`
 	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatusCode"`
 	ExpectedSpawnYear         int       `db:"expected_spawn_year" json:"expectedSpawnYear"`
@@ -433,6 +434,7 @@ type UploadSupplemental struct {
 	Broodstock         *string   `db:"broodstock" json:"broodstock"`
 	HatchWild          *string   `db:"hatch_wild" json:"hatchWild"`
 	SpeciesId          *int      `db:"species_id" json:"speciesId"`
+	Archive            *int      `db:"archive" json:"archive"`
 	Head               *string   `db:"head" json:"head"`
 	Snouttomouth       *string   `db:"snouttomouth" json:"snouttomouth"`
 	Inter              *string   `db:"inter" json:"inter"`
@@ -488,7 +490,7 @@ type UploadMoriver struct {
 	Temp             *string   `db:"temp" json:"temp"`
 	Turbidity        *string   `db:"turbidity" json:"turbidity"`
 	Conductivity     *string   `db:"conductivity" json:"conductivity"`
-	Do               *string   `db:"do" json:"do"`
+	Do               *string   `db:"do" json:"dissolvedOxygen"`
 	Distance         *string   `db:"distance" json:"distance"`
 	Width            *string   `db:"width" json:"width"`
 	Netrivermile     *string   `db:"netrivermile" json:"netrivermile"`

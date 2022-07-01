@@ -32,10 +32,10 @@ func marshalQuery(c echo.Context) (models.SearchParams, error) {
 		}
 	}
 
-	ordebyString := c.QueryParam("orderby")
+	orderbyString := c.QueryParam("orderby")
 
-	if ordebyString != "" && ordebyString != "undefined" {
-		orderby = ordebyString
+	if orderbyString != "" && orderbyString != "undefined" {
+		orderby = orderbyString
 	}
 
 	filterString := c.QueryParam("filter")
