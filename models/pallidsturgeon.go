@@ -334,7 +334,8 @@ type UploadSearch struct {
 	SeFid           string    `db:"se_fid" json:"seFid"`
 	DsId            int       `db:"ds_id" json:"dsId"`
 	SiteFid         string    `db:"site_fid" json:"siteFid"`
-	SearchDate      time.Time `db:"search_date" json:"searchDate"`
+	SearchDate      string    `db:"search_date" json:"searchDate"`
+	SearchDateTime  time.Time `db:"search_date" json:"searchDateTime"`
 	Recorder        string    `db:"recorder" json:"recorder"`
 	SearchTypeCode  string    `db:"search_type_code" json:"searchTypeCode"`
 	SearchDay       int       `db:"search_day" json:"searchDay"`
@@ -363,7 +364,8 @@ type UploadProcedure struct {
 	Id                        int       `db:"id" json:"id"`
 	FFid                      string    `db:"f_fid" json:"f_fid"`
 	PurposeCode               string    `db:"PURPOSE" json:"purposeCode"`
-	ProcedureDate             time.Time `db:"PROCEDURE_DATE" json:"procedureDate"`
+	ProcedureDate             string    `db:"PROCEDURE_DATE" json:"procedureDate"`
+	ProcedureDateTime         time.Time `db:"PROCEDURE_DATE" json:"procedureDateTime"`
 	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
 	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
 	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
@@ -374,7 +376,8 @@ type UploadProcedure struct {
 	OldRadioTagNum            int       `db:"old_radio_tag_num" json:"oldRadioTagNum"`
 	OldFrequencyId            int       `db:"OLD_FREQ_ID" json:"oldFrequencyId"`
 	DstSerialNum              int       `db:"dst_serial_num" json:"dstSerialNum"`
-	DstStartDate              time.Time `db:"dst_start_date" json:"dstStartDate"`
+	DstStartDate              string    `db:"dst_start_date" json:"dstStartDate"`
+	DstStartDateTime          time.Time `db:"dst_start_date" json:"dstStartDateTime"`
 	DstStartTime              string    `db:"dst_start_time" json:"dstStartTime"`
 	DstReimplantInd           int       `db:"DST_REIMPLANT" json:"dstReimplantInd"`
 	NewRadioTagNum            int       `db:"new_radio_tag_num" json:"newRadioTagNum"`
@@ -479,7 +482,8 @@ type UploadMoriver struct {
 	MrID             int       `db:"mr_id" json:"mrId"`
 	MrFid            string    `db:"mr_fid" json:"mrFid"`
 	Season           string    `db:"season" json:"season"`
-	Setdate          time.Time `db:"setdate" json:"setdate"`
+	Setdate          string    `db:"setdate" json:"setdate"`
+	SetdateTime      time.Time `db:"setdate" json:"setdatetime"`
 	Subsample        float64   `db:"subsample" json:"subsample"`
 	Subsamplepass    float64   `db:"subsamplepass" json:"subsamplepass"`
 	SubsampleROrN    string    `db:"subsample_r_or_n" json:"subsampleROrN"`
