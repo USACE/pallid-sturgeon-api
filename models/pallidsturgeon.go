@@ -370,25 +370,25 @@ type UploadProcedure struct {
 	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
 	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
 	AntibioticInjectionInd    int       `db:"ANTIBIOTIC_INJECTION" json:"antibioticInjectionInd"`
-	PhotoDorsalInd            int       `db:"P_DORSAL" json:"photoDorsalInd"`
-	PhotoVentralInd           int       `db:"P_VENTRAL" json:"photoVentralInd"`
-	PhotoLeftInd              int       `db:"P_LEFT" json:"photoLeftInd"`
+	PhotoDorsalInd            int       `db:"PHOTO_DORSAL_IND" json:"photoDorsalInd"`
+	PhotoVentralInd           int       `db:"PHOTO_VENTRAL_IND" json:"photoVentralInd"`
+	PhotoLeftInd              int       `db:"PHOTO_LEFT_IND" json:"photoLeftInd"`
 	OldRadioTagNum            int       `db:"old_radio_tag_num" json:"oldRadioTagNum"`
-	OldFrequencyId            int       `db:"OLD_FREQ_ID" json:"oldFrequencyId"`
+	OldFrequencyId            int       `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
 	DstSerialNum              int       `db:"dst_serial_num" json:"dstSerialNum"`
 	DstStartDate              string    `db:"dst_start_date" json:"dstStartDate"`
 	DstStartDateTime          time.Time `db:"dst_start_date" json:"dstStartDateTime"`
 	DstStartTime              string    `db:"dst_start_time" json:"dstStartTime"`
-	DstReimplantInd           int       `db:"DST_REIMPLANT" json:"dstReimplantInd"`
+	DstReimplantInd           int       `db:"DST_REIMPLANT_IND" json:"dstReimplantInd"`
 	NewRadioTagNum            int       `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId            int       `db:"NEW_FREQ_ID" json:"newFrequencyId"`
-	SexCode                   string    `db:"SEX" json:"sexCode"`
+	NewFrequencyId            int       `db:"NEW_FREQUENCY_ID" json:"newFrequencyId"`
+	SexCode                   string    `db:"SEX_CODE" json:"sexCode"`
 	BloodSampleInd            int       `db:"BLOOD_SAMPLE" json:"bloodSampleInd"`
 	EggSampleInd              int       `db:"EGG_SAMPLE" json:"eggSampleInd"`
 	Comments                  string    `db:"comments" json:"comments"`
 	FishHealthComments        string    `db:"FISH_HEALTH_COMMENT" json:"fishHealthComments"`
-	EvalLocationCode          string    `db:"EVAL_LOCATION" json:"evalLocationCode"`
-	SpawnStatus               string    `db:"SPAWN_STATUS" json:"spawnCode"`
+	EvalLocationCode          string    `db:"EVAL_LOCATION_CODE" json:"evalLocationCode"`
+	SpawnStatus               string    `db:"SPAWN_CODE" json:"spawnCode"`
 	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatusCode"`
 	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatusCode"`
 	ExpectedSpawnYear         int       `db:"expected_spawn_year" json:"expectedSpawnYear"`
@@ -492,16 +492,16 @@ type UploadMoriver struct {
 	Gear             string    `db:"gear" json:"gear"`
 	GearType         string    `db:"gear_type" json:"gearType"`
 	Temp             *float64  `db:"temp" json:"temp"`
-	Turbidity        *string   `db:"turbidity" json:"turbidity"`
-	Conductivity     *string   `db:"conductivity" json:"conductivity"`
-	Do               *string   `db:"do" json:"dissolvedOxygen"`
-	Distance         *string   `db:"distance" json:"distance"`
-	Width            *string   `db:"width" json:"width"`
-	Netrivermile     *string   `db:"netrivermile" json:"netrivermile"`
+	Turbidity        *float64  `db:"turbidity" json:"turbidity"`
+	Conductivity     *float64  `db:"conductivity" json:"conductivity"`
+	Do               *float64  `db:"do" json:"dissolvedOxygen"`
+	Distance         *float64  `db:"distance" json:"distance"`
+	Width            *float64  `db:"width" json:"width"`
+	Netrivermile     *float64  `db:"netrivermile" json:"netrivermile"`
 	Structurenumber  string    `db:"structurenumber" json:"structurenumber"`
 	Usgs             string    `db:"usgs" json:"usgs"`
 	Riverstage       *string   `db:"riverstage" json:"riverstage"`
-	Discharge        *string   `db:"discharge" json:"discharge"`
+	Discharge        *float64  `db:"discharge" json:"discharge"`
 	U1               string    `db:"u1" json:"u1"`
 	U2               string    `db:"u2" json:"u2"`
 	U3               string    `db:"u3" json:"u3"`
@@ -520,31 +520,31 @@ type UploadMoriver struct {
 	SetSite2         string    `db:"set_site_2" json:"setSite_2"`
 	SetSite3         string    `db:"set_site_3" json:"setSite_3"`
 	StartTime        string    `db:"starttime" json:"startTime"`
-	StartLatitude    *string   `db:"startlatitude" json:"startLatitude"`
-	StartLongitude   *string   `db:"startlongitude" json:"startLongitude"`
+	StartLatitude    *float64  `db:"startlatitude" json:"startLatitude"`
+	StartLongitude   *float64  `db:"startlongitude" json:"startLongitude"`
 	StopTime         string    `db:"stoptime" json:"stopTime"`
-	StopLatitude     *string   `db:"stoplatitude" json:"stopLatitude"`
-	StopLongitude    *string   `db:"stop_longitude" json:"stopLongitude"`
-	Depth1           *string   `db:"depth1" json:"depth1"`
-	Velocitybot1     *string   `db:"velocitybot1" json:"velocitybot1"`
-	Velocity08_1     *string   `db:"velocity08_1" json:"velocity08_1"`
-	Velocity02or06_1 *string   `db:"velocity02or06_1" json:"velocity02or06_1"`
-	Depth2           *string   `db:"depth2" json:"depth2"`
-	Velocitybot2     *string   `db:"velocitybot2" json:"velocitybot2"`
-	Velocity08_2     *string   `db:"velocity08_2" json:"velocity08_2"`
-	Velocity02or06_2 *string   `db:"velocity02or06_2" json:"velocity02or06_2"`
-	Depth3           *string   `db:"depth3" json:"depth3"`
-	Velocitybot3     *string   `db:"velocitybot3" json:"velocitybot3"`
-	Velocity08_3     *string   `db:"velocity08_3" json:"velocity08_3"`
-	Velocity02or06_3 *string   `db:"velocity02or06_3" json:"velocity02or06_3"`
+	StopLatitude     *float64  `db:"stoplatitude" json:"stopLatitude"`
+	StopLongitude    *float64  `db:"stop_longitude" json:"stopLongitude"`
+	Depth1           *float64  `db:"depth1" json:"depth1"`
+	Velocitybot1     *float64  `db:"velocitybot1" json:"velocitybot1"`
+	Velocity08_1     *float64  `db:"velocity08_1" json:"velocity08_1"`
+	Velocity02or06_1 *float64  `db:"velocity02or06_1" json:"velocity02or06_1"`
+	Depth2           *float64  `db:"depth2" json:"depth2"`
+	Velocitybot2     *float64  `db:"velocitybot2" json:"velocitybot2"`
+	Velocity08_2     *float64  `db:"velocity08_2" json:"velocity08_2"`
+	Velocity02or06_2 *float64  `db:"velocity02or06_2" json:"velocity02or06_2"`
+	Depth3           *float64  `db:"depth3" json:"depth3"`
+	Velocitybot3     *float64  `db:"velocitybot3" json:"velocitybot3"`
+	Velocity08_3     *float64  `db:"velocity08_3" json:"velocity08_3"`
+	Velocity02or06_3 *float64  `db:"velocity02or06_3" json:"velocity02or06_3"`
 	Watervel         *string   `db:"watervel" json:"watervel"`
-	Cobble           *string   `db:"cobble" json:"cobble"`
-	Organic          *string   `db:"organic" json:"organic"`
-	Silt             *string   `db:"silt" json:"silt"`
-	Sand             *string   `db:"sand" json:"sand"`
-	Gravel           *string   `db:"gravel" json:"gravel"`
+	Cobble           *float64  `db:"cobble" json:"cobble"`
+	Organic          *float64  `db:"organic" json:"organic"`
+	Silt             *float64  `db:"silt" json:"silt"`
+	Sand             *float64  `db:"sand" json:"sand"`
+	Gravel           *float64  `db:"gravel" json:"gravel"`
 	Comments         string    `db:"comments" json:"comments"`
-	Complete         *string   `db:"complete" json:"complete"`
+	Complete         *float64  `db:"complete" json:"complete"`
 	Checkby          string    `db:"checkby" json:"checkby"`
 	NoTurbidity      string    `db:"no_turbidity" json:"noTurbidity"`
 	NoVelocity       string    `db:"no_velocity" json:"noVelocity"`

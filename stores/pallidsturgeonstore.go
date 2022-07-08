@@ -2106,10 +2106,10 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 }
 
 var insertProcedureUploadSql = `insert into upload_procedure (f_fid, purpose, procedure_date, procedure_start_time, procedure_end_time, procedure_by, 
-	antibiotic_injection, p_dorsal, p_ventral, p_left,
-	old_radio_tag_num, old_freq_id, dst_serial_num, dst_start_date, dst_start_time, dst_reimplant, new_radio_tag_num,
-	new_freq_id, sex, blood_sample, egg_sample, comments, fish_health_comment,
-	eval_location, spawn_code, visual_repro_status_code, ultrasound_repro_status_code,
+	antibiotic_injection, photo_dorsal_ind, photo_ventral_ind, photo_left_ind,
+	old_radio_tag_num, old_frequency_id, dst_serial_num, dst_start_date, dst_start_time, dst_reimplant_ind, new_radio_tag_num,
+	new_frequency_id, sex_code, blood_sample, egg_sample_ind, comments, fish_health_comments,
+	eval_location_code, spawn_code, visual_repro_status_code, ultrasound_repro_status_code,
 	expected_spawn_year, ultrasound_gonad_length, gonad_condition,
 	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)                                                        
 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35)`
