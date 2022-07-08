@@ -383,7 +383,7 @@ type UploadProcedure struct {
 	NewRadioTagNum            int       `db:"new_radio_tag_num" json:"newRadioTagNum"`
 	NewFrequencyId            int       `db:"NEW_FREQUENCY_ID" json:"newFrequencyId"`
 	SexCode                   string    `db:"SEX_CODE" json:"sexCode"`
-	BloodSampleInd            int       `db:"BLOOD_SAMPLE" json:"bloodSampleInd"`
+	BloodSampleInd            int       `db:"BLOOD_SAMPLE_IND" json:"bloodSampleInd"`
 	EggSampleInd              int       `db:"EGG_SAMPLE" json:"eggSampleInd"`
 	Comments                  string    `db:"comments" json:"comments"`
 	FishHealthComments        string    `db:"FISH_HEALTH_COMMENT" json:"fishHealthComments"`
