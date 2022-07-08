@@ -345,7 +345,7 @@ type UploadSearch struct {
 	StopTime        string    `db:"stop_time" json:"stopTime"`
 	StopLatitude    float64   `db:"stop_latitude" json:"stopLatitude"`
 	StopLongitude   float64   `db:"stop_longitude" json:"stopLongitude"`
-	Temp            string    `db:"temp" json:"temp"`
+	Temp            float64   `db:"temp" json:"temp"`
 	Conductivity    float64   `db:"conductivity" json:"conductivity"`
 	EditInitials    string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
@@ -491,7 +491,7 @@ type UploadMoriver struct {
 	Recorder         string    `db:"recorder" json:"recorder"`
 	Gear             string    `db:"gear" json:"gear"`
 	GearType         string    `db:"gear_type" json:"gearType"`
-	Temp             *string   `db:"temp" json:"temp"`
+	Temp             *float64  `db:"temp" json:"temp"`
 	Turbidity        *string   `db:"turbidity" json:"turbidity"`
 	Conductivity     *string   `db:"conductivity" json:"conductivity"`
 	Do               *string   `db:"do" json:"dissolvedOxygen"`
