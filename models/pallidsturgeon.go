@@ -369,7 +369,7 @@ type UploadProcedure struct {
 	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
 	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
 	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
-	AntibioticInjectionInd    int       `db:"ANTIBIOTIC_INJECTION" json:"antibioticInjectionInd"`
+	AntibioticInjectionInd    int       `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjectionInd"`
 	PhotoDorsalInd            int       `db:"PHOTO_DORSAL_IND" json:"photoDorsalInd"`
 	PhotoVentralInd           int       `db:"PHOTO_VENTRAL_IND" json:"photoVentralInd"`
 	PhotoLeftInd              int       `db:"PHOTO_LEFT_IND" json:"photoLeftInd"`
