@@ -681,13 +681,13 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 }
 
 var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,
-	TAGNUMBER, PITRN, 
-	SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2, 
+	TAGNUMBER, PITRN,
+	SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2,
 	ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
 	BROODSTOCK, HATCH_WILD, species_id,
 	head, snouttomouth, inter, mouthwidth, m_ib,
-	l_ob, l_ib, r_ib, 
-	r_ob, anal, dorsal, status, HATCHERY_ORIGIN, 
+	l_ob, l_ib, r_ib,
+	r_ob, anal, dorsal, status, HATCHERY_ORIGIN,
 	SEX, stage,  recapture, photo,
 	genetic_needs, other_tag_info,
 	comments,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
@@ -1197,7 +1197,21 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 	return file.Name(), err
 }
 
-var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, HATCHERY_ORIGIN_CODE, checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var suppDataSummarySql = `SELECT fish_code, 
+	mr_id, 
+	f_id, 
+	sid_display, 
+	year, 
+	FIELD_OFFICE_CODE, 
+	PROJECT_CODE, 
+	SEGMENT_CODE, 
+	SEASON_CODE, 
+	COALESCE(BEND_NUMBER, 0) as BEND_NUMBER,
+	COALESCE(BEND_R_OR_N, '') as BEND_R_OR_N,
+	COALESCE(bend_river_mile, 0) as bend_river_mile,
+	COALESCE(HATCHERY_ORIGIN_CODE, '') as HATCHERY_ORIGIN_CODE,
+	COALESCE(tag_number, '') as tag_number,
+	checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var suppDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -1242,7 +1256,7 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 		summary := models.SuppSummary{}
 		err = rows.Scan(&summary.FishCode, &summary.UniqueID, &summary.FishID, &summary.SuppID, &summary.Year,
 			&summary.FieldOffice, &summary.Project, &summary.Segment, &summary.Season, &summary.Bend, &summary.Bendrn,
-			&summary.BendRiverMile, &summary.HatcheryOrigin, &summary.CheckedBy)
+			&summary.BendRiverMile, &summary.HatcheryOrigin, &summary.TagNumber, &summary.CheckedBy)
 		if err != nil {
 			return suppSummariesWithCount, err
 		}
@@ -1682,12 +1696,29 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var telemetryDataSummarySql = `select * FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var telemetryDataSummarySql = `select t_id, 
+	COALESCE(year, 0) as year, 
+	COALESCE(field_office_code, 'ZZ') as field_office_code, 
+	COALESCE(project_code, 0) as project_code, 
+	COALESCE(segment_code, 0) as segment_code,
+	COALESCE(season_code, '') as season_code,
+	COALESCE(bend_number, 0) as bend_number, 
+	radio_tag_num, 
+	frequency_id, 
+	capture_time, 
+	capture_latitude, 
+	capture_longitude, 
+	COALESCE(position_confidence, 0) as position_confidence, 
+	COALESCE(macro_code, '') as macro_code, 
+	COALESCE(meso_code, '') as meso_code, 
+	COALESCE(depth, 0) as depth, 
+	COALESCE(conductivity, 0) as conductivity, 
+	COALESCE(turbidity, 0) as turbidity FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var telemetryDataSummaryCountSql = `select count(*) FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.SummaryWithCount, error) {
-	telemetrySummaryWithCount := models.SummaryWithCount{}
+func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.TelemetrySummaryWithCount, error) {
+	telemetrySummaryWithCount := models.TelemetrySummaryWithCount{}
 	countQuery, err := s.db.Prepare(telemetryDataSummaryCountSql)
 	if err != nil {
 		return telemetrySummaryWithCount, err
@@ -1706,6 +1737,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 		}
 	}
 
+	telemetrySummaries := []models.TelemetrySummary{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "t_id"
@@ -1723,43 +1755,30 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 	}
 	defer rows.Close()
 
-	cols, _ := rows.Columns()
-
-	telemetrySummaries := make([]map[string]string, 0)
-
 	for rows.Next() {
-
-		columns := make([]interface{}, len(cols))
-		columnPointers := make([]interface{}, len(cols))
-		for i := range columns {
-			columnPointers[i] = &columns[i]
+		summary := models.TelemetrySummary{}
+		err = rows.Scan(&summary.TId,
+			&summary.Year,
+			&summary.FieldOffice,
+			&summary.Project,
+			&summary.Segment,
+			&summary.Season,
+			&summary.Bend,
+			&summary.RadioTagNum,
+			&summary.FrequencyIdCode,
+			&summary.CaptureTime,
+			&summary.CaptureLatitude,
+			&summary.CaptureLongitude,
+			&summary.PositionConfidence,
+			&summary.MacroId,
+			&summary.MesoId,
+			&summary.Depth,
+			&summary.Conductivity,
+			&summary.Turbidity)
+		if err != nil {
+			return telemetrySummaryWithCount, err
 		}
-
-		rows.Scan(columnPointers...)
-
-		data := make(map[string]string)
-
-		for i, colName := range cols {
-			var v string
-			val := columns[i]
-
-			if val == nil {
-				v = ""
-			} else {
-				v = fmt.Sprintf("%v", val)
-			}
-
-			words := strings.Split(strings.ToLower(colName), "_")
-			var convertedColName = words[0]
-			if len(words) > 1 {
-				word2 := strings.ToUpper(string(words[1][0])) + words[1][1:]
-				convertedColName = words[0] + word2
-			}
-
-			data[convertedColName] = v
-		}
-
-		telemetrySummaries = append(telemetrySummaries, data)
+		telemetrySummaries = append(telemetrySummaries, summary)
 	}
 
 	telemetrySummaryWithCount.Items = telemetrySummaries
@@ -1834,12 +1853,24 @@ func (s *PallidSturgeonStore) GetFullProcedureDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var procedureDataSummarySql = `select * FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var procedureDataSummarySql = `select pid_display, 
+	mr_id, 
+	COALESCE(year, 0) as year, 
+	COALESCE(field_office_code, 'ZZ') as field_office_code, 
+	COALESCE(project_code, 0) as project_code, 
+	COALESCE(segment_code, 0) as segment_code,
+	COALESCE(season_code, '') as season_code,
+	purpose_code, 
+	procedure_date, 
+	COALESCE(new_radio_tag_num, 0) as new_radio_tag_num, 
+	COALESCE(new_frequency_id, 0) as new_frequency_id, 
+	COALESCE(spawn_code, '') as spawn_code, 
+	COALESCE(expected_spawn_year, 0) as expected_spawn_year FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var procedureDataSummaryCountSql = `select count(*) FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.SummaryWithCount, error) {
-	procedureSummaryWithCount := models.SummaryWithCount{}
+func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.ProcedureSummaryWithCount, error) {
+	procedureSummaryWithCount := models.ProcedureSummaryWithCount{}
 	countQuery, err := s.db.Prepare(procedureDataSummaryCountSql)
 	if err != nil {
 		return procedureSummaryWithCount, err
@@ -1858,12 +1889,12 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 		}
 	}
 
+	procedureSummaries := []models.ProcedureSummary{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "mr_id"
 	}
 	procedureDataEntriesSqlWithSearch := procedureDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
-
 	dbQuery, err := s.db.Prepare(procedureDataEntriesSqlWithSearch)
 	if err != nil {
 		return procedureSummaryWithCount, err
@@ -1875,43 +1906,25 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 	}
 	defer rows.Close()
 
-	cols, _ := rows.Columns()
-
-	procedureSummaries := make([]map[string]string, 0)
-
 	for rows.Next() {
-
-		columns := make([]interface{}, len(cols))
-		columnPointers := make([]interface{}, len(cols))
-		for i := range columns {
-			columnPointers[i] = &columns[i]
+		summary := models.ProcedureSummary{}
+		err = rows.Scan(&summary.ID,
+			&summary.UniqueID,
+			&summary.Year,
+			&summary.FieldOffice,
+			&summary.Project,
+			&summary.Segment,
+			&summary.Season,
+			&summary.PurposeCode,
+			&summary.ProcedureDate,
+			&summary.NewRadioTagNum,
+			&summary.NewFrequencyId,
+			&summary.SpawnCode,
+			&summary.ExpectedSpawnYear)
+		if err != nil {
+			return procedureSummaryWithCount, err
 		}
-
-		rows.Scan(columnPointers...)
-
-		data := make(map[string]string)
-
-		for i, colName := range cols {
-			var v string
-			val := columns[i]
-
-			if val == nil {
-				v = ""
-			} else {
-				v = fmt.Sprintf("%v", val)
-			}
-
-			words := strings.Split(strings.ToLower(colName), "_")
-			var convertedColName = words[0]
-			if len(words) > 1 {
-				word2 := strings.ToUpper(string(words[1][0])) + words[1][1:]
-				convertedColName = words[0] + word2
-			}
-
-			data[convertedColName] = v
-		}
-
-		procedureSummaries = append(procedureSummaries, data)
+		procedureSummaries = append(procedureSummaries, summary)
 	}
 
 	procedureSummaryWithCount.Items = procedureSummaries
@@ -2036,20 +2049,18 @@ func (s *PallidSturgeonStore) SaveSearchUpload(uploadSearch models.UploadSearch)
 	return err
 }
 
-var insertSupplementalUploadSql = `insert into upload_supplemental (site_id, f_fid, mr_fid, 
-	tagnumber, pitrn, 
-	scuteloc, scutenum, scuteloc2, scutenum2, 
+var insertSupplementalUploadSql = `insert into upload_supplemental (site_id, f_fid, mr_fid,
+	tagnumber, pitrn,
+	scuteloc, scutenum, scuteloc2, scutenum2,
 	elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
-	broodstock, hatch_wild, species_id, archive, 
+	broodstock, hatch_wild, species_id, archive,
 	head, snouttomouth, inter, mouthwidth, m_ib,
-	l_ob, l_ib, r_ib, 
-	r_ob, anal, dorsal, status, hatchery_origin, 
-	sex, stage,  recapture, photo,
+	l_ob, l_ib, r_ib,
+	r_ob, anal, dorsal, status, hatchery_origin,
+	sex, stage, recapture, photo,
 	genetic_needs, other_tag_info,
-	comments, edit_initials, 
-	last_updated, upload_session_id,uploaded_by, upload_filename)
-	
-	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
+	comments, edit_initials,
+	last_updated, upload_session_id, uploaded_by, upload_filename) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
 		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46)`
 
 func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.UploadSupplemental) error {
@@ -2105,18 +2116,19 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 	return err
 }
 
-var insertProcedureUploadSql = `insert into upload_procedure (f_fid, purpose_code, procedure_date, procedure_start_time, procedure_end_time, procedure_by, 
+var insertProcedureUploadSql = `insert into upload_procedure (f_fid, mr_fid, purpose_code, procedure_date, procedure_start_time, procedure_end_time, procedure_by, 
 	antibiotic_injection_ind, photo_dorsal_ind, photo_ventral_ind, photo_left_ind,
 	old_radio_tag_num, old_frequency_id, dst_serial_num, dst_start_date, dst_start_time, dst_reimplant_ind, new_radio_tag_num,
 	new_frequency_id, sex_code, blood_sample_ind, egg_sample_ind, comments, fish_health_comments,
 	eval_location_code, spawn_code, visual_repro_status_code, ultrasound_repro_status_code,
 	expected_spawn_year, ultrasound_gonad_length, gonad_condition,
 	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)                                                        
-values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35)`
+values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36)`
 
 func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadProcedure) error {
 	_, err := s.db.Exec(insertProcedureUploadSql,
 		uploadProcedure.FFid,
+		uploadProcedure.MrFid,
 		uploadProcedure.PurposeCode,
 		uploadProcedure.ProcedureDateTime,
 		uploadProcedure.ProcedureStartTime,

@@ -101,6 +101,7 @@ type SuppSummary struct {
 	Bendrn          string  `db:"BEND_R_OR_N" json:"bendrn"`
 	BendRiverMile   float64 `db:"bend_river_mile" json:"bendRiverMile"`
 	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN_CODE" json:"hatcheryOrigin"`
+	TagNumber       string  `db:"tag_number" json:"tagNumber"`
 	CheckedBy       string  `db:"checkby" json:"checkedby"`
 	EditInitials    string  `db:"edit_initials" json:"editInitials"`
 	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
@@ -184,13 +185,63 @@ type SummaryWithCount struct {
 	TotalCount int                 `json:"totalCount"`
 }
 
+type ProcedureSummaryWithCount struct {
+	Items      []ProcedureSummary `json:"items"`
+	TotalCount int                `json:"totalCount"`
+}
+
+type ProcedureSummary struct {
+	ID                int    `db:"pid_display" json:"id"`
+	UniqueID          int    `db:"mr_id" json:"uniqueId"`
+	Year              int    `db:"year" json:"year"`
+	FieldOffice       string `db:"field_office_code" json:"fieldOffice"`
+	Project           int    `db:"project_code" json:"project"`
+	Segment           int    `db:"segment_code" json:"segment"`
+	Season            string `db:"season_code" json:"season"`
+	PurposeCode       string `db:"purpose_code" json:"purposeCode"`
+	ProcedureDate     string `db:"procedure_date" json:"procedureDate"`
+	NewRadioTagNum    int    `db:"new_radio_tag_num" json:"newRadioTagNum"`
+	NewFrequencyId    int    `db:"new_frequency_id" json:"newFrequencyId"`
+	SpawnCode         string `db:"spawn_code" json:"spawnCode"`
+	ExpectedSpawnYear int    `db:"expected_spawn_year" json:"expectedSpawnYear"`
+}
+
+type TelemetrySummaryWithCount struct {
+	Items      []TelemetrySummary `json:"items"`
+	TotalCount int                `json:"totalCount"`
+}
+
+type TelemetrySummary struct {
+	UniqueID           int     `db:"mr_id" json:"uniqueId"`
+	TId                string  `db:"t_id" json:"tId"`
+	TFid               string  `db:"t_fid" json:"tFid"`
+	SeId               string  `db:"se_id" json:"seFid"`
+	Year               int     `db:"year" json:"year"`
+	FieldOffice        string  `db:"field_office_code" json:"fieldOffice"`
+	Project            int     `db:"project_code" json:"project"`
+	Segment            int     `db:"segment_code" json:"segment"`
+	Season             string  `db:"season_code" json:"season"`
+	Bend               float64 `db:"bend_number" json:"bend"`
+	RadioTagNum        int     `db:"radio_tag_num" json:"radioTagNum"`
+	FrequencyIdCode    int     `db:"frequency_id" json:"frequencyIdCode"`
+	CaptureTime        string  `db:"capture_time" json:"captureTime"`
+	CaptureLatitude    float64 `db:"capture_latitude" json:"captureLatitude"`
+	CaptureLongitude   float64 `db:"capture_longitude" json:"captureLongitude"`
+	PositionConfidence float64 `db:"position_confidence" json:"positionConfidence"`
+	MacroId            string  `db:"macro_code" json:"macroId"`
+	MesoId             string  `db:"meso_code" json:"mesoId"`
+	Depth              float64 `db:"depth" json:"depth"`
+	Conductivity       float64 `db:"conductivity" json:"conductivity"`
+	Turbidity          float64 `db:"turbidity" json:"turbidity"`
+}
+
 type Upload struct {
 	EditInitials       string                 `db:"edit_initials" json:"editInitials"`
 	SiteUpload         UploadSiteData         `json:"siteUpload"`
 	FishUpload         UploadFishData         `json:"fishUpload"`
 	SearchUpload       UploadSearchData       `json:"searchUpload"`
 	ProcedureUpload    UploadProcedureData    `json:"procedureUpload"`
-	UploadSupplemental UploadSupplementalData `json:"uploadSupplemental"`
+	SupplementalUpload UploadSupplementalData `json:"supplementalUpload"`
 	MoriverUpload      UploadMoriverData      `json:"moriverUpload"`
 	TelemetryUpload    UploadTelemetryData    `json:"telemetryUpload"`
 }
@@ -362,8 +413,9 @@ type UploadProcedureData struct {
 
 type UploadProcedure struct {
 	Id                        int       `db:"id" json:"id"`
-	FFid                      string    `db:"f_fid" json:"f_fid"`
-	PurposeCode               string    `db:"PURPOSE" json:"purposeCode"`
+	FFid                      string    `db:"f_fid" json:"fFid"`
+	MrFid                     string    `db:"mr_fid" json:"mrFid"`
+	PurposeCode               string    `db:"purpose_code" json:"purposeCode"`
 	ProcedureDate             string    `db:"PROCEDURE_DATE" json:"procedureDate"`
 	ProcedureDateTime         time.Time `db:"PROCEDURE_DATE" json:"procedureDateTime"`
 	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
@@ -393,7 +445,7 @@ type UploadProcedure struct {
 	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatusCode"`
 	ExpectedSpawnYear         int       `db:"expected_spawn_year" json:"expectedSpawnYear"`
 	UltrasoundGonadLength     float64   `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
-	GonadCondition            string    `db:"gonad_condition" json:"gonadCondition"`
+	GonadCondition            int       `db:"gonad_condition" json:"gonadCondition"`
 	EditInitials              string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment           string    `db:"last_edit_comment" json:"lastEditComment"`
 	LastUpdated               time.Time `db:"last_updated" json:"lastUpdated"`
@@ -420,12 +472,12 @@ type UploadSupplemental struct {
 	FFid               string    `db:"f_fid" json:"fFid"`
 	MrId               string    `db:"mr_id" json:"mrId"`
 	MrFid              string    `db:"mr_fid" json:"mrFid"`
-	Tagnumber          string    `db:"tagnumber" json:"tagnumber"`
+	Tagnumber          int       `db:"tagnumber" json:"tagnumber"`
 	Pitrn              string    `db:"pitrn" json:"pitrn"`
 	Scuteloc           string    `db:"scuteloc" json:"scuteloc"`
-	Scutenum           *string   `db:"scutenum" json:"scutenum"`
+	Scutenum           *int      `db:"scutenum" json:"scutenum"`
 	Scuteloc2          string    `db:"scuteloc2" json:"scuteloc2"`
-	Scutenum2          *string   `db:"scutenum2" json:"scutenum2"`
+	Scutenum2          *int      `db:"scutenum2" json:"scutenum2"`
 	Elhv               string    `db:"elhv" json:"elhv"`
 	Elcolor            string    `db:"elcolor" json:"elcolor"`
 	Erhv               string    `db:"erhv" json:"erhv"`
@@ -434,21 +486,21 @@ type UploadSupplemental struct {
 	Dangler            string    `db:"dangler" json:"dangler"`
 	Genetic            string    `db:"genetic" json:"genetic"`
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
-	Broodstock         *string   `db:"broodstock" json:"broodstock"`
-	HatchWild          *string   `db:"hatch_wild" json:"hatchWild"`
+	Broodstock         *int      `db:"broodstock" json:"broodstock"`
+	HatchWild          *int      `db:"hatch_wild" json:"hatchWild"`
 	SpeciesId          *int      `db:"species_id" json:"speciesId"`
 	Archive            *int      `db:"archive" json:"archive"`
-	Head               *string   `db:"head" json:"head"`
-	Snouttomouth       *string   `db:"snouttomouth" json:"snouttomouth"`
-	Inter              *string   `db:"inter" json:"inter"`
-	Mouthwidth         *string   `db:"mouthwidth" json:"mouthwidth"`
-	MIb                *string   `db:"m_ib" json:"mIb"`
-	LOb                *string   `db:"l_ob" json:"lOb"`
-	LIb                *string   `db:"l_ib" json:"lIb"`
-	RIb                *string   `db:"r_ib" json:"rIb"`
-	ROb                *string   `db:"r_ob" json:"rOb"`
-	Anal               *string   `db:"anal" json:"anal"`
-	Dorsal             *string   `db:"dorsal" json:"dorsal"`
+	Head               *int      `db:"head" json:"head"`
+	Snouttomouth       *int      `db:"snouttomouth" json:"snouttomouth"`
+	Inter              *int      `db:"inter" json:"inter"`
+	Mouthwidth         *int      `db:"mouthwidth" json:"mouthwidth"`
+	MIb                *int      `db:"m_ib" json:"mIb"`
+	LOb                *int      `db:"l_ob" json:"lOb"`
+	LIb                *int      `db:"l_ib" json:"lIb"`
+	RIb                *int      `db:"r_ib" json:"rIb"`
+	ROb                *int      `db:"r_ob" json:"rOb"`
+	Anal               *int      `db:"anal" json:"anal"`
+	Dorsal             *int      `db:"dorsal" json:"dorsal"`
 	Status             string    `db:"status" json:"status"`
 	HatcheryOrigin     string    `db:"hatchery_origin" json:"hatcheryOrigin"`
 	Sex                string    `db:"sex" json:"sex"`
@@ -527,16 +579,16 @@ type UploadMoriver struct {
 	StopLongitude    *float64  `db:"stop_longitude" json:"stopLongitude"`
 	Depth1           *float64  `db:"depth1" json:"depth1"`
 	Velocitybot1     *float64  `db:"velocitybot1" json:"velocitybot1"`
-	Velocity08_1     *float64  `db:"velocity08_1" json:"velocity08_1"`
-	Velocity02or06_1 *float64  `db:"velocity02or06_1" json:"velocity02or06_1"`
+	Velocity08_1     *float64  `db:"velocity08_1" json:"velocity081"`
+	Velocity02or06_1 *float64  `db:"velocity02or06_1" json:"velocity02or061"`
 	Depth2           *float64  `db:"depth2" json:"depth2"`
 	Velocitybot2     *float64  `db:"velocitybot2" json:"velocitybot2"`
-	Velocity08_2     *float64  `db:"velocity08_2" json:"velocity08_2"`
-	Velocity02or06_2 *float64  `db:"velocity02or06_2" json:"velocity02or06_2"`
+	Velocity08_2     *float64  `db:"velocity08_2" json:"velocity082"`
+	Velocity02or06_2 *float64  `db:"velocity02or06_2" json:"velocity02or062"`
 	Depth3           *float64  `db:"depth3" json:"depth3"`
 	Velocitybot3     *float64  `db:"velocitybot3" json:"velocitybot3"`
-	Velocity08_3     *float64  `db:"velocity08_3" json:"velocity08_3"`
-	Velocity02or06_3 *float64  `db:"velocity02or06_3" json:"velocity02or06_3"`
+	Velocity08_3     *float64  `db:"velocity08_3" json:"velocity083"`
+	Velocity02or06_3 *float64  `db:"velocity02or06_3" json:"velocity02or063"`
 	Watervel         *string   `db:"watervel" json:"watervel"`
 	Cobble           *float64  `db:"cobble" json:"cobble"`
 	Organic          *float64  `db:"organic" json:"organic"`
@@ -565,6 +617,7 @@ type UploadTelemetryData struct {
 }
 
 type UploadTelemetry struct {
+	TId                string    `db:"t_id" json:"tId"`
 	TFid               string    `db:"t_fid" json:"tFid"`
 	SeFid              string    `db:"se_fid" json:"seFid"`
 	Bend               float64   `db:"bend" json:"bend"`
