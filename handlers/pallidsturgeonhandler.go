@@ -647,7 +647,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 
 	for _, uploadMoriver := range uploads.MoriverUpload.Items {
-		uploadMoriver.SetdateTime = processTimeString(uploadMoriver.Setdate)
+		uploadMoriver.SetDateTime = processTimeString(uploadMoriver.SetDate)
 		uploadMoriver.LastUpdated = time.Now()
 		uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
 		uploadMoriver.UploadSessionId = sessionId

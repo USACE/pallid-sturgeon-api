@@ -349,19 +349,19 @@ type UploadFish struct {
 	Fid             int       `db:"f_id" json:"fid"`
 	Ffid            string    `db:"f_fid" json:"ffid"`
 	MrID            *int      `db:"mr_id" json:"mrId"`
-	Panelhook       string    `db:"panelhook" json:"panelhook"`
+	Panelhook       string    `db:"panelhook" json:"panelHook"`
 	Bait            string    `db:"bait" json:"bait"`
 	Species         string    `db:"species" json:"species"`
 	Length          *float32  `db:"length" json:"length"`
 	Weight          *float32  `db:"weight" json:"weight"`
-	Fishcount       int       `db:"fishcount" json:"fishcount"`
+	Fishcount       int       `db:"fishcount" json:"countF"`
 	FinCurl         string    `db:"fin_curl" json:"finCurl"`
 	Otolith         string    `db:"otolith" json:"otolith"`
-	Rayspine        string    `db:"rayspine" json:"rayspine"`
+	Rayspine        string    `db:"rayspine" json:"raySpine"`
 	Scale           string    `db:"scale" json:"scale"`
-	Ftprefix        string    `db:"ftprefix" json:"ftprefix"`
+	Ftprefix        string    `db:"ftprefix" json:"ftPrefix"`
 	Ftnum           string    `db:"ftnum" json:"ftnum"`
-	Ftmr            string    `db:"ftmr" json:"ftmr"`
+	Ftmr            string    `db:"ftmr" json:"mR"`
 	Comments        string    `db:"comments" json:"comments"`
 	LastUpdated     time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId int       `db:"upload_session_id" json:"uploadSessionId"`
@@ -415,34 +415,34 @@ type UploadProcedure struct {
 	Id                        int       `db:"id" json:"id"`
 	FFid                      string    `db:"f_fid" json:"fFid"`
 	MrFid                     string    `db:"mr_fid" json:"mrFid"`
-	PurposeCode               string    `db:"purpose_code" json:"purposeCode"`
+	PurposeCode               string    `db:"purpose_code" json:"purpose"`
 	ProcedureDate             string    `db:"PROCEDURE_DATE" json:"procedureDate"`
 	ProcedureDateTime         time.Time `db:"PROCEDURE_DATE" json:"procedureDateTime"`
 	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
 	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
 	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
-	AntibioticInjectionInd    int       `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjectionInd"`
-	PhotoDorsalInd            int       `db:"PHOTO_DORSAL_IND" json:"photoDorsalInd"`
-	PhotoVentralInd           int       `db:"PHOTO_VENTRAL_IND" json:"photoVentralInd"`
-	PhotoLeftInd              int       `db:"PHOTO_LEFT_IND" json:"photoLeftInd"`
+	AntibioticInjectionInd    int       `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjection"`
+	PhotoDorsalInd            int       `db:"PHOTO_DORSAL_IND" json:"pDorsal"`
+	PhotoVentralInd           int       `db:"PHOTO_VENTRAL_IND" json:"pVentral"`
+	PhotoLeftInd              int       `db:"PHOTO_LEFT_IND" json:"pLeft"`
 	OldRadioTagNum            int       `db:"old_radio_tag_num" json:"oldRadioTagNum"`
 	OldFrequencyId            int       `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
 	DstSerialNum              int       `db:"dst_serial_num" json:"dstSerialNum"`
 	DstStartDate              string    `db:"dst_start_date" json:"dstStartDate"`
 	DstStartDateTime          time.Time `db:"dst_start_date" json:"dstStartDateTime"`
 	DstStartTime              string    `db:"dst_start_time" json:"dstStartTime"`
-	DstReimplantInd           int       `db:"DST_REIMPLANT_IND" json:"dstReimplantInd"`
+	DstReimplantInd           int       `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
 	NewRadioTagNum            int       `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId            int       `db:"NEW_FREQUENCY_ID" json:"newFrequencyId"`
+	NewFrequencyId            int       `db:"NEW_FREQUENCY_ID" json:"newFreqId"`
 	SexCode                   string    `db:"SEX_CODE" json:"sexCode"`
-	BloodSampleInd            int       `db:"BLOOD_SAMPLE_IND" json:"bloodSampleInd"`
-	EggSampleInd              int       `db:"EGG_SAMPLE" json:"eggSampleInd"`
+	BloodSampleInd            int       `db:"BLOOD_SAMPLE_IND" json:"bloodSample"`
+	EggSampleInd              int       `db:"EGG_SAMPLE" json:"eggSample"`
 	Comments                  string    `db:"comments" json:"comments"`
-	FishHealthComments        string    `db:"FISH_HEALTH_COMMENT" json:"fishHealthComments"`
-	EvalLocationCode          string    `db:"EVAL_LOCATION_CODE" json:"evalLocationCode"`
-	SpawnStatus               string    `db:"SPAWN_CODE" json:"spawnCode"`
-	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatusCode"`
-	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatusCode"`
+	FishHealthComments        string    `db:"FISH_HEALTH_COMMENTS" json:"fishHealthComment"`
+	EvalLocationCode          string    `db:"EVAL_LOCATION_CODE" json:"evalLocation"`
+	SpawnStatus               string    `db:"SPAWN_CODE" json:"spawnStatus"`
+	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
+	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
 	ExpectedSpawnYear         int       `db:"expected_spawn_year" json:"expectedSpawnYear"`
 	UltrasoundGonadLength     float64   `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
 	GonadCondition            int       `db:"gonad_condition" json:"gonadCondition"`
@@ -533,9 +533,10 @@ type UploadMoriver struct {
 	SiteFid          string    `db:"site_fid" json:"siteFid"`
 	MrID             int       `db:"mr_id" json:"mrId"`
 	MrFid            string    `db:"mr_fid" json:"mrFid"`
+	SeFieldID        string    `db:"se_field_id" json:"seFieldId"`
 	Season           string    `db:"season" json:"season"`
-	Setdate          string    `db:"setdate" json:"setdate"`
-	SetdateTime      time.Time `db:"setdate" json:"setdatetime"`
+	SetDate          string    `db:"setdate" json:"setdate"` // TODO: date not displaying in table
+	SetDateTime      time.Time `db:"setdate" json:"setDateTime"`
 	Subsample        float64   `db:"subsample" json:"subsample"`
 	Subsamplepass    float64   `db:"subsamplepass" json:"subsamplepass"`
 	SubsampleROrN    string    `db:"subsample_r_or_n" json:"subsampleROrN"`
@@ -568,15 +569,15 @@ type UploadMoriver struct {
 	MicroStructure   string    `db:"micro_structure" json:"microStructure"`
 	StructureFlow    string    `db:"structure_flow" json:"structureFlow"`
 	StructureMod     string    `db:"structure_mod" json:"structureMod"`
-	SetSite1         string    `db:"set_site_1" json:"setSite_1"`
-	SetSite2         string    `db:"set_site_2" json:"setSite_2"`
-	SetSite3         string    `db:"set_site_3" json:"setSite_3"`
+	SetSite1         string    `db:"set_site_1" json:"setSite1"`
+	SetSite2         string    `db:"set_site_2" json:"setSite2"`
+	SetSite3         string    `db:"set_site_3" json:"setSite3"`
 	StartTime        string    `db:"starttime" json:"startTime"`
-	StartLatitude    *float64  `db:"startlatitude" json:"startLatitude"`
-	StartLongitude   *float64  `db:"startlongitude" json:"startLongitude"`
-	StopTime         string    `db:"stoptime" json:"stopTime"`
-	StopLatitude     *float64  `db:"stoplatitude" json:"stopLatitude"`
-	StopLongitude    *float64  `db:"stop_longitude" json:"stopLongitude"`
+	StartLatitude    *float64  `db:"startlatitude" json:"startlatitude"`
+	StartLongitude   *float64  `db:"startlongitude" json:"startlongitude"`
+	StopTime         string    `db:"stoptime" json:"stoptime"`
+	StopLatitude     *float64  `db:"stoplatitude" json:"stoplatitude"`
+	StopLongitude    *float64  `db:"stop_longitude" json:"stoplongitude"`
 	Depth1           *float64  `db:"depth1" json:"depth1"`
 	Velocitybot1     *float64  `db:"velocitybot1" json:"velocitybot1"`
 	Velocity08_1     *float64  `db:"velocity08_1" json:"velocity081"`
@@ -619,11 +620,11 @@ type UploadTelemetryData struct {
 type UploadTelemetry struct {
 	TId                string    `db:"t_id" json:"tId"`
 	TFid               string    `db:"t_fid" json:"tFid"`
-	SeFid              string    `db:"se_fid" json:"seFid"`
+	SeFid              string    `db:"se_fid" json:"seFieldId"`
 	Bend               float64   `db:"bend" json:"bend"`
 	RadioTagNum        int       `db:"radio_tag_num" json:"radioTagNum"`
 	FrequencyIdCode    int       `db:"frequency_id_code" json:"frequencyIdCode"`
-	CaptureTime        string    `db:"capture_time" json:"captureTime"`
+	CaptureTime        string    `db:"capture_time" json:"captureDate"`
 	CaptureLatitude    float64   `db:"capture_latitude" json:"captureLatitude"`
 	CaptureLongitude   float64   `db:"capture_longitude" json:"captureLongitude"`
 	PositionConfidence float64   `db:"position_confidence" json:"positionConfidence"`

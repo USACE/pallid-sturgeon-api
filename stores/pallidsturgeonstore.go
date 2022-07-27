@@ -527,7 +527,7 @@ var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PR
 func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.UploadMoriver) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertMoriverDataSql, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
-		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.Setdate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
+		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.SetDate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
 		moriverDataEntry.SubsampleROrN, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
 		moriverDataEntry.Distance, moriverDataEntry.Width, moriverDataEntry.Netrivermile, moriverDataEntry.Structurenumber, moriverDataEntry.Usgs, moriverDataEntry.Riverstage, moriverDataEntry.Discharge,
 		moriverDataEntry.U1, moriverDataEntry.U2, moriverDataEntry.U3, moriverDataEntry.U4, moriverDataEntry.U5, moriverDataEntry.U6, moriverDataEntry.U7, moriverDataEntry.Macro, moriverDataEntry.Meso, moriverDataEntry.Habitatrn, moriverDataEntry.Qc,
@@ -560,7 +560,7 @@ WHERE mr_id = :1`
 
 func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.UploadMoriver) error {
 	_, err := s.db.Exec(updateMoriverDataSql,
-		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.Setdate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
+		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.SetDate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
 		moriverDataEntry.SubsampleROrN, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
 		moriverDataEntry.Distance, moriverDataEntry.Width, moriverDataEntry.Netrivermile, moriverDataEntry.Structurenumber, moriverDataEntry.Usgs, moriverDataEntry.Riverstage, moriverDataEntry.Discharge,
 		moriverDataEntry.U1, moriverDataEntry.U2, moriverDataEntry.U3, moriverDataEntry.U4, moriverDataEntry.U5, moriverDataEntry.U6, moriverDataEntry.U7, moriverDataEntry.Macro, moriverDataEntry.Meso, moriverDataEntry.Habitatrn, moriverDataEntry.Qc,
@@ -658,7 +658,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	for rows.Next() {
 		moriverDataEntry := models.UploadMoriver{}
 		err = rows.Scan(&moriverDataEntry.MrFid, &moriverDataEntry.MrID, &moriverDataEntry.SiteID, &moriverDataEntry.FieldOffice,
-			&moriverDataEntry.Project, &moriverDataEntry.Segment, &moriverDataEntry.Season, &moriverDataEntry.Setdate, &moriverDataEntry.Subsample, &moriverDataEntry.Subsamplepass,
+			&moriverDataEntry.Project, &moriverDataEntry.Segment, &moriverDataEntry.Season, &moriverDataEntry.SetDate, &moriverDataEntry.Subsample, &moriverDataEntry.Subsamplepass,
 			&moriverDataEntry.SubsampleROrN, &moriverDataEntry.Recorder, &moriverDataEntry.Gear, &moriverDataEntry.GearType, &moriverDataEntry.Temp, &moriverDataEntry.Turbidity, &moriverDataEntry.Conductivity, &moriverDataEntry.Do,
 			&moriverDataEntry.Distance, &moriverDataEntry.Width, &moriverDataEntry.Netrivermile, &moriverDataEntry.Structurenumber, &moriverDataEntry.Usgs, &moriverDataEntry.Riverstage, &moriverDataEntry.Discharge,
 			&moriverDataEntry.U1, &moriverDataEntry.U2, &moriverDataEntry.U3, &moriverDataEntry.U4, &moriverDataEntry.U5, &moriverDataEntry.U6, &moriverDataEntry.U7, &moriverDataEntry.Macro, &moriverDataEntry.Meso, &moriverDataEntry.Habitatrn, &moriverDataEntry.Qc,
@@ -2189,7 +2189,7 @@ var insertMoriverUploadSql = `insert into upload_mr (site_id, site_fid, mr_fid, 
 
 func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriver) error {
 	_, err := s.db.Exec(insertMoriverUploadSql,
-		UploadMoriver.SiteID, UploadMoriver.SiteFid, UploadMoriver.MrFid, UploadMoriver.Season, UploadMoriver.SetdateTime,
+		UploadMoriver.SiteID, UploadMoriver.SiteFid, UploadMoriver.MrFid, UploadMoriver.Season, UploadMoriver.SetDateTime,
 		UploadMoriver.Subsample, UploadMoriver.Subsamplepass, UploadMoriver.Subsamplen, UploadMoriver.Recorder,
 		UploadMoriver.Gear, UploadMoriver.GearType, UploadMoriver.Temp, UploadMoriver.Turbidity, UploadMoriver.Conductivity,
 		UploadMoriver.Do, UploadMoriver.Distance, UploadMoriver.Width, UploadMoriver.Netrivermile, UploadMoriver.Structurenumber,
