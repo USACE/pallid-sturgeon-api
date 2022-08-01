@@ -108,6 +108,7 @@ func main() {
 	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))
 	e.GET(urlContext+"/users", auth.Authorize(userH.GetUsers, ADMIN))
 	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, ADMIN))
+	e.PUT(urlContext+"/userRoleOffice", auth.Authorize(userH.UpdateUserRoleOffice, ADMIN))
 
 	// e.Logger.Fatal(e.Start(":8080"))
 	// force update

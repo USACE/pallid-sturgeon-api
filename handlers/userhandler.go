@@ -54,3 +54,15 @@ func (u *UserHandler) GetUserAccessRequests(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, users)
 }
+
+func (u *UserHandler) UpdateUserRoleOffice(c echo.Context) error {
+	userData := models.UserRoleOffice{}
+	if err := c.Bind(&userData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	err := u.Store.UpdateUserRoleOffice(userData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
