@@ -852,7 +852,7 @@ func (sd *PallidSturgeonHandler) GetUsgNoVialNumbers(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	usgNoVialNumbers, err := sd.Store.GetUsgNoVialNumbers(userInfo.OfficeCode)
+	usgNoVialNumbers, err := sd.Store.GetUsgNoVialNumbers(userInfo.OfficeCode, userInfo.ProjectCode)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -869,15 +869,13 @@ func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetUncheckedDataSheets(c echo.Context) error {
-
-	queryParams, err := marshalQuery(c)
 	user := c.Get("PSUSER").(models.User)
-
 	userInfo, err := sd.Store.GetUser(user.Email)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	uncheckedDataSheets, err := sd.Store.GetUncheckedDataSheets(userInfo.OfficeCode, queryParams)
+
+	uncheckedDataSheets, err := sd.Store.GetUncheckedDataSheets(userInfo.OfficeCode, userInfo.ProjectCode)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

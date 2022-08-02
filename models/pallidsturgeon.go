@@ -672,6 +672,27 @@ type UsgNoVialNumber struct {
 	GeneticsVialNumber string `db:"genetics_vial_number" json:"GeneticsVialNumber"`
 }
 
+type UncheckedDataWithCount struct {
+	Items      []UncheckedData `json:"items"`
+	TotalCount int             `json:"totalCount"`
+}
+
+type UncheckedData struct {
+	Cb           string  `db:"cb" json:"cb"`
+	Psb          string  `db:"psb" json:"psb"`
+	MrID         int     `db:"mr_id" json:"mrID"`
+	Subsample    int     `db:"subsample" json:"subsample"`
+	Recorder     string  `db:"recorder" json:"recorder"`
+	Checkby      string  `db:"checkby" json:"checkby"`
+	Netrivermile float64 `db:"netrivermile" json:"netrivermile"`
+	SiteID       int     `db:"site_id" json:"siteId"`
+	ProjectID    int     `db:"project_id" json:"projectId"`
+	SegmentID    int     `db:"segment_id" json:"segmentId"`
+	Season       string  `db:"season" json:"season"`
+	FieldOffice  string  `db:"fieldoffice" json:"fieldoffice"`
+	Gear         string  `db:"gear" json:"gear"`
+}
+
 type ErrorCount struct {
 	Year  int `db:"year" json:"year"`
 	Count int `db:"count(el.el_id)" json:"count"`
