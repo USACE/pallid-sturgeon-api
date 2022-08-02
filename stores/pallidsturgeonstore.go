@@ -23,7 +23,7 @@ type PallidSturgeonStore struct {
 	config *config.AppConfig
 }
 
-var getUserSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description, f.FIELD_OFFICE_CODE from users_t u
+var getUserSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description, f.FIELD_OFFICE_CODE, project_code from users_t u
 							inner join user_role_office_lk uro on uro.user_id = u.id
 							inner join role_lk r on r.id = uro.role_id
 							inner join field_office_lk f on f.fo_id = uro.office_id
@@ -42,7 +42,7 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&user.ID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.OfficeCode)
+		err = rows.Scan(&user.ID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.OfficeCode, &user.ProjectCode)
 		if err != nil {
 			return user, err
 		}
@@ -2338,43 +2338,29 @@ func (s *PallidSturgeonStore) GetErrorCount(fieldOfficeCode string) ([]models.Er
 }
 
 var usgNoVialNumberSql = `select fo.field_office_description||' : '||p.project_description as fp,
-							f.species, 
-							f.f_id, mr.mr_id, MR.SITE_ID as mrsite_id,   DS.SITE_ID as s_site_id,
-							f.f_fid, Sup.GENETICS_VIAL_NUMBER
+f.species, 
+f.f_id, mr.mr_id, MR.SITE_ID as mrsite_id,   DS.SITE_ID as s_site_id,
+f.f_fid, Sup.GENETICS_VIAL_NUMBER
+from ds_fish f, ds_supplemental sup, ds_moriver mr, ds_sites ds, project_lk p, segment_lk s, field_office_lk fo
+where F.F_ID = Sup.F_ID (+)
+and MR.MR_ID = F.MR_ID (+)
+and mr.site_id = ds.site_id (+)
+and DS.PROJECT_ID = P.PROJECT_CODE (+)
+and DS.FIELDOFFICE = fo.FIELD_OFFICE_CODE (+)
+and ds.SEGMENT_ID = s.segment_code (+)
+and (f.species = 'USG' or f.species = 'PDSG')
+and Sup.GENETICS_VIAL_NUMBER IS NULL
+and ds.FIELDOFFICE = :1
+and ds.PROJECT_ID = :2
+order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
 
-							from ds_fish f, ds_supplemental sup, ds_moriver mr, ds_sites ds,
-							project_lk p, segment_lk s, field_office_lk fo
-
-							where F.F_ID = Sup.F_ID (+)
-							and MR.MR_ID = F.MR_ID (+)
-							and mr.site_id = ds.site_id (+)
-							and DS.PROJECT_ID = P.PROJECT_CODE (+)
-							and DS.FIELDOFFICE = fo.FIELD_OFFICE_CODE (+)
-							and ds.SEGMENT_ID = s.segment_code (+)
-
-							and f.species = 'USG'
-							and Sup.GENETICS_VIAL_NUMBER IS NULL
-							and (CASE when :1 != 'ZZ' THEN
-									ds.FIELDOFFICE
-								ELSE
-									:2
-								END) = :3
-							and ds.PROJECT_ID != 2
-							order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
-
-func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string) ([]models.UsgNoVialNumber, error) {
+func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projectCode int) ([]models.UsgNoVialNumber, error) {
 	usgNoVialNumbers := []models.UsgNoVialNumber{}
 
-	selectQuery, err := s.db.Prepare(usgNoVialNumberSql)
+	rows, err := s.db.Query(usgNoVialNumberSql, fieldOfficeCode, projectCode)
 	if err != nil {
 		return usgNoVialNumbers, err
 	}
-
-	rows, err := selectQuery.Query(fieldOfficeCode, fieldOfficeCode, fieldOfficeCode)
-	if err != nil {
-		return usgNoVialNumbers, err
-	}
-	defer rows.Close()
 
 	for rows.Next() {
 		usgNoVialNumber := models.UsgNoVialNumber{}
@@ -2384,6 +2370,8 @@ func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string) ([]mod
 		}
 		usgNoVialNumbers = append(usgNoVialNumbers, usgNoVialNumber)
 	}
+
+	defer rows.Close()
 
 	return usgNoVialNumbers, err
 }
@@ -2503,57 +2491,48 @@ func (s *PallidSturgeonStore) GetUnapprovedDataSheets() (models.SummaryWithCount
 	return unapprovedDataSheetsWithCount, err
 }
 
-var uncheckedDataSheetsSql = `select 
-								asv.cb,
-								p.project_description||' : '||s.segment_description||' : Bend '||ds.BEND as psb,
-								m.MR_ID, 
-								m.UNIQUEIDENTIFIER,
-								m.SETDATE,
-								m.SUBSAMPLE,
-								m.RECORDER,
-								m.CHECKBY,
-								m.NETRIVERMILE,
-								m.site_id,
-								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE, m.gear
-								from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
-								where m.site_id = ds.site_id (+)
-								and ds.SEGMENT_ID = s.segment_code (+)
-								and DS.PROJECT_ID = P.project_code (+)
-								and m.mr_id = asv.mr_id (+)  
-								and ds.FIELDOFFICE = :1 
-								and asv.cb = 'Unchecked'
-								-- and asv.co = 'Complete'
-								and ds.PROJECT_ID != 2
-								and M.MR_ID NOT IN (SELECT MR_ID 
-													FROM DS_FISH
-													WHERE SPECIES = 'BAFI')
-								and m.FIELDOFFICE is not null`
+var uncheckedDataSheetsSql = `select asv.cb,
+p.project_description||' : '||s.segment_description||' : Bend '||ds.BEND as psb,
+m.MR_ID, 
+m.SUBSAMPLE,
+m.RECORDER,
+m.CHECKBY,
+COALESCE(m.NETRIVERMILE, 0) as NETRIVERMILE,
+m.site_id,
+ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE, m.gear
+from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
+where m.site_id = ds.site_id (+)
+and ds.SEGMENT_ID = s.segment_code (+)
+and DS.PROJECT_ID = P.project_code (+)
+and m.mr_id = asv.mr_id (+)  
+and ds.FIELDOFFICE = :1
+and asv.cb = 'Unchecked'
+and ds.PROJECT_ID = :2
+and M.MR_ID NOT IN (SELECT MR_ID 
+FROM DS_FISH
+WHERE SPECIES = 'BAFI')`
 
-var uncheckedDataSheetsCountSql = `select 
-									count(*)
-									from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
-									where m.site_id = ds.site_id (+)
-									and ds.segment_id = s.segment_code (+)
-									and DS.PROJECT_ID = p.project_code (+)
-									and m.mr_id = asv.mr_id (+)  
-									and ds.FIELDOFFICE = :1 
-									and asv.cb = 'Unchecked'
-									-- and asv.co = 'Complete'
-									and ds.PROJECT_ID != 2
-									and M.MR_ID NOT IN (SELECT MR_ID 
-														FROM DS_FISH
-														WHERE SPECIES = 'BAFI')
-									and m.FIELDOFFICE is not null`
+var uncheckedDataSheetsCountSql = `select count(*)
+from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
+where m.site_id = ds.site_id (+)
+and ds.segment_id = s.segment_code (+)
+and DS.PROJECT_ID = p.project_code (+)
+and m.mr_id = asv.mr_id (+)  
+and ds.FIELDOFFICE = :1
+and asv.cb = 'Unchecked'
+and ds.PROJECT_ID = :2
+and M.MR_ID NOT IN (SELECT MR_ID 
+FROM DS_FISH
+WHERE SPECIES = 'BAFI')`
 
-func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, queryParams models.SearchParams) (models.SummaryWithCount, error) {
-
-	uncheckedDataSheetsWithCount := models.SummaryWithCount{}
+func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, projectCode int) (models.UncheckedDataWithCount, error) {
+	uncheckedDataSheetsWithCount := models.UncheckedDataWithCount{}
 	countQuery, err := s.db.Prepare(uncheckedDataSheetsCountSql)
 	if err != nil {
 		return uncheckedDataSheetsWithCount, err
 	}
 
-	countrows, err := countQuery.Query(fieldOfficeCode)
+	countrows, err := countQuery.Query(fieldOfficeCode, projectCode)
 	if err != nil {
 		return uncheckedDataSheetsWithCount, err
 	}
@@ -2566,59 +2545,26 @@ func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, que
 		}
 	}
 
-	uncheckedDataSheets := make([]map[string]string, 0)
-
-	offset := queryParams.PageSize * queryParams.Page
-	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "PROJECT_ID"
-	}
-	selectQueryWithSearch := uncheckedDataSheetsSql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
-	dbQuery, err := s.db.Prepare(selectQueryWithSearch)
+	uncheckedDataSheets := []models.UncheckedData{}
+	dbQuery, err := s.db.Prepare(uncheckedDataSheetsSql)
 	if err != nil {
 		return uncheckedDataSheetsWithCount, err
 	}
 
-	rows, err := dbQuery.Query(fieldOfficeCode)
+	rows, err := dbQuery.Query(fieldOfficeCode, projectCode)
 	if err != nil {
 		return uncheckedDataSheetsWithCount, err
 	}
 	defer rows.Close()
 
-	cols, _ := rows.Columns()
-
 	for rows.Next() {
-
-		columns := make([]interface{}, len(cols))
-		columnPointers := make([]interface{}, len(cols))
-		for i := range columns {
-			columnPointers[i] = &columns[i]
+		uncheckedData := models.UncheckedData{}
+		err = rows.Scan(&uncheckedData.Cb, &uncheckedData.Psb, &uncheckedData.MrID, &uncheckedData.Subsample, &uncheckedData.Recorder, &uncheckedData.Checkby, &uncheckedData.Netrivermile, &uncheckedData.SiteID,
+			&uncheckedData.ProjectID, &uncheckedData.SegmentID, &uncheckedData.Season, &uncheckedData.FieldOffice, &uncheckedData.Gear)
+		if err != nil {
+			return uncheckedDataSheetsWithCount, err
 		}
-
-		rows.Scan(columnPointers...)
-
-		data := make(map[string]string)
-
-		for i, colName := range cols {
-			var v string
-			val := columns[i]
-
-			if val == nil {
-				v = ""
-			} else {
-				v = fmt.Sprintf("%v", val)
-			}
-
-			words := strings.Split(strings.ToLower(colName), "_")
-			var convertedColName = words[0]
-			if len(words) > 1 {
-				word2 := strings.ToUpper(string(words[1][0])) + words[1][1:]
-				convertedColName = words[0] + word2
-			}
-
-			data[convertedColName] = v
-		}
-
-		uncheckedDataSheets = append(uncheckedDataSheets, data)
+		uncheckedDataSheets = append(uncheckedDataSheets, uncheckedData)
 	}
 
 	uncheckedDataSheetsWithCount.Items = uncheckedDataSheets

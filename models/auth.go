@@ -36,7 +36,7 @@ type User struct {
 	OfficeID    int     `db:"office_id" json:"officeId"`
 	Role        string  `db:"description" json:"role"`
 	OfficeCode  string  `db:"code" json:"officeCode"`
-	ProjectCode string  `db:"project_code" json:"projectCode"`
+	ProjectCode int     `db:"project_code" json:"projectCode"`
 }
 
 type UserRoleOffice struct {
@@ -46,7 +46,7 @@ type UserRoleOffice struct {
 	OfficeID    int    `db:"office_id" json:"officeId"`
 	Role        string `db:"description" json:"role"`
 	OfficeCode  string `db:"code" json:"officeCode"`
-	ProjectCode string `db:"project_code" json:"projectCode"`
+	ProjectCode int    `db:"project_code" json:"projectCode"`
 }
 
 type KeyCloakResponse struct {
