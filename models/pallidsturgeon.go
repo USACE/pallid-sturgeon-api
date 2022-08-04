@@ -698,6 +698,20 @@ type ErrorCount struct {
 	Count int `db:"count(el.el_id)" json:"count"`
 }
 
+type OfficeErrorLog struct {
+	ElID             int       `db:"el_id" json:"elId"`
+	SiteID           int       `db:"site_id" json:"siteId"`
+	Year             int       `db:"year" json:"year"`
+	ErrorEntryDate   time.Time `db:"error_entry_date" json:"errorEntryDate"`
+	WorksheetID      int       `db:"worksheet_id" json:"worksheetId"`
+	WorksheetTypeID  int       `db:"worksheet_type_id" json:"worksheetTypeId"`
+	FieldID          int       `db:"field_id" json:"fieldId"`
+	FormID           int       `db:"form_id" json:"formId"`
+	ErrorDescription string    `db:"error_description" json:"errorDescription"`
+	ErrorStatus      int       `db:"error_fixed" json:"errorFixed"`
+	ErrorUpdateDate  time.Time `db:"error_fixed_date" json:"errorFixedDate"`
+}
+
 type DownloadInfo struct {
 	Name        string `db:"name" json:"name"`
 	DisplayName string `db:"display_name" json:"displayName"`

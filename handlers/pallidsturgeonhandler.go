@@ -844,6 +844,22 @@ func (sd *PallidSturgeonHandler) GetErrorCount(c echo.Context) error {
 	return c.JSON(http.StatusOK, errorCounts)
 }
 
+func (sd *PallidSturgeonHandler) GetOfficeErrorLogs(c echo.Context) error {
+
+	user := c.Get("PSUSER").(models.User)
+
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	officeErrorLogs, err := sd.Store.GetOfficeErrorLogs(userInfo.OfficeCode)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, officeErrorLogs)
+}
+
 func (sd *PallidSturgeonHandler) GetUsgNoVialNumbers(c echo.Context) error {
 
 	user := c.Get("PSUSER").(models.User)
@@ -852,6 +868,7 @@ func (sd *PallidSturgeonHandler) GetUsgNoVialNumbers(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	usgNoVialNumbers, err := sd.Store.GetUsgNoVialNumbers(userInfo.OfficeCode, userInfo.ProjectCode)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -869,13 +886,18 @@ func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetUncheckedDataSheets(c echo.Context) error {
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
 	user := c.Get("PSUSER").(models.User)
 	userInfo, err := sd.Store.GetUser(user.Email)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	uncheckedDataSheets, err := sd.Store.GetUncheckedDataSheets(userInfo.OfficeCode, userInfo.ProjectCode)
+	uncheckedDataSheets, err := sd.Store.GetUncheckedDataSheets(userInfo.OfficeCode, userInfo.ProjectCode, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

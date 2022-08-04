@@ -2287,29 +2287,29 @@ func (s *PallidSturgeonStore) CallStoreProcedures(uploadedBy string, uploadSessi
 	return procedureOut, err
 }
 
-var errorCountSql = `select el.year,count(el.el_id)
-						from site_error_log_v el
-						where NVL(error_fixed,0) = 0
-						and  (case
-						when el.worksheet_type_id = 2 then 
-							(select FIELDOFFICE
-							from ds_sites
-							where site_id = (select site_id
-											from ds_moriver
-											where mr_id = el.worksheet_id))
-						when el.worksheet_type_id = 1 then
-							NULL
-						when el.worksheet_type_id in(3,4) then
-							(select FIELDOFFICE
-							from ds_sites
-							where site_id = (select mr2.site_id
-											from ds_sites s2, ds_moriver mr2, ds_fish f2
-											where s2.site_id = mr2.site_id
-											and mr2.mr_id = F2.MR_ID
-											and f2.f_id = el.worksheet_id))
-						end) = :1
-						group by el.year
-						Order By el.year desc`
+var errorCountSql = `select el.year, count(el.el_id)
+from site_error_log_v el
+where NVL(error_fixed,0) = 0
+and (case
+when el.worksheet_type_id = 2 
+then (select FIELDOFFICE
+from ds_sites
+where site_id = (select site_id
+from ds_moriver
+where mr_id = el.worksheet_id))
+when el.worksheet_type_id = 1 
+then NULL
+when el.worksheet_type_id in(3,4) 
+then (select FIELDOFFICE
+from ds_sites
+where site_id = (select mr2.site_id
+from ds_sites s2, ds_moriver mr2, ds_fish f2
+where s2.site_id = mr2.site_id
+and mr2.mr_id = F2.MR_ID
+and f2.f_id = el.worksheet_id))
+end) = :1
+group by el.year
+Order By el.year desc`
 
 func (s *PallidSturgeonStore) GetErrorCount(fieldOfficeCode string) ([]models.ErrorCount, error) {
 	errorCounts := []models.ErrorCount{}
@@ -2337,6 +2337,50 @@ func (s *PallidSturgeonStore) GetErrorCount(fieldOfficeCode string) ([]models.Er
 	return errorCounts, err
 }
 
+var getOfficeErrorLogSql = `select el.site_id, el.year, el.el_id, el.error_entry_date, el.worksheet_type_id, el.field_id, el.error_description, COALESCE(el.error_fixed, 0) as error_fixed, el.worksheet_id, el.form_id
+from site_error_log_v el
+where (case
+when el.worksheet_type_id = 2 
+then (select FIELDOFFICE
+from ds_sites
+where site_id = (select site_id
+from ds_moriver
+where mr_id = el.worksheet_id))
+when el.worksheet_type_id = 1 
+then NULL
+when el.worksheet_type_id in(3,4) 
+then (select FIELDOFFICE
+from ds_sites
+where site_id = (select mr2.site_id
+from ds_sites s2, ds_moriver mr2, ds_fish f2
+where s2.site_id = mr2.site_id
+and mr2.mr_id = F2.MR_ID
+and f2.f_id = el.worksheet_id))
+end) = :1`
+
+func (s *PallidSturgeonStore) GetOfficeErrorLogs(fieldOfficeCode string) ([]models.OfficeErrorLog, error) {
+	officeErrorLogs := []models.OfficeErrorLog{}
+
+	rows, err := s.db.Query(getOfficeErrorLogSql, fieldOfficeCode)
+	if err != nil {
+		return officeErrorLogs, err
+	}
+
+	for rows.Next() {
+		officeErrorLog := models.OfficeErrorLog{}
+		err = rows.Scan(&officeErrorLog.SiteID, &officeErrorLog.Year, &officeErrorLog.ElID, &officeErrorLog.ErrorEntryDate, &officeErrorLog.WorksheetTypeID, &officeErrorLog.FieldID,
+			&officeErrorLog.ErrorDescription, &officeErrorLog.ErrorStatus, &officeErrorLog.WorksheetID, &officeErrorLog.FormID)
+		if err != nil {
+			return officeErrorLogs, err
+		}
+		officeErrorLogs = append(officeErrorLogs, officeErrorLog)
+	}
+
+	defer rows.Close()
+
+	return officeErrorLogs, err
+}
+
 var usgNoVialNumberSql = `select fo.field_office_description||' : '||p.project_description as fp,
 f.species, 
 f.f_id, mr.mr_id, MR.SITE_ID as mrsite_id,   DS.SITE_ID as s_site_id,
@@ -2350,14 +2394,14 @@ and DS.FIELDOFFICE = fo.FIELD_OFFICE_CODE (+)
 and ds.SEGMENT_ID = s.segment_code (+)
 and (f.species = 'USG' or f.species = 'PDSG')
 and Sup.GENETICS_VIAL_NUMBER IS NULL
-and ds.FIELDOFFICE = :1
-and ds.PROJECT_ID = :2
+and (CASE when :1 != 'ZZ' THEN ds.FIELDOFFICE ELSE :2 END) = :3
+and ds.PROJECT_ID = :4
 order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
 
 func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projectCode int) ([]models.UsgNoVialNumber, error) {
 	usgNoVialNumbers := []models.UsgNoVialNumber{}
 
-	rows, err := s.db.Query(usgNoVialNumberSql, fieldOfficeCode, projectCode)
+	rows, err := s.db.Query(usgNoVialNumberSql, fieldOfficeCode, fieldOfficeCode, fieldOfficeCode, projectCode)
 	if err != nil {
 		return usgNoVialNumbers, err
 	}
@@ -2525,7 +2569,7 @@ and M.MR_ID NOT IN (SELECT MR_ID
 FROM DS_FISH
 WHERE SPECIES = 'BAFI')`
 
-func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, projectCode int) (models.UncheckedDataWithCount, error) {
+func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, projectCode int, queryParams models.SearchParams) (models.UncheckedDataWithCount, error) {
 	uncheckedDataSheetsWithCount := models.UncheckedDataWithCount{}
 	countQuery, err := s.db.Prepare(uncheckedDataSheetsCountSql)
 	if err != nil {
@@ -2546,7 +2590,12 @@ func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, pro
 	}
 
 	uncheckedDataSheets := []models.UncheckedData{}
-	dbQuery, err := s.db.Prepare(uncheckedDataSheetsSql)
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "project_id"
+	}
+	selectQueryWithSearch := uncheckedDataSheetsSql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(selectQueryWithSearch)
 	if err != nil {
 		return uncheckedDataSheetsWithCount, err
 	}
