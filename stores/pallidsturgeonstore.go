@@ -322,6 +322,66 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(year string, fieldOfficeCode st
 	return siteDataEntryWithCount, err
 }
 
+var siteDataEntryById = `select brm_id, site_id, site_fid, year, fieldoffice, project_id, segment_id, season, sample_unit_type, bendrn, edit_initials, uploaded_by from ds_sites 
+where site_id = :1 and fieldoffice = :2`
+
+var siteDataEntryCountById = `select count(*) from ds_sites where site_id = :1 and fieldoffice = :2`
+
+func (s *PallidSturgeonStore) GetSiteDataEntryById(siteId string, fieldOfficeCode string, queryParams models.SearchParams) (models.SitesWithCount, error) {
+	siteDataEntryWithCount := models.SitesWithCount{}
+	query := siteDataEntryById
+	queryWithCount := siteDataEntryCountById
+
+	countQuery, err := s.db.Prepare(queryWithCount)
+	if err != nil {
+		return siteDataEntryWithCount, err
+	}
+
+	countrows, err := countQuery.Query(siteId, fieldOfficeCode)
+	if err != nil {
+		return siteDataEntryWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&siteDataEntryWithCount.TotalCount)
+		if err != nil {
+			return siteDataEntryWithCount, err
+		}
+	}
+
+	siteEntries := []models.Sites{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "site_id"
+	}
+	fishDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(fishDataEntriesSqlWithSearch)
+	if err != nil {
+		return siteDataEntryWithCount, err
+	}
+
+	rows, err := dbQuery.Query(siteId, fieldOfficeCode)
+	if err != nil {
+		return siteDataEntryWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		siteDataEntry := models.Sites{}
+		err = rows.Scan(&siteDataEntry.BendRiverMile, &siteDataEntry.SiteID, &siteDataEntry.SiteFID, &siteDataEntry.SiteYear, &siteDataEntry.FieldOffice, &siteDataEntry.Project,
+			&siteDataEntry.Segment, &siteDataEntry.Season, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.Bendrn, &siteDataEntry.EditInitials, &siteDataEntry.UploadedBy)
+		if err != nil {
+			return siteDataEntryWithCount, err
+		}
+		siteEntries = append(siteEntries, siteDataEntry)
+	}
+
+	siteDataEntryWithCount.Items = siteEntries
+
+	return siteDataEntryWithCount, err
+}
+
 var insertSiteDataSql = `insert into ds_sites (brm_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
 	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, BENDRN, edit_initials, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12) returning site_id into :13`
 
@@ -574,33 +634,25 @@ func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.Upl
 	return err
 }
 
-var moriverDataEntriesByFidSql = `select mr_fid,mr_id,site_id,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,SEASON,set_date, subsample, subsample_pass, 
-									subsample_r_or_n, recorder, gear_code, GEAR_TYPE, temp, turbidity, conductivity, do,
-									distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
-									u1, u2, u3, u4, u5, u6, u7, MACRO_ID, MESO_ID, habitat_r_or_n, qc,
-									micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
-									start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
-									depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
-									depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
-									depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
-									water_velocity, cobble_estimation_code, ORGANIC, silt, sand, gravel,
-									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, uploaded_by from ds_moriver where mr_id = :1 and FIELDOFFICE = :2`
+var moriverDataEntriesByFidSql = `select mr_fid,mr_id,site_id,FIELDOFFICE,PROJECT,SEGMENT,SEASON,setdate, subsample, subsamplepass, 
+subsamplen, recorder, gear, GEAR_TYPE, temp, turbidity, conductivity, do, distance, width, netrivermile, structurenumber, usgs, riverstage, discharge,
+u1, u2, u3, u4, u5, u6, u7, MACRO, MESO, habitatrn, qc, micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
+starttime, startlatitude, startlongitude, stoptime, stoplatitude, stoplongitude, depth1, velocitybot1, velocity08_1, velocity02or06_1,
+depth2, velocitybot2, velocity08_2, velocity02or06_2,depth3, velocitybot3, velocity08_3, velocity02or06_3, watervel, cobble, ORGANIC, silt, sand,
+gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, uploaded_by from ds_moriver 
+where mr_id = :1`
 
-var moriverDataEntriesCountByFidSql = `SELECT count(*) FROM ds_moriver where mr_id = :1 and FIELDOFFICE = :2`
+var moriverDataEntriesCountByFidSql = `SELECT count(*) FROM ds_moriver where mr_id = :1`
 
-var moriverDataEntriesByFfidSql = `select mr_fid,mr_id,site_id,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,SEASON,set_date, subsample, subsample_pass, 
-									subsample_r_or_n, recorder, gear_code, GEAR_TYPE, temp, turbidity, conductivity, do,
-									distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
-									u1, u2, u3, u4, u5, u6, u7, MACRO_ID, MESO_ID, habitat_r_or_n, qc,
-									micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
-									start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
-									depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
-									depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
-									depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
-									water_velocity, cobble_estimation_code, ORGANIC, silt, sand, gravel,
-									comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, uploaded_by from ds_moriver where mr_fid = :1 and FIELDOFFICE = :2`
+var moriverDataEntriesByFfidSql = `select mr_fid,mr_id,site_id,FIELDOFFICE,PROJECT,SEGMENT,SEASON,setdate, subsample, subsamplepass, 
+subsamplen, recorder, gear, GEAR_TYPE, temp, turbidity, conductivity, do, distance, width, netrivermile, structurenumber, usgs, riverstage, discharge,
+u1, u2, u3, u4, u5, u6, u7, MACRO, MESO, habitatrn, qc, micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
+starttime, startlatitude, startlongitude, stoptime, stoplatitude, stoplongitude, depth1, velocitybot1, velocity08_1, velocity02or06_1,
+depth2, velocitybot2, velocity08_2, velocity02or06_2,depth3, velocitybot3, velocity08_3, velocity02or06_3, watervel, cobble, ORGANIC, silt, sand,
+gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, uploaded_by from ds_moriver 
+where mr_fid = :1`
 
-var moriverDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_moriver where mr_fid = :1 and FIELDOFFICE = :2`
+var moriverDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_moriver where mr_fid = :1`
 
 func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId string, fieldOfficeCode string, queryParams models.SearchParams) (models.MoriverDataEntryWithCount, error) {
 	moriverDataEntryWithCount := models.MoriverDataEntryWithCount{}
@@ -625,7 +677,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 		return moriverDataEntryWithCount, err
 	}
 
-	countrows, err := countQuery.Query(id, fieldOfficeCode)
+	countrows, err := countQuery.Query(id)
 	if err != nil {
 		return moriverDataEntryWithCount, err
 	}
@@ -649,7 +701,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 		return moriverDataEntryWithCount, err
 	}
 
-	rows, err := dbQuery.Query(id, fieldOfficeCode)
+	rows, err := dbQuery.Query(id)
 	if err != nil {
 		return moriverDataEntryWithCount, err
 	}
@@ -2398,7 +2450,7 @@ and (CASE when :1 != 'ZZ' THEN ds.FIELDOFFICE ELSE :2 END) = :3
 and ds.PROJECT_ID = :4
 order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
 
-func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projectCode int) ([]models.UsgNoVialNumber, error) {
+func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projectCode string) ([]models.UsgNoVialNumber, error) {
 	usgNoVialNumbers := []models.UsgNoVialNumber{}
 
 	rows, err := s.db.Query(usgNoVialNumberSql, fieldOfficeCode, fieldOfficeCode, fieldOfficeCode, projectCode)
@@ -2569,7 +2621,7 @@ and M.MR_ID NOT IN (SELECT MR_ID
 FROM DS_FISH
 WHERE SPECIES = 'BAFI')`
 
-func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, projectCode int, queryParams models.SearchParams) (models.UncheckedDataWithCount, error) {
+func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, projectCode string, queryParams models.SearchParams) (models.UncheckedDataWithCount, error) {
 	uncheckedDataSheetsWithCount := models.UncheckedDataWithCount{}
 	countQuery, err := s.db.Prepare(uncheckedDataSheetsCountSql)
 	if err != nil {

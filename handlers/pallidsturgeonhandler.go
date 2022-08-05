@@ -111,11 +111,32 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	dataSummary, err := sd.Store.GetSiteDataEntries(year, userInfo.OfficeCode, projectCode, segmentCode, seasonCode, bendrn, queryParams)
+	siteDataEntries, err := sd.Store.GetSiteDataEntries(year, userInfo.OfficeCode, projectCode, segmentCode, seasonCode, bendrn, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, siteDataEntries)
+}
+
+func (sd *PallidSturgeonHandler) GetSiteDataEntryById(c echo.Context) error {
+	siteId := c.QueryParam("siteId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	user := c.Get("PSUSER").(models.User)
+
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	siteDataEntry, err := sd.Store.GetSiteDataEntryById(siteId, userInfo.OfficeCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, siteDataEntry)
 }
 
 func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {

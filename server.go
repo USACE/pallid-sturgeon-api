@@ -61,6 +61,7 @@ func main() {
 	e.GET(urlContext+"/sampleUnitTypes", auth.Authorize(PallidSturgeonH.GetSampleUnitTypes, PUBLIC))
 	e.GET(urlContext+"/bends", auth.Authorize(PallidSturgeonH.GetBends, PUBLIC))
 	e.GET(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.GetSiteDataEntries, PUBLIC))
+	e.GET(urlContext+"/siteDataEntryById", auth.Authorize(PallidSturgeonH.GetSiteDataEntryById, PUBLIC))
 	e.POST(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.SaveSiteDataEntry, PUBLIC))
 	e.PUT(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.UpdateSiteDataEntry, PUBLIC))
 	e.GET(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.GetFishDataEntries, PUBLIC))
