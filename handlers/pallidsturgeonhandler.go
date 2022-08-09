@@ -885,12 +885,41 @@ func (sd *PallidSturgeonHandler) GetUsgNoVialNumbers(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
-
-	usgNoVialNumbers, err := sd.Store.GetUnapprovedDataSheets()
+	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, usgNoVialNumbers)
+
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	unapprovedDataSheets, err := sd.Store.GetUnapprovedDataSheets(userInfo.ProjectCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, unapprovedDataSheets)
+}
+
+func (sd *PallidSturgeonHandler) GetBafiDataSheets(c echo.Context) error {
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	bafiDataSheets, err := sd.Store.GetBafiDataSheets(userInfo.OfficeCode, userInfo.ProjectCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, bafiDataSheets)
 }
 
 func (sd *PallidSturgeonHandler) GetUncheckedDataSheets(c echo.Context) error {
