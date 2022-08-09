@@ -101,6 +101,7 @@ func main() {
 	e.GET(urlContext+"/officeErrorLog", auth.Authorize(PallidSturgeonH.GetOfficeErrorLogs, PUBLIC))
 	e.GET(urlContext+"/usgNoVialNumbers", auth.Authorize(PallidSturgeonH.GetUsgNoVialNumbers, PUBLIC))
 	e.GET(urlContext+"/unapprovedDataSheets", auth.Authorize(PallidSturgeonH.GetUnapprovedDataSheets, PUBLIC))
+	e.GET(urlContext+"/bafiDataSheets", auth.Authorize(PallidSturgeonH.GetBafiDataSheets, PUBLIC))
 	e.GET(urlContext+"/uncheckedDataSheets", auth.Authorize(PallidSturgeonH.GetUncheckedDataSheets, PUBLIC))
 	e.POST(urlContext+"/uploadDownloadZip", auth.Authorize(PallidSturgeonH.UploadDownloadZip, PUBLIC))
 	e.GET(urlContext+"/downloadInfo", auth.Authorize(PallidSturgeonH.GetDownloadInfo, PUBLIC))

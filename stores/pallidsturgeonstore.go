@@ -2472,59 +2472,48 @@ func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projec
 	return usgNoVialNumbers, err
 }
 
-var unapprovedDataSheetsSql = `select 
-								asv.ch,
-								f.field_office_description||' : '||p.project_description as fp, 
-								s.segment_description,
-								m.BEND,
-								m.MR_ID, 
-								m.UNIQUEIDENTIFIER,
-								m.SETDATE,
-								m.SUBSAMPLE,
-								m.RECORDER,
-								m.CHECKBY,
-								m.NETRIVERMILE,
-								m.site_id,
-								ds.PROJECT_ID, ds.SEGMENT_ID, ds.SEASON, ds.FIELDOFFICE,
-								ds.SAMPLE_UNIT_TYPE,
-								m.gear
-								from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
-								where m.site_id = ds.site_id (+)
-								and ds.SEGMENT_ID = s.segment_code (+)
-								and DS.PROJECT_ID = P.project_code (+)
-								and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
-								and m.mr_id = asv.mr_id (+)
-								and asv.ch = 'Unapproved'
-								-- and m.checkby is not null
-								and asv.cb = 'YES'
-								-- and asv.co = 'Complete'  
-								-- and nvl(m.complete,0) = 1
-								-- and nvl(m.approved,0) = 0
-								and ds.PROJECT_ID != 2
-								order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
+var unapprovedDataSheetsSql = `select asv.ch,
+f.field_office_description||' : '||p.project_description as fp, 
+s.segment_description,
+COALESCE(m.bend, 0) as bend,
+m.MR_ID, 
+m.SUBSAMPLE,
+m.RECORDER,
+m.CHECKBY,
+COALESCE(m.NETRIVERMILE, 0) as NETRIVERMILE,
+m.site_id,
+ds.project_id, ds.segment_id, ds.season, ds.fieldoffice,
+ds.sample_unit_type,
+m.gear
+from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
+where m.site_id = ds.site_id (+)
+and ds.segment_id = s.segment_code (+)
+and DS.PROJECT_ID = P.PROJECT_CODE (+)
+and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
+and m.mr_id = asv.mr_id (+)
+and asv.ch = 'Unapproved'
+and asv.cb = 'YES'
+and ds.project_id = :1`
 
-var unapprovedDataSheetsCountSql = `select 
-							count(*)
-							from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
-							where m.site_id = ds.site_id (+)
-							and ds.SEGMENT_ID = s.segment_code (+)
-							and DS.PROJECT_ID = P.project_code (+)
-							and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
-							and m.mr_id = asv.mr_id (+)
-							and asv.ch = 'Unapproved'
-							-- and m.checkby is not null
-							and asv.cb = 'YES'
-							-- and asv.co = 'Complete'  
-							-- and nvl(m.complete,0) = 1
-							-- and nvl(m.approved,0) = 0
-							and ds.PROJECT_ID != 2
-							order by ds.FIELDOFFICE, ds.PROJECT_ID, ds.SEGMENT_ID, ds.BEND`
+var unapprovedDataSheetsCountSql = `select count(*)
+from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
+where m.site_id = ds.site_id (+)
+and ds.segment_id = s.segment_code (+)
+and DS.PROJECT_ID = P.PROJECT_CODE (+)
+and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
+and m.mr_id = asv.mr_id (+)
+and asv.ch = 'Unapproved'
+and asv.cb = 'YES'
+and ds.project_id = :1`
 
-func (s *PallidSturgeonStore) GetUnapprovedDataSheets() (models.SummaryWithCount, error) {
+func (s *PallidSturgeonStore) GetUnapprovedDataSheets(projectCode string, queryParams models.SearchParams) (models.UnapprovedDataWithCount, error) {
+	unapprovedDataSheetsWithCount := models.UnapprovedDataWithCount{}
+	countQuery, err := s.db.Prepare(unapprovedDataSheetsCountSql)
+	if err != nil {
+		return unapprovedDataSheetsWithCount, err
+	}
 
-	unapprovedDataSheetsWithCount := models.SummaryWithCount{}
-
-	countrows, err := s.db.Query(unapprovedDataSheetsCountSql)
+	countrows, err := countQuery.Query(projectCode)
 	if err != nil {
 		return unapprovedDataSheetsWithCount, err
 	}
@@ -2537,54 +2526,113 @@ func (s *PallidSturgeonStore) GetUnapprovedDataSheets() (models.SummaryWithCount
 		}
 	}
 
-	unapprovedDataSheets := make([]map[string]string, 0)
+	unapprovedDataSheets := []models.UnapprovedData{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id"
+	}
+	selectQueryWithSearch := unapprovedDataSheetsSql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(selectQueryWithSearch)
+	if err != nil {
+		return unapprovedDataSheetsWithCount, err
+	}
 
-	rows, err := s.db.Query(unapprovedDataSheetsSql)
+	rows, err := dbQuery.Query(projectCode)
 	if err != nil {
 		return unapprovedDataSheetsWithCount, err
 	}
 	defer rows.Close()
 
-	cols, _ := rows.Columns()
-
 	for rows.Next() {
-
-		columns := make([]interface{}, len(cols))
-		columnPointers := make([]interface{}, len(cols))
-		for i := range columns {
-			columnPointers[i] = &columns[i]
+		unapprovedData := models.UnapprovedData{}
+		err = rows.Scan(&unapprovedData.Ch, &unapprovedData.Fp, &unapprovedData.SegmentDescription, &unapprovedData.Bend, &unapprovedData.MrId, &unapprovedData.Subsample,
+			&unapprovedData.Recorder, &unapprovedData.Checkby, &unapprovedData.NetRiverMile, &unapprovedData.SiteId, &unapprovedData.ProjectId, &unapprovedData.SegmentId, &unapprovedData.Season,
+			&unapprovedData.FieldOffice, &unapprovedData.SampleUnitType, &unapprovedData.Gear)
+		if err != nil {
+			return unapprovedDataSheetsWithCount, err
 		}
-
-		rows.Scan(columnPointers...)
-
-		data := make(map[string]string)
-
-		for i, colName := range cols {
-			var v string
-			val := columns[i]
-
-			if val == nil {
-				v = ""
-			} else {
-				v = fmt.Sprintf("%v", val)
-			}
-
-			words := strings.Split(strings.ToLower(colName), "_")
-			var convertedColName = words[0]
-			if len(words) > 1 {
-				word2 := strings.ToUpper(string(words[1][0])) + words[1][1:]
-				convertedColName = words[0] + word2
-			}
-
-			data[convertedColName] = v
-		}
-
-		unapprovedDataSheets = append(unapprovedDataSheets, data)
+		unapprovedDataSheets = append(unapprovedDataSheets, unapprovedData)
 	}
 
 	unapprovedDataSheetsWithCount.Items = unapprovedDataSheets
 
 	return unapprovedDataSheetsWithCount, err
+}
+
+var bafiDataSheetsSql = `SELECT p.project_description||' : '||s.segment_description||' : Bend '||ds.bend as psb,
+ds.site_id, DS.FIELDOFFICE, f.f_id, mr.mr_id, mr.mr_fid, F.SPECIES,
+MR.RECORDER, MR.SUBSAMPLE, MR.GEAR, F.FISHCOUNT,
+ds.year, ds.segment_id, ds.bend, ds.bendrn, 
+COALESCE(mr.bendrivermile, 0) as bendrivermile, f.panelhook
+from ds_sites ds, ds_moriver mr, ds_fish f, project_lk p, segment_lk s
+where DS.SITE_ID = MR.SITE_ID (+)
+and MR.MR_ID = F.MR_ID (+)
+and DS.PROJECT_ID = P.PROJECT_CODE (+)
+and ds.segment_id = s.segment_code (+)
+and F.SPECIES = 'BAFI'
+and ds.fieldoffice = :1
+and ds.project_id = :2`
+
+var bafiDataSheetCountsSql = `SELECT count(*)
+from ds_sites ds, ds_moriver mr, ds_fish f, project_lk p, segment_lk s
+where DS.SITE_ID = MR.SITE_ID (+)
+and MR.MR_ID = F.MR_ID (+)
+and DS.PROJECT_ID = P.PROJECT_CODE (+)
+and ds.segment_id = s.segment_code (+)
+and F.SPECIES = 'BAFI'
+and ds.fieldoffice = :1
+and ds.project_id = :2`
+
+func (s *PallidSturgeonStore) GetBafiDataSheets(fieldOffice string, projectCode string, queryParams models.SearchParams) (models.BafiDataWithCount, error) {
+	bafiDataSheetsWithCount := models.BafiDataWithCount{}
+	countQuery, err := s.db.Prepare(bafiDataSheetCountsSql)
+	if err != nil {
+		return bafiDataSheetsWithCount, err
+	}
+
+	countrows, err := countQuery.Query(fieldOffice, projectCode)
+	if err != nil {
+		return bafiDataSheetsWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&bafiDataSheetsWithCount.TotalCount)
+		if err != nil {
+			return bafiDataSheetsWithCount, err
+		}
+	}
+
+	bafiDataSheets := []models.BafiData{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id"
+	}
+	selectQueryWithSearch := bafiDataSheetsSql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(selectQueryWithSearch)
+	if err != nil {
+		return bafiDataSheetsWithCount, err
+	}
+
+	rows, err := dbQuery.Query(fieldOffice, projectCode)
+	if err != nil {
+		return bafiDataSheetsWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		bafiData := models.BafiData{}
+		err = rows.Scan(&bafiData.Psb, &bafiData.SiteId, &bafiData.FieldOffice, &bafiData.FId, &bafiData.MrId, &bafiData.MrFid, &bafiData.Species, &bafiData.Recorder, &bafiData.Subsample, &bafiData.Gear, &bafiData.FishCount,
+			&bafiData.Year, &bafiData.SegmentId, &bafiData.Bend, &bafiData.Bendrn, &bafiData.BendRiverMile, &bafiData.PanelHook)
+		if err != nil {
+			return bafiDataSheetsWithCount, err
+		}
+		bafiDataSheets = append(bafiDataSheets, bafiData)
+	}
+
+	bafiDataSheetsWithCount.Items = bafiDataSheets
+
+	return bafiDataSheetsWithCount, err
 }
 
 var uncheckedDataSheetsSql = `select asv.cb,

@@ -672,6 +672,56 @@ type UsgNoVialNumber struct {
 	GeneticsVialNumber string `db:"genetics_vial_number" json:"GeneticsVialNumber"`
 }
 
+type UnapprovedDataWithCount struct {
+	Items      []UnapprovedData `json:"items"`
+	TotalCount int              `json:"totalCount"`
+}
+
+type UnapprovedData struct {
+	Ch                 string `db:"ch" json:"ch"`
+	Fp                 string `db:"fp" json:"fp"`
+	SegmentDescription string `db:"segment_description" json:"segmentDescription"`
+	Bend               int    `db:"bend" json:"bend"`
+	MrId               int    `db:"mr_id" json:"mrId"`
+	// SetDate            time.Time `db:"setdate" json:"setdate"`
+	Subsample      int     `db:"subsampple" json:"subsample"`
+	Recorder       string  `db:"recorder" json:"recorder"`
+	Checkby        string  `db:"checkby" json:"checkby"`
+	NetRiverMile   float64 `db:"netrivermile" json:"netrivermile"`
+	SiteId         int     `db:"site_id" json:"siteId"`
+	ProjectId      int     `db:"project_id" json:"projectId"`
+	SegmentId      int     `db:"segment_id" json:"segmentId"`
+	Season         string  `db:"season" json:"season"`
+	FieldOffice    string  `db:"fieldoffice" json:"fieldoffice"`
+	SampleUnitType string  `db:"sample_unit_type" json:"sampleUnitType"`
+	Gear           string  `db:"gear" json:"gear"`
+}
+
+type BafiDataWithCount struct {
+	Items      []BafiData `json:"items"`
+	TotalCount int        `json:"totalCount"`
+}
+
+type BafiData struct {
+	Psb           string  `db:"psb" json:"psb"`
+	SiteId        int     `db:"site_id" json:"siteId"`
+	FieldOffice   string  `db:"fieldoffice" json:"fieldoffice"`
+	FId           int     `db:"f_id" json:"fId"`
+	MrId          int     `db:"mr_id" json:"mrId"`
+	MrFid         string  `db:"mr_fid" json:"mrFid"`
+	Species       string  `db:"species" json:"species"`
+	Recorder      string  `db:"recorder" json:"recorder"`
+	Subsample     int     `db:"subsample" json:"subsample"`
+	Gear          string  `db:"gear" json:"gear"`
+	FishCount     int     `db:"fishcount" json:"fishcount"`
+	Year          int     `db:"year" json:"year"`
+	SegmentId     int     `db:"segment_id" json:"segmentId"`
+	Bend          int     `db:"bend" json:"bend"`
+	Bendrn        string  `db:"bendrn" json:"bendrn"`
+	BendRiverMile float64 `db:"bendrivermile" json:"bendrivermile"`
+	PanelHook     string  `db:"panelhook" json:"panelhook"`
+}
+
 type UncheckedDataWithCount struct {
 	Items      []UncheckedData `json:"items"`
 	TotalCount int             `json:"totalCount"`
