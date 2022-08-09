@@ -1125,7 +1125,7 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 	return file.Name(), err
 }
 
-var fishDataSummarySql = `SELECT mr_id, f_id, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, panelhook, SPECIES_CODE, HATCHERY_ORIGIN_CODE, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var fishDataSummarySql = `SELECT mr_id, f_id, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, COALESCE(BEND_NUMBER, 0) as BEND_NUMBER, BEND_R_OR_N, bend_river_mile, panelhook, SPECIES_CODE, HATCHERY_ORIGIN_CODE, checkby FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var fishDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
