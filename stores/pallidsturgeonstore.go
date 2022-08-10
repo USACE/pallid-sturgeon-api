@@ -2003,9 +2003,8 @@ func (s *PallidSturgeonStore) GetUploadSessionId() (int, error) {
 
 var insertUploadSiteSql = `insert into upload_sites (site_id, site_fid, site_year, fieldoffice_id, 
 	field_office, project_id, project, 
-	segment_id, segment, season_id, season, bend, bendrn, bend_river_mile, comments, 
-	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20)`
+	segment_id, segment, season_id, season, bend, bendrn, bend_river_mile, comments, last_updated, upload_session_id, uploaded_by, upload_filename)
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19)`
 
 func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error {
 	_, err := s.db.Exec(insertUploadSiteSql,
@@ -2024,7 +2023,6 @@ func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error
 		uploadSite.Bendrn,
 		uploadSite.BendRiverMile,
 		uploadSite.Comments,
-		uploadSite.EditInitials,
 		uploadSite.LastUpdated,
 		uploadSite.UploadSessionId,
 		uploadSite.UploadedBy,
@@ -2036,8 +2034,8 @@ func (s *PallidSturgeonStore) SaveSiteUpload(uploadSite models.UploadSite) error
 
 var insertFishUploadSql = `insert into upload_fish (site_id, f_fid, mr_fid, panelhook, bait, species, length, weight,
 	fishcount, fin_curl, otolith, rayspine, scale, ftprefix, ftnum, ftmr,
-	comments, edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)
-	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22)`
+	comments, last_updated, upload_session_id, uploaded_by, upload_filename)
+	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21)`
 
 func (s *PallidSturgeonStore) SaveFishUpload(uploadFish models.UploadFish) error {
 	_, err := s.db.Exec(insertFishUploadSql,
@@ -2058,7 +2056,6 @@ func (s *PallidSturgeonStore) SaveFishUpload(uploadFish models.UploadFish) error
 		uploadFish.Ftnum,
 		uploadFish.Ftmr,
 		uploadFish.Comments,
-		uploadFish.EditInitials,
 		uploadFish.LastUpdated,
 		uploadFish.UploadSessionId,
 		uploadFish.UploadedBy,
@@ -2069,9 +2066,9 @@ func (s *PallidSturgeonStore) SaveFishUpload(uploadFish models.UploadFish) error
 }
 
 var insertSearchUploadSql = `insert into upload_search(se_fid, ds_id, site_id, site_fid, search_date, recorder, search_type_code, search_day, start_time,  
-		start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, temp, conductivity, edit_initials, last_updated, 
+		start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, temp, conductivity, last_updated, 
 		upload_session_id, uploaded_by, upload_filename)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21)`
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20)`
 
 func (s *PallidSturgeonStore) SaveSearchUpload(uploadSearch models.UploadSearch) error {
 	_, err := s.db.Exec(insertSearchUploadSql,
@@ -2091,7 +2088,6 @@ func (s *PallidSturgeonStore) SaveSearchUpload(uploadSearch models.UploadSearch)
 		uploadSearch.StopLongitude,
 		uploadSearch.Temp,
 		uploadSearch.Conductivity,
-		uploadSearch.EditInitials,
 		uploadSearch.LastUpdated,
 		uploadSearch.UploadSessionId,
 		uploadSearch.UploadedBy,
@@ -2111,9 +2107,9 @@ var insertSupplementalUploadSql = `insert into upload_supplemental (site_id, f_f
 	r_ob, anal, dorsal, status, hatchery_origin,
 	sex, stage, recapture, photo,
 	genetic_needs, other_tag_info,
-	comments, edit_initials,
+	comments,
 	last_updated, upload_session_id, uploaded_by, upload_filename) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46)`
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45)`
 
 func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.UploadSupplemental) error {
 	_, err := s.db.Exec(insertSupplementalUploadSql,
@@ -2158,7 +2154,6 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 		uploadSupplemental.GeneticNeeds,
 		uploadSupplemental.OtherTagInfo,
 		uploadSupplemental.Comments,
-		uploadSupplemental.EditInitials,
 		uploadSupplemental.LastUpdated,
 		uploadSupplemental.UploadSessionId,
 		uploadSupplemental.UploadedBy,
@@ -2173,9 +2168,8 @@ var insertProcedureUploadSql = `insert into upload_procedure (f_fid, mr_fid, pur
 	old_radio_tag_num, old_frequency_id, dst_serial_num, dst_start_date, dst_start_time, dst_reimplant_ind, new_radio_tag_num,
 	new_frequency_id, sex_code, blood_sample_ind, egg_sample_ind, comments, fish_health_comments,
 	eval_location_code, spawn_code, visual_repro_status_code, ultrasound_repro_status_code,
-	expected_spawn_year, ultrasound_gonad_length, gonad_condition,
-	edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)                                                        
-values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36)`
+	expected_spawn_year, ultrasound_gonad_length, gonad_condition, last_updated, upload_session_id, uploaded_by, upload_filename)                                                        
+values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35)`
 
 func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadProcedure) error {
 	_, err := s.db.Exec(insertProcedureUploadSql,
@@ -2210,7 +2204,6 @@ func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadP
 		uploadProcedure.ExpectedSpawnYear,
 		uploadProcedure.UltrasoundGonadLength,
 		uploadProcedure.GonadCondition,
-		uploadProcedure.EditInitials,
 		uploadProcedure.LastUpdated,
 		uploadProcedure.UploadSessionId,
 		uploadProcedure.UploadedBy,
@@ -2230,14 +2223,14 @@ var insertMoriverUploadSql = `insert into upload_mr (site_id, site_fid, mr_fid, 
 	depth2, velocitybot2, velocity08_2, velocity02or06_2,
 	depth3, velocitybot3, velocity08_3, velocity02or06_3,
 	watervel, cobble, organic, silt, sand, gravel,
-	comments, edit_initials, last_updated, upload_session_id,
+	comments, last_updated, upload_session_id,
 	uploaded_by, upload_filename, complete,
 	no_turbidity, no_velocity)
 
 	 values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,
 		:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,
 		:48,:49,:50,:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,
-		:71,:72)`
+		:71)`
 
 func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriver) error {
 	_, err := s.db.Exec(insertMoriverUploadSql,
@@ -2253,7 +2246,7 @@ func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriv
 		UploadMoriver.Depth2, UploadMoriver.Velocitybot2, UploadMoriver.Velocity08_2, UploadMoriver.Velocity02or06_2,
 		UploadMoriver.Depth3, UploadMoriver.Velocitybot3, UploadMoriver.Velocity08_3, UploadMoriver.Velocity02or06_3,
 		UploadMoriver.Watervel, UploadMoriver.Cobble, UploadMoriver.Organic, UploadMoriver.Silt, UploadMoriver.Sand, UploadMoriver.Gravel,
-		UploadMoriver.Comments, UploadMoriver.EditInitials, UploadMoriver.LastUpdated, UploadMoriver.UploadSessionId,
+		UploadMoriver.Comments, UploadMoriver.LastUpdated, UploadMoriver.UploadSessionId,
 		UploadMoriver.UploadedBy, UploadMoriver.UploadFilename, UploadMoriver.Complete,
 		UploadMoriver.NoTurbidity, UploadMoriver.NoVelocity,
 	)
@@ -2262,8 +2255,8 @@ func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriv
 }
 
 var insertTelemetryUploadSql = `insert into upload_telemetry_fish(t_fid, se_fid, bend, radio_tag_num, frequency_id_code, capture_time, capture_latitude, capture_longitude,
-	position_confidence, macro_id, meso_id, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, edit_initials, last_updated, upload_session_id, uploaded_by, upload_filename)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24)`
+	position_confidence, macro_id, meso_id, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, last_updated, upload_session_id, uploaded_by, upload_filename)
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23)`
 
 func (s *PallidSturgeonStore) SaveTelemetryUpload(uploadTelemetry models.UploadTelemetry) error {
 	_, err := s.db.Exec(insertTelemetryUploadSql,
@@ -2286,7 +2279,6 @@ func (s *PallidSturgeonStore) SaveTelemetryUpload(uploadTelemetry models.UploadT
 		uploadTelemetry.Sand,
 		uploadTelemetry.Gravel,
 		uploadTelemetry.Comments,
-		uploadTelemetry.EditInitials,
 		uploadTelemetry.LastUpdated,
 		uploadTelemetry.UploadSessionId,
 		uploadTelemetry.UploadedBy,
