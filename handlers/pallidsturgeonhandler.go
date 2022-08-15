@@ -569,6 +569,21 @@ func (sd *PallidSturgeonHandler) GetFullProcedureDataSummary(c echo.Context) err
 	return c.Inline(fileName, fileName)
 }
 
+func (sd *PallidSturgeonHandler) GetMissouriDatasheetById(c echo.Context) error {
+	siteId := c.QueryParam("siteId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	missouriData, err := sd.Store.GetMissouriDatasheetById(siteId, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, missouriData)
+}
+
 func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
 	sessionId, err := sd.Store.GetUploadSessionId()
 	if err != nil {

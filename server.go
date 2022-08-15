@@ -87,6 +87,7 @@ func main() {
 	e.GET(urlContext+"/telemetryDataSummary", auth.Authorize(PallidSturgeonH.GetTelemetryDataSummary, PUBLIC))
 	e.GET(urlContext+"/procedureFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullProcedureDataSummary, PUBLIC))
 	e.GET(urlContext+"/procedureDataSummary", auth.Authorize(PallidSturgeonH.GetProcedureDataSummary, PUBLIC))
+	e.GET(urlContext+"/missouriDatasheets", auth.Authorize(PallidSturgeonH.GetMissouriDatasheetById, PUBLIC))
 	e.GET(urlContext+"/uploadSessionId", auth.Authorize(PallidSturgeonH.GetUploadSessionId, PUBLIC))
 	e.POST(urlContext+"/upload", auth.Authorize(PallidSturgeonH.Upload, PUBLIC))
 	// e.POST(urlContext+"/siteUpload", auth.Authorize(PallidSturgeonH.SiteUpload, PUBLIC))

@@ -355,8 +355,8 @@ func (s *PallidSturgeonStore) GetSiteDataEntryById(siteId string, fieldOfficeCod
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "site_id"
 	}
-	fishDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
-	dbQuery, err := s.db.Prepare(fishDataEntriesSqlWithSearch)
+	siteEntriesByIdSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(siteEntriesByIdSqlWithSearch)
 	if err != nil {
 		return siteDataEntryWithCount, err
 	}
@@ -1983,6 +1983,69 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 
 	return procedureSummaryWithCount, err
 }
+
+var missouriDatasheetsBySiteId = `select si.site_id, mo.mr_id, si.fieldoffice, si.project_id, si.segment_id, si.season, mo.subsample, mo.subsamplepass, mo.conductivity from ds_sites si
+inner join ds_moriver mo on si.site_id = mo.site_id 
+where si.site_id = :1`
+
+var missouriDatasheetsCountBySiteId = `select count(*) from ds_sites si inner join ds_moriver mo on si.site_id = mo.site_id where si.site_id = :1`
+
+func (s *PallidSturgeonStore) GetMissouriDatasheetById(siteId string, queryParams models.SearchParams) (models.MoriverDataEntryWithCount, error) {
+	missouriSummariesWithCount := models.MoriverDataEntryWithCount{}
+	countQuery, err := s.db.Prepare(missouriDatasheetsCountBySiteId)
+	if err != nil {
+		return missouriSummariesWithCount, err
+	}
+
+	countrows, err := countQuery.Query(siteId)
+	if err != nil {
+		return missouriSummariesWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&missouriSummariesWithCount.TotalCount)
+		if err != nil {
+			return missouriSummariesWithCount, err
+		}
+	}
+
+	missouriSummaries := []models.UploadMoriver{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "site_id"
+	}
+	missouriDataByIdSqlWithSearch := missouriDatasheetsBySiteId + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(missouriDataByIdSqlWithSearch)
+	if err != nil {
+		return missouriSummariesWithCount, err
+	}
+
+	rows, err := dbQuery.Query(siteId)
+	if err != nil {
+		return missouriSummariesWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		summary := models.UploadMoriver{}
+		err = rows.Scan(&summary.SiteID, &summary.MrID, &summary.FieldOffice, &summary.Project, &summary.Segment, &summary.Season, &summary.Subsample, &summary.Subsamplepass, &summary.Conductivity)
+		if err != nil {
+			return missouriSummariesWithCount, err
+		}
+		missouriSummaries = append(missouriSummaries, summary)
+	}
+
+	missouriSummariesWithCount.Items = missouriSummaries
+
+	return missouriSummariesWithCount, err
+}
+
+var searchDatasheetsBySiteId = `select si.site_id, se.se_id, si.year, si.fieldoffice, si.project_id, si.segment_id, si.season, se.search_date, se.recorder, se.search_type_code, se.start_time, 
+se.start_latitude, se.start_longitude, se.stop_time, se.stop_latitude, se.stop_longitude, se.se_fid, se.ds_id, se.site_fid, se.temp, COALESCE(se.conductivity, 0) as conductivity from ds_sites si
+inner join ds_search se on se.site_id = si.site_id where si.site_id = :1`
+
+var searchDatasheetsCountBySiteId = `select count(*) from ds_sites si inner join ds_search se on se.site_id = si.site_id where si.site_id = :1`
 
 var nextUploadSessionIdSql = `SELECT upload_session_seq.nextval from dual`
 
