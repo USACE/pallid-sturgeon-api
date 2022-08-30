@@ -569,6 +569,43 @@ func (sd *PallidSturgeonHandler) GetFullProcedureDataSummary(c echo.Context) err
 	return c.Inline(fileName, fileName)
 }
 
+func (sd *PallidSturgeonHandler) GetMissouriDatasheetById(c echo.Context) error {
+	siteId, project, segment, season, bend := c.QueryParam("siteId"), c.QueryParam("project"), c.QueryParam("segment"), c.QueryParam("season"), c.QueryParam("bend")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	user := c.Get("PSUSER").(models.User)
+
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	missouriData, err := sd.Store.GetMissouriDatasheetById(siteId, userInfo.OfficeCode, project, segment, season, bend, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, missouriData)
+}
+
+func (sd *PallidSturgeonHandler) GetSearchDatasheetById(c echo.Context) error {
+	siteId := c.QueryParam("siteId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	searchData, err := sd.Store.GetSearchDatasheetById(siteId, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, searchData)
+}
+
 func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
 	sessionId, err := sd.Store.GetUploadSessionId()
 	if err != nil {
@@ -686,139 +723,6 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, procedureOut)
 }
-
-// func (sd *PallidSturgeonHandler) SiteUpload(c echo.Context) error {
-// 	var err error
-// 	uploadSites := []models.UploadSite{}
-// 	if err := c.Bind(&uploadSites); err != nil {
-// 		return c.JSON(http.StatusInternalServerError, err.Error())
-// 	}
-// 	for _, uploadSite := range uploadSites {
-// 		uploadSite.LastUpdated = time.Now()
-// 		user := c.Get("PSUSER").(models.User)
-// 		uploadSite.UploadedBy = user.FirstName + " " + user.LastName
-// 		err = sd.Store.SaveSiteUpload(uploadSite)
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, err.Error())
-// 		}
-// 	}
-
-// 	return c.JSON(http.StatusOK, `{"result":"success"}`)
-// }
-
-// func (sd *PallidSturgeonHandler) FishUpload(c echo.Context) error {
-// 	var err error
-// 	uploadFishs := []models.UploadFish{}
-// 	if err := c.Bind(&uploadFishs); err != nil {
-// 		return c.JSON(http.StatusInternalServerError, err.Error())
-// 	}
-// 	for _, uploadFish := range uploadFishs {
-// 		uploadFish.LastUpdated = time.Now()
-// 		user := c.Get("PSUSER").(models.User)
-// 		uploadFish.UploadedBy = user.FirstName + " " + user.LastName
-// 		err = sd.Store.SaveFishUpload(uploadFish)
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, err.Error())
-// 		}
-// 	}
-
-// 	return c.JSON(http.StatusOK, `{"result":"success"}`)
-// }
-
-// func (sd *PallidSturgeonHandler) SearchUpload(c echo.Context) error {
-// 	var err error
-// 	uploadSearches := []models.UploadSearch{}
-// 	if err := c.Bind(&uploadSearches); err != nil {
-// 		return c.JSON(http.StatusInternalServerError, err.Error())
-// 	}
-// 	for _, uploadSearch := range uploadSearches {
-// 		uploadSearch.LastUpdated = time.Now()
-// 		user := c.Get("PSUSER").(models.User)
-// 		uploadSearch.UploadedBy = user.FirstName + " " + user.LastName
-// 		err = sd.Store.SaveSearchUpload(uploadSearch)
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, err.Error())
-// 		}
-// 	}
-
-// 	return c.JSON(http.StatusOK, `{"result":"success"}`)
-// }
-
-// func (sd *PallidSturgeonHandler) SupplementalUpload(c echo.Context) error {
-// 	var err error
-// 	uploadSupplementals := []models.UploadSupplemental{}
-// 	if err := c.Bind(&uploadSupplementals); err != nil {
-// 		return c.JSON(http.StatusInternalServerError, err.Error())
-// 	}
-// 	for _, uploadSupplemental := range uploadSupplementals {
-// 		uploadSupplemental.LastUpdated = time.Now()
-// 		user := c.Get("PSUSER").(models.User)
-// 		uploadSupplemental.UploadedBy = user.FirstName + " " + user.LastName
-// 		err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, err.Error())
-// 		}
-// 	}
-
-// 	return c.JSON(http.StatusOK, `{"result":"success"}`)
-// }
-
-// func (sd *PallidSturgeonHandler) ProcedureUpload(c echo.Context) error {
-// 	var err error
-// 	uploadProcedures := []models.UploadProcedure{}
-// 	if err := c.Bind(&uploadProcedures); err != nil {
-// 		return c.JSON(http.StatusInternalServerError, err.Error())
-// 	}
-// 	for _, uploadProcedure := range uploadProcedures {
-// 		uploadProcedure.LastUpdated = time.Now()
-// 		user := c.Get("PSUSER").(models.User)
-// 		uploadProcedure.UploadedBy = user.FirstName + " " + user.LastName
-// 		err = sd.Store.SaveProcedureUpload(uploadProcedure)
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, err.Error())
-// 		}
-// 	}
-
-// 	return c.JSON(http.StatusOK, `{"result":"success"}`)
-// }
-
-// func (sd *PallidSturgeonHandler) MoriverUpload(c echo.Context) error {
-// 	var err error
-// 	UploadMorivers := []models.UploadMoriver{}
-// 	if err := c.Bind(&UploadMorivers); err != nil {
-// 		return c.JSON(http.StatusInternalServerError, err.Error())
-// 	}
-// 	for _, uploadMoriver := range UploadMorivers {
-// 		uploadMoriver.LastUpdated = time.Now()
-// 		user := c.Get("PSUSER").(models.User)
-// 		uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
-// 		err = sd.Store.SaveMoriverUpload(uploadMoriver)
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, err.Error())
-// 		}
-// 	}
-
-// 	return c.JSON(http.StatusOK, `{"result":"success"}`)
-// }
-
-// func (sd *PallidSturgeonHandler) TelemetryUpload(c echo.Context) error {
-// 	var err error
-// 	uploadTelemetrys := []models.UploadTelemetry{}
-// 	if err := c.Bind(&uploadTelemetrys); err != nil {
-// 		return c.JSON(http.StatusInternalServerError, err.Error())
-// 	}
-// 	for _, uploadTelemetry := range uploadTelemetrys {
-// 		uploadTelemetry.LastUpdated = time.Now()
-// 		user := c.Get("PSUSER").(models.User)
-// 		uploadTelemetry.UploadedBy = user.FirstName + " " + user.LastName
-// 		err = sd.Store.SaveTelemetryUpload(uploadTelemetry)
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, err.Error())
-// 		}
-// 	}
-
-// 	return c.JSON(http.StatusOK, `{"result":"success"}`)
-// }
 
 func (sd *PallidSturgeonHandler) CallStoreProcedures(c echo.Context) error {
 	var err error

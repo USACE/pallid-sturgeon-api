@@ -289,19 +289,23 @@ type SitesWithCount struct {
 type Sites struct {
 	SiteID             int       `db:"site_id" json:"siteId"`
 	SiteFID            string    `db:"site_fid" json:"siteFid"`
-	SiteYear           int       `db:"site_year" json:"siteYear"`
-	FieldofficeID      string    `db:"fieldoffice_id" json:"fieldofficeId"`
-	FieldOffice        string    `db:"field_office" json:"fieldOffice"`
+	SiteYear           int       `db:"year" json:"year"`
+	FieldofficeID      string    `db:"fieldoffice" json:"fieldoffice"`
+	FieldOffice        string    `db:"field_office_description" json:"fieldOfficeDescription"`
 	ProjectId          int       `db:"project_id" json:"projectId"`
-	Project            string    `db:"project" json:"project"`
+	Project            string    `db:"project_description" json:"projectDescription"`
 	SegmentId          int       `db:"segment_id" json:"segmentId"`
-	Segment            string    `db:"segment" json:"segment"`
-	SeasonId           string    `db:"season_id" json:"seasonId"`
-	Season             string    `db:"season" json:"season"`
-	SampleUnitTypeCode string    `db:"SAMPLE_UNIT_TYPE" json:"sampleUnitTypeCode"`
+	Segment            string    `db:"segment_description" json:"segmentDescription"`
+	SeasonId           string    `db:"season" json:"season"`
+	Season             string    `db:"season_description" json:"seasonDescription"`
+	SampleUnitTypeCode string    `db:"sample_unit_type" json:"sampleUnitType"`
+	SampleUnitDesc     string    `db:"sample_unit_desc" json:"sampleUnitDesc"`
+	RiverDesc          string    `db:"river_description" json:"riverDescription"`
 	Bend               int       `db:"bend" json:"bend"`
 	Bendrn             string    `db:"bendrn" json:"bendrn"`
-	BendRiverMile      *string   `db:"brm_id" json:"bendRiverMile"`
+	BendRiverMile      *string   `db:"bend_river_mile" json:"bendRiverMile"`
+	Complete           string    `db:"complete" json:"complete"`
+	BkgColor           string    `db:"bkg_color" json:"bkgColor"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`
 	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
@@ -378,10 +382,12 @@ type UploadFish struct {
 type UploadSearchData struct {
 	Items          []UploadSearch `json:"items"`
 	UploadFilename string         `db:"upload_filename" json:"uploadFilename"`
+	TotalCount     int            `json:"totalCount"`
 }
 
 type UploadSearch struct {
-	SiteID          int       `db:"site_id" json:"siteId"`
+	SiteId          int       `db:"site_id" json:"siteId"`
+	SeId            int       `db:"se_id" json:"seId"`
 	SeFid           string    `db:"se_fid" json:"seFid"`
 	DsId            int       `db:"ds_id" json:"dsId"`
 	SiteFid         string    `db:"site_fid" json:"siteFid"`
@@ -472,7 +478,7 @@ type UploadSupplemental struct {
 	FFid               string    `db:"f_fid" json:"fFid"`
 	MrId               string    `db:"mr_id" json:"mrId"`
 	MrFid              string    `db:"mr_fid" json:"mrFid"`
-	Tagnumber          int       `db:"tagnumber" json:"tagnumber"`
+	Tagnumber          string    `db:"tagnumber" json:"tagnumber"`
 	Pitrn              string    `db:"pitrn" json:"pitrn"`
 	Scuteloc           string    `db:"scuteloc" json:"scuteloc"`
 	Scutenum           *int      `db:"scutenum" json:"scutenum"`
@@ -606,6 +612,10 @@ type UploadMoriver struct {
 	Project          *int      `db:"PROJECT_ID" json:"project"`
 	FieldOffice      string    `db:"FIELDOFFICE" json:"fieldOffice"`
 	Segment          *int      `db:"SEGMENT_ID" json:"segment"`
+	BkgColor         string    `db:"bkg_color" json:"bkgColor"`
+	SuppBkgColor     string    `db:"supp_bkg_color" json:"suppBkgColor"`
+	FishCount        int       `db:"fish_count" json:"fishCount"`
+	SuppCount        int       `db:"supp_count" json:"suppCount"`
 	LastUpdated      time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
