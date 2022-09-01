@@ -97,6 +97,14 @@ func (sd *PallidSturgeonHandler) GetBends(c echo.Context) error {
 	return c.JSON(http.StatusOK, bends)
 }
 
+func (sd *PallidSturgeonHandler) GetBendRn(c echo.Context) error {
+	bends, err := sd.Store.GetBendRn()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, bends)
+}
+
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	year, projectCode, segmentCode, seasonCode, bendrn := c.QueryParam("year"), c.QueryParam("projectCode"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn")
 	queryParams, err := marshalQuery(c)
