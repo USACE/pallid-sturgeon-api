@@ -242,6 +242,27 @@ func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
 	return bends, err
 }
 
+func (s *PallidSturgeonStore) GetBendRn() ([]models.BendRn, error) {
+	rows, err := s.db.Query("select bs_id, BEND_SELECTION_DESCRIPTION, BEND_SELECTION_CODE from BEND_SELECTION_LK order by 1 desc")
+
+	bendRnsItems := []models.BendRn{}
+	if err != nil {
+		return bendRnsItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		bendRn := models.BendRn{}
+		err = rows.Scan(&bendRn.ID, &bendRn.Description, &bendRn.Code)
+		if err != nil {
+			return nil, err
+		}
+		bendRnsItems = append(bendRnsItems, bendRn)
+	}
+
+	return bendRnsItems, err
+}
+
 var siteDataEntriesSql = `select site_id, year, fieldoffice, project_id, segment_id, season, bend, bendrn, season_description, project_description, segment_description, river_description, bend_river_mile, complete, bkg_color, sample_unit_type, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
 
 var siteDataEntriesCountSql = `SELECT count(*) from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
@@ -285,7 +306,7 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(year string, officeCode string,
 
 	for rows.Next() {
 		siteDataEntry := models.Sites{}
-		err = rows.Scan(&siteDataEntry.SiteID, &siteDataEntry.SiteYear, &siteDataEntry.FieldofficeID, &siteDataEntry.ProjectId, &siteDataEntry.SegmentId, &siteDataEntry.SeasonId, &siteDataEntry.Bend, &siteDataEntry.Bendrn, &siteDataEntry.Season,
+		err = rows.Scan(&siteDataEntry.SiteID, &siteDataEntry.Year, &siteDataEntry.FieldofficeId, &siteDataEntry.ProjectId, &siteDataEntry.SegmentId, &siteDataEntry.SeasonId, &siteDataEntry.Bend, &siteDataEntry.Bendrn, &siteDataEntry.Season,
 			&siteDataEntry.Project, &siteDataEntry.Segment, &siteDataEntry.RiverDesc, &siteDataEntry.BendRiverMile, &siteDataEntry.Complete, &siteDataEntry.BkgColor, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.SampleUnitDesc)
 		if err != nil {
 			return siteDataEntryWithCount, err
@@ -345,7 +366,7 @@ func (s *PallidSturgeonStore) GetSiteDataEntryById(siteId string, fieldOfficeCod
 
 	for rows.Next() {
 		siteDataEntry := models.Sites{}
-		err = rows.Scan(&siteDataEntry.BendRiverMile, &siteDataEntry.SiteID, &siteDataEntry.SiteFID, &siteDataEntry.SiteYear, &siteDataEntry.FieldOffice, &siteDataEntry.Project,
+		err = rows.Scan(&siteDataEntry.BendRiverMile, &siteDataEntry.SiteID, &siteDataEntry.SiteFID, &siteDataEntry.Year, &siteDataEntry.FieldOffice, &siteDataEntry.Project,
 			&siteDataEntry.Segment, &siteDataEntry.Season, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.Bendrn, &siteDataEntry.EditInitials, &siteDataEntry.UploadedBy)
 		if err != nil {
 			return siteDataEntryWithCount, err
@@ -359,12 +380,13 @@ func (s *PallidSturgeonStore) GetSiteDataEntryById(siteId string, fieldOfficeCod
 }
 
 var insertSiteDataSql = `insert into ds_sites (brm_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
-	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, BENDRN, edit_initials, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12) returning site_id into :13`
+	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, bend, BENDRN, edit_initials, last_updated, last_edit_comment, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14) returning site_id into :15`
 
 func (s *PallidSturgeonStore) SaveSiteDataEntry(sitehDataEntry models.Sites) (int, error) {
 	var id int
-	_, err := s.db.Exec(insertSiteDataSql, sitehDataEntry.BendRiverMile, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
-		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
+	_, err := s.db.Exec(insertSiteDataSql, sitehDataEntry.BendRiverMile, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId,
+		sitehDataEntry.SegmentId, sitehDataEntry.SeasonId, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bend, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated,
+		sitehDataEntry.LastEditComment, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
 
 	return id, err
 }
@@ -385,7 +407,7 @@ SET   site_fid = :2,
 WHERE site_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.Sites) error {
-	_, err := s.db.Exec(updateSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.SiteYear, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
+	_, err := s.db.Exec(updateSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
 		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.BendRiverMile, sitehDataEntry.SiteID)
 	return err
 }

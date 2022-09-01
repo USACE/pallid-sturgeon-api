@@ -53,6 +53,12 @@ type Bend struct {
 	State          string  `db:"state" json:"state"`
 }
 
+type BendRn struct {
+	ID          int    `db:"bs_id" json:"id"`
+	Code        string `db:"bend_selection_code" json:"code"`
+	Description string `db:"bend_selection_description" json:"description"`
+}
+
 type Project struct {
 	Code        int    `db:"project_code" json:"code"`
 	Description string `db:"project_description" json:"description"`
@@ -257,7 +263,7 @@ type UploadSiteData struct {
 }
 
 type UploadSite struct {
-	BrmID              int       `db:"brm_id" json:"brmId"`
+	// BrmID              int       `db:"brm_id" json:"brmId"`
 	SiteID             int       `db:"site_id" json:"siteId"`
 	SiteFID            string    `db:"site_fid" json:"siteFid"`
 	SiteYear           int       `db:"site_year" json:"siteYear"`
@@ -289,8 +295,8 @@ type SitesWithCount struct {
 type Sites struct {
 	SiteID             int       `db:"site_id" json:"siteId"`
 	SiteFID            string    `db:"site_fid" json:"siteFid"`
-	SiteYear           int       `db:"year" json:"year"`
-	FieldofficeID      string    `db:"fieldoffice" json:"fieldoffice"`
+	Year               int       `db:"year" json:"year"`
+	FieldofficeId      string    `db:"fieldoffice" json:"fieldoffice"`
 	FieldOffice        string    `db:"field_office_description" json:"fieldOfficeDescription"`
 	ProjectId          int       `db:"project_id" json:"projectId"`
 	Project            string    `db:"project_description" json:"projectDescription"`
@@ -307,6 +313,7 @@ type Sites struct {
 	Complete           string    `db:"complete" json:"complete"`
 	BkgColor           string    `db:"bkg_color" json:"bkgColor"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`
+	LastEditComment    string    `db:"last_edit_comment" json:"last_edit_comment"`
 	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
