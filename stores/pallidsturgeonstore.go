@@ -577,24 +577,20 @@ func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFis
 	return err
 }
 
-var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,SEASON,set_date, subsample, subsample_pass, 
-	subsample_r_or_n, recorder, gear_code, GEAR_TYPE, temp, turbidity, conductivity, do,
-	distance, width, net_river_mile, structure_number, usgs, river_stage, discharge,
-	u1, u2, u3, u4, u5, u6, u7, MACRO_ID, MESO_ID, habitat_r_or_n, qc,
-	micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
-	start_time, start_latitude, start_longitude, stop_time, stop_latitude, stop_longitude, 
-	depth_1, velocity_bottom_1, velocity_mid_1, velocity_top_1,
-	depth_2, velocity_bottom_2, velocity_mid_2, velocity_top_2,
-	depth_3, velocity_bottom_3, velocity_mid_3, velocity_top_3, 
-	water_velocity, cobble_estimation_code, ORGANIC, silt, sand, gravel,
-	comments, complete, checkby, turbidity_ind, velocity_ind, edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
+var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PROJECT,SEGMENT,SEASON,setdate, subsample, subsamplepass, subsamplen, recorder, 
+	gear, GEAR_TYPE, temp, turbidity, conductivity, do, distance, width, netrivermile, structurenumber, usgs, riverstage, discharge,
+	u1, u2, u3, u4, u5, u6, u7, MACRO, MESO, habitatrn, qc, micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, 
+	set_site_3, starttime, startlatitude, startlongitude, stoptime, stoplatitude, stoplongitude, depth1, velocitybot1, velocity08_1, 
+	velocity02or06_1, depth2, velocitybot2, velocity08_2, velocity02or06_2, depth3, velocitybot3, velocity08_3, velocity02or06_3, 
+	watervel, cobble, ORGANIC, silt, sand, gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, 
+	last_updated, uploaded_by, bend, bendrn, bendrivermile) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
 		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49,:50,
-		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71,:72,:73,:74) returning mr_id into :75`
+		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71,:72,:73,:74,:75,:76,:77) returning mr_id into :78`
 
 func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.UploadMoriver) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertMoriverDataSql, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
-		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.SetDate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
+		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.SetDateTime, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
 		moriverDataEntry.SubsampleROrN, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
 		moriverDataEntry.Distance, moriverDataEntry.Width, moriverDataEntry.Netrivermile, moriverDataEntry.Structurenumber, moriverDataEntry.Usgs, moriverDataEntry.Riverstage, moriverDataEntry.Discharge,
 		moriverDataEntry.U1, moriverDataEntry.U2, moriverDataEntry.U3, moriverDataEntry.U4, moriverDataEntry.U5, moriverDataEntry.U6, moriverDataEntry.U7, moriverDataEntry.Macro, moriverDataEntry.Meso, moriverDataEntry.Habitatrn, moriverDataEntry.Qc,
@@ -604,26 +600,23 @@ func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.Uploa
 		moriverDataEntry.Depth2, moriverDataEntry.Velocitybot2, moriverDataEntry.Velocity08_2, moriverDataEntry.Velocity02or06_2,
 		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
 		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
-		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, sql.Out{Dest: &id})
+		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy,
+		moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, sql.Out{Dest: &id})
 	return id, err
 }
 
 var updateMoriverDataSql = `UPDATE ds_moriver
-SET  PROJECT_ID = :2,SEGMENT_ID = :3,SEASON = :4,set_date = :5, subsample = :6, subsample_pass = :7, 
-	subsample_r_or_n = :8, recorder = :9, gear_code = :10, GEAR_TYPE = :11, temp = :12, turbidity = :13, conductivity = :14, do = :15,
-	distance = :16, width = :17, net_river_mile = :18, structure_number = :19, usgs = :20, river_stage = :21, discharge = :22,
-	u1 = :23, u2 = :24, u3 = :25, u4 = :26, u5 = :27, u6 = :28, u7 = :29, MACRO_ID = :30, MESO_ID = :31, habitat_r_or_n = :32, qc = :33,
-	micro_structure = :34, structure_flow = :35, structure_mod = :36, set_site_1 = :37, set_site_2 = :38, set_site_3 = :39,
-	start_time = :40, start_latitude = :41, start_longitude = :42, stop_time = :43, stop_latitude = :44, stop_longitude = :45, 
-	depth_1 = :46, velocity_bottom_1 = :47, velocity_mid_1 = :48, velocity_top_1 = :49,
-	depth_2 = :50, velocity_bottom_2 = :51, velocity_mid_2 = :52, velocity_top_2 = :53,
-	depth_3 = :54, velocity_bottom_3 = :55, velocity_mid_3 = :56, velocity_top_3 = :57, 
-	water_velocity = :58, cobble_estimation_code = :59, ORGANIC = :60, silt = :61, sand = :62, gravel = :63,
-	comments = :64, complete = :65, checkby = :66, turbidity_ind = :67, velocity_ind = :68, edit_initials = :69,  mr_fid= :70, site_id = :71, FIELDOFFICE = :72,
-	last_edit_comment = :73,
-	last_updated = :74, 
-	uploaded_by = :75
-WHERE mr_id = :1`
+SET  project = :2,segment = :3,SEASON = :4,setdate = :5, subsample = :6, subsamplepass = :7, subsamplen = :8, recorder = :9, gear = :10, 
+GEAR_TYPE = :11, temp = :12, turbidity = :13, conductivity = :14, do = :15, distance = :16, width = :17, netrivermile = :18, structurenumber = :19, 
+usgs = :20, riverstage = :21, discharge = :22, u1 = :23, u2 = :24, u3 = :25, u4 = :26, u5 = :27, u6 = :28, u7 = :29, MACRO = :30, MESO = :31, 
+habitatrn = :32, qc = :33, micro_structure = :34, structure_flow = :35, structure_mod = :36, set_site_1 = :37, set_site_2 = :38, set_site_3 = :39,
+starttime = :40, startlatitude = :41, startlongitude = :42, stoptime = :43, stoplatitude = :44, stoplongitude = :45, 
+depth1 = :46, velocitybot1 = :47, velocity08_1 = :48, velocity02or06_1 = :49,
+depth2 = :50, velocitybot2 = :51, velocity08_2 = :52, velocity02or06_2 = :53,
+depth3 = :54, velocitybot3 = :55, velocity08_3 = :56, velocity02or06_3 = :57, 
+watervel = :58, cobble = :59, ORGANIC = :60, silt = :61, sand = :62, gravel = :63, comments = :64, complete = :65, checkby = :66, 
+no_turbidity = :67, no_velocity = :68, edit_initials = :69,  mr_fid= :70, site_id = :71, FIELDOFFICE = :72, last_edit_comment = :73, last_updated = :74, 
+uploaded_by = :75, bend = :76, bendrn = :77, bendrivermile =:78 WHERE mr_id = :1`
 
 func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.UploadMoriver) error {
 	_, err := s.db.Exec(updateMoriverDataSql,
@@ -637,7 +630,8 @@ func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.Upl
 		moriverDataEntry.Depth2, moriverDataEntry.Velocitybot2, moriverDataEntry.Velocity08_2, moriverDataEntry.Velocity02or06_2,
 		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
 		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
-		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice, moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, moriverDataEntry.MrID)
+		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
+		moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.MrID)
 	return err
 }
 
