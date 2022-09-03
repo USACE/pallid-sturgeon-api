@@ -566,7 +566,7 @@ type UploadMoriver struct {
 	Netrivermile     *float64  `db:"netrivermile" json:"netrivermile"`
 	Structurenumber  string    `db:"structurenumber" json:"structurenumber"`
 	Usgs             string    `db:"usgs" json:"usgs"`
-	Riverstage       *string   `db:"riverstage" json:"riverstage"`
+	Riverstage       *float64  `db:"riverstage" json:"riverstage"`
 	Discharge        *float64  `db:"discharge" json:"discharge"`
 	U1               string    `db:"u1" json:"u1"`
 	U2               string    `db:"u2" json:"u2"`
@@ -603,7 +603,7 @@ type UploadMoriver struct {
 	Velocitybot3     *float64  `db:"velocitybot3" json:"velocitybot3"`
 	Velocity08_3     *float64  `db:"velocity08_3" json:"velocity083"`
 	Velocity02or06_3 *float64  `db:"velocity02or06_3" json:"velocity02or063"`
-	Watervel         *string   `db:"watervel" json:"watervel"`
+	Watervel         *float64  `db:"watervel" json:"watervel"`
 	Cobble           *float64  `db:"cobble" json:"cobble"`
 	Organic          *float64  `db:"organic" json:"organic"`
 	Silt             *float64  `db:"silt" json:"silt"`
@@ -623,6 +623,9 @@ type UploadMoriver struct {
 	SuppBkgColor     string    `db:"supp_bkg_color" json:"suppBkgColor"`
 	FishCount        int       `db:"fish_count" json:"fishCount"`
 	SuppCount        int       `db:"supp_count" json:"suppCount"`
+	Bend             int       `db:"bend" json:"bend"`
+	BendRn           string    `db:"bendrn" json:"bendrn"`
+	BendRiverMile    float64   `db:"bendrivermile" json:"bendrivermile"`
 	LastUpdated      time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`

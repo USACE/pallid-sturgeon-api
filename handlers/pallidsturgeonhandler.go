@@ -259,9 +259,12 @@ func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
 	if err := c.Bind(&moriverData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
+	// TODO: figure out setdate format and remove this hardcoded value
+	moriverData.SetDateTime = time.Now()
 	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
