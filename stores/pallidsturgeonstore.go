@@ -1020,6 +1020,316 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 	return supplementalDataEntryWithCount, err
 }
 
+var searchDataEntriesSql = `select SE_FID, SE_ID, CHECKBY, COALESCE(CONDUCTIVITY, 0) as conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, COALESCE(SEARCH_DAY, 0) as search_day, 
+SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, COALESCE(TEMP, 0) as temp, UPLOADED_BY, UPLOAD_FILENAME,
+UPLOAD_SESSION_ID, ds_id from ds_search`
+
+var searchDataEntriesCountSql = `select count(*) from ds_search`
+
+var searchDataEntriesBySeIdSql = `select SE_FID, SE_ID, CHECKBY, COALESCE(CONDUCTIVITY, 0) as conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, COALESCE(SEARCH_DAY, 0) as search_day, 
+SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, COALESCE(TEMP, 0) as temp, UPLOADED_BY, UPLOAD_FILENAME,
+UPLOAD_SESSION_ID, ds_id from ds_search where se_id = :1`
+
+var searchDataEntriesCountBySeIdSql = `select count(*) from ds_search where se_id = :1`
+
+var searchDataEntriesBySiteIdSql = `select SE_FID, SE_ID, CHECKBY, COALESCE(CONDUCTIVITY, 0) as conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, COALESCE(SEARCH_DAY, 0) as search_day, 
+SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, COALESCE(TEMP, 0) as temp, UPLOADED_BY, UPLOAD_FILENAME,
+UPLOAD_SESSION_ID, ds_id from ds_search where site_id = :1`
+
+var searchDataEntriesCountBySiteIdSql = `select count(*) from ds_search where site_id = :1`
+
+func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string, queryParams models.SearchParams) (models.SearchDataEntryWithCount, error) {
+	searchDataEntryWithCount := models.SearchDataEntryWithCount{}
+	query := ""
+	queryWithCount := ""
+	id := ""
+
+	if tableId != "" {
+		query = searchDataEntriesBySeIdSql
+		queryWithCount = searchDataEntriesCountBySeIdSql
+		id = tableId
+	}
+
+	if siteId != "" {
+		query = searchDataEntriesBySiteIdSql
+		queryWithCount = searchDataEntriesCountBySiteIdSql
+		id = siteId
+	}
+
+	if tableId == "" && siteId == "" {
+		query = searchDataEntriesSql
+		queryWithCount = searchDataEntriesCountSql
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
+	if err != nil {
+		return searchDataEntryWithCount, err
+	}
+
+	var countrows *sql.Rows
+	if id == "" {
+		countrows, err = countQuery.Query()
+		if err != nil {
+			return searchDataEntryWithCount, err
+		}
+	} else {
+		countrows, err = countQuery.Query(id)
+		if err != nil {
+			return searchDataEntryWithCount, err
+		}
+	}
+
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&searchDataEntryWithCount.TotalCount)
+		if err != nil {
+			return searchDataEntryWithCount, err
+		}
+	}
+
+	searchEntries := []models.UploadSearch{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "se_id"
+	}
+	searchDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(searchDataEntriesSqlWithSearch)
+	if err != nil {
+		return searchDataEntryWithCount, err
+	}
+
+	var rows *sql.Rows
+	if id == "" {
+		rows, err = dbQuery.Query()
+		if err != nil {
+			return searchDataEntryWithCount, err
+		}
+	} else {
+		rows, err = dbQuery.Query(id)
+		if err != nil {
+			return searchDataEntryWithCount, err
+		}
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		searchDataEntry := models.UploadSearch{}
+		err = rows.Scan(&searchDataEntry.SeFid, &searchDataEntry.SeId, &searchDataEntry.Checkby, &searchDataEntry.Conductivity, &searchDataEntry.EditInitials, &searchDataEntry.LastEditComment, &searchDataEntry.LastUpdated,
+			&searchDataEntry.Recorder, &searchDataEntry.SearchDate, &searchDataEntry.SearchDay, &searchDataEntry.SearchTypeCode, &searchDataEntry.SiteId, &searchDataEntry.StartLatitude, &searchDataEntry.StartLongitude,
+			&searchDataEntry.StartTime, &searchDataEntry.StopLatitude, &searchDataEntry.StopLongitude, &searchDataEntry.StopTime, &searchDataEntry.Temp, &searchDataEntry.UploadedBy, &searchDataEntry.UploadFilename,
+			&searchDataEntry.UploadSessionId, &searchDataEntry.DsId)
+		if err != nil {
+			return searchDataEntryWithCount, err
+		}
+		searchEntries = append(searchEntries, searchDataEntry)
+	}
+
+	searchDataEntryWithCount.Items = searchEntries
+
+	return searchDataEntryWithCount, err
+}
+
+var insertSearchDataSql = `insert into ds_search (se_id, SE_FID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE,
+SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
+UPLOAD_SESSION_ID, ds_id) values (search_seq.nextval,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21)`
+
+func (s *PallidSturgeonStore) SaveSearchDataEntry(searchDataEntry models.UploadSearch) error {
+	_, err := s.db.Exec(insertSearchDataSql, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
+		searchDataEntry.SearchDate, searchDataEntry.SearchTypeCode, searchDataEntry.SiteId, searchDataEntry.StartLatitude, searchDataEntry.StartLongitude, searchDataEntry.StartTime, searchDataEntry.StopLatitude,
+		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.DsId)
+	return err
+}
+
+var updateSearchDataSql = `UPDATE ds_search SET 
+SE_FID = :2,
+CHECKBY = :3,
+CONDUCTIVITY = :4,
+EDIT_INITIALS = :5,
+LAST_EDIT_COMMENT = :6,
+LAST_UPDATED = :7,
+RECORDER = :8,
+SEARCH_DATE = :9,
+SEARCH_DAY = :10,
+SEARCH_TYPE_CODE = :11,
+SITE_ID = :12,
+START_LATITUDE = :13,
+START_LONGITUDE = :14,
+START_TIME = :15,
+STOP_LATITUDE = :16,
+STOP_LONGITUDE = :17,
+STOP_TIME = :18,
+TEMP = :19,
+UPLOADED_BY = :20,
+UPLOAD_FILENAME = :21,
+UPLOAD_SESSION_ID = :22
+WHERE SE_ID = :1`
+
+func (s *PallidSturgeonStore) UpdateSearchDataEntry(searchDataEntry models.UploadSearch) error {
+	_, err := s.db.Exec(updateSearchDataSql, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
+		searchDataEntry.SearchDate, searchDataEntry.SearchDay, searchDataEntry.SearchTypeCode, searchDataEntry.SiteId, searchDataEntry.StartLatitude, searchDataEntry.StartLongitude, searchDataEntry.StartTime, searchDataEntry.StopLatitude,
+		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.SeId)
+	return err
+}
+
+var telemetryDataEntriesSql = `select BEND,CAPTURE_LATITUDE,CAPTURE_LONGITUDE,CAPTURE_TIME,CHECKBY,COMMENTS,COALESCE(CONDUCTIVITY,0) as conductivity,COALESCE(DEPTH,0) as depth,EDIT_INITIALS,
+FREQUENCY_ID_CODE,COALESCE(GRAVEL,0) as gravel,LAST_EDIT_COMMENT,LAST_UPDATED,MACRO_ID,MESO_ID,COALESCE(POSITION_CONFIDENCE,0) as position_confidence,RADIO_TAG_NUM,COALESCE(SAND,0) as sand,SE_FID,SE_ID,COALESCE(SILT,0) as silt,
+COALESCE(TEMP,0) as temp,COALESCE(TURBIDITY,0) as turbidity,T_FID,T_ID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID from ds_telemetry_fish`
+
+var telemetryDataEntriesCountSql = `select count(*) from from ds_telemetry_fish`
+
+var telemetryDataEntriesBySeIdSql = `select BEND,CAPTURE_LATITUDE,CAPTURE_LONGITUDE,CAPTURE_TIME,CHECKBY,COMMENTS,COALESCE(CONDUCTIVITY,0) as conductivity,COALESCE(DEPTH,0) as depth,EDIT_INITIALS,
+FREQUENCY_ID_CODE,COALESCE(GRAVEL,0) as gravel,LAST_EDIT_COMMENT,LAST_UPDATED,MACRO_ID,MESO_ID,POSITION_CONFIDENCE,RADIO_TAG_NUM,COALESCE(SAND,0) as sand,SE_FID,SE_ID,COALESCE(SILT,0) as silt,
+COALESCE(TEMP,0) as temp,COALESCE(TURBIDITY,0) as turbidity,T_FID,T_ID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID from ds_telemetry_fish where se_id = :1`
+
+var telemetryDataEntriesCountBySeIdSql = `select count(*) from ds_telemetry_fish where se_id = :1`
+
+var telemetryDataEntriesByTidSql = `select BEND,CAPTURE_LATITUDE,CAPTURE_LONGITUDE,CAPTURE_TIME,CHECKBY,COMMENTS,COALESCE(CONDUCTIVITY,0) as conductivity,COALESCE(DEPTH,0) as depth,EDIT_INITIALS,
+FREQUENCY_ID_CODE,COALESCE(GRAVEL,0) as gravel,LAST_EDIT_COMMENT,LAST_UPDATED,MACRO_ID,MESO_ID,COALESCE(POSITION_CONFIDENCE,0) as position_confidence,RADIO_TAG_NUM,COALESCE(SAND,0) as sand,SE_FID,SE_ID,COALESCE(SILT,0) as silt,
+COALESCE(TEMP,0) as temp,COALESCE(TURBIDITY,0) as turbidity,T_FID,T_ID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID from ds_telemetry_fish where t_id = :1`
+
+var telemetryDataEntriesCountByTidSql = `select count(*) from ds_telemetry_fish where t_id = :1`
+
+func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId string, queryParams models.SearchParams) (models.TelemetryDataEntryWithCount, error) {
+	telemetryDataEntryWithCount := models.TelemetryDataEntryWithCount{}
+	query := ""
+	queryWithCount := ""
+	id := ""
+
+	if tableId != "" {
+		query = telemetryDataEntriesByTidSql
+		queryWithCount = telemetryDataEntriesCountByTidSql
+		id = tableId
+	}
+
+	if seId != "" {
+		query = telemetryDataEntriesBySeIdSql
+		queryWithCount = telemetryDataEntriesCountBySeIdSql
+		id = seId
+	}
+
+	if tableId == "" && seId == "" {
+		query = telemetryDataEntriesSql
+		queryWithCount = telemetryDataEntriesCountSql
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
+	if err != nil {
+		return telemetryDataEntryWithCount, err
+	}
+
+	var countrows *sql.Rows
+	if id == "" {
+		countrows, err = countQuery.Query()
+		if err != nil {
+			return telemetryDataEntryWithCount, err
+		}
+	} else {
+		countrows, err = countQuery.Query(id)
+		if err != nil {
+			return telemetryDataEntryWithCount, err
+		}
+	}
+
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&telemetryDataEntryWithCount.TotalCount)
+		if err != nil {
+			return telemetryDataEntryWithCount, err
+		}
+	}
+
+	telemetryEntries := []models.UploadTelemetry{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "t_id"
+	}
+	telemetryDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(telemetryDataEntriesSqlWithSearch)
+	if err != nil {
+		return telemetryDataEntryWithCount, err
+	}
+
+	var rows *sql.Rows
+	if id == "" {
+		rows, err = dbQuery.Query()
+		if err != nil {
+			return telemetryDataEntryWithCount, err
+		}
+	} else {
+		rows, err = dbQuery.Query(id)
+		if err != nil {
+			return telemetryDataEntryWithCount, err
+		}
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		telemetryDataEntry := models.UploadTelemetry{}
+		err = rows.Scan(&telemetryDataEntry.Bend, &telemetryDataEntry.CaptureLatitude, &telemetryDataEntry.CaptureLongitude, &telemetryDataEntry.CaptureTime, &telemetryDataEntry.Checkby, &telemetryDataEntry.Comments, &telemetryDataEntry.Conductivity, &telemetryDataEntry.Depth,
+			&telemetryDataEntry.EditInitials, &telemetryDataEntry.FrequencyIdCode, &telemetryDataEntry.Gravel, &telemetryDataEntry.LastEditComment, &telemetryDataEntry.LastUpdated, &telemetryDataEntry.MacroId, &telemetryDataEntry.MesoId, &telemetryDataEntry.PositionConfidence,
+			&telemetryDataEntry.RadioTagNum, &telemetryDataEntry.Sand, &telemetryDataEntry.SeFid, &telemetryDataEntry.SeId, &telemetryDataEntry.Silt, &telemetryDataEntry.Temp, &telemetryDataEntry.Turbidity, &telemetryDataEntry.TFid, &telemetryDataEntry.TId, &telemetryDataEntry.UploadedBy,
+			&telemetryDataEntry.UploadFilename, &telemetryDataEntry.UploadSessionId)
+		if err != nil {
+			return telemetryDataEntryWithCount, err
+		}
+		telemetryEntries = append(telemetryEntries, telemetryDataEntry)
+	}
+
+	telemetryDataEntryWithCount.Items = telemetryEntries
+
+	return telemetryDataEntryWithCount, err
+}
+
+var insertTelemetryDataSql = `insert into ds_telemetry_fish (t_id, BEND,CAPTURE_LATITUDE,CAPTURE_LONGITUDE,CAPTURE_TIME,CHECKBY,COMMENTS,conductivity,depth,EDIT_INITIALS,FREQUENCY_ID_CODE,gravel,LAST_EDIT_COMMENT,
+	LAST_UPDATED,MACRO_ID,MESO_ID,POSITION_CONFIDENCE,RADIO_TAG_NUM,sand,SE_FID,SE_ID,silt,temp,turbidity,T_FID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID) 
+	values (telemetry_id_seq.nextval, :1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27)`
+
+func (s *PallidSturgeonStore) SaveTelemetryDataEntry(telemetryDataEntry models.UploadTelemetry) error {
+	_, err := s.db.Exec(insertTelemetryDataSql, telemetryDataEntry.Bend, telemetryDataEntry.CaptureLatitude, telemetryDataEntry.CaptureLongitude, telemetryDataEntry.CaptureTime, telemetryDataEntry.Checkby, telemetryDataEntry.Comments, telemetryDataEntry.Conductivity, telemetryDataEntry.Depth,
+		telemetryDataEntry.EditInitials, telemetryDataEntry.FrequencyIdCode, telemetryDataEntry.Gravel, telemetryDataEntry.LastEditComment, telemetryDataEntry.LastUpdated, telemetryDataEntry.MacroId, telemetryDataEntry.MesoId, telemetryDataEntry.PositionConfidence, telemetryDataEntry.RadioTagNum,
+		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId)
+	return err
+}
+
+var updateTelemetryDataSql = `UPDATE ds_telemetry_fish SET 
+BEND = :2,
+CAPTURE_LATITUDE = :3,
+CAPTURE_LONGITUDE = :4,
+CAPTURE_TIME = :5,
+CHECKBY = :6,
+COMMENTS = :7,
+CONDUCTIVITY = :8,
+DEPTH = :9,
+EDIT_INITIALS = :10,
+FREQUENCY_ID_CODE = :11,
+GRAVEL = :12,
+LAST_EDIT_COMMENT = :13,
+LAST_UPDATED = :14,
+MACRO_ID = :15,
+MESO_ID = :16,
+POSITION_CONFIDENCE = :17,
+RADIO_TAG_NUM = :18,
+SAND = :19,
+SE_FID = :20,
+SE_ID = :21,
+SILT = :22,
+TEMP = :23,
+TURBIDITY = :24,
+T_FID = :25,
+UPLOADED_BY = :26,
+UPLOAD_FILENAME = :27,
+UPLOAD_SESSION_ID = :28
+WHERE T_ID = :1`
+
+func (s *PallidSturgeonStore) UpdateTelemetryDataEntry(telemetryDataEntry models.UploadTelemetry) error {
+	_, err := s.db.Exec(updateTelemetryDataSql, telemetryDataEntry.Bend, telemetryDataEntry.CaptureLatitude, telemetryDataEntry.CaptureLongitude, telemetryDataEntry.CaptureTime, telemetryDataEntry.Checkby, telemetryDataEntry.Comments, telemetryDataEntry.Conductivity, telemetryDataEntry.Depth,
+		telemetryDataEntry.EditInitials, telemetryDataEntry.FrequencyIdCode, telemetryDataEntry.Gravel, telemetryDataEntry.LastEditComment, telemetryDataEntry.LastUpdated, telemetryDataEntry.MacroId, telemetryDataEntry.MesoId, telemetryDataEntry.PositionConfidence, telemetryDataEntry.RadioTagNum,
+		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId, telemetryDataEntry.TId)
+	return err
+}
+
 var fishDataSummaryFullDataSql = `select * FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
