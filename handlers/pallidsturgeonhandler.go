@@ -335,6 +335,100 @@ func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) err
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
+func (sd *PallidSturgeonHandler) GetSearchDataEntries(c echo.Context) error {
+	tableId, siteId := c.QueryParam("tableId"), c.QueryParam("siteId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	dataSummary, err := sd.Store.GetSearchDataEntries(tableId, siteId, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
+	searchData := models.UploadSearch{}
+	if err := c.Bind(&searchData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	searchData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	searchData.UploadedBy = user.FirstName + " " + user.LastName
+	// @TODO: remove hardcoded value and fix date formatting
+	searchData.SearchDate = "12-Dec-2022"
+	err := sd.Store.SaveSearchDataEntry(searchData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, err)
+}
+
+func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
+	searchData := models.UploadSearch{}
+	if err := c.Bind(&searchData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	searchData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	searchData.UploadedBy = user.FirstName + " " + user.LastName
+	// @TODO: remove hardcoded value and fix date formatting
+	searchData.SearchDate = "12-Dec-2022"
+	err := sd.Store.UpdateSearchDataEntry(searchData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
+	tableId, seId := c.QueryParam("tableId"), c.QueryParam("seId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	dataSummary, err := sd.Store.GetTelemetryDataEntries(tableId, seId, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) SaveTelemetryDataEntry(c echo.Context) error {
+	telemetryData := models.UploadTelemetry{}
+	if err := c.Bind(&telemetryData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	telemetryData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	telemetryData.UploadedBy = user.FirstName + " " + user.LastName
+	err := sd.Store.SaveTelemetryDataEntry(telemetryData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, err)
+}
+
+func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error {
+	telemetryData := models.UploadTelemetry{}
+	if err := c.Bind(&telemetryData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	telemetryData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	telemetryData.UploadedBy = user.FirstName + " " + user.LastName
+	err := sd.Store.UpdateTelemetryDataEntry(telemetryData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
 func (sd *PallidSturgeonHandler) GetFullFishDataSummary(c echo.Context) error {
 	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 

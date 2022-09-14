@@ -386,6 +386,11 @@ type UploadFish struct {
 	Fieldoffice     string    `db:"FIELDOFFICE" json:"fieldOffice"`
 }
 
+type SearchDataEntryWithCount struct {
+	Items      []UploadSearch `json:"items"`
+	TotalCount int            `json:"totalCount"`
+}
+
 type UploadSearchData struct {
 	Items          []UploadSearch `json:"items"`
 	UploadFilename string         `db:"upload_filename" json:"uploadFilename"`
@@ -411,6 +416,7 @@ type UploadSearch struct {
 	StopLongitude   float64   `db:"stop_longitude" json:"stopLongitude"`
 	Temp            float64   `db:"temp" json:"temp"`
 	Conductivity    float64   `db:"conductivity" json:"conductivity"`
+	Checkby         string    `db:"checkby" json:"checkby"`
 	EditInitials    string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
 	LastUpdated     time.Time `db:"last_updated" json:"lastUpdated"`
@@ -632,15 +638,21 @@ type UploadMoriver struct {
 	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
 }
 
+type TelemetryDataEntryWithCount struct {
+	Items      []UploadTelemetry `json:"items"`
+	TotalCount int               `json:"totalCount"`
+}
+
 type UploadTelemetryData struct {
 	Items          []UploadTelemetry `json:"items"`
 	UploadFilename string            `db:"upload_filename" json:"uploadFilename"`
 }
 
 type UploadTelemetry struct {
-	TId                string    `db:"t_id" json:"tId"`
+	TId                int       `db:"t_id" json:"tId"`
 	TFid               string    `db:"t_fid" json:"tFid"`
 	SeFid              string    `db:"se_fid" json:"seFieldId"`
+	SeId               int       `db:"se_id" json:"seId"`
 	Bend               float64   `db:"bend" json:"bend"`
 	RadioTagNum        int       `db:"radio_tag_num" json:"radioTagNum"`
 	FrequencyIdCode    int       `db:"frequency_id_code" json:"frequencyIdCode"`
@@ -657,6 +669,7 @@ type UploadTelemetry struct {
 	Silt               float64   `db:"silt" json:"silt"`
 	Sand               float64   `db:"sand" json:"sand"`
 	Gravel             float64   `db:"gravel" json:"gravel"`
+	Checkby            string    `db:"checkby" json:"checkby"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment    string    `db:"last_edit_comment" json:"lastEditComment"`
 	Comments           string    `db:"comments" json:"comments"`

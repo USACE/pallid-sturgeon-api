@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"time"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/labstack/echo/v4"
@@ -12,7 +12,7 @@ import (
 func processTimeString(st string) time.Time {
 	t := time.Time{}
 	if len(st) > 0 {
-		if !strings.HasPrefix(st, "1")  {
+		if !strings.HasPrefix(st, "1") {
 			st = "0" + st
 		}
 		test, err := time.Parse("01/02/2006", st)
@@ -23,7 +23,6 @@ func processTimeString(st string) time.Time {
 	}
 
 	return t
-
 }
 
 func marshalQuery(c echo.Context) (models.SearchParams, error) {
