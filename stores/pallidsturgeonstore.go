@@ -263,6 +263,69 @@ func (s *PallidSturgeonStore) GetBendRn() ([]models.BendRn, error) {
 	return bendRnsItems, err
 }
 
+func (s *PallidSturgeonStore) GetMeso(macro string) ([]models.Meso, error) {
+	rows, err := s.db.Query("select MESOHABITAT_CODE from macro_meso_lk where MACROHABITAT_CODE = :1 order by 1 asc", macro)
+
+	mesoItems := []models.Meso{}
+	if err != nil {
+		return mesoItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		meso := models.Meso{}
+		err = rows.Scan(&meso.Code)
+		if err != nil {
+			return nil, err
+		}
+		mesoItems = append(mesoItems, meso)
+	}
+
+	return mesoItems, err
+}
+
+func (s *PallidSturgeonStore) GetStructureFlow(microStructure string) ([]models.StructureFlow, error) {
+	rows, err := s.db.Query("select structure_flow, structure_flow_code from micro_habitat_desc_lk where micro_structure_code = :1 group by structure_flow, structure_flow_code", microStructure)
+
+	structureFlowItems := []models.StructureFlow{}
+	if err != nil {
+		return structureFlowItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		structureFlow := models.StructureFlow{}
+		err = rows.Scan(&structureFlow.Code, &structureFlow.ID)
+		if err != nil {
+			return nil, err
+		}
+		structureFlowItems = append(structureFlowItems, structureFlow)
+	}
+
+	return structureFlowItems, err
+}
+
+func (s *PallidSturgeonStore) GetStructureMod(structureFlow string) ([]models.StructureMod, error) {
+	rows, err := s.db.Query("select structure_mod, structure_mod_code from micro_habitat_desc_lk where structure_flow_code = :1 group by structure_mod, structure_mod_code", structureFlow)
+
+	structureModItems := []models.StructureMod{}
+	if err != nil {
+		return structureModItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		structureMod := models.StructureMod{}
+		err = rows.Scan(&structureMod.Description, &structureMod.Code)
+		if err != nil {
+			return nil, err
+		}
+		structureModItems = append(structureModItems, structureMod)
+	}
+
+	return structureModItems, err
+}
+
 var siteDataEntriesSql = `select site_id, year, fieldoffice, project_id, segment_id, season, bend, bendrn, season_description, project_description, segment_description, river_description, bend_river_mile, complete, bkg_color, sample_unit_type, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
 
 var siteDataEntriesCountSql = `SELECT count(*) from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
@@ -590,7 +653,7 @@ var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PR
 func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.UploadMoriver) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertMoriverDataSql, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
-		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.SetDateTime, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
+		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.SetDate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
 		moriverDataEntry.SubsampleROrN, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
 		moriverDataEntry.Distance, moriverDataEntry.Width, moriverDataEntry.Netrivermile, moriverDataEntry.Structurenumber, moriverDataEntry.Usgs, moriverDataEntry.Riverstage, moriverDataEntry.Discharge,
 		moriverDataEntry.U1, moriverDataEntry.U2, moriverDataEntry.U3, moriverDataEntry.U4, moriverDataEntry.U5, moriverDataEntry.U6, moriverDataEntry.U7, moriverDataEntry.Macro, moriverDataEntry.Meso, moriverDataEntry.Habitatrn, moriverDataEntry.Qc,

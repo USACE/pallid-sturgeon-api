@@ -105,6 +105,33 @@ func (sd *PallidSturgeonHandler) GetBendRn(c echo.Context) error {
 	return c.JSON(http.StatusOK, bends)
 }
 
+func (sd *PallidSturgeonHandler) GetMeso(c echo.Context) error {
+	macro := c.QueryParam("macro")
+	mesoItems, err := sd.Store.GetMeso(macro)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, mesoItems)
+}
+
+func (sd *PallidSturgeonHandler) GetStructureFlow(c echo.Context) error {
+	microStructure := c.QueryParam("microStructure")
+	structureFlowItems, err := sd.Store.GetStructureFlow(microStructure)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, structureFlowItems)
+}
+
+func (sd *PallidSturgeonHandler) GetStructureMod(c echo.Context) error {
+	structureFlow := c.QueryParam("structureFlow")
+	structureModItems, err := sd.Store.GetStructureMod(structureFlow)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, structureModItems)
+}
+
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	year, projectCode, segmentCode, seasonCode, bendrn := c.QueryParam("year"), c.QueryParam("projectCode"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn")
 	queryParams, err := marshalQuery(c)
@@ -263,8 +290,8 @@ func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
-	// TODO: figure out setdate format and remove this hardcoded value
-	moriverData.SetDateTime = time.Now()
+	// @TODO: remove hardcoded value and fix date formatting
+	moriverData.SetDate = "12-Dec-2022"
 	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -274,7 +301,6 @@ func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
-
 	moriverData := models.UploadMoriver{}
 	if err := c.Bind(&moriverData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -282,6 +308,8 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
+	// @TODO: remove hardcoded value and fix date formatting
+	moriverData.SetDate = "12-Dec-2022"
 	err := sd.Store.UpdateMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())

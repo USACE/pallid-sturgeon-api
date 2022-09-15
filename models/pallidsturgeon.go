@@ -64,6 +64,20 @@ type Project struct {
 	Description string `db:"project_description" json:"description"`
 }
 
+type Meso struct {
+	Code string `db:"mesohabitat_code" json:"code"`
+}
+
+type StructureFlow struct {
+	ID   int    `db:"structure_flow_code" json:"id"`
+	Code string `db:"structure_flow" json:"code"`
+}
+
+type StructureMod struct {
+	Code        string `db:"structure_mod_code" json:"code"`
+	Description string `db:"structure_mod" json:"description"`
+}
+
 type FishSummaryWithCount struct {
 	Items      []FishSummary `json:"items"`
 	TotalCount int           `json:"totalCount"`
