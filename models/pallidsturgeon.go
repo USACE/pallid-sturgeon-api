@@ -78,6 +78,24 @@ type StructureMod struct {
 	Description string `db:"structure_mod" json:"description"`
 }
 
+type Species struct {
+	Code string `db:"alpha_code" json:"code"`
+}
+
+type FtPrefix struct {
+	Code string `db:"tag_prefix_code" json:"code"`
+}
+
+type Mr struct {
+	Code        string `db:"mark_recapture_code" json:"code"`
+	Description string `db:"mark_recapture_description" json:"description"`
+}
+
+type Otolith struct {
+	Code        string `db:"code" json:"code"`
+	Description string `db:"description" json:"description"`
+}
+
 type FishSummaryWithCount struct {
 	Items      []FishSummary `json:"items"`
 	TotalCount int           `json:"totalCount"`
@@ -368,36 +386,38 @@ type UploadFishData struct {
 // }
 
 type UploadFish struct {
-	Id              *int      `db:"id" json:"id"`
-	SiteID          int       `db:"site_id" json:"siteId"`
-	MrFid           string    `db:"mr_fid" json:"mrFid"`
-	Fid             int       `db:"f_id" json:"fid"`
-	Ffid            string    `db:"f_fid" json:"ffid"`
-	MrID            *int      `db:"mr_id" json:"mrId"`
-	Panelhook       string    `db:"panelhook" json:"panelHook"`
-	Bait            string    `db:"bait" json:"bait"`
-	Species         string    `db:"species" json:"species"`
-	Length          *float32  `db:"length" json:"length"`
-	Weight          *float32  `db:"weight" json:"weight"`
-	Fishcount       int       `db:"fishcount" json:"countF"`
-	FinCurl         string    `db:"fin_curl" json:"finCurl"`
-	Otolith         string    `db:"otolith" json:"otolith"`
-	Rayspine        string    `db:"rayspine" json:"raySpine"`
-	Scale           string    `db:"scale" json:"scale"`
-	Ftprefix        string    `db:"ftprefix" json:"ftPrefix"`
-	Ftnum           string    `db:"ftnum" json:"ftnum"`
-	Ftmr            string    `db:"ftmr" json:"mR"`
-	Comments        string    `db:"comments" json:"comments"`
-	LastUpdated     time.Time `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId int       `db:"upload_session_id" json:"uploadSessionId"`
-	EditInitials    string    `db:"edit_initials" json:"editInitials"`
-	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
-	UploadedBy      string    `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename  string    `db:"upload_filename" json:"uploadFilename"`
-	Project         *int      `db:"PROJECT_ID" json:"project"`
-	UniqueID        *int      `db:"uniqueidentifier" json:"uniqueID"`
-	Segment         *int      `db:"SEGMENT_ID" json:"segment"`
-	Fieldoffice     string    `db:"FIELDOFFICE" json:"fieldOffice"`
+	Id                 *int      `db:"id" json:"id"`
+	SiteID             int       `db:"site_id" json:"siteId"`
+	MrFid              string    `db:"mr_fid" json:"mrFid"`
+	Fid                int       `db:"f_id" json:"fid"`
+	Ffid               string    `db:"f_fid" json:"ffid"`
+	MrID               *int      `db:"mr_id" json:"mrId"`
+	Panelhook          string    `db:"panelhook" json:"panelHook"`
+	Bait               string    `db:"bait" json:"bait"`
+	Species            string    `db:"species" json:"species"`
+	Length             *float32  `db:"length" json:"length"`
+	Weight             *float32  `db:"weight" json:"weight"`
+	Fishcount          int       `db:"fishcount" json:"countF"`
+	FinCurl            string    `db:"fin_curl" json:"finCurl"`
+	Otolith            string    `db:"otolith" json:"otolith"`
+	Rayspine           string    `db:"rayspine" json:"raySpine"`
+	Scale              string    `db:"scale" json:"scale"`
+	Ftprefix           string    `db:"ftprefix" json:"ftPrefix"`
+	Ftnum              string    `db:"ftnum" json:"ftnum"`
+	Ftmr               string    `db:"ftmr" json:"mR"`
+	Comments           string    `db:"comments" json:"comments"`
+	Approved           int       `db:"approved" json:"approved"`
+	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
+	EditInitials       string    `db:"edit_initials" json:"editInitials"`
+	LastEditComment    string    `db:"last_edit_comment" json:"lastEditComment"`
+	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
+	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+	Project            *int      `db:"PROJECT_ID" json:"project"`
+	UniqueID           *int      `db:"uniqueidentifier" json:"uniqueID"`
+	Segment            *int      `db:"SEGMENT_ID" json:"segment"`
+	Fieldoffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
+	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
 }
 
 type SearchDataEntryWithCount struct {

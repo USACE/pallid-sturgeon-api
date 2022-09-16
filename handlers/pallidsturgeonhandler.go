@@ -132,6 +132,38 @@ func (sd *PallidSturgeonHandler) GetStructureMod(c echo.Context) error {
 	return c.JSON(http.StatusOK, structureModItems)
 }
 
+func (sd *PallidSturgeonHandler) GetSpecies(c echo.Context) error {
+	species, err := sd.Store.GetSpecies()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, species)
+}
+
+func (sd *PallidSturgeonHandler) GetFtPrefixes(c echo.Context) error {
+	ftPrefixes, err := sd.Store.GetFtPrefixes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, ftPrefixes)
+}
+
+func (sd *PallidSturgeonHandler) GetMr(c echo.Context) error {
+	mr, err := sd.Store.GetMr()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, mr)
+}
+
+func (sd *PallidSturgeonHandler) GetOtolith(c echo.Context) error {
+	otolith, err := sd.Store.GetOtolith()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, otolith)
+}
+
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	year, projectCode, segmentCode, seasonCode, bendrn := c.QueryParam("year"), c.QueryParam("projectCode"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn")
 	queryParams, err := marshalQuery(c)

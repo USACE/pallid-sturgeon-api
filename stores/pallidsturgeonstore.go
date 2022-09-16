@@ -326,6 +326,90 @@ func (s *PallidSturgeonStore) GetStructureMod(structureFlow string) ([]models.St
 	return structureModItems, err
 }
 
+func (s *PallidSturgeonStore) GetSpecies() ([]models.Species, error) {
+	rows, err := s.db.Query("select alpha_code from fish_code_lk order by 1 asc")
+
+	speciesItems := []models.Species{}
+	if err != nil {
+		return speciesItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		species := models.Species{}
+		err = rows.Scan(&species.Code)
+		if err != nil {
+			return nil, err
+		}
+		speciesItems = append(speciesItems, species)
+	}
+
+	return speciesItems, err
+}
+
+func (s *PallidSturgeonStore) GetFtPrefixes() ([]models.FtPrefix, error) {
+	rows, err := s.db.Query("select tag_prefix_code from floy_tag_prefix_code_lk order by 1 asc")
+
+	ftPrefixItems := []models.FtPrefix{}
+	if err != nil {
+		return ftPrefixItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		ftPrefix := models.FtPrefix{}
+		err = rows.Scan(&ftPrefix.Code)
+		if err != nil {
+			return nil, err
+		}
+		ftPrefixItems = append(ftPrefixItems, ftPrefix)
+	}
+
+	return ftPrefixItems, err
+}
+
+func (s *PallidSturgeonStore) GetMr() ([]models.Mr, error) {
+	rows, err := s.db.Query("select mark_recapture_code, mark_recapture_description from mark_recapture_lk order by 1 asc")
+
+	mrItems := []models.Mr{}
+	if err != nil {
+		return mrItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		mr := models.Mr{}
+		err = rows.Scan(&mr.Code, &mr.Description)
+		if err != nil {
+			return nil, err
+		}
+		mrItems = append(mrItems, mr)
+	}
+
+	return mrItems, err
+}
+
+func (s *PallidSturgeonStore) GetOtolith() ([]models.Otolith, error) {
+	rows, err := s.db.Query("select code, description from fish_structure_lk order by 1 asc")
+
+	otolithItems := []models.Otolith{}
+	if err != nil {
+		return otolithItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		otolith := models.Otolith{}
+		err = rows.Scan(&otolith.Code, &otolith.Description)
+		if err != nil {
+			return nil, err
+		}
+		otolithItems = append(otolithItems, otolith)
+	}
+
+	return otolithItems, err
+}
+
 var siteDataEntriesSql = `select site_id, year, fieldoffice, project_id, segment_id, season, bend, bendrn, season_description, project_description, segment_description, river_description, bend_river_mile, complete, bkg_color, sample_unit_type, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
 
 var siteDataEntriesCountSql = `SELECT count(*) from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
@@ -481,19 +565,14 @@ edit_initials, last_edit_comment, uploaded_by from ds_fish where fieldoffice = :
 var fishDataEntriesCountSql = `select count(*) from ds_fish where fieldoffice = :1`
 
 var fishDataEntriesByFidSql = `select f_id, f_fid, fieldoffice, project, segment, uniqueidentifier, id, panelhook, bait, species, length, weight, fishcount, otolith, rayspine, scale, ftprefix, ftnum, ftmr, mr_id,
-edit_initials, last_edit_comment, uploaded_by from ds_fish where f_id = :1 and fieldoffice = :2`
+edit_initials, last_edit_comment, uploaded_by from ds_fish where f_id = :1`
 
-var fishDataEntriesCountByFidSql = `select count(*) from ds_fish where f_id = :1 and fieldoffice = :2`
+var fishDataEntriesCountByFidSql = `select count(*) from ds_fish where f_id = :1`
 
 var fishDataEntriesByFfidSql = `select f_id, f_fid, fieldoffice, project, segment, uniqueidentifier, id, panelhook, bait, species, length, weight, fishcount, otolith, rayspine, scale, ftprefix, ftnum, ftmr, mr_id,
-edit_initials, last_edit_comment, uploaded_by from ds_fish where f_fid = :1 and fieldoffice = :2`
+edit_initials, last_edit_comment, uploaded_by from ds_fish where f_fid = :1`
 
-var fishDataEntriesCountByFfidSql = `select count(*) from ds_fish where f_fid = :1 and fieldoffice = :2`
-
-// var fishDataEntriesByMridSql = `select f_id, f_fid, fieldoffice, project, segment, uniqueidentifier, id, panelhook, bait, species, length, weight, fishcount, otolith, rayspine, scale, ftprefix, ftnum, ftmr, mr_id,
-// edit_initials, last_edit_comment, uploaded_by from ds_fish where mr_id = :1 and fieldoffice = :2`
-
-// var fishDataEntriesCountByMridSql = `select count(*) from ds_fish where mr_id = :1 and fieldoffice = :2`
+var fishDataEntriesCountByFfidSql = `select count(*) from ds_fish where f_fid = :1`
 
 var fishDataEntriesByMridSql = `select f_id, f_fid, fieldoffice, project, segment, uniqueidentifier, id, panelhook, bait, species, length, weight, fishcount, otolith, rayspine, scale, ftprefix, ftnum, ftmr, mr_id,
 edit_initials, last_edit_comment, uploaded_by from ds_fish where mr_id = :1`
@@ -536,7 +615,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 
 	var countrows *sql.Rows
 	if id == "" {
-		countrows, err = countQuery.Query()
+		countrows, err = countQuery.Query(officeCode)
 		if err != nil {
 			return fishDataEntryWithCount, err
 		}
@@ -569,7 +648,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 
 	var rows *sql.Rows
 	if id == "" {
-		rows, err = dbQuery.Query()
+		rows, err = dbQuery.Query(officeCode)
 		if err != nil {
 			return fishDataEntryWithCount, err
 		}
@@ -597,46 +676,47 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	return fishDataEntryWithCount, err
 }
 
-var insertFishDataSql = `insert into ds_fish (f_fid,FIELDOFFICE,PROJECT_ID,SEGMENT_ID,uniqueidentifier,id,panelhook,bait,SPECIES_ID,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23) returning f_id into :24`
+var insertFishDataSql = `insert into ds_fish (FIELDOFFICE,PROJECT,SEGMENT,uniqueidentifier,id,panelhook,bait,SPECIES,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22) returning f_id into :23`
 
 func (s *PallidSturgeonStore) SaveFishDataEntry(fishDataEntry models.UploadFish) (int, error) {
 	var id int
-	_, err := s.db.Exec(insertFishDataSql, fishDataEntry.Ffid, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
+	_, err := s.db.Exec(insertFishDataSql, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
 		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.MrID, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy, sql.Out{Dest: &id})
 
 	return id, err
 }
 
-var updateFishDataSql = `UPDATE ds_fish
-SET   f_fid = :2,
-	  FIELDOFFICE = :3,
-	  PROJECT_ID = :4,
-	  SEGMENT_ID = :5,
-	  uniqueidentifier = :6,
-	  id = :7,
-	  panelhook = :8,
-	  bait = :9,
-	  SPECIES_ID = :10,
-	  length = :11,
-	  weight = :12,
-	  FISHCOUNT = :13,
-	  otolith = :14,
-	  rayspine = :15,
-	  scale = :16,
-	  FTPREFIX = :17,
-	  FTNUM = :18,
-	  FTMR = :19,
-	  edit_initials = :20,
-	  last_edit_comment = :21,
-	  last_updated = :22, 
-	  uploaded_by = :23
+var updateFishDataSql = `UPDATE ds_fish SET
+FIELDOFFICE = :2,
+PROJECT = :3,
+SEGMENT = :4,
+uniqueidentifier = :5,
+id = :6,
+panelhook = :7,
+bait = :8,
+SPECIES = :9,
+length = :10,
+weight = :11,
+FISHCOUNT = :12,
+otolith = :13,
+rayspine = :14,
+scale = :15,
+FTPREFIX = :16,
+FTNUM = :17,
+FTMR = :18,
+edit_initials = :19,
+last_edit_comment = :20,
+last_updated = :21, 
+uploaded_by = :22,
+genetics_vial_number = :23
 WHERE f_id = :1`
 
 func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFish) error {
-	_, err := s.db.Exec(updateFishDataSql, fishDataEntry.Ffid, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
+	_, err := s.db.Exec(updateFishDataSql, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
-		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy, fishDataEntry.Fid)
+		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy,
+		fishDataEntry.GeneticsVialNumber, fishDataEntry.Fid)
 	return err
 }
 
