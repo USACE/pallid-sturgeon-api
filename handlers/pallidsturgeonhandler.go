@@ -350,13 +350,13 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) error {
-	tableId, fieldId, geneticsVial, pitTag, mrId := c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("geneticsVial"), c.QueryParam("pitTag"), c.QueryParam("mrId")
+	tableId, fieldId, geneticsVial, pitTag, mrId, fId := c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("geneticsVial"), c.QueryParam("pitTag"), c.QueryParam("mrId"), c.QueryParam("fId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, mrId, queryParams)
+	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, mrId, fId, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -371,12 +371,12 @@ func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error
 	supplementalData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	supplementalData.UploadedBy = user.FirstName + " " + user.LastName
-	id, err := sd.Store.SaveSupplementalDataEntry(supplementalData)
+	err := sd.Store.SaveSupplementalDataEntry(supplementalData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(200, id)
+	return c.JSON(200, err)
 }
 
 func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) error {
