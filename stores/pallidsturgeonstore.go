@@ -876,21 +876,12 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	return moriverDataEntryWithCount, err
 }
 
-var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,
-	TAGNUMBER, PITRN,
-	SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM_2,
-	ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic_y_n_or_u, genetics_vial_number,
-	BROODSTOCK, HATCH_WILD, species_id,
-	head, snouttomouth, inter, mouthwidth, m_ib,
-	l_ob, l_ib, r_ib,
-	r_ob, anal, dorsal, status, HATCHERY_ORIGIN,
-	SEX, stage,  recapture, photo,
-	genetic_needs, other_tag_info,
-	comments,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44, :45) returning s_id into :46`
+var insertSupplementalDataSql = `insert into ds_supplemental(s_id, f_id, f_fid, mr_id,TAGNUMBER, PITRN,SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM2,ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic, genetics_vial_number,
+BROODSTOCK, HATCH_WILD, species_id,head, snouttomouth, inter, mouthwidth, m_ib,l_ob, l_ib, r_ib,r_ob, anal, dorsal, status, HATCHERY_ORIGIN,SEX, stage, recapture, photo,genetic_needs, other_tag_info,comments,
+edit_initials,last_edit_comment, last_updated, uploaded_by) 
+values (supp_seq.nextval,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44)`
 
-func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
-	var id int
+func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) error {
 	_, err := s.db.Exec(insertSupplementalDataSql,
 		supplementalDataEntry.Fid,
 		supplementalDataEntry.FFid,
@@ -935,25 +926,56 @@ func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry mo
 		supplementalDataEntry.EditInitials,
 		supplementalDataEntry.LastEditComment,
 		supplementalDataEntry.LastUpdated,
-		supplementalDataEntry.UploadedBy,
-		sql.Out{Dest: &id})
-	return id, err
+		supplementalDataEntry.UploadedBy)
+	return err
 }
 
-var updateSupplementalDataSql = `UPDATE ds_supplemental
-SET   f_fid = :2,mr_id = :3,TAGNUMBER = :4, PITRN = :5, SCUTELOC = :6, 
-		SCUTENUM = :7, SCUTELOC2  = :8, SCUTENUM_2 = :9, ELHV = :10, ELCOLOR = :11, ERHV = :12, 
-		ERCOLOR = :13, CWTYN  = :14, DANGLER = :15, genetic_y_n_or_u = :16, genetics_vial_number = :17,
-		BROODSTOCK = :18, HATCH_WILD = :19, 
-		head = :20, snouttomouth = :21, inter = :22, mouthwidth = :23, m_ib = :24, l_ob = :25, l_ib = :26, r_ib = :27, 
-		r_ob = :28, anal = :29, dorsal = :30, status = :31, HATCHERY_ORIGIN = :32, SEX = :33, stage = :34,  recapture = :35, 
-		photo = :36, genetic_needs = :37, other_tag_info = :38, comments = :39, f_id = :40,
-		edit_initials = :41,
-		last_edit_comment = :42,	
-		last_updated = :43, 
-		uploaded_by = :44,
-		species_id = :45
-WHERE f_id = :1`
+var updateSupplementalDataSql = `UPDATE ds_supplemental SET 
+f_fid = :2,
+mr_id = :3,
+TAGNUMBER = :4, 
+PITRN = :5, 
+SCUTELOC = :6, 
+SCUTENUM = :7, 
+SCUTELOC2  = :8, 
+SCUTENUM2 = :9, 
+ELHV = :10, 
+ELCOLOR = :11, 
+ERHV = :12, 
+ERCOLOR = :13, 
+CWTYN  = :14, 
+DANGLER = :15, 
+genetic = :16, 
+genetics_vial_number = :17,
+BROODSTOCK = :18, 
+HATCH_WILD = :19, 
+head = :20, 
+snouttomouth = :21, 
+inter = :22, 
+mouthwidth = :23, 
+m_ib = :24, 
+l_ob = :25, 
+l_ib = :26, 
+r_ib = :27, 
+r_ob = :28, 
+anal = :29, 
+dorsal = :30, 
+status = :31, 
+HATCHERY_ORIGIN = :32, 
+SEX = :33, 
+stage = :34,  
+recapture = :35, 
+photo = :36, 
+genetic_needs = :37, 
+other_tag_info = :38, 
+comments = :39, 
+f_id = :40,
+edit_initials = :41,
+last_edit_comment = :42,	
+last_updated = :43, 
+uploaded_by = :44,
+species_id = :45
+WHERE s_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) error {
 	_, err := s.db.Exec(updateSupplementalDataSql,
@@ -1000,51 +1022,69 @@ func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry 
 		supplementalDataEntry.LastEditComment,
 		supplementalDataEntry.LastUpdated,
 		supplementalDataEntry.UploadedBy,
-		supplementalDataEntry.Sid,
-		supplementalDataEntry.SpeciesId)
+		supplementalDataEntry.SpeciesId,
+		supplementalDataEntry.Sid)
 	return err
 }
 
-var supplementalDataEntriesByFidSql = `select f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
+var supplementalDataEntriesSql = `select s_id, f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
+broodstock, hatch_wild, species_id, head, snouttomouth, inter, mouthwidth, m_ib, l_ob, l_ib, r_ib, r_ob, anal, dorsal, status, hatchery_origin, sex, stage, recapture, photo, genetic_needs, other_tag_info, 
+comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental`
+
+var supplementalDataEntriesCountBySql = `SELECT count(*) FROM ds_supplemental`
+
+var supplementalDataEntriesByFidSql = `select s_id, f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
 broodstock, hatch_wild, species_id, head, snouttomouth, inter, mouthwidth, m_ib, l_ob, l_ib, r_ib, r_ob, anal, dorsal, status, hatchery_origin, sex, stage, recapture, photo, genetic_needs, other_tag_info, 
 comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_id = :1 `
 
 var supplementalDataEntriesCountByFidSql = `SELECT count(*) FROM ds_supplemental where f_id = :1`
 
-var supplementalDataEntriesByFfidSql = `select f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
+var supplementalDataEntriesByFfidSql = `select s_id, f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
 broodstock, hatch_wild, species_id, head, snouttomouth, inter, mouthwidth, m_ib, l_ob, l_ib, r_ib, r_ob, anal, dorsal, status, hatchery_origin, sex, stage, recapture, photo, genetic_needs, other_tag_info, 
 comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where f_fid = :1`
 
 var supplementalDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_supplemental where f_fid = :1`
 
-var supplementalDataEntriesByGeneticsVialSql = `select f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
+var supplementalDataEntriesByGeneticsVialSql = `select s_id, f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
 broodstock, hatch_wild, species_id, head, snouttomouth, inter, mouthwidth, m_ib, l_ob, l_ib, r_ib, r_ob, anal, dorsal, status, hatchery_origin, sex, stage, recapture, photo, genetic_needs, other_tag_info, 
 comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where genetics_vial_number = :1 `
 
 var supplementalDataEntriesCountByGeneticsVialSql = `SELECT count(*) FROM ds_supplemental where genetics_vial_number = :1`
 
-var supplementalDataEntriesByGeneticsPitTagSql = `select f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
+var supplementalDataEntriesByGeneticsPitTagSql = `select s_id, f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
 broodstock, hatch_wild, species_id, head, snouttomouth, inter, mouthwidth, m_ib, l_ob, l_ib, r_ib, r_ob, anal, dorsal, status, hatchery_origin, sex, stage, recapture, photo, genetic_needs, other_tag_info, 
 comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where TAGNUMBER = :1 `
 
 var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) FROM ds_supplemental where TAGNUMBER = :1 `
 
-var supplementalDataEntriesByMrIdSql = `select f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
+var supplementalDataEntriesByMrIdSql = `select s_id, f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
 broodstock, hatch_wild, species_id, head, snouttomouth, inter, mouthwidth, m_ib, l_ob, l_ib, r_ib, r_ob, anal, dorsal, status, hatchery_origin, sex, stage, recapture, photo, genetic_needs, other_tag_info, 
 comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where mr_id = :1 `
 
 var supplementalDataEntriesCountByMrIdSql = `SELECT count(*) FROM ds_supplemental where mr_id = :1 `
 
-func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId string, geneticsVial string, pitTag string, mrId string, queryParams models.SearchParams) (models.SupplementalDataEntryWithCount, error) {
+var supplementalDataEntriesBySidSql = `select s_id, f_id, f_fid, mr_id, tagnumber, pitrn, scuteloc, scutenum, scuteloc2, scutenum2, elhv, elcolor, erhv, ercolor, cwtyn, dangler, genetic, genetics_vial_number,
+broodstock, hatch_wild, species_id, head, snouttomouth, inter, mouthwidth, m_ib, l_ob, l_ib, r_ib, r_ob, anal, dorsal, status, hatchery_origin, sex, stage, recapture, photo, genetic_needs, other_tag_info, 
+comments, edit_initials,last_edit_comment, uploaded_by from ds_supplemental where s_id = :1 `
+
+var supplementalDataEntriesCountBySidSql = `SELECT count(*) FROM ds_supplemental where s_id = :1 `
+
+func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId string, geneticsVial string, pitTag string, mrId string, fId string, queryParams models.SearchParams) (models.SupplementalDataEntryWithCount, error) {
 	supplementalDataEntryWithCount := models.SupplementalDataEntryWithCount{}
 	query := ""
 	queryWithCount := ""
 	id := ""
 
 	if tableId != "" {
+		query = supplementalDataEntriesBySidSql
+		queryWithCount = supplementalDataEntriesCountBySidSql
+		id = tableId
+	}
+
+	if fId != "" {
 		query = supplementalDataEntriesByFidSql
 		queryWithCount = supplementalDataEntriesCountByFidSql
-		id = tableId
+		id = fId
 	}
 
 	if fieldId != "" {
@@ -1071,16 +1111,28 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 		id = mrId
 	}
 
+	if tableId == "" && fId == "" && fieldId == "" && geneticsVial == "" && pitTag == "" && mrId == "" {
+		query = supplementalDataEntriesSql
+		queryWithCount = supplementalDataEntriesCountBySql
+	}
+
 	countQuery, err := s.db.Prepare(queryWithCount)
 	if err != nil {
 		return supplementalDataEntryWithCount, err
 	}
 
-	countrows, err := countQuery.Query(id)
-	if err != nil {
-		return supplementalDataEntryWithCount, err
+	var countrows *sql.Rows
+	if id == "" {
+		countrows, err = countQuery.Query()
+		if err != nil {
+			return supplementalDataEntryWithCount, err
+		}
+	} else {
+		countrows, err = countQuery.Query(id)
+		if err != nil {
+			return supplementalDataEntryWithCount, err
+		}
 	}
-	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&supplementalDataEntryWithCount.TotalCount)
@@ -1092,7 +1144,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 	supplementalEntries := []models.UploadSupplemental{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "mr_id"
+		queryParams.OrderBy = "s_id"
 	}
 	supplementalDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(supplementalDataEntriesSqlWithSearch)
@@ -1100,15 +1152,24 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 		return supplementalDataEntryWithCount, err
 	}
 
-	rows, err := dbQuery.Query(id)
-	if err != nil {
-		return supplementalDataEntryWithCount, err
+	var rows *sql.Rows
+	if id == "" {
+		rows, err = dbQuery.Query()
+		if err != nil {
+			return supplementalDataEntryWithCount, err
+		}
+	} else {
+		rows, err = dbQuery.Query(id)
+		if err != nil {
+			return supplementalDataEntryWithCount, err
+		}
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		supplementalDataEntry := models.UploadSupplemental{}
 		err = rows.Scan(
+			&supplementalDataEntry.Sid,
 			&supplementalDataEntry.Fid,
 			&supplementalDataEntry.FFid,
 			&supplementalDataEntry.MrId,

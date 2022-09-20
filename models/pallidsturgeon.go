@@ -362,29 +362,6 @@ type UploadFishData struct {
 	UploadFilename string       `db:"upload_filename" json:"uploadFilename"`
 }
 
-// type FishDataEntry struct {
-// 	Fid         int      `db:"f_id" json:"fid"`
-// 	Ffid        string   `db:"f_fid" json:"ffid"`
-// 	Fieldoffice string   `db:"FIELDOFFICE" json:"fieldOffice"`
-// 	Project     *int     `db:"PROJECT_ID" json:"project"`
-// 	Segment     *int     `db:"SEGMENT_ID" json:"segment"`
-// 	UniqueID    *int     `db:"uniqueidentifier" json:"uniqueID"`
-// 	Id          *int     `db:"id" json:"id"`
-// 	Panelhook   string   `db:"panelhook" json:"panelhook"`
-// 	Bait        string   `db:"bait" json:"bait"`
-// 	Species     string   `db:"SPECIES_ID" json:"species"`
-// 	Length      *float32 `db:"length" json:"length"`
-// 	Weight      *float32 `db:"weight" json:"weight"`
-// 	Fishcount   *int     `db:"FISHCOUNT" json:"fishcount"`
-// 	Otolith     string   `db:"otolith" json:"otolith"`
-// 	Rayspine    string   `db:"rayspine" json:"rayspine"`
-// 	Scale       string   `db:"scale" json:"scale"`
-// 	Ftprefix    string   `db:"FTPREFIX" json:"ftprefix"`
-// 	Ftnum       string   `db:"FTNUM" json:"ftnum"`
-// 	Ftmr        string   `db:"FTMR" json:"ftmr"`
-// 	MrID        *int     `db:"mr_id" json:"mrId"`
-// }
-
 type UploadFish struct {
 	Id                 *int      `db:"id" json:"id"`
 	SiteID             int       `db:"site_id" json:"siteId"`
@@ -523,7 +500,7 @@ type UploadSupplemental struct {
 	Fid                int       `db:"f_id" json:"fid"`
 	SiteID             int       `db:"site_id" json:"siteId"`
 	FFid               string    `db:"f_fid" json:"fFid"`
-	MrId               string    `db:"mr_id" json:"mrId"`
+	MrId               int       `db:"mr_id" json:"mrId"`
 	MrFid              string    `db:"mr_fid" json:"mrFid"`
 	Tagnumber          string    `db:"tagnumber" json:"tagnumber"`
 	Pitrn              string    `db:"pitrn" json:"pitrn"`
