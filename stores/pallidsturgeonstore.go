@@ -410,81 +410,53 @@ func (s *PallidSturgeonStore) GetOtolith() ([]models.Otolith, error) {
 	return otolithItems, err
 }
 
-var siteDataEntriesSql = `select site_id, year, fieldoffice, project_id, segment_id, season, bend, bendrn, season_description, project_description, segment_description, river_description, bend_river_mile, complete, bkg_color, sample_unit_type, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
+var siteDataEntriesSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,COALESCE(si.COMPLETE,0) as complete,
+COALESCE(si.APPROVED,0) as approved,si.UPLOAD_FILENAME,COALESCE(si.UPLOAD_SESSION_ID,0) as UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,COALESCE(si.BRM_ID,0) as brm_id,fnc.bkg_color,fnc.bend_river_mile
+from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id`
 
-var siteDataEntriesCountSql = `SELECT count(*) from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
+var siteDataEntriesCountSql = `SELECT count(*) from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id`
 
-func (s *PallidSturgeonStore) GetSiteDataEntries(year string, officeCode string, project string, segment string, season string, bend string, queryParams models.SearchParams) (models.SitesWithCount, error) {
+var siteDataEntriesBySiteIdSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,COALESCE(si.COMPLETE,0) as complete,
+COALESCE(si.APPROVED,0) as approved,si.UPLOAD_FILENAME,COALESCE(si.UPLOAD_SESSION_ID,0) as UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,COALESCE(si.BRM_ID,0) as brm_id,fnc.bkg_color,fnc.bend_river_mile
+from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id where site_id=:1`
+
+var siteDataEntriesCountBySiteIdSql = `SELECT count(*) from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id where site_id=:1`
+
+func (s *PallidSturgeonStore) GetSiteDataEntries(siteId string, year string, officeCode string, project string, segment string, season string, bend string, queryParams models.SearchParams) (models.SitesWithCount, error) {
 	siteDataEntryWithCount := models.SitesWithCount{}
-	countQuery, err := s.db.Prepare(siteDataEntriesCountSql)
-	if err != nil {
-		return siteDataEntryWithCount, err
+	query := ""
+	queryWithCount := ""
+	id := ""
+
+	if siteId != "" {
+		query = siteDataEntriesBySiteIdSql
+		queryWithCount = siteDataEntriesCountBySiteIdSql
+		id = siteId
 	}
 
-	countrows, err := countQuery.Query(year, officeCode, project, bend, season, segment)
-	if err != nil {
-		return siteDataEntryWithCount, err
+	if siteId == "" {
+		query = siteDataEntriesSql
+		queryWithCount = siteDataEntriesCountSql
 	}
-	defer countrows.Close()
-
-	for countrows.Next() {
-		err = countrows.Scan(&siteDataEntryWithCount.TotalCount)
-		if err != nil {
-			return siteDataEntryWithCount, err
-		}
-	}
-
-	siteEntries := []models.Sites{}
-	offset := queryParams.PageSize * queryParams.Page
-	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "site_id"
-	}
-	fishDataEntriesSqlWithSearch := siteDataEntriesSql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
-	dbQuery, err := s.db.Prepare(fishDataEntriesSqlWithSearch)
-	if err != nil {
-		return siteDataEntryWithCount, err
-	}
-
-	rows, err := dbQuery.Query(year, officeCode, project, bend, season, segment)
-	if err != nil {
-		return siteDataEntryWithCount, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		siteDataEntry := models.Sites{}
-		err = rows.Scan(&siteDataEntry.SiteID, &siteDataEntry.Year, &siteDataEntry.FieldofficeId, &siteDataEntry.ProjectId, &siteDataEntry.SegmentId, &siteDataEntry.SeasonId, &siteDataEntry.Bend, &siteDataEntry.Bendrn, &siteDataEntry.Season,
-			&siteDataEntry.Project, &siteDataEntry.Segment, &siteDataEntry.RiverDesc, &siteDataEntry.BendRiverMile, &siteDataEntry.Complete, &siteDataEntry.BkgColor, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.SampleUnitDesc)
-		if err != nil {
-			return siteDataEntryWithCount, err
-		}
-		siteEntries = append(siteEntries, siteDataEntry)
-	}
-
-	siteDataEntryWithCount.Items = siteEntries
-
-	return siteDataEntryWithCount, err
-}
-
-var siteDataEntryById = `select brm_id, site_id, site_fid, year, fieldoffice, project_id, segment_id, season, sample_unit_type, bendrn, edit_initials, uploaded_by from ds_sites 
-where site_id = :1 and fieldoffice = :2`
-
-var siteDataEntryCountById = `select count(*) from ds_sites where site_id = :1 and fieldoffice = :2`
-
-func (s *PallidSturgeonStore) GetSiteDataEntryById(siteId string, fieldOfficeCode string, queryParams models.SearchParams) (models.SitesWithCount, error) {
-	siteDataEntryWithCount := models.SitesWithCount{}
-	query := siteDataEntryById
-	queryWithCount := siteDataEntryCountById
 
 	countQuery, err := s.db.Prepare(queryWithCount)
 	if err != nil {
 		return siteDataEntryWithCount, err
 	}
 
-	countrows, err := countQuery.Query(siteId, fieldOfficeCode)
-	if err != nil {
-		return siteDataEntryWithCount, err
+	var countrows *sql.Rows
+	if id == "" {
+		countrows, err = countQuery.Query(year, officeCode, project, bend, season, segment)
+		if err != nil {
+			return siteDataEntryWithCount, err
+		}
+	} else {
+		countrows, err = countQuery.Query(year, officeCode, project, bend, season, segment, id)
+		if err != nil {
+			return siteDataEntryWithCount, err
+		}
 	}
+
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -499,22 +471,31 @@ func (s *PallidSturgeonStore) GetSiteDataEntryById(siteId string, fieldOfficeCod
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "site_id"
 	}
-	siteEntriesByIdSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
-	dbQuery, err := s.db.Prepare(siteEntriesByIdSqlWithSearch)
+	siteDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(siteDataEntriesSqlWithSearch)
 	if err != nil {
 		return siteDataEntryWithCount, err
 	}
 
-	rows, err := dbQuery.Query(siteId, fieldOfficeCode)
-	if err != nil {
-		return siteDataEntryWithCount, err
+	var rows *sql.Rows
+	if id == "" {
+		rows, err = dbQuery.Query(year, officeCode, project, bend, season, segment)
+		if err != nil {
+			return siteDataEntryWithCount, err
+		}
+	} else {
+		rows, err = dbQuery.Query(year, officeCode, project, bend, season, segment, id)
+		if err != nil {
+			return siteDataEntryWithCount, err
+		}
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		siteDataEntry := models.Sites{}
-		err = rows.Scan(&siteDataEntry.BendRiverMile, &siteDataEntry.SiteID, &siteDataEntry.SiteFID, &siteDataEntry.Year, &siteDataEntry.FieldOffice, &siteDataEntry.Project,
-			&siteDataEntry.Segment, &siteDataEntry.Season, &siteDataEntry.SampleUnitTypeCode, &siteDataEntry.Bendrn, &siteDataEntry.EditInitials, &siteDataEntry.UploadedBy)
+		err = rows.Scan(&siteDataEntry.SiteID, &siteDataEntry.Year, &siteDataEntry.FieldofficeId, &siteDataEntry.ProjectId, &siteDataEntry.SegmentId, &siteDataEntry.SeasonId, &siteDataEntry.Bend, &siteDataEntry.Bendrn, &siteDataEntry.SiteFID,
+			&siteDataEntry.UploadedBy, &siteDataEntry.LastEditComment, &siteDataEntry.EditInitials, &siteDataEntry.Complete, &siteDataEntry.Approved, &siteDataEntry.UploadFilename, &siteDataEntry.UploadSessionId,
+			&siteDataEntry.SampleUnitTypeCode, &siteDataEntry.BrmID, &siteDataEntry.BkgColor, &siteDataEntry.BendRiverMile)
 		if err != nil {
 			return siteDataEntryWithCount, err
 		}
@@ -539,7 +520,7 @@ func (s *PallidSturgeonStore) SaveSiteDataEntry(sitehDataEntry models.Sites) (in
 }
 
 var updateSiteDataSql = `UPDATE ds_sites
-SET   site_fid = :2,
+SET site_fid = :2,
 	  year = :3,
 	  FIELDOFFICE = :4,
 	  PROJECT_ID = :5,
@@ -550,12 +531,13 @@ SET   site_fid = :2,
 	  edit_initials = :10,
 	  last_updated = :11, 
 	  uploaded_by = :12,
-	  brm_id = :13
+	  brm_id = :13,
+		last_edit_comment = :14
 WHERE site_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.Sites) error {
-	_, err := s.db.Exec(updateSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldOffice, sitehDataEntry.Project,
-		sitehDataEntry.Segment, sitehDataEntry.Season, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.BendRiverMile, sitehDataEntry.SiteID)
+	_, err := s.db.Exec(updateSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId, sitehDataEntry.SegmentId, sitehDataEntry.SeasonId, sitehDataEntry.SampleUnitTypeCode,
+		sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.BrmID, sitehDataEntry.LastEditComment, sitehDataEntry.SiteID)
 	return err
 }
 
