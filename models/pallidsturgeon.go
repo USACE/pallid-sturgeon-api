@@ -328,21 +328,17 @@ type Sites struct {
 	SiteID             int       `db:"site_id" json:"siteId"`
 	SiteFID            string    `db:"site_fid" json:"siteFid"`
 	Year               int       `db:"year" json:"year"`
+	BrmID              int       `db:"brm_id" json:"brmId"`
 	FieldofficeId      string    `db:"fieldoffice" json:"fieldoffice"`
-	FieldOffice        string    `db:"field_office_description" json:"fieldOfficeDescription"`
 	ProjectId          int       `db:"project_id" json:"projectId"`
-	Project            string    `db:"project_description" json:"projectDescription"`
 	SegmentId          int       `db:"segment_id" json:"segmentId"`
-	Segment            string    `db:"segment_description" json:"segmentDescription"`
 	SeasonId           string    `db:"season" json:"season"`
-	Season             string    `db:"season_description" json:"seasonDescription"`
 	SampleUnitTypeCode string    `db:"sample_unit_type" json:"sampleUnitType"`
-	SampleUnitDesc     string    `db:"sample_unit_desc" json:"sampleUnitDesc"`
-	RiverDesc          string    `db:"river_description" json:"riverDescription"`
 	Bend               int       `db:"bend" json:"bend"`
 	Bendrn             string    `db:"bendrn" json:"bendrn"`
 	BendRiverMile      *string   `db:"bend_river_mile" json:"bendRiverMile"`
-	Complete           string    `db:"complete" json:"complete"`
+	Complete           int       `db:"complete" json:"complete"`
+	Approved           int       `db:"approved" json:"approved"`
 	BkgColor           string    `db:"bkg_color" json:"bkgColor"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment    string    `db:"last_edit_comment" json:"last_edit_comment"`
