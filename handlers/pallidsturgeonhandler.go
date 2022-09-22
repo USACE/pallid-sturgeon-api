@@ -444,6 +444,57 @@ func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
+func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
+	tableId, fId := c.QueryParam("tableId"), c.QueryParam("fId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
+func (sd *PallidSturgeonHandler) SaveProcedureDataEntry(c echo.Context) error {
+	procedureData := models.UploadProcedure{}
+	if err := c.Bind(&procedureData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	procedureData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	procedureData.UploadedBy = user.FirstName + " " + user.LastName
+	// @TODO: remove hardcoded value and fix date formatting
+	procedureData.ProcedureDate = "12-Dec-2022"
+	procedureData.DstStartDate = "12-Dec-2022"
+	err := sd.Store.SaveProcedureDataEntry(procedureData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, err)
+}
+
+func (sd *PallidSturgeonHandler) UpdateProcedureDataEntry(c echo.Context) error {
+	procedureData := models.UploadProcedure{}
+	if err := c.Bind(&procedureData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	procedureData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	procedureData.UploadedBy = user.FirstName + " " + user.LastName
+	// @TODO: remove hardcoded value and fix date formatting
+	procedureData.ProcedureDate = "12-Dec-2022"
+	procedureData.DstStartDate = "12-Dec-2022"
+	err := sd.Store.UpdateProcedureDataEntry(procedureData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
 func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
 	tableId, seId := c.QueryParam("tableId"), c.QueryParam("seId")
 	queryParams, err := marshalQuery(c)
