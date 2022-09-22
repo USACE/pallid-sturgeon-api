@@ -436,6 +436,11 @@ type UploadSearch struct {
 	UploadFilename  string    `db:"upload_filename" json:"uploadFilename"`
 }
 
+type ProcedureDataEntryWithCount struct {
+	Items      []UploadProcedure `json:"items"`
+	TotalCount int               `json:"totalCount"`
+}
+
 type UploadProcedureData struct {
 	Items          []UploadProcedure `json:"items"`
 	UploadFilename string            `db:"upload_filename" json:"uploadFilename"`
@@ -443,8 +448,9 @@ type UploadProcedureData struct {
 
 type UploadProcedure struct {
 	Id                        int       `db:"id" json:"id"`
+	Fid                       int       `db:"f_id" json:"fid"`
 	FFid                      string    `db:"f_fid" json:"fFid"`
-	MrFid                     string    `db:"mr_fid" json:"mrFid"`
+	MrFid                     string    `db:"MR_FID" json:"mrFid"`
 	PurposeCode               string    `db:"purpose_code" json:"purpose"`
 	ProcedureDate             string    `db:"PROCEDURE_DATE" json:"procedureDate"`
 	ProcedureDateTime         time.Time `db:"PROCEDURE_DATE" json:"procedureDateTime"`
@@ -473,7 +479,7 @@ type UploadProcedure struct {
 	SpawnStatus               string    `db:"SPAWN_CODE" json:"spawnStatus"`
 	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
 	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
-	ExpectedSpawnYear         int       `db:"expected_spawn_year" json:"expectedSpawnYear"`
+	ExpectedSpawnYear         int       `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
 	UltrasoundGonadLength     float64   `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
 	GonadCondition            int       `db:"gonad_condition" json:"gonadCondition"`
 	EditInitials              string    `db:"edit_initials" json:"editInitials"`
@@ -482,6 +488,7 @@ type UploadProcedure struct {
 	UploadSessionId           int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy                string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
+	Checkby                   string    `db:"checkby" json:"checkby"`
 }
 
 type SupplementalDataEntryWithCount struct {
@@ -574,7 +581,7 @@ type UploadMoriver struct {
 	Recorder         string    `db:"recorder" json:"recorder"`
 	Gear             string    `db:"gear" json:"gear"`
 	GearType         string    `db:"gear_type" json:"gearType"`
-	Temp             *float64  `db:"temp" json:"temp"`
+	Temp             float64   `db:"temp" json:"temp"`
 	Turbidity        *float64  `db:"turbidity" json:"turbidity"`
 	Conductivity     *float64  `db:"conductivity" json:"conductivity"`
 	Do               *float64  `db:"do" json:"dissolvedOxygen"`
@@ -603,8 +610,8 @@ type UploadMoriver struct {
 	SetSite2         string    `db:"set_site_2" json:"setSite2"`
 	SetSite3         string    `db:"set_site_3" json:"setSite3"`
 	StartTime        string    `db:"starttime" json:"startTime"`
-	StartLatitude    *float64  `db:"startlatitude" json:"startlatitude"`
-	StartLongitude   *float64  `db:"startlongitude" json:"startlongitude"`
+	StartLatitude    float64   `db:"startlatitude" json:"startlatitude"`
+	StartLongitude   float64   `db:"startlongitude" json:"startlongitude"`
 	StopTime         string    `db:"stoptime" json:"stoptime"`
 	StopLatitude     *float64  `db:"stoplatitude" json:"stoplatitude"`
 	StopLongitude    *float64  `db:"stop_longitude" json:"stoplongitude"`

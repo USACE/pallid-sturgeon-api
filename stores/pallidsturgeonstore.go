@@ -1534,6 +1534,192 @@ func (s *PallidSturgeonStore) UpdateTelemetryDataEntry(telemetryDataEntry models
 	return err
 }
 
+var procedureDataEntriesSql = `select ID, F_ID, F_FID, PURPOSE_CODE, PROCEDURE_DATE, PROCEDURE_START_TIME, PROCEDURE_END_TIME, PROCEDURE_BY, ANTIBIOTIC_INJECTION_IND, PHOTO_DORSAL_IND, PHOTO_VENTRAL_IND, PHOTO_LEFT_IND, OLD_RADIO_TAG_NUM,
+OLD_FREQUENCY_ID, DST_SERIAL_NUM, DST_START_DATE, DST_START_TIME, DST_REIMPLANT_IND, NEW_RADIO_TAG_NUM, NEW_FREQUENCY_ID, SEX_CODE, COMMENTS, FISH_HEALTH_COMMENTS, SPAWN_CODE, EVAL_LOCATION_CODE, BLOOD_SAMPLE_IND,
+EGG_SAMPLE_IND, VISUAL_REPRO_STATUS_CODE, ULTRASOUND_REPRO_STATUS_CODE, ULTRASOUND_GONAD_LENGTH, GONAD_CONDITION, EXPECTED_SPAWN_YEAR, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, UPLOAD_FILENAME, CHECKBY,
+EDIT_INITIALS, LAST_EDIT_COMMENT, MR_FID from ds_procedure`
+
+var procedureDataEntriesCountBySql = `SELECT count(*) FROM ds_procedure`
+
+var procedureDataEntriesByIdSql = `select ID, F_ID, F_FID, PURPOSE_CODE, PROCEDURE_DATE, PROCEDURE_START_TIME, PROCEDURE_END_TIME, PROCEDURE_BY, ANTIBIOTIC_INJECTION_IND, PHOTO_DORSAL_IND, PHOTO_VENTRAL_IND, PHOTO_LEFT_IND, OLD_RADIO_TAG_NUM,
+OLD_FREQUENCY_ID, DST_SERIAL_NUM, DST_START_DATE, DST_START_TIME, DST_REIMPLANT_IND, NEW_RADIO_TAG_NUM, NEW_FREQUENCY_ID, SEX_CODE, COMMENTS, FISH_HEALTH_COMMENTS, SPAWN_CODE, EVAL_LOCATION_CODE, BLOOD_SAMPLE_IND,
+EGG_SAMPLE_IND, VISUAL_REPRO_STATUS_CODE, ULTRASOUND_REPRO_STATUS_CODE, ULTRASOUND_GONAD_LENGTH, GONAD_CONDITION, EXPECTED_SPAWN_YEAR, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, UPLOAD_FILENAME, CHECKBY,
+EDIT_INITIALS, LAST_EDIT_COMMENT, MR_FID from ds_procedure where id = :1 `
+
+var procedureDataEntriesCountByIdSql = `SELECT count(*) FROM ds_procedure where id = :1`
+
+var procedureDataEntriesByFidSql = `select ID, F_ID, F_FID, PURPOSE_CODE, PROCEDURE_DATE, PROCEDURE_START_TIME, PROCEDURE_END_TIME, PROCEDURE_BY, ANTIBIOTIC_INJECTION_IND, PHOTO_DORSAL_IND, PHOTO_VENTRAL_IND, PHOTO_LEFT_IND, OLD_RADIO_TAG_NUM,
+OLD_FREQUENCY_ID, DST_SERIAL_NUM, DST_START_DATE, DST_START_TIME, DST_REIMPLANT_IND, NEW_RADIO_TAG_NUM, NEW_FREQUENCY_ID, SEX_CODE, COMMENTS, FISH_HEALTH_COMMENTS, SPAWN_CODE, EVAL_LOCATION_CODE, BLOOD_SAMPLE_IND,
+EGG_SAMPLE_IND, VISUAL_REPRO_STATUS_CODE, ULTRASOUND_REPRO_STATUS_CODE, ULTRASOUND_GONAD_LENGTH, GONAD_CONDITION, EXPECTED_SPAWN_YEAR, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, UPLOAD_FILENAME, CHECKBY,
+EDIT_INITIALS, LAST_EDIT_COMMENT, MR_FID from ds_procedure where f_id = :1 `
+
+var procedureDataEntriesCountByFidSql = `SELECT count(*) FROM ds_procedure where f_id = :1`
+
+var procedureDataEntriesByFfidSql = `select ID, F_ID, F_FID, PURPOSE_CODE, PROCEDURE_DATE, PROCEDURE_START_TIME, PROCEDURE_END_TIME, PROCEDURE_BY, ANTIBIOTIC_INJECTION_IND, PHOTO_DORSAL_IND, PHOTO_VENTRAL_IND, PHOTO_LEFT_IND, OLD_RADIO_TAG_NUM,
+OLD_FREQUENCY_ID, DST_SERIAL_NUM, DST_START_DATE, DST_START_TIME, DST_REIMPLANT_IND, NEW_RADIO_TAG_NUM, NEW_FREQUENCY_ID, SEX_CODE, COMMENTS, FISH_HEALTH_COMMENTS, SPAWN_CODE, EVAL_LOCATION_CODE, BLOOD_SAMPLE_IND,
+EGG_SAMPLE_IND, VISUAL_REPRO_STATUS_CODE, ULTRASOUND_REPRO_STATUS_CODE, ULTRASOUND_GONAD_LENGTH, GONAD_CONDITION, EXPECTED_SPAWN_YEAR, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, UPLOAD_FILENAME, CHECKBY,
+EDIT_INITIALS, LAST_EDIT_COMMENT, MR_FID from ds_procedure where f_fid = :1`
+
+var procedureDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_procedure where f_fid = :1`
+
+func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string, queryParams models.SearchParams) (models.ProcedureDataEntryWithCount, error) {
+	procedureDataEntryWithCount := models.ProcedureDataEntryWithCount{}
+	query := ""
+	queryWithCount := ""
+	id := ""
+
+	if tableId != "" {
+		query = procedureDataEntriesByIdSql
+		queryWithCount = procedureDataEntriesCountByIdSql
+		id = tableId
+	}
+
+	if fId != "" {
+		query = procedureDataEntriesByFidSql
+		queryWithCount = procedureDataEntriesCountByFidSql
+		id = fId
+	}
+
+	if tableId == "" && fId == "" {
+		query = procedureDataEntriesSql
+		queryWithCount = procedureDataEntriesCountBySql
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
+	if err != nil {
+		return procedureDataEntryWithCount, err
+	}
+
+	var countrows *sql.Rows
+	if id == "" {
+		countrows, err = countQuery.Query()
+		if err != nil {
+			return procedureDataEntryWithCount, err
+		}
+	} else {
+		countrows, err = countQuery.Query(id)
+		if err != nil {
+			return procedureDataEntryWithCount, err
+		}
+	}
+
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&procedureDataEntryWithCount.TotalCount)
+		if err != nil {
+			return procedureDataEntryWithCount, err
+		}
+	}
+
+	procedureEntries := []models.UploadProcedure{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "id"
+	}
+	procedureDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(procedureDataEntriesSqlWithSearch)
+	if err != nil {
+		return procedureDataEntryWithCount, err
+	}
+
+	var rows *sql.Rows
+	if id == "" {
+		rows, err = dbQuery.Query()
+		if err != nil {
+			return procedureDataEntryWithCount, err
+		}
+	} else {
+		rows, err = dbQuery.Query(id)
+		if err != nil {
+			return procedureDataEntryWithCount, err
+		}
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		procedureDataEntry := models.UploadProcedure{}
+		err = rows.Scan(&procedureDataEntry.Id, &procedureDataEntry.Fid, &procedureDataEntry.FFid, &procedureDataEntry.PurposeCode, &procedureDataEntry.ProcedureDate, &procedureDataEntry.ProcedureStartTime, &procedureDataEntry.ProcedureEndTime, &procedureDataEntry.ProcedureBy, &procedureDataEntry.AntibioticInjectionInd,
+			&procedureDataEntry.PhotoDorsalInd, &procedureDataEntry.PhotoVentralInd, &procedureDataEntry.PhotoLeftInd, &procedureDataEntry.OldRadioTagNum, &procedureDataEntry.OldFrequencyId, &procedureDataEntry.DstSerialNum, &procedureDataEntry.DstStartDate, &procedureDataEntry.DstStartTime, &procedureDataEntry.DstReimplantInd,
+			&procedureDataEntry.NewRadioTagNum, &procedureDataEntry.NewFrequencyId, &procedureDataEntry.SexCode, &procedureDataEntry.Comments, &procedureDataEntry.FishHealthComments, &procedureDataEntry.SpawnStatus, &procedureDataEntry.EvalLocationCode, &procedureDataEntry.BloodSampleInd, &procedureDataEntry.EggSampleInd,
+			&procedureDataEntry.VisualReproStatusCode, &procedureDataEntry.UltrasoundReproStatusCode, &procedureDataEntry.UltrasoundGonadLength, &procedureDataEntry.GonadCondition, &procedureDataEntry.ExpectedSpawnYear, &procedureDataEntry.LastUpdated, &procedureDataEntry.UploadSessionId, &procedureDataEntry.UploadedBy,
+			&procedureDataEntry.UploadFilename, &procedureDataEntry.Checkby, &procedureDataEntry.EditInitials, &procedureDataEntry.LastEditComment, &procedureDataEntry.MrFid)
+		if err != nil {
+			return procedureDataEntryWithCount, err
+		}
+		procedureEntries = append(procedureEntries, procedureDataEntry)
+	}
+
+	procedureDataEntryWithCount.Items = procedureEntries
+
+	return procedureDataEntryWithCount, err
+}
+
+var insertProcedureDataSql = `insert into ds_procedure (ID, F_ID, F_FID, PURPOSE_CODE, PROCEDURE_DATE, PROCEDURE_START_TIME, PROCEDURE_END_TIME, PROCEDURE_BY, ANTIBIOTIC_INJECTION_IND, PHOTO_DORSAL_IND, PHOTO_VENTRAL_IND, PHOTO_LEFT_IND, OLD_RADIO_TAG_NUM, OLD_FREQUENCY_ID, DST_SERIAL_NUM, DST_START_DATE, DST_START_TIME, 
+	DST_REIMPLANT_IND, NEW_RADIO_TAG_NUM, NEW_FREQUENCY_ID, SEX_CODE, COMMENTS, FISH_HEALTH_COMMENTS, SPAWN_CODE, EVAL_LOCATION_CODE, BLOOD_SAMPLE_IND, EGG_SAMPLE_IND, VISUAL_REPRO_STATUS_CODE, ULTRASOUND_REPRO_STATUS_CODE, ULTRASOUND_GONAD_LENGTH, GONAD_CONDITION, EXPECTED_SPAWN_YEAR, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, 
+	UPLOAD_FILENAME, CHECKBY, EDIT_INITIALS, LAST_EDIT_COMMENT, MR_FID) 
+	values (procedure_seq.nextval, :1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39)`
+
+func (s *PallidSturgeonStore) SaveProcedureDataEntry(procedureDataEntry models.UploadProcedure) error {
+	_, err := s.db.Exec(insertProcedureDataSql, procedureDataEntry.Fid, procedureDataEntry.FFid, procedureDataEntry.PurposeCode, procedureDataEntry.ProcedureDate, procedureDataEntry.ProcedureStartTime, procedureDataEntry.ProcedureEndTime, procedureDataEntry.ProcedureBy, procedureDataEntry.AntibioticInjectionInd,
+		procedureDataEntry.PhotoDorsalInd, procedureDataEntry.PhotoVentralInd, procedureDataEntry.PhotoLeftInd, procedureDataEntry.OldRadioTagNum, procedureDataEntry.OldFrequencyId, procedureDataEntry.DstSerialNum, procedureDataEntry.DstStartDate, procedureDataEntry.DstStartTime, procedureDataEntry.DstReimplantInd,
+		procedureDataEntry.NewRadioTagNum, procedureDataEntry.NewFrequencyId, procedureDataEntry.SexCode, procedureDataEntry.Comments, procedureDataEntry.FishHealthComments, procedureDataEntry.SpawnStatus, procedureDataEntry.EvalLocationCode, procedureDataEntry.BloodSampleInd, procedureDataEntry.EggSampleInd,
+		procedureDataEntry.VisualReproStatusCode, procedureDataEntry.UltrasoundReproStatusCode, procedureDataEntry.UltrasoundGonadLength, procedureDataEntry.GonadCondition, procedureDataEntry.ExpectedSpawnYear, procedureDataEntry.LastUpdated, procedureDataEntry.UploadSessionId, procedureDataEntry.UploadedBy,
+		procedureDataEntry.UploadFilename, procedureDataEntry.Checkby, procedureDataEntry.EditInitials, procedureDataEntry.LastEditComment, procedureDataEntry.MrFid)
+	return err
+}
+
+var updateProcedureDataSql = `update ds_procedure set 
+f_id = :2,
+f_fid =:3,
+PURPOSE_CODE = :4, 
+PROCEDURE_DATE = :5, 
+PROCEDURE_START_TIME = :6, 
+PROCEDURE_END_TIME = :7, 
+PROCEDURE_BY = :8,
+ANTIBIOTIC_INJECTION_IND = :9, 
+PHOTO_DORSAL_IND = :10, 
+PHOTO_VENTRAL_IND = :11, 
+PHOTO_LEFT_IND = :12, 
+OLD_RADIO_TAG_NUM = :13,
+OLD_FREQUENCY_ID = :14, 
+DST_SERIAL_NUM = :15, 
+DST_START_DATE = :16, 
+DST_START_TIME = :17, 
+DST_REIMPLANT_IND = :18, 
+NEW_RADIO_TAG_NUM = :19, 
+NEW_FREQUENCY_ID = :20, 
+SEX_CODE = :21, 
+COMMENTS = :22, 
+FISH_HEALTH_COMMENTS = :23, 
+SPAWN_CODE = :24, 
+EVAL_LOCATION_CODE = :25, 
+BLOOD_SAMPLE_IND = :26,
+EGG_SAMPLE_IND = :27, 
+VISUAL_REPRO_STATUS_CODE = :28, 
+ULTRASOUND_REPRO_STATUS_CODE = :29, 
+ULTRASOUND_GONAD_LENGTH = :30, 
+GONAD_CONDITION = :31, 
+EXPECTED_SPAWN_YEAR = :32, 
+LAST_UPDATED = :33, 
+UPLOAD_SESSION_ID = :34, 
+UPLOADED_BY = :35, 
+UPLOAD_FILENAME = :36, 
+CHECKBY = :37,
+EDIT_INITIALS = :38, 
+LAST_EDIT_COMMENT = :39, 
+mr_fid = :40
+where id = :1`
+
+func (s *PallidSturgeonStore) UpdateProcedureDataEntry(procedureDataEntry models.UploadProcedure) error {
+	_, err := s.db.Exec(updateProcedureDataSql, procedureDataEntry.Fid, procedureDataEntry.FFid, procedureDataEntry.PurposeCode, procedureDataEntry.ProcedureDate, procedureDataEntry.ProcedureStartTime, procedureDataEntry.ProcedureEndTime, procedureDataEntry.ProcedureBy, procedureDataEntry.AntibioticInjectionInd,
+		procedureDataEntry.PhotoDorsalInd, procedureDataEntry.PhotoVentralInd, procedureDataEntry.PhotoLeftInd, procedureDataEntry.OldRadioTagNum, procedureDataEntry.OldFrequencyId, procedureDataEntry.DstSerialNum, procedureDataEntry.DstStartDate, procedureDataEntry.DstStartTime, procedureDataEntry.DstReimplantInd,
+		procedureDataEntry.NewRadioTagNum, procedureDataEntry.NewFrequencyId, procedureDataEntry.SexCode, procedureDataEntry.Comments, procedureDataEntry.FishHealthComments, procedureDataEntry.SpawnStatus, procedureDataEntry.EvalLocationCode, procedureDataEntry.BloodSampleInd, procedureDataEntry.EggSampleInd,
+		procedureDataEntry.VisualReproStatusCode, procedureDataEntry.UltrasoundReproStatusCode, procedureDataEntry.UltrasoundGonadLength, procedureDataEntry.GonadCondition, procedureDataEntry.ExpectedSpawnYear, procedureDataEntry.LastUpdated, procedureDataEntry.UploadSessionId, procedureDataEntry.UploadedBy,
+		procedureDataEntry.UploadFilename, procedureDataEntry.Checkby, procedureDataEntry.EditInitials, procedureDataEntry.LastEditComment, procedureDataEntry.MrFid, procedureDataEntry.Id)
+	return err
+}
+
 var fishDataSummaryFullDataSql = `select * FROM table (pallid_data_api.fish_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
