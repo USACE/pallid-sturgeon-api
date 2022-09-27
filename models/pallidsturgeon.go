@@ -229,15 +229,15 @@ type ProcedureSummaryWithCount struct {
 }
 
 type ProcedureSummary struct {
-	ID                int    `db:"pid_display" json:"id"`
-	UniqueID          int    `db:"mr_id" json:"uniqueId"`
-	Year              int    `db:"year" json:"year"`
-	FieldOffice       string `db:"field_office_code" json:"fieldOffice"`
-	Project           int    `db:"project_code" json:"project"`
-	Segment           int    `db:"segment_code" json:"segment"`
-	Season            string `db:"season_code" json:"season"`
-	PurposeCode       string `db:"purpose_code" json:"purposeCode"`
-	ProcedureDate     string `db:"procedure_date" json:"procedureDate"`
+	ID          int    `db:"pid_display" json:"id"`
+	UniqueID    int    `db:"mr_id" json:"uniqueId"`
+	Year        int    `db:"year" json:"year"`
+	FieldOffice string `db:"field_office_code" json:"fieldOffice"`
+	Project     int    `db:"project_code" json:"project"`
+	Segment     int    `db:"segment_code" json:"segment"`
+	Season      string `db:"season_code" json:"season"`
+	PurposeCode string `db:"purpose_code" json:"purposeCode"`
+	// ProcedureDate     time.Time `db:"procedure_date" json:"procedureDate"`
 	NewRadioTagNum    int    `db:"new_radio_tag_num" json:"newRadioTagNum"`
 	NewFrequencyId    int    `db:"new_frequency_id" json:"newFrequencyId"`
 	SpawnCode         string `db:"spawn_code" json:"spawnCode"`
