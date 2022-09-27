@@ -447,6 +447,7 @@ type UploadProcedure struct {
 	Fid                       int       `db:"f_id" json:"fid"`
 	FFid                      string    `db:"f_fid" json:"fFid"`
 	MrFid                     string    `db:"MR_FID" json:"mrFid"`
+	SiteID                    int       `db:"site_id" json:"siteId"`
 	PurposeCode               string    `db:"purpose_code" json:"purpose"`
 	ProcedureDate             string    `db:"PROCEDURE_DATE" json:"procedureDate"`
 	ProcedureDateTime         time.Time `db:"PROCEDURE_DATE" json:"procedureDateTime"`
