@@ -164,6 +164,15 @@ func (sd *PallidSturgeonHandler) GetOtolith(c echo.Context) error {
 	return c.JSON(http.StatusOK, otolith)
 }
 
+func (sd *PallidSturgeonHandler) GetHeaderData(c echo.Context) error {
+	siteId := c.QueryParam("siteId")
+	headerDataItems, err := sd.Store.GetHeaderData(siteId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, headerDataItems)
+}
+
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	year, projectCode, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("year"), c.QueryParam("projectCode"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
@@ -495,7 +504,13 @@ func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	dataSummary, err := sd.Store.GetTelemetryDataEntries(tableId, seId, queryParams)
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	dataSummary, err := sd.Store.GetTelemetryDataEntries(tableId, seId, userInfo.OfficeCode, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

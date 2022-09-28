@@ -96,6 +96,19 @@ type Otolith struct {
 	Description string `db:"description" json:"description"`
 }
 
+type HeaderData struct {
+	SiteId         int     `db:"site_id" json:"siteId"`
+	Year           int     `db:"year" json:"year"`
+	FieldOffice    string  `db:"fieldoffice" json:"fieldoffice"`
+	Project        int     `db:"project_id" json:"project"`
+	Segment        int     `db:"segment_id" json:"segment"`
+	Season         string  `db:"season" json:"season"`
+	Bend           int     `db:"bend" json:"bend"`
+	Bendrn         string  `db:"bendrn" json:"bendrn"`
+	BendRiverMile  float64 `db:"bendrivermile" json:"bendrivermile"`
+	SampleUnitType string  `db:"sample_unit_type" json:"sampleUnitType"`
+}
+
 type FishSummaryWithCount struct {
 	Items      []FishSummary `json:"items"`
 	TotalCount int           `json:"totalCount"`
@@ -478,7 +491,7 @@ type UploadProcedure struct {
 	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
 	ExpectedSpawnYear         int       `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
 	UltrasoundGonadLength     float64   `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
-	GonadCondition            int       `db:"gonad_condition" json:"gonadCondition"`
+	GonadCondition            string    `db:"gonad_condition" json:"gonadCondition"`
 	EditInitials              string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment           string    `db:"last_edit_comment" json:"lastEditComment"`
 	LastUpdated               time.Time `db:"last_updated" json:"lastUpdated"`
@@ -668,6 +681,7 @@ type UploadTelemetry struct {
 	TFid               string    `db:"t_fid" json:"tFid"`
 	SeFid              string    `db:"se_fid" json:"seFieldId"`
 	SeId               int       `db:"se_id" json:"seId"`
+	SiteId             int       `db:"site_id" json:"siteId"`
 	Bend               float64   `db:"bend" json:"bend"`
 	RadioTagNum        int       `db:"radio_tag_num" json:"radioTagNum"`
 	FrequencyIdCode    int       `db:"frequency_id_code" json:"frequencyIdCode"`
