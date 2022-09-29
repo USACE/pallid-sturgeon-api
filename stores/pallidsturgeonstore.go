@@ -3399,7 +3399,8 @@ and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 and m.mr_id = asv.mr_id (+)
 and asv.ch = 'Unapproved'
 and asv.cb = 'YES'
-and ds.project_id = :1`
+and ds.project_id = :1
+and (CASE when :2 != 'ZZ' THEN ds.FIELDOFFICE ELSE :3 END) = :4`
 
 var unapprovedDataSheetsCountSql = `select count(*)
 from DS_MORIVER m, project_lk p, segment_lk s, field_office_lk f, approval_status_v asv, ds_sites ds
@@ -3410,16 +3411,17 @@ and DS.FIELDOFFICE = F.FIELD_OFFICE_CODE
 and m.mr_id = asv.mr_id (+)
 and asv.ch = 'Unapproved'
 and asv.cb = 'YES'
-and ds.project_id = :1`
+and ds.project_id = :1
+and (CASE when :2 != 'ZZ' THEN ds.FIELDOFFICE ELSE :3 END) = :4`
 
-func (s *PallidSturgeonStore) GetUnapprovedDataSheets(projectCode string, queryParams models.SearchParams) (models.UnapprovedDataWithCount, error) {
+func (s *PallidSturgeonStore) GetUnapprovedDataSheets(projectCode string, officeCode string, queryParams models.SearchParams) (models.UnapprovedDataWithCount, error) {
 	unapprovedDataSheetsWithCount := models.UnapprovedDataWithCount{}
 	countQuery, err := s.db.Prepare(unapprovedDataSheetsCountSql)
 	if err != nil {
 		return unapprovedDataSheetsWithCount, err
 	}
 
-	countrows, err := countQuery.Query(projectCode)
+	countrows, err := countQuery.Query(projectCode, officeCode, officeCode, officeCode)
 	if err != nil {
 		return unapprovedDataSheetsWithCount, err
 	}
@@ -3443,7 +3445,7 @@ func (s *PallidSturgeonStore) GetUnapprovedDataSheets(projectCode string, queryP
 		return unapprovedDataSheetsWithCount, err
 	}
 
-	rows, err := dbQuery.Query(projectCode)
+	rows, err := dbQuery.Query(projectCode, officeCode, officeCode, officeCode)
 	if err != nil {
 		return unapprovedDataSheetsWithCount, err
 	}
@@ -3476,8 +3478,8 @@ and MR.MR_ID = F.MR_ID (+)
 and DS.PROJECT_ID = P.PROJECT_CODE (+)
 and ds.segment_id = s.segment_code (+)
 and F.SPECIES = 'BAFI'
-and ds.fieldoffice = :1
-and ds.project_id = :2`
+and ds.project_id = :1
+and (CASE when :2 != 'ZZ' THEN ds.FIELDOFFICE ELSE :3 END) = :4`
 
 var bafiDataSheetCountsSql = `SELECT count(*)
 from ds_sites ds, ds_moriver mr, ds_fish f, project_lk p, segment_lk s
@@ -3486,8 +3488,8 @@ and MR.MR_ID = F.MR_ID (+)
 and DS.PROJECT_ID = P.PROJECT_CODE (+)
 and ds.segment_id = s.segment_code (+)
 and F.SPECIES = 'BAFI'
-and ds.fieldoffice = :1
-and ds.project_id = :2`
+and ds.project_id = :1
+and (CASE when :2 != 'ZZ' THEN ds.FIELDOFFICE ELSE :3 END) = :4`
 
 func (s *PallidSturgeonStore) GetBafiDataSheets(fieldOffice string, projectCode string, queryParams models.SearchParams) (models.BafiDataWithCount, error) {
 	bafiDataSheetsWithCount := models.BafiDataWithCount{}
@@ -3496,7 +3498,7 @@ func (s *PallidSturgeonStore) GetBafiDataSheets(fieldOffice string, projectCode 
 		return bafiDataSheetsWithCount, err
 	}
 
-	countrows, err := countQuery.Query(fieldOffice, projectCode)
+	countrows, err := countQuery.Query(projectCode, fieldOffice, fieldOffice, fieldOffice)
 	if err != nil {
 		return bafiDataSheetsWithCount, err
 	}
@@ -3520,7 +3522,7 @@ func (s *PallidSturgeonStore) GetBafiDataSheets(fieldOffice string, projectCode 
 		return bafiDataSheetsWithCount, err
 	}
 
-	rows, err := dbQuery.Query(fieldOffice, projectCode)
+	rows, err := dbQuery.Query(projectCode, fieldOffice, fieldOffice, fieldOffice)
 	if err != nil {
 		return bafiDataSheetsWithCount, err
 	}
@@ -3555,12 +3557,12 @@ where m.site_id = ds.site_id (+)
 and ds.SEGMENT_ID = s.segment_code (+)
 and DS.PROJECT_ID = P.project_code (+)
 and m.mr_id = asv.mr_id (+)  
-and ds.FIELDOFFICE = :1
 and asv.cb = 'Unchecked'
-and ds.PROJECT_ID = :2
+and ds.PROJECT_ID = :1
 and M.MR_ID NOT IN (SELECT MR_ID 
 FROM DS_FISH
-WHERE SPECIES = 'BAFI')`
+WHERE SPECIES = 'BAFI')
+and (CASE when :2 != 'ZZ' THEN ds.FIELDOFFICE ELSE :3 END) = :4`
 
 var uncheckedDataSheetsCountSql = `select count(*)
 from DS_MORIVER m, project_lk p, segment_lk s, approval_status_v asv, ds_sites ds
@@ -3568,12 +3570,12 @@ where m.site_id = ds.site_id (+)
 and ds.segment_id = s.segment_code (+)
 and DS.PROJECT_ID = p.project_code (+)
 and m.mr_id = asv.mr_id (+)  
-and ds.FIELDOFFICE = :1
 and asv.cb = 'Unchecked'
-and ds.PROJECT_ID = :2
+and ds.PROJECT_ID = :1
 and M.MR_ID NOT IN (SELECT MR_ID 
 FROM DS_FISH
-WHERE SPECIES = 'BAFI')`
+WHERE SPECIES = 'BAFI')
+and (CASE when :2 != 'ZZ' THEN ds.FIELDOFFICE ELSE :3 END) = :4`
 
 func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, projectCode string, queryParams models.SearchParams) (models.UncheckedDataWithCount, error) {
 	uncheckedDataSheetsWithCount := models.UncheckedDataWithCount{}
@@ -3582,7 +3584,7 @@ func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, pro
 		return uncheckedDataSheetsWithCount, err
 	}
 
-	countrows, err := countQuery.Query(fieldOfficeCode, projectCode)
+	countrows, err := countQuery.Query(projectCode, fieldOfficeCode, fieldOfficeCode, fieldOfficeCode)
 	if err != nil {
 		return uncheckedDataSheetsWithCount, err
 	}
@@ -3606,7 +3608,7 @@ func (s *PallidSturgeonStore) GetUncheckedDataSheets(fieldOfficeCode string, pro
 		return uncheckedDataSheetsWithCount, err
 	}
 
-	rows, err := dbQuery.Query(fieldOfficeCode, projectCode)
+	rows, err := dbQuery.Query(projectCode, fieldOfficeCode, fieldOfficeCode, fieldOfficeCode)
 	if err != nil {
 		return uncheckedDataSheetsWithCount, err
 	}
@@ -3697,4 +3699,27 @@ func (s *PallidSturgeonStore) GetDownloadInfo() (models.DownloadInfo, error) {
 	}
 
 	return downloadInfo, err
+}
+
+var getUploadSessionLogsSql = `select debug_text, date_created, p_user, upload_session_id from upload_session_log_t where p_user = :1 and upload_session_id = :2`
+
+func (s *PallidSturgeonStore) GetUploadSessionLogs(user string, uploadSessionId string) ([]models.UploadSessionLog, error) {
+	rows, err := s.db.Query(getUploadSessionLogsSql, user, uploadSessionId)
+
+	logs := []models.UploadSessionLog{}
+	if err != nil {
+		return logs, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		log := models.UploadSessionLog{}
+		err = rows.Scan(&log.DebugText, &log.DateCreated, &log.PUser, &log.UploadSessionId)
+		if err != nil {
+			return nil, err
+		}
+		logs = append(logs, log)
+	}
+
+	return logs, err
 }

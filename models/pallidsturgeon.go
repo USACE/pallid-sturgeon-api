@@ -829,3 +829,10 @@ type DownloadInfo struct {
 	DisplayName string `db:"display_name" json:"displayName"`
 	LastUpdated string `db:"last_updated" json:"lastUpdated"`
 }
+
+type UploadSessionLog struct {
+	DebugText       string `db:"debug_text" json:"debugText"`
+	DateCreated     string `db:"date_created" json:"dateCreated"`
+	PUser           string `db:"p_user" json:"pUser"`
+	UploadSessionId string `db:"upload_session_id" json:"uploadSessionId"`
+}
