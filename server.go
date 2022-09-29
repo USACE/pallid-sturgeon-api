@@ -118,6 +118,7 @@ func main() {
 	e.POST(urlContext+"/uploadDownloadZip", auth.Authorize(PallidSturgeonH.UploadDownloadZip, PUBLIC))
 	e.GET(urlContext+"/downloadInfo", auth.Authorize(PallidSturgeonH.GetDownloadInfo, PUBLIC))
 	e.GET(urlContext+"/downloadZip", auth.Authorize(PallidSturgeonH.GetDownloadZip, PUBLIC))
+	e.GET(urlContext+"/uploadSessionLogs", auth.Authorize(PallidSturgeonH.GetUploadSessionLogs, PUBLIC))
 
 	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
 	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))

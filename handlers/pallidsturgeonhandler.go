@@ -1024,7 +1024,7 @@ func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	unapprovedDataSheets, err := sd.Store.GetUnapprovedDataSheets(userInfo.ProjectCode, queryParams)
+	unapprovedDataSheets, err := sd.Store.GetUnapprovedDataSheets(userInfo.ProjectCode, userInfo.OfficeCode, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -1099,4 +1099,19 @@ func (sd *PallidSturgeonHandler) GetDownloadZip(c echo.Context) error {
 	}
 	defer os.Remove(downloadZipName)
 	return c.Inline(downloadZipName, downloadZipName)
+}
+
+func (sd *PallidSturgeonHandler) GetUploadSessionLogs(c echo.Context) error {
+	uploadSessionId := c.QueryParam("uploadSessionId")
+
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	bends, err := sd.Store.GetUploadSessionLogs(userInfo.FirstName+" "+userInfo.LastName, uploadSessionId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, bends)
 }
