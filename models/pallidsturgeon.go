@@ -404,6 +404,7 @@ type UploadFish struct {
 	Segment            *int      `db:"SEGMENT_ID" json:"segment"`
 	Fieldoffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
+	Condition          *float32  `db:"condition" json:"condition"`
 }
 
 type SearchDataEntryWithCount struct {
