@@ -571,14 +571,14 @@ func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.Sites) e
 }
 
 var fishDataEntriesSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, COALESCE(fi.condition,0) as condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var fishDataEntriesCountSql = `select count(*) from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var fishDataEntriesByFidSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, COALESCE(fi.condition,0) as condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and fi.f_id = :1`
 
@@ -587,7 +587,7 @@ where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_id = :1`
 
 var fishDataEntriesByFfidSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, COALESCE(fi.condition,0) as condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_fid = :1`
 
@@ -596,7 +596,7 @@ where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_fid = :1`
 
 var fishDataEntriesByMridSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, COALESCE(fi.condition,0) as condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and fi.mr_id = :1`
 
@@ -688,7 +688,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	for rows.Next() {
 		fishDataEntry := models.UploadFish{}
 		err = rows.Scan(&fishDataEntry.Fid, &fishDataEntry.Ffid, &fishDataEntry.MrID, &fishDataEntry.SiteID, &fishDataEntry.Panelhook, &fishDataEntry.Bait, &fishDataEntry.Species, &fishDataEntry.Length, &fishDataEntry.Weight, &fishDataEntry.Fishcount, &fishDataEntry.Otolith, &fishDataEntry.Rayspine,
-			&fishDataEntry.Scale, &fishDataEntry.Ftprefix, &fishDataEntry.Ftnum, &fishDataEntry.Ftmr, &fishDataEntry.EditInitials, &fishDataEntry.LastEditComment, &fishDataEntry.UploadedBy, &fishDataEntry.GeneticsVialNumber)
+			&fishDataEntry.Scale, &fishDataEntry.Ftprefix, &fishDataEntry.Ftnum, &fishDataEntry.Ftmr, &fishDataEntry.EditInitials, &fishDataEntry.LastEditComment, &fishDataEntry.UploadedBy, &fishDataEntry.GeneticsVialNumber, &fishDataEntry.Condition, &fishDataEntry.FinCurl)
 		if err != nil {
 			return fishDataEntryWithCount, err
 		}
@@ -700,13 +700,16 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	return fishDataEntryWithCount, err
 }
 
-var insertFishDataSql = `insert into ds_fish (FIELDOFFICE,PROJECT,SEGMENT,uniqueidentifier,id,panelhook,bait,SPECIES,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, last_updated, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22) returning f_id into :23`
+var insertFishDataSql = `insert into ds_fish (FIELDOFFICE,PROJECT,SEGMENT,uniqueidentifier,id,panelhook,bait,SPECIES,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, 
+last_updated, uploaded_by, genetics_vial_number, condition, fin_curl) 
+values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25) returning f_id into :26`
 
 func (s *PallidSturgeonStore) SaveFishDataEntry(fishDataEntry models.UploadFish) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertFishDataSql, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
-		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.MrID, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy, sql.Out{Dest: &id})
+		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.MrID, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy,
+		fishDataEntry.GeneticsVialNumber, fishDataEntry.Condition, fishDataEntry.FinCurl, sql.Out{Dest: &id})
 
 	return id, err
 }
@@ -733,14 +736,16 @@ edit_initials = :19,
 last_edit_comment = :20,
 last_updated = :21, 
 uploaded_by = :22,
-genetics_vial_number = :23
+genetics_vial_number = :23,
+condition = :24,
+fin_curl = :25
 WHERE f_id = :1`
 
 func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFish) error {
 	_, err := s.db.Exec(updateFishDataSql, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
 		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy,
-		fishDataEntry.GeneticsVialNumber, fishDataEntry.Fid)
+		fishDataEntry.GeneticsVialNumber, fishDataEntry.Condition, fishDataEntry.FinCurl, fishDataEntry.Fid)
 	return err
 }
 
