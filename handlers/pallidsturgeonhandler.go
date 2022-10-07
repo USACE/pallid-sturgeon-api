@@ -164,6 +164,24 @@ func (sd *PallidSturgeonHandler) GetOtolith(c echo.Context) error {
 	return c.JSON(http.StatusOK, otolith)
 }
 
+func (sd *PallidSturgeonHandler) GetSetSite1(c echo.Context) error {
+	microstructure := c.QueryParam("microstructure")
+	setSiteItems, err := sd.Store.GetSetSite1(microstructure)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, setSiteItems)
+}
+
+func (sd *PallidSturgeonHandler) GetSetSite2(c echo.Context) error {
+	setsite1 := c.QueryParam("setsite1")
+	setSiteItems, err := sd.Store.GetSetSite2(setsite1)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, setSiteItems)
+}
+
 func (sd *PallidSturgeonHandler) GetHeaderData(c echo.Context) error {
 	siteId := c.QueryParam("siteId")
 	headerDataItems, err := sd.Store.GetHeaderData(siteId)

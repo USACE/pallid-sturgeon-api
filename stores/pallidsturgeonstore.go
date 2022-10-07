@@ -192,7 +192,7 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 var getSegmentsSql = `select distinct s.s_id, s.segment_code, s.segment_description, s.segment_type, s.river, s.upper_river_mile, s.lower_river_mile, s.rpma from segment_lk s
 						join fieldoffice_segment_v v
 						on v.SEGMENT_CODE = s.segment_code
-						and v.FIELD_OFFICE_CODE = :1
+						where (CASE when :1 != 'ZZ' THEN v.FIELD_OFFICE_CODE ELSE :2 END) = :3
 						order by s.s_id`
 
 func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segment, error) {
@@ -203,7 +203,7 @@ func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segm
 		return segments, err
 	}
 
-	rows, err := selectQuery.Query(fieldOfficeCode)
+	rows, err := selectQuery.Query(fieldOfficeCode, fieldOfficeCode, fieldOfficeCode)
 	if err != nil {
 		return segments, err
 	}
@@ -410,6 +410,48 @@ func (s *PallidSturgeonStore) GetOtolith() ([]models.Otolith, error) {
 	return otolithItems, err
 }
 
+func (s *PallidSturgeonStore) GetSetSite1(microstructure string) ([]models.SetSite1, error) {
+	rows, err := s.db.Query("select set_site_1, set_site_1_code from micro_set_site_lk where structure_code=:1 group by set_site_1, set_site_1_code order by set_site_1_code asc", microstructure)
+
+	setSiteItems := []models.SetSite1{}
+	if err != nil {
+		return setSiteItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		setSite := models.SetSite1{}
+		err = rows.Scan(&setSite.Description, &setSite.Code)
+		if err != nil {
+			return nil, err
+		}
+		setSiteItems = append(setSiteItems, setSite)
+	}
+
+	return setSiteItems, err
+}
+
+func (s *PallidSturgeonStore) GetSetSite2(setsite1 string) ([]models.SetSite2, error) {
+	rows, err := s.db.Query("select set_site_two, set_site_two_code from micro_set_site_lk where set_site_1_code=:1 and set_site_two != 'SIDE  NOTCH' group by set_site_two, set_site_two_code order by set_site_two_code asc", setsite1)
+
+	setSiteItems := []models.SetSite2{}
+	if err != nil {
+		return setSiteItems, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		setSite := models.SetSite2{}
+		err = rows.Scan(&setSite.Description, &setSite.Code)
+		if err != nil {
+			return nil, err
+		}
+		setSiteItems = append(setSiteItems, setSite)
+	}
+
+	return setSiteItems, err
+}
+
 var headerDataSql = `select si.site_id, si.year, si.fieldoffice, si.project_id, si.segment_id, si.season, si.bend,
 si.bendrn, si.sample_unit_type, COALESCE(mo.bendrivermile,0.0) as bendrivermile from ds_sites si
 inner join ds_moriver mo on si.site_id = mo.site_id
@@ -498,7 +540,7 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(siteId string, year string, off
 	siteEntries := []models.Sites{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "site_id"
+		queryParams.OrderBy = "site_id desc"
 	}
 	siteDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(siteDataEntriesSqlWithSearch)
@@ -663,7 +705,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	fishEntries := []models.UploadFish{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "f_id"
+		queryParams.OrderBy = "f_id desc"
 	}
 	fishDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(fishDataEntriesSqlWithSearch)
@@ -763,7 +805,7 @@ func (s *PallidSturgeonStore) SaveMoriverDataEntry(moriverDataEntry models.Uploa
 	var id int
 	_, err := s.db.Exec(insertMoriverDataSql, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
 		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.SetDate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
-		moriverDataEntry.SubsampleROrN, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
+		moriverDataEntry.Subsamplen, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
 		moriverDataEntry.Distance, moriverDataEntry.Width, moriverDataEntry.Netrivermile, moriverDataEntry.Structurenumber, moriverDataEntry.Usgs, moriverDataEntry.Riverstage, moriverDataEntry.Discharge,
 		moriverDataEntry.U1, moriverDataEntry.U2, moriverDataEntry.U3, moriverDataEntry.U4, moriverDataEntry.U5, moriverDataEntry.U6, moriverDataEntry.U7, moriverDataEntry.Macro, moriverDataEntry.Meso, moriverDataEntry.Habitatrn, moriverDataEntry.Qc,
 		moriverDataEntry.MicroStructure, moriverDataEntry.StructureFlow, moriverDataEntry.StructureMod, moriverDataEntry.SetSite1, moriverDataEntry.SetSite2, moriverDataEntry.SetSite3,
@@ -793,7 +835,7 @@ uploaded_by = :75, bend = :76, bendrn = :77, bendrivermile =:78 WHERE mr_id = :1
 func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.UploadMoriver) error {
 	_, err := s.db.Exec(updateMoriverDataSql,
 		moriverDataEntry.Project, moriverDataEntry.Segment, moriverDataEntry.Season, moriverDataEntry.SetDate, moriverDataEntry.Subsample, moriverDataEntry.Subsamplepass,
-		moriverDataEntry.SubsampleROrN, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
+		moriverDataEntry.Subsamplen, moriverDataEntry.Recorder, moriverDataEntry.Gear, moriverDataEntry.GearType, moriverDataEntry.Temp, moriverDataEntry.Turbidity, moriverDataEntry.Conductivity, moriverDataEntry.Do,
 		moriverDataEntry.Distance, moriverDataEntry.Width, moriverDataEntry.Netrivermile, moriverDataEntry.Structurenumber, moriverDataEntry.Usgs, moriverDataEntry.Riverstage, moriverDataEntry.Discharge,
 		moriverDataEntry.U1, moriverDataEntry.U2, moriverDataEntry.U3, moriverDataEntry.U4, moriverDataEntry.U5, moriverDataEntry.U6, moriverDataEntry.U7, moriverDataEntry.Macro, moriverDataEntry.Meso, moriverDataEntry.Habitatrn, moriverDataEntry.Qc,
 		moriverDataEntry.MicroStructure, moriverDataEntry.StructureFlow, moriverDataEntry.StructureMod, moriverDataEntry.SetSite1, moriverDataEntry.SetSite2, moriverDataEntry.SetSite3,
@@ -866,7 +908,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	moriverEntries := []models.UploadMoriver{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "mr_id"
+		queryParams.OrderBy = "mr_id desc"
 	}
 	moriverDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(moriverDataEntriesSqlWithSearch)
@@ -884,7 +926,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 		moriverDataEntry := models.UploadMoriver{}
 		err = rows.Scan(&moriverDataEntry.MrFid, &moriverDataEntry.MrID, &moriverDataEntry.SiteID, &moriverDataEntry.FieldOffice,
 			&moriverDataEntry.Project, &moriverDataEntry.Segment, &moriverDataEntry.Season, &moriverDataEntry.SetDate, &moriverDataEntry.Subsample, &moriverDataEntry.Subsamplepass,
-			&moriverDataEntry.SubsampleROrN, &moriverDataEntry.Recorder, &moriverDataEntry.Gear, &moriverDataEntry.GearType, &moriverDataEntry.Temp, &moriverDataEntry.Turbidity, &moriverDataEntry.Conductivity, &moriverDataEntry.Do,
+			&moriverDataEntry.Subsamplen, &moriverDataEntry.Recorder, &moriverDataEntry.Gear, &moriverDataEntry.GearType, &moriverDataEntry.Temp, &moriverDataEntry.Turbidity, &moriverDataEntry.Conductivity, &moriverDataEntry.Do,
 			&moriverDataEntry.Distance, &moriverDataEntry.Width, &moriverDataEntry.Netrivermile, &moriverDataEntry.Structurenumber, &moriverDataEntry.Usgs, &moriverDataEntry.Riverstage, &moriverDataEntry.Discharge,
 			&moriverDataEntry.U1, &moriverDataEntry.U2, &moriverDataEntry.U3, &moriverDataEntry.U4, &moriverDataEntry.U5, &moriverDataEntry.U6, &moriverDataEntry.U7, &moriverDataEntry.Macro, &moriverDataEntry.Meso, &moriverDataEntry.Habitatrn, &moriverDataEntry.Qc,
 			&moriverDataEntry.MicroStructure, &moriverDataEntry.StructureFlow, &moriverDataEntry.StructureMod, &moriverDataEntry.SetSite1, &moriverDataEntry.SetSite2, &moriverDataEntry.SetSite3,
@@ -1379,7 +1421,7 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 	searchEntries := []models.UploadSearch{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "se_id"
+		queryParams.OrderBy = "se_id desc"
 	}
 	searchDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(searchDataEntriesSqlWithSearch)
@@ -1460,7 +1502,7 @@ func (s *PallidSturgeonStore) UpdateSearchDataEntry(searchDataEntry models.Uploa
 	return err
 }
 
-var telemetryDataEntriesSql = `select te.BEND,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
+var telemetryDataEntriesSql = `select COALESCE(te.BEND,0) as bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,COALESCE(te.GRAVEL,0) as gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,COALESCE(te.POSITION_CONFIDENCE,0) as position_confidence,te.RADIO_TAG_NUM,
 COALESCE(te.SAND,0) as sand,te.SE_FID,te.SE_ID,COALESCE(te.SILT,0) as silt,COALESCE(te.TEMP,0) as temp,COALESCE(te.TURBIDITY,0) as turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
 te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
@@ -1473,7 +1515,7 @@ inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
-var telemetryDataEntriesBySeIdSql = `select te.BEND,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
+var telemetryDataEntriesBySeIdSql = `select COALESCE(te.BEND,0) as bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,COALESCE(te.GRAVEL,0) as gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,COALESCE(te.POSITION_CONFIDENCE,0) as position_confidence,te.RADIO_TAG_NUM,
 COALESCE(te.SAND,0) as sand,te.SE_FID,te.SE_ID,COALESCE(te.SILT,0) as silt,COALESCE(te.TEMP,0) as temp,COALESCE(te.TURBIDITY,0) as turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
 te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
@@ -1488,7 +1530,7 @@ inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and te.se_id = :1`
 
-var telemetryDataEntriesByTidSql = `select te.BEND,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
+var telemetryDataEntriesByTidSql = `select COALESCE(te.BEND,0) as bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,COALESCE(te.GRAVEL,0) as gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,COALESCE(te.POSITION_CONFIDENCE,0) as position_confidence,te.RADIO_TAG_NUM,
 COALESCE(te.SAND,0) as sand,te.SE_FID,te.SE_ID,COALESCE(te.SILT,0) as silt,COALESCE(te.TEMP,0) as temp,COALESCE(te.TURBIDITY,0) as turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
 te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
@@ -1556,7 +1598,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 	telemetryEntries := []models.UploadTelemetry{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "t_id"
+		queryParams.OrderBy = "t_id desc"
 	}
 	telemetryDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(telemetryDataEntriesSqlWithSearch)
@@ -2194,7 +2236,7 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 	return file.Name(), err
 }
 
-var missouriDataSummarySql = `SELECT mr_id, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, COALESCE(BEND_NUMBER,0) as bend_number, BEND_R_OR_N, COALESCE(bend_river_mile, 0.0) as bend_river_mile, COALESCE(subsample,0) as subsample, COALESCE(subsample_pass,0) as subsample_pass, set_Date, conductivity, checkby FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var missouriDataSummarySql = `SELECT mr_id, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, COALESCE(BEND_NUMBER,0) as bend_number, BEND_R_OR_N, COALESCE(bend_river_mile, 0.0) as bend_river_mile, COALESCE(subsample,0) as subsample, COALESCE(subsample_pass,0) as subsample_pass, set_Date, conductivity, checkby, COALESCE(approved, 0) as approved FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var missouriDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.missouri_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -2239,7 +2281,7 @@ func (s *PallidSturgeonStore) GetMissouriDataSummary(year string, officeCode str
 		summary := models.MissouriSummary{}
 		err = rows.Scan(&summary.UniqueID, &summary.Year, &summary.FieldOffice, &summary.Project, &summary.Segment,
 			&summary.Season, &summary.Bend, &summary.Bendrn, &summary.BendRiverMile,
-			&summary.Subsample, &summary.Pass, &summary.SetDate, &summary.Conductivity, &summary.CheckedBy)
+			&summary.Subsample, &summary.Pass, &summary.SetDate, &summary.Conductivity, &summary.CheckedBy, &summary.Approved)
 		if err != nil {
 			return missouriSummariesWithCount, err
 		}

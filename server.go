@@ -68,6 +68,8 @@ func main() {
 	e.GET(urlContext+"/ftPrefix", auth.Authorize(PallidSturgeonH.GetFtPrefixes, PUBLIC))
 	e.GET(urlContext+"/mr", auth.Authorize(PallidSturgeonH.GetMr, PUBLIC))
 	e.GET(urlContext+"/otolith", auth.Authorize(PallidSturgeonH.GetOtolith, PUBLIC))
+	e.GET(urlContext+"/setsite1", auth.Authorize(PallidSturgeonH.GetSetSite1, PUBLIC))
+	e.GET(urlContext+"/setsite2", auth.Authorize(PallidSturgeonH.GetSetSite2, PUBLIC))
 	e.GET(urlContext+"/headerData", auth.Authorize(PallidSturgeonH.GetHeaderData, PUBLIC))
 	e.GET(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.GetSiteDataEntries, PUBLIC))
 	e.POST(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.SaveSiteDataEntry, PUBLIC))

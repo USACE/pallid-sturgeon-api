@@ -96,6 +96,16 @@ type Otolith struct {
 	Description string `db:"description" json:"description"`
 }
 
+type SetSite1 struct {
+	Code        string `db:"code" json:"code"`
+	Description string `db:"description" json:"description"`
+}
+
+type SetSite2 struct {
+	Code        string `db:"code" json:"code"`
+	Description string `db:"description" json:"description"`
+}
+
 type HeaderData struct {
 	SiteId         int     `db:"site_id" json:"siteId"`
 	Year           int     `db:"year" json:"year"`
@@ -178,6 +188,7 @@ type MissouriSummary struct {
 	SetDate         time.Time `db:"set_date" json:"setDate"`
 	Conductivity    *string   `db:"conductivity" json:"conductivity"`
 	CheckedBy       string    `db:"checkby" json:"checkedby"`
+	Approved        int       `db:"approved" json:"approved"`
 	EditInitials    string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
 }
