@@ -896,6 +896,8 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadSearch := range uploads.SearchUpload.Items {
 		uploadSearch.SearchDateTime = processTimeString(uploadSearch.SearchDate)
+		// @TODO: remove hardcoded value and fix date formatting
+		uploadSearch.SearchDate = "12-Dec-2022"
 		uploadSearch.LastUpdated = time.Now()
 		uploadSearch.UploadedBy = user.FirstName + " " + user.LastName
 		uploadSearch.UploadSessionId = sessionId
@@ -935,6 +937,8 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadMoriver := range uploads.MoriverUpload.Items {
 		uploadMoriver.SetDateTime = processTimeString(uploadMoriver.SetDate)
+		// @TODO: remove hardcoded value and fix date formatting
+		uploadMoriver.SetDate = "12-Dec-2022"
 		uploadMoriver.LastUpdated = time.Now()
 		uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
 		uploadMoriver.UploadSessionId = sessionId

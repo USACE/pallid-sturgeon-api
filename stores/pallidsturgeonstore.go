@@ -3037,7 +3037,7 @@ func (s *PallidSturgeonStore) SaveSearchUpload(uploadSearch models.UploadSearch)
 		uploadSearch.DsId,
 		uploadSearch.SiteId,
 		uploadSearch.SiteFid,
-		uploadSearch.SearchDateTime,
+		uploadSearch.SearchDate,
 		uploadSearch.Recorder,
 		uploadSearch.SearchTypeCode,
 		uploadSearch.SearchDay,
@@ -3195,7 +3195,7 @@ var insertMoriverUploadSql = `insert into upload_mr (site_id, site_fid, mr_fid, 
 
 func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriver) error {
 	_, err := s.db.Exec(insertMoriverUploadSql,
-		UploadMoriver.SiteID, UploadMoriver.SiteFid, UploadMoriver.MrFid, UploadMoriver.Season, UploadMoriver.SetDateTime,
+		UploadMoriver.SiteID, UploadMoriver.SiteFid, UploadMoriver.MrFid, UploadMoriver.Season, UploadMoriver.SetDate,
 		UploadMoriver.Subsample, UploadMoriver.Subsamplepass, UploadMoriver.Subsamplen, UploadMoriver.Recorder,
 		UploadMoriver.Gear, UploadMoriver.GearType, UploadMoriver.Temp, UploadMoriver.Turbidity, UploadMoriver.Conductivity,
 		UploadMoriver.Do, UploadMoriver.Distance, UploadMoriver.Width, UploadMoriver.Netrivermile, UploadMoriver.Structurenumber,
