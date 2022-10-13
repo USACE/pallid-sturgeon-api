@@ -26,6 +26,17 @@ func (u *UserHandler) AddUserRoleOffice(c echo.Context) error {
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
+func (u *UserHandler) GetUserRoleOffices(c echo.Context) error {
+	email := c.Param("email")
+
+	roleOfficeItems, err := u.Store.GetUserRoleOffices(email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, roleOfficeItems)
+}
+
 func (u *UserHandler) GetUserRoleOffice(c echo.Context) error {
 	email := c.Param("email")
 

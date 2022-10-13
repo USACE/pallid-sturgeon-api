@@ -233,6 +233,50 @@ func (auth *AuthStore) AddUserRoleOffice(userRoleOffice models.UserRoleOffice) e
 	return err
 }
 
+func (auth *AuthStore) GetUserRoleOffices(email string) ([]models.UserRoleOffice, error) {
+	userRoleOffices := []models.UserRoleOffice{}
+	selectQuery, err := auth.db.Prepare(getUserRoleOfficeSql)
+	if err != nil {
+		return userRoleOffices, err
+	}
+
+	rows, err := selectQuery.Query(email)
+	if err != nil {
+		return userRoleOffices, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		userRoleOffice := models.UserRoleOffice{}
+		err = rows.Scan(&userRoleOffice.ID, &userRoleOffice.UserID, &userRoleOffice.RoleID, &userRoleOffice.OfficeID, &userRoleOffice.Role, &userRoleOffice.OfficeCode, &userRoleOffice.ProjectCode)
+		if err != nil {
+			return userRoleOffices, err
+		}
+		userRoleOffices = append(userRoleOffices, userRoleOffice)
+	}
+
+	// if userRoleOffice.OfficeCode == "" {
+	// 	message := []byte("There is a new user role request. Please login to appove or deny the request.")
+	// 	users, adminUserLoadErr := auth.GetUsersByRoleType("ADMINISTRATOR")
+	// 	if adminUserLoadErr != nil {
+	// 		log.Print("Unable to send email.", adminUserLoadErr)
+	// 	}
+
+	// 	to := make([]string, 0)
+	// 	for _, user := range users {
+	// 		to = append(to, user.Email)
+	// 	}
+
+	// 	from := auth.config.EmailFrom
+	// 	emailErr := auth.SendEmail(message, to, from)
+	// 	if emailErr != nil {
+	// 		log.Print("Unable to send email.", emailErr)
+	// 	}
+	// }
+
+	return userRoleOffices, err
+}
+
 func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, error) {
 	userRoleOffice := models.UserRoleOffice{}
 	selectQuery, err := auth.db.Prepare(getUserRoleOfficeSql)

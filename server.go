@@ -122,6 +122,7 @@ func main() {
 	e.GET(urlContext+"/downloadZip", auth.Authorize(PallidSturgeonH.GetDownloadZip, PUBLIC))
 	e.GET(urlContext+"/uploadSessionLogs", auth.Authorize(PallidSturgeonH.GetUploadSessionLogs, PUBLIC))
 
+	e.GET(urlContext+"/userRoleOffices/:email", auth.Authorize(userH.GetUserRoleOffices, PUBLIC))
 	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
 	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))
 	e.GET(urlContext+"/users", auth.Authorize(userH.GetUsers, ADMIN))
