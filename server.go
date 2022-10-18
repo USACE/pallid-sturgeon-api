@@ -123,7 +123,7 @@ func main() {
 	e.GET(urlContext+"/uploadSessionLogs", auth.Authorize(PallidSturgeonH.GetUploadSessionLogs, PUBLIC))
 
 	e.GET(urlContext+"/userRoleOffices/:email", auth.Authorize(userH.GetUserRoleOffices, PUBLIC))
-	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
+	e.GET(urlContext+"/userRoleOffice/:id", auth.Authorize(userH.GetUserRoleOfficeById, PUBLIC))
 	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))
 	e.GET(urlContext+"/users", auth.Authorize(userH.GetUsers, ADMIN))
 	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, ADMIN))

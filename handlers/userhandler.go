@@ -37,10 +37,10 @@ func (u *UserHandler) GetUserRoleOffices(c echo.Context) error {
 	return c.JSON(http.StatusOK, roleOfficeItems)
 }
 
-func (u *UserHandler) GetUserRoleOffice(c echo.Context) error {
-	email := c.Param("email")
+func (u *UserHandler) GetUserRoleOfficeById(c echo.Context) error {
+	id := c.Param("id")
 
-	roleOffice, err := u.Store.GetUserRoleOffice(email)
+	roleOffice, err := u.Store.GetUserRoleOfficeById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

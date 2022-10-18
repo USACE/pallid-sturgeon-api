@@ -50,6 +50,12 @@ var getUserRoleOfficeSql = `select uro.id, uro.user_id, uro.role_id, uro.office_
 							inner join field_office_lk f on f.fo_id = uro.office_id
 							where u.email = :1`
 
+var getUserRoleOfficeByIdSql = `select uro.id, uro.user_id, uro.role_id, uro.office_id, r.description, f.FIELD_OFFICE_CODE, project_code from user_role_office_lk uro 
+							inner join users_t u on u.id = uro.user_id
+							inner join role_lk r on r.id = uro.role_id
+							inner join field_office_lk f on f.fo_id = uro.office_id
+							where uro.id = :1`
+
 func InitAuthStore(appConfig *config.AppConfig) (*AuthStore, error) {
 
 	connectString := fmt.Sprintf("%s:%s/%s", appConfig.Dbhost, appConfig.Dbport, appConfig.Dbname)
@@ -277,6 +283,29 @@ func (auth *AuthStore) GetUserRoleOffices(email string) ([]models.UserRoleOffice
 	return userRoleOffices, err
 }
 
+func (auth *AuthStore) GetUserRoleOfficeById(id string) (models.UserRoleOffice, error) {
+	userRoleOffice := models.UserRoleOffice{}
+	selectQuery, err := auth.db.Prepare(getUserRoleOfficeByIdSql)
+	if err != nil {
+		return userRoleOffice, err
+	}
+
+	rows, err := selectQuery.Query(id)
+	if err != nil {
+		return userRoleOffice, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&userRoleOffice.ID, &userRoleOffice.UserID, &userRoleOffice.RoleID, &userRoleOffice.OfficeID, &userRoleOffice.Role, &userRoleOffice.OfficeCode, &userRoleOffice.ProjectCode)
+		if err != nil {
+			return userRoleOffice, err
+		}
+	}
+	defer rows.Close()
+
+	return userRoleOffice, err
+}
+
 func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, error) {
 	userRoleOffice := models.UserRoleOffice{}
 	selectQuery, err := auth.db.Prepare(getUserRoleOfficeSql)
@@ -296,25 +325,6 @@ func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, e
 		}
 	}
 	defer rows.Close()
-
-	// if userRoleOffice.OfficeCode == "" {
-	// 	message := []byte("There is a new user role request. Please login to appove or deny the request.")
-	// 	users, adminUserLoadErr := auth.GetUsersByRoleType("ADMINISTRATOR")
-	// 	if adminUserLoadErr != nil {
-	// 		log.Print("Unable to send email.", adminUserLoadErr)
-	// 	}
-
-	// 	to := make([]string, 0)
-	// 	for _, user := range users {
-	// 		to = append(to, user.Email)
-	// 	}
-
-	// 	from := auth.config.EmailFrom
-	// 	emailErr := auth.SendEmail(message, to, from)
-	// 	if emailErr != nil {
-	// 		log.Print("Unable to send email.", emailErr)
-	// 	}
-	// }
 
 	return userRoleOffice, err
 }
