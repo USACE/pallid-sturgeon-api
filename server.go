@@ -71,6 +71,7 @@ func main() {
 	e.GET(urlContext+"/setsite1", auth.Authorize(PallidSturgeonH.GetSetSite1, PUBLIC))
 	e.GET(urlContext+"/setsite2", auth.Authorize(PallidSturgeonH.GetSetSite2, PUBLIC))
 	e.GET(urlContext+"/headerData", auth.Authorize(PallidSturgeonH.GetHeaderData, PUBLIC))
+
 	e.GET(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.GetSiteDataEntries, PUBLIC))
 	e.POST(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.SaveSiteDataEntry, PUBLIC))
 	e.PUT(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.UpdateSiteDataEntry, PUBLIC))
@@ -92,6 +93,7 @@ func main() {
 	e.GET(urlContext+"/procedureDataEntry", auth.Authorize(PallidSturgeonH.GetProcedureDataEntries, PUBLIC))
 	e.POST(urlContext+"/procedureDataEntry", auth.Authorize(PallidSturgeonH.SaveProcedureDataEntry, PUBLIC))
 	e.PUT(urlContext+"/procedureDataEntry", auth.Authorize(PallidSturgeonH.UpdateProcedureDataEntry, PUBLIC))
+
 	e.GET(urlContext+"/fishFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullFishDataSummary, PUBLIC))
 	e.GET(urlContext+"/fishDataSummary", auth.Authorize(PallidSturgeonH.GetFishDataSummary, PUBLIC))
 	e.GET(urlContext+"/suppFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullSuppDataSummary, PUBLIC))
@@ -108,9 +110,11 @@ func main() {
 	e.GET(urlContext+"/procedureDataSummary", auth.Authorize(PallidSturgeonH.GetProcedureDataSummary, PUBLIC))
 	e.GET(urlContext+"/missouriDatasheets", auth.Authorize(PallidSturgeonH.GetMissouriDatasheetById, PUBLIC))
 	e.GET(urlContext+"/searchDatasheets", auth.Authorize(PallidSturgeonH.GetSearchDatasheetById, PUBLIC))
+
 	e.GET(urlContext+"/uploadSessionId", auth.Authorize(PallidSturgeonH.GetUploadSessionId, PUBLIC))
 	e.POST(urlContext+"/upload", auth.Authorize(PallidSturgeonH.Upload, PUBLIC))
 	e.POST(urlContext+"/storeProcedure/:uploadSessionId", auth.Authorize(PallidSturgeonH.CallStoreProcedures, PUBLIC))
+
 	e.GET(urlContext+"/errorCount", auth.Authorize(PallidSturgeonH.GetErrorCount, PUBLIC))
 	e.GET(urlContext+"/officeErrorLog", auth.Authorize(PallidSturgeonH.GetOfficeErrorLogs, PUBLIC))
 	e.GET(urlContext+"/usgNoVialNumbers", auth.Authorize(PallidSturgeonH.GetUsgNoVialNumbers, PUBLIC))
@@ -118,9 +122,12 @@ func main() {
 	e.GET(urlContext+"/bafiDataSheets", auth.Authorize(PallidSturgeonH.GetBafiDataSheets, PUBLIC))
 	e.GET(urlContext+"/uncheckedDataSheets", auth.Authorize(PallidSturgeonH.GetUncheckedDataSheets, PUBLIC))
 	e.POST(urlContext+"/uploadDownloadZip", auth.Authorize(PallidSturgeonH.UploadDownloadZip, PUBLIC))
+
 	e.GET(urlContext+"/downloadInfo", auth.Authorize(PallidSturgeonH.GetDownloadInfo, PUBLIC))
 	e.GET(urlContext+"/downloadZip", auth.Authorize(PallidSturgeonH.GetDownloadZip, PUBLIC))
 	e.GET(urlContext+"/uploadSessionLogs", auth.Authorize(PallidSturgeonH.GetUploadSessionLogs, PUBLIC))
+
+	e.GET(urlContext+"/export/sites", auth.Authorize(PallidSturgeonH.GetSitesExport, PUBLIC))
 
 	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
 	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))

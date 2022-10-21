@@ -848,3 +848,22 @@ type UploadSessionLog struct {
 	PUser           string `db:"p_user" json:"pUser"`
 	UploadSessionId string `db:"upload_session_id" json:"uploadSessionId"`
 }
+
+type ExportSite struct {
+	SiteID         int     `db:"site_id" json:"siteId"`
+	SiteYear       int     `db:"year" json:"year"`
+	SiteFID        int     `db:"site_fid" json:"siteFid"`
+	FieldOfficeID  string  `db:"fieldoffice" json:"fieldoffice"`
+	FieldOffice    string  `db:"field_office_description" json:"fieldOfficeDescription"`
+	ProjectId      int     `db:"project_id" json:"projectId"`
+	Project        string  `db:"project_description" json:"projectDescription"`
+	SegmentId      int     `db:"segment_id" json:"segmentId"`
+	Segment        string  `db:"segment_description" json:"segmentDescription"`
+	SeasonId       string  `db:"season" json:"season"`
+	Season         string  `db:"season_description" json:"seasonDescription"`
+	SampleUnitType string  `db:"sample_unit_type" json:"sampleUnitType"`
+	Bend           int     `db:"bend" json:"bend"`
+	Bendrn         string  `db:"bendrn" json:"bendrn"`
+	BendRiverMile  float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	SampleUnitDesc string  `db:"sample_unit_desc" json:"sampleUnitDesc"`
+}
