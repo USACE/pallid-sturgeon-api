@@ -51,19 +51,12 @@ func (sd *PallidSturgeonHandler) GetFieldOffices(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSeasons(c echo.Context) error {
-	seasons, err := sd.Store.GetSeasons()
+	project := c.QueryParam("project")
+	seasons, err := sd.Store.GetSeasons(project)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, seasons)
-}
-
-func (sd *PallidSturgeonHandler) GetSampleMethods(c echo.Context) error {
-	sampleMethods, err := sd.Store.GetSampleMethods()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-	return c.JSON(http.StatusOK, sampleMethods)
 }
 
 func (sd *PallidSturgeonHandler) GetSampleUnitTypes(c echo.Context) error {
@@ -75,14 +68,8 @@ func (sd *PallidSturgeonHandler) GetSampleUnitTypes(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSegments(c echo.Context) error {
-
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-	segments, err := sd.Store.GetSegments(userInfo.OfficeCode)
+	office := c.QueryParam("office")
+	segments, err := sd.Store.GetSegments(office)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -90,7 +77,8 @@ func (sd *PallidSturgeonHandler) GetSegments(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetBends(c echo.Context) error {
-	bends, err := sd.Store.GetBends()
+	sampleUnitType, segment := c.QueryParam("sampleUnitType"), c.QueryParam("segment")
+	bends, err := sd.Store.GetBends(sampleUnitType, segment)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -213,6 +201,7 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
+	code, sampleUnitType, segment := c.QueryParam("code"), c.QueryParam("sampleUnitType"), c.QueryParam("segment")
 	siteData := models.Sites{}
 	if err := c.Bind(&siteData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -221,7 +210,7 @@ func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
 	siteData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	siteData.UploadedBy = user.FirstName + " " + user.LastName
-	id, err := sd.Store.SaveSiteDataEntry(siteData)
+	id, err := sd.Store.SaveSiteDataEntry(code, sampleUnitType, segment, siteData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

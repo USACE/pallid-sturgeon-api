@@ -126,27 +126,6 @@ func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
 	return fieldOffices, err
 }
 
-func (s *PallidSturgeonStore) GetSampleMethods() ([]models.SampleMethod, error) {
-	rows, err := s.db.Query("select * from sample_type_lk order by SAMPLE_TYPE_CODE")
-
-	sampleMethods := []models.SampleMethod{}
-	if err != nil {
-		return sampleMethods, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		sampleMethod := models.SampleMethod{}
-		err = rows.Scan(&sampleMethod.Code, &sampleMethod.Description)
-		if err != nil {
-			return nil, err
-		}
-		sampleMethods = append(sampleMethods, sampleMethod)
-	}
-
-	return sampleMethods, err
-}
-
 func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, error) {
 	rows, err := s.db.Query("select * from sample_unit_type_lk order by SAMPLE_UNIT_TYPE_CODE")
 
@@ -168,8 +147,8 @@ func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, err
 	return sampleUnitTypes, err
 }
 
-func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
-	rows, err := s.db.Query("select s_id, season_code, season_description, field_app, PROJECT_CODE from season_lk order by s_id")
+func (s *PallidSturgeonStore) GetSeasons(projectCode string) ([]models.Season, error) {
+	rows, err := s.db.Query("select s_id, season_code, season_description, field_app, project_code from season_lk where project_code = :1 order by s_id", projectCode)
 
 	seasons := []models.Season{}
 	if err != nil {
@@ -189,13 +168,14 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 	return seasons, err
 }
 
-var getSegmentsSql = `select distinct s.s_id, s.segment_code, s.segment_description, s.segment_type, s.river, s.upper_river_mile, s.lower_river_mile, s.rpma from segment_lk s
-						join fieldoffice_segment_v v
-						on v.SEGMENT_CODE = s.segment_code
-						where (CASE when :1 != 'ZZ' THEN v.FIELD_OFFICE_CODE ELSE :2 END) = :3
-						order by s.s_id`
+var getSegmentsSql = `select distinct s.s_id, s.segment_code as code, 
+s.segment_code || ' - ' || s.segment_description as description,
+s.segment_type, s.river, s.upper_river_mile, s.lower_river_mile, s.rpma
+from segment_lk s join fieldoffice_segment_v v on v.SEGMENT_CODE = s.segment_code
+where (CASE when :1 != 'ZZ' THEN v.FIELD_OFFICE_CODE ELSE :2 END) = :3
+order by 1`
 
-func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segment, error) {
+func (s *PallidSturgeonStore) GetSegments(officeCode string) ([]models.Segment, error) {
 	segments := []models.Segment{}
 
 	selectQuery, err := s.db.Prepare(getSegmentsSql)
@@ -203,7 +183,7 @@ func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segm
 		return segments, err
 	}
 
-	rows, err := selectQuery.Query(fieldOfficeCode, fieldOfficeCode, fieldOfficeCode)
+	rows, err := selectQuery.Query(officeCode, officeCode, officeCode)
 	if err != nil {
 		return segments, err
 	}
@@ -221,18 +201,38 @@ func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segm
 	return segments, err
 }
 
-func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
-	rows, err := s.db.Query("select BRM_ID, BEND_NUM, B_DESC, B_SEGMENT, upper_river_mile, lower_river_mile, state from bend_river_mile_lk order by BRM_ID")
+var getBendsBySegmentSql = `select brm_id as id, b_segment as segment_id, bend_num as code, b_desc as description, upper_river_mile, lower_river_mile from bend_river_mile_lk where b_segment = :1`
 
-	bends := []models.Bend{}
+var getChutesBySegmentSql = `select chute_id as id, segment_id, chute_code as code, chute_desc as description, upper_river_mile, lower_river_mile from chute_lk where segment_id = :1`
+
+var getReachBySegmentSql = `select reach_id as id, segment_id, reach_code as code, reach_desc as description, upper_river_mile, lower_river_mile from reach_lk where segment_id = :1`
+
+func (s *PallidSturgeonStore) GetBends(sampleUnitType string, segmentCode string) ([]models.Bend2, error) {
+	query := ""
+
+	if sampleUnitType == "B" {
+		query = getBendsBySegmentSql
+	}
+
+	if sampleUnitType == "C" {
+		query = getChutesBySegmentSql
+	}
+
+	if sampleUnitType == "R" {
+		query = getReachBySegmentSql
+	}
+
+	rows, err := s.db.Query(query, segmentCode)
+
+	bends := []models.Bend2{}
 	if err != nil {
 		return bends, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		bend := models.Bend{}
-		err = rows.Scan(&bend.ID, &bend.BendNumber, &bend.Description, &bend.SegmentCode, &bend.UpperRiverMile, &bend.LowerRiverMile, &bend.State)
+		bend := models.Bend2{}
+		err = rows.Scan(&bend.ID, &bend.SegmentId, &bend.Code, &bend.Description, &bend.UpperRiverMile, &bend.LowerRiverMile)
 		if err != nil {
 			return nil, err
 		}
@@ -579,11 +579,17 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(siteId string, year string, off
 }
 
 var insertSiteDataSql = `insert into ds_sites (brm_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
-	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, bend, BENDRN, edit_initials, last_updated, last_edit_comment, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14) returning site_id into :15`
+	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, bend, BENDRN, edit_initials, last_updated, last_edit_comment, uploaded_by) 
+	values ((CASE 
+	when :14 = 'B' THEN (select brm_id from bend_river_mile_lk where bend_num = :15 and b_segment = :16)
+	when :17 = 'C' THEN (select chute_id from chute_lk where chute_code = :18 and segment_id = :19)
+	when :20 = 'R' THEN (select reach_id from reach_lk where reach_code = :21 and segment_id = :22)
+	ELSE 0
+	END),:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13) returning site_id into :23`
 
-func (s *PallidSturgeonStore) SaveSiteDataEntry(sitehDataEntry models.Sites) (int, error) {
+func (s *PallidSturgeonStore) SaveSiteDataEntry(code string, sampleUnitType string, segmentCode string, sitehDataEntry models.Sites) (int, error) {
 	var id int
-	_, err := s.db.Exec(insertSiteDataSql, sitehDataEntry.BendRiverMile, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId,
+	_, err := s.db.Exec(insertSiteDataSql, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId,
 		sitehDataEntry.SegmentId, sitehDataEntry.SeasonId, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bend, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated,
 		sitehDataEntry.LastEditComment, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
 
