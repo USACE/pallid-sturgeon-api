@@ -57,7 +57,6 @@ func main() {
 	e.GET(urlContext+"/seasons", auth.Authorize(PallidSturgeonH.GetSeasons, PUBLIC))
 	e.GET(urlContext+"/segments", auth.Authorize(PallidSturgeonH.GetSegments, PUBLIC))
 	e.GET(urlContext+"/fieldOffices", auth.Authorize(PallidSturgeonH.GetFieldOffices, PUBLIC))
-	e.GET(urlContext+"/sampleMethods", auth.Authorize(PallidSturgeonH.GetSampleMethods, PUBLIC))
 	e.GET(urlContext+"/sampleUnitTypes", auth.Authorize(PallidSturgeonH.GetSampleUnitTypes, PUBLIC))
 	e.GET(urlContext+"/bends", auth.Authorize(PallidSturgeonH.GetBends, PUBLIC))
 	e.GET(urlContext+"/bendRn", auth.Authorize(PallidSturgeonH.GetBendRn, PUBLIC))

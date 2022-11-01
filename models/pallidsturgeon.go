@@ -53,6 +53,15 @@ type Bend struct {
 	State          string  `db:"state" json:"state"`
 }
 
+type Bend2 struct {
+	ID             int     `db:"id" json:"id"`
+	Code           int     `db:"code" json:"code"`
+	Description    *string `db:"description" json:"description"`
+	SegmentId      int     `db:"segment_id" json:"segmentId"`
+	UpperRiverMile *string `db:"upper_river_mile" json:"upperRiverMile"`
+	LowerRiverMile *string `db:"lower_river_mile" json:"lowerRiverMile"`
+}
+
 type BendRn struct {
 	ID          int    `db:"bs_id" json:"id"`
 	Code        string `db:"bend_selection_code" json:"code"`
