@@ -58,7 +58,7 @@ func main() {
 	e.GET(urlContext+"/segments", auth.Authorize(PallidSturgeonH.GetSegments, PUBLIC))
 	e.GET(urlContext+"/fieldOffices", auth.Authorize(PallidSturgeonH.GetFieldOffices, PUBLIC))
 	e.GET(urlContext+"/sampleUnitTypes", auth.Authorize(PallidSturgeonH.GetSampleUnitTypes, PUBLIC))
-	e.GET(urlContext+"/bends", auth.Authorize(PallidSturgeonH.GetBends, PUBLIC))
+	e.GET(urlContext+"/sampleUnit", auth.Authorize(PallidSturgeonH.GetSampleUnit, PUBLIC))
 	e.GET(urlContext+"/bendRn", auth.Authorize(PallidSturgeonH.GetBendRn, PUBLIC))
 	e.GET(urlContext+"/meso", auth.Authorize(PallidSturgeonH.GetMeso, PUBLIC))
 	e.GET(urlContext+"/structureFlow", auth.Authorize(PallidSturgeonH.GetStructureFlow, PUBLIC))

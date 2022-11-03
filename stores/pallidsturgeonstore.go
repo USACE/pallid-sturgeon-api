@@ -105,8 +105,20 @@ func (s *PallidSturgeonStore) GetRoles() ([]models.Role, error) {
 	return roles, err
 }
 
-func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
-	rows, err := s.db.Query("select FO_ID, FIELD_OFFICE_CODE, FIELD_OFFICE_DESCRIPTION, STATE from field_office_lk order by FO_ID")
+var getFieldOfficesSql = `select FO_ID, FIELD_OFFICE_CODE, FIELD_OFFICE_DESCRIPTION, STATE from field_office_lk where field_office_code <> 'ZZ' order by FO_ID`
+
+var getFieldOfficeSqlAll = `select FO_ID, FIELD_OFFICE_CODE, FIELD_OFFICE_DESCRIPTION, STATE from field_office_lk order by FO_ID`
+
+func (s *PallidSturgeonStore) GetFieldOffices(showAll string) ([]models.FieldOffice, error) {
+	query := ""
+
+	if showAll == "true" {
+		query = getFieldOfficeSqlAll
+	} else {
+		query = getFieldOfficesSql
+	}
+
+	rows, err := s.db.Query(query)
 
 	fieldOffices := []models.FieldOffice{}
 	if err != nil {
@@ -168,14 +180,9 @@ func (s *PallidSturgeonStore) GetSeasons(projectCode string) ([]models.Season, e
 	return seasons, err
 }
 
-var getSegmentsSql = `select distinct s.s_id, s.segment_code as code, 
-s.segment_code || ' - ' || s.segment_description as description,
-s.segment_type, s.river, s.upper_river_mile, s.lower_river_mile, s.rpma
-from segment_lk s join fieldoffice_segment_v v on v.SEGMENT_CODE = s.segment_code
-where (CASE when :1 != 'ZZ' THEN v.FIELD_OFFICE_CODE ELSE :2 END) = :3
-order by 1`
+var getSegmentsSql = `select segment_code as code, segment_description as description from fieldoffice_segment_v where field_office_code = :1 and project_code = :2`
 
-func (s *PallidSturgeonStore) GetSegments(officeCode string) ([]models.Segment, error) {
+func (s *PallidSturgeonStore) GetSegments(officeCode string, projectCode string) ([]models.Segment, error) {
 	segments := []models.Segment{}
 
 	selectQuery, err := s.db.Prepare(getSegmentsSql)
@@ -183,7 +190,7 @@ func (s *PallidSturgeonStore) GetSegments(officeCode string) ([]models.Segment, 
 		return segments, err
 	}
 
-	rows, err := selectQuery.Query(officeCode, officeCode, officeCode)
+	rows, err := selectQuery.Query(officeCode, projectCode)
 	if err != nil {
 		return segments, err
 	}
@@ -191,7 +198,7 @@ func (s *PallidSturgeonStore) GetSegments(officeCode string) ([]models.Segment, 
 
 	for rows.Next() {
 		segment := models.Segment{}
-		err = rows.Scan(&segment.ID, &segment.Code, &segment.Description, &segment.Type, &segment.RiverCode, &segment.UpperRiverMile, &segment.LowerRiverMile, &segment.Rpma)
+		err = rows.Scan(&segment.Code, &segment.Description)
 		if err != nil {
 			return nil, err
 		}
@@ -201,45 +208,32 @@ func (s *PallidSturgeonStore) GetSegments(officeCode string) ([]models.Segment, 
 	return segments, err
 }
 
-var getBendsBySegmentSql = `select brm_id as id, b_segment as segment_id, bend_num as code, b_desc as description, upper_river_mile, lower_river_mile from bend_river_mile_lk where b_segment = :1`
+var getSampleUnitSql = `select sample_unit, sample_unit_desc as description from segment_sampleunit_v where segment_code = :1 and sample_unit_type = :2 order by 1`
 
-var getChutesBySegmentSql = `select chute_id as id, segment_id, chute_code as code, chute_desc as description, upper_river_mile, lower_river_mile from chute_lk where segment_id = :1`
+func (s *PallidSturgeonStore) GetSampleUnit(sampleUnitType string, segmentCode string) ([]models.SampleUnit, error) {
+	sampleUnits := []models.SampleUnit{}
 
-var getReachBySegmentSql = `select reach_id as id, segment_id, reach_code as code, reach_desc as description, upper_river_mile, lower_river_mile from reach_lk where segment_id = :1`
-
-func (s *PallidSturgeonStore) GetBends(sampleUnitType string, segmentCode string) ([]models.Bend2, error) {
-	query := ""
-
-	if sampleUnitType == "B" {
-		query = getBendsBySegmentSql
-	}
-
-	if sampleUnitType == "C" {
-		query = getChutesBySegmentSql
-	}
-
-	if sampleUnitType == "R" {
-		query = getReachBySegmentSql
-	}
-
-	rows, err := s.db.Query(query, segmentCode)
-
-	bends := []models.Bend2{}
+	selectQuery, err := s.db.Prepare(getSampleUnitSql)
 	if err != nil {
-		return bends, err
+		return sampleUnits, err
+	}
+
+	rows, err := selectQuery.Query(segmentCode, sampleUnitType)
+	if err != nil {
+		return sampleUnits, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		bend := models.Bend2{}
-		err = rows.Scan(&bend.ID, &bend.SegmentId, &bend.Code, &bend.Description, &bend.UpperRiverMile, &bend.LowerRiverMile)
+		sampleUnit := models.SampleUnit{}
+		err = rows.Scan(&sampleUnit.SampleUnit, &sampleUnit.Description)
 		if err != nil {
 			return nil, err
 		}
-		bends = append(bends, bend)
+		sampleUnits = append(sampleUnits, sampleUnit)
 	}
 
-	return bends, err
+	return sampleUnits, err
 }
 
 func (s *PallidSturgeonStore) GetBendRn() ([]models.BendRn, error) {

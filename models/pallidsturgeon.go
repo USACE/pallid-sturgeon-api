@@ -33,14 +33,13 @@ type SampleUnitType struct {
 }
 
 type Segment struct {
-	ID             int     `db:"s_id" json:"id"`
-	Code           int     `db:"segment_code" json:"code"`
-	Description    *string `db:"segment_description" json:"description"`
-	Type           string  `db:"segment_type" json:"type"`
-	RiverCode      int     `db:"river" json:"riverCode"`
-	UpperRiverMile *string `db:"upper_river_mile" json:"upperRiverMile"`
-	LowerRiverMile *string `db:"lower_river_mile" json:"lowerRiverMile"`
-	Rpma           *int    `db:"rpma" json:"rpma"`
+	Code        int     `db:"code" json:"code"`
+	Description *string `db:"description" json:"description"`
+}
+
+type SampleUnit struct {
+	SampleUnit  int     `db:"sample_unit" json:"sampleUnit"`
+	Description *string `db:"description" json:"description"`
 }
 
 type Bend struct {

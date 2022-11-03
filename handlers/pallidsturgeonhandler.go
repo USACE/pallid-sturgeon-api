@@ -43,7 +43,8 @@ func (sd *PallidSturgeonHandler) GetRoles(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFieldOffices(c echo.Context) error {
-	fieldOffices, err := sd.Store.GetFieldOffices()
+	showAll := c.QueryParam("showAll")
+	fieldOffices, err := sd.Store.GetFieldOffices(showAll)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -68,17 +69,17 @@ func (sd *PallidSturgeonHandler) GetSampleUnitTypes(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSegments(c echo.Context) error {
-	office := c.QueryParam("office")
-	segments, err := sd.Store.GetSegments(office)
+	office, project := c.QueryParam("office"), c.QueryParam("project")
+	segments, err := sd.Store.GetSegments(office, project)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, segments)
 }
 
-func (sd *PallidSturgeonHandler) GetBends(c echo.Context) error {
+func (sd *PallidSturgeonHandler) GetSampleUnit(c echo.Context) error {
 	sampleUnitType, segment := c.QueryParam("sampleUnitType"), c.QueryParam("segment")
-	bends, err := sd.Store.GetBends(sampleUnitType, segment)
+	bends, err := sd.Store.GetSampleUnit(sampleUnitType, segment)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
