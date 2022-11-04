@@ -139,7 +139,7 @@ func (s *PallidSturgeonStore) GetFieldOffices(showAll string) ([]models.FieldOff
 }
 
 func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, error) {
-	rows, err := s.db.Query("select * from sample_unit_type_lk order by SAMPLE_UNIT_TYPE_CODE")
+	rows, err := s.db.Query("select * from sample_unit_type_lk where sample_unit_type_code <> 'A' order by SAMPLE_UNIT_TYPE_CODE")
 
 	sampleUnitTypes := []models.SampleUnitType{}
 	if err != nil {
