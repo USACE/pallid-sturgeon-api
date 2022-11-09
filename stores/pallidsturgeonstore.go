@@ -2417,8 +2417,15 @@ func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode stri
 	return geneticSummariesWithCount, err
 }
 
-func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
-	rows, err := s.db.Queryx("SELECT * FROM ds_search")
+var searchDataSummaryFullDataSql = `SELECT * FROM table (pallid_data_api.search_datasummary_fnc(:1,:2,:3,:4,:5,:6,:7,to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetFullSearchDataSummary(year string, officeCode string, project string, approved string, season string, segment string, month string, fromDate string, toDate string) (string, error) {
+	dbQuery, err := s.db.Prepare(searchDataSummaryFullDataSql)
+	if err != nil {
+		return "Cannot create file", err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, segment, month, fromDate, toDate)
 	if err != nil {
 		return "Cannot create file", err
 	}
@@ -2477,23 +2484,23 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
 	return file.Name(), err
 }
 
-var searchDataSummarySql = `SELECT se_id,search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude, stop_longitude,se_fid,ds_id,site_fid,temp,conductivity FROM ds_search`
+var searchDataSummarySql = `SELECT year,fieldoffice,project_id,segment_id,season,se_id,search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude,stop_longitude,temp,conductivity
+FROM table (pallid_data_api.search_datasummary_fnc(:1,:2,:3,:4,:5,:6,:7,to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-var searchDataSummaryCountSql = `SELECT count(*) FROM ds_search`
+var searchDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.search_datasummary_fnc(:1,:2,:3,:4,:5,:6,:7,to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchParams) (models.SearchSummaryWithCount, error) {
+func (s *PallidSturgeonStore) GetSearchDataSummary(year string, officeCode string, project string, approved string, season string, segment string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.SearchSummaryWithCount, error) {
 	searchSummariesWithCount := models.SearchSummaryWithCount{}
-
-	filterQuery := ""
-	if queryParams.Filter != "" {
-		filter := "'%" + strings.ToUpper(queryParams.Filter) + "%'"
-		filterQuery = fmt.Sprintf(" where se_id like %s or TO_CHAR(search_date, 'MM/DD/YYYY') like %s or UPPER(recorder) like %s or UPPER(search_type_code) like %s or start_time like %s  or start_time like %s  or stop_time like %s  or stop_latitude like %s  or stop_longitude like %s or stop_longitude like %s or se_fid like %s or ds_id like %s or site_fid like %s or temp like %s or conductivity like %s", filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter)
-	}
-
-	countrows, err := s.db.Queryx(searchDataSummaryCountSql + filterQuery)
+	countQuery, err := s.db.Prepare(searchDataSummaryCountSql)
 	if err != nil {
 		return searchSummariesWithCount, err
 	}
+
+	countrows, err := countQuery.Query(year, officeCode, project, approved, season, segment, month, fromDate, toDate)
+	if err != nil {
+		return searchSummariesWithCount, err
+	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&searchSummariesWithCount.TotalCount)
@@ -2501,25 +2508,28 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchPara
 			return searchSummariesWithCount, err
 		}
 	}
-	defer countrows.Close()
+
 	searchSummaries := []models.SearchSummary{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "se_id"
 	}
-
-	searchDataSummarySqlWithSearch := searchDataSummarySql + filterQuery + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
-
-	rows, err := s.db.Queryx(searchDataSummarySqlWithSearch)
+	searchDataSummarySqlWithSearch := searchDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(searchDataSummarySqlWithSearch)
 	if err != nil {
 		return searchSummariesWithCount, err
 	}
 
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, segment, month, fromDate, toDate)
+	if err != nil {
+		return searchSummariesWithCount, err
+	}
+	defer rows.Close()
+
 	for rows.Next() {
 		summary := models.SearchSummary{}
-		err = rows.Scan(&summary.SeID, &summary.SearchDate, &summary.Recorder, &summary.SearchTypeCode, &summary.StartTime,
-			&summary.StartLatitude, &summary.StartLongitude, &summary.StopTime, &summary.StopLatitude, &summary.StopLongitude, &summary.SeFID,
-			&summary.DsID, &summary.SiteFID, &summary.Temp, &summary.Conductivity)
+		err = rows.Scan(&summary.Year, &summary.FieldOffice, &summary.Project, &summary.Segment, &summary.Season, &summary.SeID, &summary.SearchDate, &summary.Recorder, &summary.SearchTypeCode, &summary.StartTime,
+			&summary.StartLatitude, &summary.StartLongitude, &summary.StopTime, &summary.StopLatitude, &summary.StopLongitude, &summary.Temp, &summary.Conductivity)
 		if err != nil {
 			return searchSummariesWithCount, err
 		}

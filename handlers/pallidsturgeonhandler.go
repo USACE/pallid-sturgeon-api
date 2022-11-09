@@ -557,7 +557,7 @@ func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error 
 }
 
 func (sd *PallidSturgeonHandler) GetFullFishDataSummary(c echo.Context) error {
-	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
 	user := c.Get("PSUSER").(models.User)
 
@@ -566,7 +566,7 @@ func (sd *PallidSturgeonHandler) GetFullFishDataSummary(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	fileName, err := sd.Store.GetFullFishDataSummary(year, userInfo.OfficeCode, project, approved, season, spice, month, fromDate, toDate)
+	fileName, err := sd.Store.GetFullFishDataSummary(year, userInfo.OfficeCode, userInfo.ProjectCode, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -597,7 +597,7 @@ func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullSuppDataSummary(c echo.Context) error {
-	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
 	user := c.Get("PSUSER").(models.User)
 
@@ -606,7 +606,7 @@ func (sd *PallidSturgeonHandler) GetFullSuppDataSummary(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	fileName, err := sd.Store.GetFullSuppDataSummary(year, userInfo.OfficeCode, project, approved, season, spice, month, fromDate, toDate)
+	fileName, err := sd.Store.GetFullSuppDataSummary(year, userInfo.OfficeCode, userInfo.ProjectCode, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -636,7 +636,7 @@ func (sd *PallidSturgeonHandler) GetSuppDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) error {
-	year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	year, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
 	user := c.Get("PSUSER").(models.User)
 
@@ -645,7 +645,7 @@ func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) erro
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	fileName, err := sd.Store.GetFullMissouriDataSummary(year, userInfo.OfficeCode, project, approved, season, spice, month, fromDate, toDate)
+	fileName, err := sd.Store.GetFullMissouriDataSummary(year, userInfo.OfficeCode, userInfo.ProjectCode, approved, season, spice, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -715,8 +715,16 @@ func (sd *PallidSturgeonHandler) GetGeneticDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullSearchDataSummary(c echo.Context) error {
+	year, approved, season, segment, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("segment"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
-	fileName, err := sd.Store.GetFullSearchDataSummary()
+	user := c.Get("PSUSER").(models.User)
+
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	fileName, err := sd.Store.GetFullSearchDataSummary(year, userInfo.OfficeCode, userInfo.ProjectCode, approved, season, segment, month, fromDate, toDate)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -726,11 +734,19 @@ func (sd *PallidSturgeonHandler) GetFullSearchDataSummary(c echo.Context) error 
 }
 
 func (sd *PallidSturgeonHandler) GetSearchDataSummary(c echo.Context) error {
+	year, approved, season, segment, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("segment"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	dataSummary, err := sd.Store.GetSearchDataSummary(queryParams)
+
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	dataSummary, err := sd.Store.GetSearchDataSummary(year, userInfo.OfficeCode, userInfo.ProjectCode, approved, season, segment, month, fromDate, toDate, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

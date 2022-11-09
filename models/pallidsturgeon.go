@@ -231,23 +231,25 @@ type SearchSummaryWithCount struct {
 }
 
 type SearchSummary struct {
-	SeID            int     `db:"se_id" json:"seId"`
-	SearchDate      string  `db:"Search_date" json:"searchDate"`
-	Recorder        string  `db:"recorder" json:"recorder"`
-	SearchTypeCode  string  `db:"search_type_code" json:"searchTypeCode"`
-	StartTime       string  `db:"start_time" json:"startTime"`
-	StartLatitude   float64 `db:"start_latitude" json:"startLatitude"`
-	StartLongitude  float64 `db:"start_longitude" json:"startLongitude"`
-	StopTime        string  `db:"stop_time" json:"stopTime"`
-	StopLatitude    float64 `db:"stop_latitude" json:"stopLatitude"`
-	StopLongitude   float64 `db:"stop_longitude" json:"stopLongitude"`
-	SeFID           string  `db:"se_fid" json:"seFid"`
-	DsID            int     `db:"ds_id" json:"dsId"`
-	SiteFID         string  `db:"site_fid" json:"siteFid"`
-	Temp            *string `db:"temp" json:"temp"`
-	Conductivity    *string `db:"conductivity" json:"conductivity"`
-	EditInitials    string  `db:"edit_initials" json:"editInitials"`
-	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
+	SeID           int     `db:"se_id" json:"seId"`
+	SiteID         int     `db:"site_id" json:"site_id"`
+	Year           int     `db:"year" json:"year"`
+	FieldOffice    string  `db:"fieldoffice" json:"fieldoffice"`
+	Project        int     `db:"project_id" json:"projectId"`
+	Segment        int     `db:"segment_id" json:"segmentId"`
+	Season         string  `db:"season" json:"season"`
+	SearchDate     string  `db:"Search_date" json:"searchDate"`
+	Recorder       string  `db:"recorder" json:"recorder"`
+	SearchTypeCode string  `db:"search_type_code" json:"searchTypeCode"`
+	StartTime      string  `db:"start_time" json:"startTime"`
+	StartLatitude  float64 `db:"start_latitude" json:"startLatitude"`
+	StartLongitude float64 `db:"start_longitude" json:"startLongitude"`
+	StopTime       string  `db:"stop_time" json:"stopTime"`
+	StopLatitude   float64 `db:"stop_latitude" json:"stopLatitude"`
+	StopLongitude  float64 `db:"stop_longitude" json:"stopLongitude"`
+	Temp           *string `db:"temp" json:"temp"`
+	Conductivity   *string `db:"conductivity" json:"conductivity"`
+	Checkby        string  `db:"checkby" json:"checkby"`
 }
 
 type SummaryWithCount struct {
