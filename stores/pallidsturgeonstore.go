@@ -40,6 +40,7 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 	if err != nil {
 		return user, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		err = rows.Scan(&user.ID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.OfficeCode, &user.ProjectCode)
@@ -47,7 +48,6 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 			return user, err
 		}
 	}
-	defer rows.Close()
 
 	return user, err
 }
@@ -60,7 +60,6 @@ var getProjectsSql = `select distinct p.* from project_lk p
 
 func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Project, error) {
 	projects := []models.Project{}
-
 	selectQuery, err := s.db.Prepare(getProjectsSql)
 	if err != nil {
 		return projects, err
@@ -85,9 +84,8 @@ func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Proj
 }
 
 func (s *PallidSturgeonStore) GetRoles() ([]models.Role, error) {
-	rows, err := s.db.Query("select * from role_lk order by id")
-
 	roles := []models.Role{}
+	rows, err := s.db.Query("select * from role_lk order by id")
 	if err != nil {
 		return roles, err
 	}
@@ -118,9 +116,8 @@ func (s *PallidSturgeonStore) GetFieldOffices(showAll string) ([]models.FieldOff
 		query = getFieldOfficesSql
 	}
 
-	rows, err := s.db.Query(query)
-
 	fieldOffices := []models.FieldOffice{}
+	rows, err := s.db.Query(query)
 	if err != nil {
 		return fieldOffices, err
 	}
@@ -521,7 +518,6 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(siteId string, year string, off
 			return siteDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -692,7 +688,6 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 			return fishDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -1258,6 +1253,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			return supplementalDataEntryWithCount, err
 		}
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&supplementalDataEntryWithCount.TotalCount)
@@ -1408,7 +1404,6 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 			return searchDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -1585,7 +1580,6 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 			return telemetryDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -1791,7 +1785,6 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 			return procedureDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -3380,6 +3373,7 @@ func (s *PallidSturgeonStore) GetOfficeErrorLogs(fieldOfficeCode string) ([]mode
 	if err != nil {
 		return officeErrorLogs, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		officeErrorLog := models.OfficeErrorLog{}
@@ -3390,8 +3384,6 @@ func (s *PallidSturgeonStore) GetOfficeErrorLogs(fieldOfficeCode string) ([]mode
 		}
 		officeErrorLogs = append(officeErrorLogs, officeErrorLog)
 	}
-
-	defer rows.Close()
 
 	return officeErrorLogs, err
 }
@@ -3420,6 +3412,7 @@ func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projec
 	if err != nil {
 		return usgNoVialNumbers, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		usgNoVialNumber := models.UsgNoVialNumber{}
@@ -3429,8 +3422,6 @@ func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projec
 		}
 		usgNoVialNumbers = append(usgNoVialNumbers, usgNoVialNumber)
 	}
-
-	defer rows.Close()
 
 	return usgNoVialNumbers, err
 }

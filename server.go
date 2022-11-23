@@ -1,8 +1,6 @@
 package main
 
 import (
-	//"log"
-
 	. "github.com/USACE/pallid_sturgeon_api/server/auth"
 
 	"log"
