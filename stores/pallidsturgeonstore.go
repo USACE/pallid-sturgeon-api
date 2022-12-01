@@ -40,6 +40,7 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 	if err != nil {
 		return user, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		err = rows.Scan(&user.ID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.OfficeCode, &user.ProjectCode)
@@ -47,7 +48,6 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 			return user, err
 		}
 	}
-	defer rows.Close()
 
 	return user, err
 }
@@ -60,7 +60,6 @@ var getProjectsSql = `select distinct p.* from project_lk p
 
 func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Project, error) {
 	projects := []models.Project{}
-
 	selectQuery, err := s.db.Prepare(getProjectsSql)
 	if err != nil {
 		return projects, err
@@ -85,9 +84,8 @@ func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Proj
 }
 
 func (s *PallidSturgeonStore) GetRoles() ([]models.Role, error) {
-	rows, err := s.db.Query("select * from role_lk order by id")
-
 	roles := []models.Role{}
+	rows, err := s.db.Query("select * from role_lk order by id")
 	if err != nil {
 		return roles, err
 	}
@@ -105,10 +103,21 @@ func (s *PallidSturgeonStore) GetRoles() ([]models.Role, error) {
 	return roles, err
 }
 
-func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
-	rows, err := s.db.Query("select FO_ID, FIELD_OFFICE_CODE, FIELD_OFFICE_DESCRIPTION, STATE from field_office_lk order by FO_ID")
+var getFieldOfficesSql = `select FO_ID, FIELD_OFFICE_CODE, FIELD_OFFICE_DESCRIPTION, STATE from field_office_lk where field_office_code <> 'ZZ' order by FO_ID`
+
+var getFieldOfficeSqlAll = `select FO_ID, FIELD_OFFICE_CODE, FIELD_OFFICE_DESCRIPTION, STATE from field_office_lk order by FO_ID`
+
+func (s *PallidSturgeonStore) GetFieldOffices(showAll string) ([]models.FieldOffice, error) {
+	query := ""
+
+	if showAll == "true" {
+		query = getFieldOfficeSqlAll
+	} else {
+		query = getFieldOfficesSql
+	}
 
 	fieldOffices := []models.FieldOffice{}
+	rows, err := s.db.Query(query)
 	if err != nil {
 		return fieldOffices, err
 	}
@@ -126,29 +135,8 @@ func (s *PallidSturgeonStore) GetFieldOffices() ([]models.FieldOffice, error) {
 	return fieldOffices, err
 }
 
-func (s *PallidSturgeonStore) GetSampleMethods() ([]models.SampleMethod, error) {
-	rows, err := s.db.Query("select * from sample_type_lk order by SAMPLE_TYPE_CODE")
-
-	sampleMethods := []models.SampleMethod{}
-	if err != nil {
-		return sampleMethods, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		sampleMethod := models.SampleMethod{}
-		err = rows.Scan(&sampleMethod.Code, &sampleMethod.Description)
-		if err != nil {
-			return nil, err
-		}
-		sampleMethods = append(sampleMethods, sampleMethod)
-	}
-
-	return sampleMethods, err
-}
-
 func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, error) {
-	rows, err := s.db.Query("select * from sample_unit_type_lk order by SAMPLE_UNIT_TYPE_CODE")
+	rows, err := s.db.Query("select * from sample_unit_type_lk where sample_unit_type_code <> 'A' order by SAMPLE_UNIT_TYPE_CODE")
 
 	sampleUnitTypes := []models.SampleUnitType{}
 	if err != nil {
@@ -168,8 +156,8 @@ func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, err
 	return sampleUnitTypes, err
 }
 
-func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
-	rows, err := s.db.Query("select s_id, season_code, season_description, field_app, PROJECT_CODE from season_lk order by s_id")
+func (s *PallidSturgeonStore) GetSeasons(projectCode string) ([]models.Season, error) {
+	rows, err := s.db.Query("select s_id, season_code, season_description, field_app, project_code from season_lk where project_code = :1 order by s_id", projectCode)
 
 	seasons := []models.Season{}
 	if err != nil {
@@ -189,13 +177,9 @@ func (s *PallidSturgeonStore) GetSeasons() ([]models.Season, error) {
 	return seasons, err
 }
 
-var getSegmentsSql = `select distinct s.s_id, s.segment_code, s.segment_description, s.segment_type, s.river, s.upper_river_mile, s.lower_river_mile, s.rpma from segment_lk s
-						join fieldoffice_segment_v v
-						on v.SEGMENT_CODE = s.segment_code
-						where (CASE when :1 != 'ZZ' THEN v.FIELD_OFFICE_CODE ELSE :2 END) = :3
-						order by s.s_id`
+var getSegmentsSql = `select segment_code as code, segment_description as description from fieldoffice_segment_v where field_office_code = :1 and project_code = :2`
 
-func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segment, error) {
+func (s *PallidSturgeonStore) GetSegments(officeCode string, projectCode string) ([]models.Segment, error) {
 	segments := []models.Segment{}
 
 	selectQuery, err := s.db.Prepare(getSegmentsSql)
@@ -203,7 +187,7 @@ func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segm
 		return segments, err
 	}
 
-	rows, err := selectQuery.Query(fieldOfficeCode, fieldOfficeCode, fieldOfficeCode)
+	rows, err := selectQuery.Query(officeCode, projectCode)
 	if err != nil {
 		return segments, err
 	}
@@ -211,7 +195,7 @@ func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segm
 
 	for rows.Next() {
 		segment := models.Segment{}
-		err = rows.Scan(&segment.ID, &segment.Code, &segment.Description, &segment.Type, &segment.RiverCode, &segment.UpperRiverMile, &segment.LowerRiverMile, &segment.Rpma)
+		err = rows.Scan(&segment.Code, &segment.Description)
 		if err != nil {
 			return nil, err
 		}
@@ -221,25 +205,32 @@ func (s *PallidSturgeonStore) GetSegments(fieldOfficeCode string) ([]models.Segm
 	return segments, err
 }
 
-func (s *PallidSturgeonStore) GetBends() ([]models.Bend, error) {
-	rows, err := s.db.Query("select BRM_ID, BEND_NUM, B_DESC, B_SEGMENT, upper_river_mile, lower_river_mile, state from bend_river_mile_lk order by BRM_ID")
+var getSampleUnitSql = `select sample_unit, sample_unit_desc as description from segment_sampleunit_v where segment_code = :1 and sample_unit_type = :2 order by 1`
 
-	bends := []models.Bend{}
+func (s *PallidSturgeonStore) GetSampleUnit(sampleUnitType string, segmentCode string) ([]models.SampleUnit, error) {
+	sampleUnits := []models.SampleUnit{}
+
+	selectQuery, err := s.db.Prepare(getSampleUnitSql)
 	if err != nil {
-		return bends, err
+		return sampleUnits, err
+	}
+
+	rows, err := selectQuery.Query(segmentCode, sampleUnitType)
+	if err != nil {
+		return sampleUnits, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		bend := models.Bend{}
-		err = rows.Scan(&bend.ID, &bend.BendNumber, &bend.Description, &bend.SegmentCode, &bend.UpperRiverMile, &bend.LowerRiverMile, &bend.State)
+		sampleUnit := models.SampleUnit{}
+		err = rows.Scan(&sampleUnit.SampleUnit, &sampleUnit.Description)
 		if err != nil {
 			return nil, err
 		}
-		bends = append(bends, bend)
+		sampleUnits = append(sampleUnits, sampleUnit)
 	}
 
-	return bends, err
+	return sampleUnits, err
 }
 
 func (s *PallidSturgeonStore) GetBendRn() ([]models.BendRn, error) {
@@ -527,7 +518,6 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(siteId string, year string, off
 			return siteDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -579,11 +569,17 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(siteId string, year string, off
 }
 
 var insertSiteDataSql = `insert into ds_sites (brm_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
-	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, bend, BENDRN, edit_initials, last_updated, last_edit_comment, uploaded_by) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14) returning site_id into :15`
+	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, bend, BENDRN, edit_initials, last_updated, last_edit_comment, uploaded_by) 
+	values ((CASE 
+	when :14 = 'B' THEN (select brm_id from bend_river_mile_lk where bend_num = :15 and b_segment = :16)
+	when :17 = 'C' THEN (select chute_id from chute_lk where chute_code = :18 and segment_id = :19)
+	when :20 = 'R' THEN (select reach_id from reach_lk where reach_code = :21 and segment_id = :22)
+	ELSE 0
+	END),:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13) returning site_id into :23`
 
-func (s *PallidSturgeonStore) SaveSiteDataEntry(sitehDataEntry models.Sites) (int, error) {
+func (s *PallidSturgeonStore) SaveSiteDataEntry(code string, sampleUnitType string, segmentCode string, sitehDataEntry models.Sites) (int, error) {
 	var id int
-	_, err := s.db.Exec(insertSiteDataSql, sitehDataEntry.BendRiverMile, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId,
+	_, err := s.db.Exec(insertSiteDataSql, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId,
 		sitehDataEntry.SegmentId, sitehDataEntry.SeasonId, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bend, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated,
 		sitehDataEntry.LastEditComment, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
 
@@ -692,7 +688,6 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 			return fishDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -1258,6 +1253,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			return supplementalDataEntryWithCount, err
 		}
 	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&supplementalDataEntryWithCount.TotalCount)
@@ -1408,7 +1404,6 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 			return searchDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -1585,7 +1580,6 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 			return telemetryDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -1791,7 +1785,6 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 			return procedureDataEntryWithCount, err
 		}
 	}
-
 	defer countrows.Close()
 
 	for countrows.Next() {
@@ -2417,8 +2410,15 @@ func (s *PallidSturgeonStore) GetGeneticDataSummary(year string, officeCode stri
 	return geneticSummariesWithCount, err
 }
 
-func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
-	rows, err := s.db.Queryx("SELECT * FROM ds_search")
+var searchDataSummaryFullDataSql = `SELECT * FROM table (pallid_data_api.search_datasummary_fnc(:1,:2,:3,:4,:5,:6,:7,to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+
+func (s *PallidSturgeonStore) GetFullSearchDataSummary(year string, officeCode string, project string, approved string, season string, segment string, month string, fromDate string, toDate string) (string, error) {
+	dbQuery, err := s.db.Prepare(searchDataSummaryFullDataSql)
+	if err != nil {
+		return "Cannot create file", err
+	}
+
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, segment, month, fromDate, toDate)
 	if err != nil {
 		return "Cannot create file", err
 	}
@@ -2477,23 +2477,23 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary() (string, error) {
 	return file.Name(), err
 }
 
-var searchDataSummarySql = `SELECT se_id,search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude, stop_longitude,se_fid,ds_id,site_fid,temp,conductivity FROM ds_search`
+var searchDataSummarySql = `SELECT year,fieldoffice,project_id,segment_id,season,se_id,search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude,stop_longitude,temp,conductivity
+FROM table (pallid_data_api.search_datasummary_fnc(:1,:2,:3,:4,:5,:6,:7,to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-var searchDataSummaryCountSql = `SELECT count(*) FROM ds_search`
+var searchDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.search_datasummary_fnc(:1,:2,:3,:4,:5,:6,:7,to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
-func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchParams) (models.SearchSummaryWithCount, error) {
+func (s *PallidSturgeonStore) GetSearchDataSummary(year string, officeCode string, project string, approved string, season string, segment string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.SearchSummaryWithCount, error) {
 	searchSummariesWithCount := models.SearchSummaryWithCount{}
-
-	filterQuery := ""
-	if queryParams.Filter != "" {
-		filter := "'%" + strings.ToUpper(queryParams.Filter) + "%'"
-		filterQuery = fmt.Sprintf(" where se_id like %s or TO_CHAR(search_date, 'MM/DD/YYYY') like %s or UPPER(recorder) like %s or UPPER(search_type_code) like %s or start_time like %s  or start_time like %s  or stop_time like %s  or stop_latitude like %s  or stop_longitude like %s or stop_longitude like %s or se_fid like %s or ds_id like %s or site_fid like %s or temp like %s or conductivity like %s", filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter, filter)
-	}
-
-	countrows, err := s.db.Queryx(searchDataSummaryCountSql + filterQuery)
+	countQuery, err := s.db.Prepare(searchDataSummaryCountSql)
 	if err != nil {
 		return searchSummariesWithCount, err
 	}
+
+	countrows, err := countQuery.Query(year, officeCode, project, approved, season, segment, month, fromDate, toDate)
+	if err != nil {
+		return searchSummariesWithCount, err
+	}
+	defer countrows.Close()
 
 	for countrows.Next() {
 		err = countrows.Scan(&searchSummariesWithCount.TotalCount)
@@ -2501,25 +2501,28 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(queryParams models.SearchPara
 			return searchSummariesWithCount, err
 		}
 	}
-	defer countrows.Close()
+
 	searchSummaries := []models.SearchSummary{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "se_id"
 	}
-
-	searchDataSummarySqlWithSearch := searchDataSummarySql + filterQuery + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
-
-	rows, err := s.db.Queryx(searchDataSummarySqlWithSearch)
+	searchDataSummarySqlWithSearch := searchDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(searchDataSummarySqlWithSearch)
 	if err != nil {
 		return searchSummariesWithCount, err
 	}
 
+	rows, err := dbQuery.Query(year, officeCode, project, approved, season, segment, month, fromDate, toDate)
+	if err != nil {
+		return searchSummariesWithCount, err
+	}
+	defer rows.Close()
+
 	for rows.Next() {
 		summary := models.SearchSummary{}
-		err = rows.Scan(&summary.SeID, &summary.SearchDate, &summary.Recorder, &summary.SearchTypeCode, &summary.StartTime,
-			&summary.StartLatitude, &summary.StartLongitude, &summary.StopTime, &summary.StopLatitude, &summary.StopLongitude, &summary.SeFID,
-			&summary.DsID, &summary.SiteFID, &summary.Temp, &summary.Conductivity)
+		err = rows.Scan(&summary.Year, &summary.FieldOffice, &summary.Project, &summary.Segment, &summary.Season, &summary.SeID, &summary.SearchDate, &summary.Recorder, &summary.SearchTypeCode, &summary.StartTime,
+			&summary.StartLatitude, &summary.StartLongitude, &summary.StopTime, &summary.StopLatitude, &summary.StopLongitude, &summary.Temp, &summary.Conductivity)
 		if err != nil {
 			return searchSummariesWithCount, err
 		}
@@ -3370,6 +3373,7 @@ func (s *PallidSturgeonStore) GetOfficeErrorLogs(fieldOfficeCode string) ([]mode
 	if err != nil {
 		return officeErrorLogs, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		officeErrorLog := models.OfficeErrorLog{}
@@ -3380,8 +3384,6 @@ func (s *PallidSturgeonStore) GetOfficeErrorLogs(fieldOfficeCode string) ([]mode
 		}
 		officeErrorLogs = append(officeErrorLogs, officeErrorLog)
 	}
-
-	defer rows.Close()
 
 	return officeErrorLogs, err
 }
@@ -3410,6 +3412,7 @@ func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projec
 	if err != nil {
 		return usgNoVialNumbers, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		usgNoVialNumber := models.UsgNoVialNumber{}
@@ -3419,8 +3422,6 @@ func (s *PallidSturgeonStore) GetUsgNoVialNumbers(fieldOfficeCode string, projec
 		}
 		usgNoVialNumbers = append(usgNoVialNumbers, usgNoVialNumber)
 	}
-
-	defer rows.Close()
 
 	return usgNoVialNumbers, err
 }
@@ -3769,4 +3770,29 @@ func (s *PallidSturgeonStore) GetUploadSessionLogs(user string, uploadSessionId 
 	}
 
 	return logs, err
+}
+
+var getSitesExportSql = `select site_id,COALESCE(site_fid, 0) as site_fid,year,fieldoffice,field_office_description,project_id,project_description,segment_id,segment_description,season,season_description,sample_unit_type,bend,bendrn,
+COALESCE(bend_river_mile, 0) as bend_river_mile,sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
+
+func (s *PallidSturgeonStore) GetSitesExport(year string, officeCode string, project string, segment string, season string, bendrn string) ([]models.ExportSite, error) {
+	rows, err := s.db.Query(getSitesExportSql, year, officeCode, project, bendrn, season, segment)
+
+	exportData := []models.ExportSite{}
+	if err != nil {
+		return exportData, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		export := models.ExportSite{}
+		err = rows.Scan(&export.SiteID, &export.SiteFID, &export.SiteYear, &export.FieldOfficeID, &export.FieldOffice, &export.ProjectId, &export.Project, &export.SegmentId, &export.Segment, &export.SeasonId, &export.Season,
+			&export.SampleUnitType, &export.Bend, &export.Bendrn, &export.BendRiverMile, &export.SampleUnitDesc)
+		if err != nil {
+			return nil, err
+		}
+		exportData = append(exportData, export)
+	}
+
+	return exportData, err
 }

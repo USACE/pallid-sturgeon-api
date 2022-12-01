@@ -33,14 +33,13 @@ type SampleUnitType struct {
 }
 
 type Segment struct {
-	ID             int     `db:"s_id" json:"id"`
-	Code           int     `db:"segment_code" json:"code"`
-	Description    *string `db:"segment_description" json:"description"`
-	Type           string  `db:"segment_type" json:"type"`
-	RiverCode      int     `db:"river" json:"riverCode"`
-	UpperRiverMile *string `db:"upper_river_mile" json:"upperRiverMile"`
-	LowerRiverMile *string `db:"lower_river_mile" json:"lowerRiverMile"`
-	Rpma           *int    `db:"rpma" json:"rpma"`
+	Code        int     `db:"code" json:"code"`
+	Description *string `db:"description" json:"description"`
+}
+
+type SampleUnit struct {
+	SampleUnit  int     `db:"sample_unit" json:"sampleUnit"`
+	Description *string `db:"description" json:"description"`
 }
 
 type Bend struct {
@@ -51,6 +50,15 @@ type Bend struct {
 	UpperRiverMile *string `db:"upper_river_mile" json:"upperRiverMile"`
 	LowerRiverMile *string `db:"lower_river_mile" json:"lowerRiverMile"`
 	State          string  `db:"state" json:"state"`
+}
+
+type Bend2 struct {
+	ID             int     `db:"id" json:"id"`
+	Code           int     `db:"code" json:"code"`
+	Description    *string `db:"description" json:"description"`
+	SegmentId      int     `db:"segment_id" json:"segmentId"`
+	UpperRiverMile *string `db:"upper_river_mile" json:"upperRiverMile"`
+	LowerRiverMile *string `db:"lower_river_mile" json:"lowerRiverMile"`
 }
 
 type BendRn struct {
@@ -223,23 +231,25 @@ type SearchSummaryWithCount struct {
 }
 
 type SearchSummary struct {
-	SeID            int     `db:"se_id" json:"seId"`
-	SearchDate      string  `db:"Search_date" json:"searchDate"`
-	Recorder        string  `db:"recorder" json:"recorder"`
-	SearchTypeCode  string  `db:"search_type_code" json:"searchTypeCode"`
-	StartTime       string  `db:"start_time" json:"startTime"`
-	StartLatitude   float64 `db:"start_latitude" json:"startLatitude"`
-	StartLongitude  float64 `db:"start_longitude" json:"startLongitude"`
-	StopTime        string  `db:"stop_time" json:"stopTime"`
-	StopLatitude    float64 `db:"stop_latitude" json:"stopLatitude"`
-	StopLongitude   float64 `db:"stop_longitude" json:"stopLongitude"`
-	SeFID           string  `db:"se_fid" json:"seFid"`
-	DsID            int     `db:"ds_id" json:"dsId"`
-	SiteFID         string  `db:"site_fid" json:"siteFid"`
-	Temp            *string `db:"temp" json:"temp"`
-	Conductivity    *string `db:"conductivity" json:"conductivity"`
-	EditInitials    string  `db:"edit_initials" json:"editInitials"`
-	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
+	SeID           int     `db:"se_id" json:"seId"`
+	SiteID         int     `db:"site_id" json:"site_id"`
+	Year           int     `db:"year" json:"year"`
+	FieldOffice    string  `db:"fieldoffice" json:"fieldoffice"`
+	Project        int     `db:"project_id" json:"projectId"`
+	Segment        int     `db:"segment_id" json:"segmentId"`
+	Season         string  `db:"season" json:"season"`
+	SearchDate     string  `db:"Search_date" json:"searchDate"`
+	Recorder       string  `db:"recorder" json:"recorder"`
+	SearchTypeCode string  `db:"search_type_code" json:"searchTypeCode"`
+	StartTime      string  `db:"start_time" json:"startTime"`
+	StartLatitude  float64 `db:"start_latitude" json:"startLatitude"`
+	StartLongitude float64 `db:"start_longitude" json:"startLongitude"`
+	StopTime       string  `db:"stop_time" json:"stopTime"`
+	StopLatitude   float64 `db:"stop_latitude" json:"stopLatitude"`
+	StopLongitude  float64 `db:"stop_longitude" json:"stopLongitude"`
+	Temp           *string `db:"temp" json:"temp"`
+	Conductivity   *string `db:"conductivity" json:"conductivity"`
+	Checkby        string  `db:"checkby" json:"checkby"`
 }
 
 type SummaryWithCount struct {
@@ -847,4 +857,23 @@ type UploadSessionLog struct {
 	DateCreated     string `db:"date_created" json:"dateCreated"`
 	PUser           string `db:"p_user" json:"pUser"`
 	UploadSessionId string `db:"upload_session_id" json:"uploadSessionId"`
+}
+
+type ExportSite struct {
+	SiteID         int     `db:"site_id" json:"siteId"`
+	SiteYear       int     `db:"year" json:"year"`
+	SiteFID        int     `db:"site_fid" json:"siteFid"`
+	FieldOfficeID  string  `db:"fieldoffice" json:"fieldoffice"`
+	FieldOffice    string  `db:"field_office_description" json:"fieldOfficeDescription"`
+	ProjectId      int     `db:"project_id" json:"projectId"`
+	Project        string  `db:"project_description" json:"projectDescription"`
+	SegmentId      int     `db:"segment_id" json:"segmentId"`
+	Segment        string  `db:"segment_description" json:"segmentDescription"`
+	SeasonId       string  `db:"season" json:"season"`
+	Season         string  `db:"season_description" json:"seasonDescription"`
+	SampleUnitType string  `db:"sample_unit_type" json:"sampleUnitType"`
+	Bend           int     `db:"bend" json:"bend"`
+	Bendrn         string  `db:"bendrn" json:"bendrn"`
+	BendRiverMile  float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	SampleUnitDesc string  `db:"sample_unit_desc" json:"sampleUnitDesc"`
 }

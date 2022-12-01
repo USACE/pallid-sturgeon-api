@@ -2,6 +2,8 @@ package stores
 
 import (
 	"fmt"
+	"log"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 
@@ -13,14 +15,16 @@ import (
 )
 
 func InitStores(appConfig *config.AppConfig) (*PallidSturgeonStore, error) {
-
 	connectString := fmt.Sprintf("%s:%s/%s", appConfig.Dbhost, appConfig.Dbport, appConfig.Dbname)
 	db, err := sqlx.Connect(
 		"godror",
 		"user="+appConfig.Dbuser+" password="+appConfig.Dbpass+" connectString="+connectString,
 	)
+	db.SetMaxIdleConns(5)
+	db.SetConnMaxLifetime(2 * time.Minute)
+	db.SetMaxOpenConns(100)
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("m=GetDb,msg=connection has failed: %s", err)
 		return nil, err
 	}
 
