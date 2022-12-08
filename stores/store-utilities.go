@@ -19,9 +19,7 @@ func InitStores(appConfig *config.AppConfig) (*PallidSturgeonStore, error) {
 		"godror",
 		"user="+appConfig.Dbuser+" password="+appConfig.Dbpass+" connectString="+connectString+" poolMaxSessions=100 poolSessionMaxLifetime=2m0s",
 	)
-	// db.SetMaxIdleConns(2)
-	// db.SetConnMaxLifetime(2 * time.Minute)
-	// db.SetMaxOpenConns(100)
+	db.SetMaxIdleConns(0)
 	if err != nil {
 		log.Printf("[InitStores] m=GetDb,msg=connection has failed: %s", err)
 		return nil, err
