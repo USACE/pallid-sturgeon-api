@@ -128,9 +128,9 @@ func main() {
 
 	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
 	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))
-	e.GET(urlContext+"/users", auth.Authorize(userH.GetUsers, ADMIN))
+	e.GET(urlContext+"/users", auth.Authorize(userH.GetUsers, PUBLIC))
 	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, ADMIN))
-	e.PUT(urlContext+"/userRoleOffice", auth.Authorize(userH.UpdateUserRoleOffice, ADMIN))
+	e.PUT(urlContext+"/userRoleOffice", auth.Authorize(userH.UpdateUserRoleOffice, PUBLIC))
 
 	// e.Logger.Fatal(e.Start(":8080"))
 	// force update
