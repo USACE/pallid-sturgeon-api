@@ -27,6 +27,7 @@ type SearchParams struct {
 
 type User struct {
 	ID          int     `db:"id" json:"id"`
+	UserID      int     `db:"user_id" json:"userId"`
 	UserName    string  `db:"user_name" json:"userName"`
 	FirstName   string  `db:"first_name" json:"firstName"`
 	LastName    string  `db:"last_name" json:"lastName"`

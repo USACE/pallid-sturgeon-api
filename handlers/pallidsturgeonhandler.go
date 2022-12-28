@@ -181,7 +181,7 @@ func (sd *PallidSturgeonHandler) GetHeaderData(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
-	id, year, projectCode, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("projectCode"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
+	id, year, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -192,7 +192,7 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	siteDataEntries, err := sd.Store.GetSiteDataEntries(siteId, year, userInfo.OfficeCode, projectCode, segmentCode, seasonCode, bendrn, queryParams)
+	siteDataEntries, err := sd.Store.GetSiteDataEntries(siteId, year, userInfo.OfficeCode, userInfo.ProjectCode, segmentCode, seasonCode, bendrn, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

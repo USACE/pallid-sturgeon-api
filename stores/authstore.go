@@ -29,7 +29,7 @@ var userByIdSql = "select id, edipi, username, email, first_name,last_name from 
 
 var insertUserSql = "insert into users_t (username,email,first_name,last_name,edipi) values (:1,:2,:3,:4,:5)"
 
-var getUsersSql = `select u.id, u.username, u.first_name, u.last_name, u.email, uro.role_id, r.description, uro.office_id, f.field_office_code, uro.project_code from users_t u 
+var getUsersSql = `select uro.id, uro.user_id, u.username, u.first_name, u.last_name, u.email, uro.role_id, r.description, uro.office_id, f.field_office_code, uro.project_code from users_t u 
 	inner join user_role_office_lk uro on uro.user_id = u.id 
 	inner join role_lk r on r.id = uro.role_id 
 	inner join field_office_lk f on f.fo_id = uro.office_id order by u.last_name`
@@ -43,7 +43,7 @@ var getUserAccessRequestSql = "select id, username, first_name, last_name, email
 
 var insertUserRoleOfficeSql = "insert into user_role_office_lk (id,user_id,role_id,office_id,project_code) values (user_role_office_seq.nextval,:1,:2,:3,:4)"
 
-var updateUserRoleOfficesSql = `update user_role_office_lk set role_id = :2, office_id = :3, project_code = :4 where user_id = :1`
+var updateUserRoleOfficesSql = `update user_role_office_lk set role_id = :2, office_id = :3, project_code = :4 where id = :1`
 
 var getUserRoleOfficeSql = `select uro.id, uro.user_id, uro.role_id, uro.office_id, r.description, f.FIELD_OFFICE_CODE, project_code from user_role_office_lk uro 
 							inner join users_t u on u.id = uro.user_id
@@ -149,7 +149,7 @@ func (auth *AuthStore) GetUsers() ([]models.User, error) {
 
 	for rows.Next() {
 		user := models.User{}
-		err = rows.Scan(&user.ID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.RoleID, &user.Role, &user.OfficeID, &user.OfficeCode, &user.ProjectCode)
+		err = rows.Scan(&user.ID, &user.UserID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.RoleID, &user.Role, &user.OfficeID, &user.OfficeCode, &user.ProjectCode)
 		if err != nil {
 			return users, err
 		}
@@ -161,7 +161,7 @@ func (auth *AuthStore) GetUsers() ([]models.User, error) {
 }
 
 func (auth *AuthStore) UpdateUserRoleOffice(userRoleOffice models.UserRoleOffice) error {
-	_, err := auth.db.Exec(updateUserRoleOfficesSql, userRoleOffice.RoleID, userRoleOffice.OfficeID, userRoleOffice.ProjectCode, userRoleOffice.UserID)
+	_, err := auth.db.Exec(updateUserRoleOfficesSql, userRoleOffice.RoleID, userRoleOffice.OfficeID, userRoleOffice.ProjectCode, userRoleOffice.ID)
 
 	return err
 }
