@@ -77,3 +77,12 @@ func (u *UserHandler) UpdateUserRoleOffice(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
+
+func (u *UserHandler) GetUsers2(c echo.Context) error {
+	users, err := u.Store.GetUsers2()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, users)
+}
