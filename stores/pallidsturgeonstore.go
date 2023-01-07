@@ -29,12 +29,6 @@ var getUserSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r
 							inner join field_office_lk f on f.fo_id = uro.office_id
 				    where email = :1`
 
-var getUserRoleByIdSql = `select uro.id, uro.user_id, uro.role_id, uro.office_id, r.description, f.FIELD_OFFICE_CODE, project_code from user_role_office_lk uro 
-							inner join users_t u on u.id = uro.user_id
-							inner join role_lk r on r.id = uro.role_id
-							inner join field_office_lk f on f.fo_id = uro.office_id
-							where uro.id = :1`
-
 func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 	user := models.User{}
 	selectQuery, err := s.db.Prepare(getUserSql)
@@ -56,29 +50,6 @@ func (s *PallidSturgeonStore) GetUser(email string) (models.User, error) {
 	}
 
 	return user, err
-}
-
-func (s *PallidSturgeonStore) GetUserRoleById(id string) (models.UserRoleOffice, error) {
-	userRoleOffice := models.UserRoleOffice{}
-	selectQuery, err := s.db.Prepare(getUserRoleByIdSql)
-	if err != nil {
-		return userRoleOffice, err
-	}
-
-	rows, err := selectQuery.Query(id)
-	if err != nil {
-		return userRoleOffice, err
-	}
-
-	for rows.Next() {
-		err = rows.Scan(&userRoleOffice.ID, &userRoleOffice.UserID, &userRoleOffice.RoleID, &userRoleOffice.OfficeID, &userRoleOffice.Role, &userRoleOffice.OfficeCode, &userRoleOffice.ProjectCode)
-		if err != nil {
-			return userRoleOffice, err
-		}
-	}
-	defer rows.Close()
-
-	return userRoleOffice, err
 }
 
 var getProjectsSql = `select distinct p.* from project_lk p
