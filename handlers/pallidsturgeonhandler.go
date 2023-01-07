@@ -181,20 +181,18 @@ func (sd *PallidSturgeonHandler) GetHeaderData(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
-	year, projectCode, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("year"), c.QueryParam("projectCode"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
+	id, year, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	siteDataEntries, err := sd.Store.GetSiteDataEntries(siteId, year, userInfo.OfficeCode, projectCode, segmentCode, seasonCode, bendrn, queryParams)
+	siteDataEntries, err := sd.Store.GetSiteDataEntries(siteId, year, userInfo.OfficeCode, userInfo.ProjectCode, segmentCode, seasonCode, bendrn, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -237,15 +235,13 @@ func (sd *PallidSturgeonHandler) UpdateSiteDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {
-	tableId, fieldId, mrId := c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("mrId")
+	id, tableId, fieldId, mrId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("mrId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -636,11 +632,9 @@ func (sd *PallidSturgeonHandler) GetSuppDataSummary(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) error {
-	year, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	id, year, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -654,15 +648,13 @@ func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) erro
 }
 
 func (sd *PallidSturgeonHandler) GetMissouriDataSummary(c echo.Context) error {
-	year, approved, season, spice, month, fromDate, toDate := c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	id, year, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -671,6 +663,7 @@ func (sd *PallidSturgeonHandler) GetMissouriDataSummary(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	return c.JSON(http.StatusOK, dataSummary)
 }
 

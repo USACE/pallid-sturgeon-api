@@ -26,10 +26,21 @@ func (u *UserHandler) AddUserRoleOffice(c echo.Context) error {
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
-func (u *UserHandler) GetUserRoleOffice(c echo.Context) error {
+func (u *UserHandler) GetUserRoleOffices(c echo.Context) error {
 	email := c.Param("email")
 
-	roleOffice, err := u.Store.GetUserRoleOffice(email)
+	roleOfficeItems, err := u.Store.GetUserRoleOffices(email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, roleOfficeItems)
+}
+
+func (u *UserHandler) GetUserRoleOfficeById(c echo.Context) error {
+	id := c.Param("id")
+
+	roleOffice, err := u.Store.GetUserRoleOfficeById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -65,4 +76,13 @@ func (u *UserHandler) UpdateUserRoleOffice(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (u *UserHandler) GetUsers2(c echo.Context) error {
+	users, err := u.Store.GetUsers2()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, users)
 }
