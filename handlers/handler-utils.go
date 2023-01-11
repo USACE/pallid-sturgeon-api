@@ -25,7 +25,7 @@ func processTimeString(st string) time.Time {
 	return t
 }
 
-func processPallidTime(st string,ty string) string {
+func processStringTime(st string,ty string) string {
 	t := ""
 
 	if len(st) > 0 {
