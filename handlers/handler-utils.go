@@ -25,6 +25,31 @@ func processTimeString(st string) time.Time {
 	return t
 }
 
+func processPallidTime(st string,ty string) string {
+	t := ""
+
+	if len(st) > 0 {
+		if ty == "db" && strings.Index(st, "/") == 1 {
+			st = "0" + st
+		}
+
+		f := "01/02/2006"
+
+		if ty == "app" {
+			f = "2006-01-02T15:04:05Z"
+		} 
+
+		test, err := time.Parse(f, st)
+		if err != nil {
+			t = ""
+		} else {
+			t = test.Format("02-Jan-2006")
+		}
+	}
+	return t
+
+}
+
 func marshalQuery(c echo.Context) (models.SearchParams, error) {
 	var page int = 0
 	var size int = 20
