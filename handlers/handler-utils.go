@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"encoding/json"
 
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/labstack/echo/v4"
