@@ -5,7 +5,6 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"reflect"
 
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
@@ -938,16 +937,6 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 
 	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
-		if reflect.TypeOf(uploadProcedure.ProcedureStartTime) != "string" {
-			uploadProcedure.ProcedureStartTime = strconv.Itoa(uploadProcedure.ProcedureStartTime)
-		}
-		if reflect.TypeOf(uploadProcedure.ProcedureEndTime) != "string" {
-			uploadProcedure.ProcedureEndTime = strconv.Itoa(uploadProcedure.ProcedureEndTime)
-		}
-		if reflect.TypeOf(uploadProcedure.VisualReproStatusCode) != "string" {
-			uploadProcedure.VisualReproStatusCode = strconv.Itoa(uploadProcedure.VisualReproStatusCode)
-		}
-
 		uploadProcedure.ProcedureDateTime = processTimeString(uploadProcedure.ProcedureDate)
 		uploadProcedure.DstStartDateTime = processTimeString(uploadProcedure.DstStartDate)
 		uploadProcedure.LastUpdated = time.Now()
