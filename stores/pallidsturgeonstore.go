@@ -3,7 +3,6 @@ package stores
 import (
 	"database/sql"
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
