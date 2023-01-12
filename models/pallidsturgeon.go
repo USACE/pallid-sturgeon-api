@@ -512,7 +512,7 @@ type UploadProcedure struct {
 	FishHealthComments        string      `db:"FISH_HEALTH_COMMENTS" json:"fishHealthComment"`
 	EvalLocationCode          string      `db:"EVAL_LOCATION_CODE" json:"evalLocation"`
 	SpawnStatus               string      `db:"SPAWN_CODE" json:"spawnStatus"`
-	VisualReproStatusCode     string      `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
+	VisualReproStatusCode     json.Number `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
 	UltrasoundReproStatusCode string      `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
 	ExpectedSpawnYear         int         `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
 	UltrasoundGonadLength     float64     `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
