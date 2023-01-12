@@ -2,7 +2,6 @@ package models
 
 import (
 	"time"
-	"encoding/json"
 )
 
 type Role struct {
