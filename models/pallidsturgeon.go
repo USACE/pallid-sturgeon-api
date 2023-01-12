@@ -2,6 +2,7 @@ package models
 
 import (
 	"time"
+	"encoding/json"
 )
 
 type Role struct {
@@ -488,8 +489,8 @@ type UploadProcedure struct {
 	PurposeCode               string      `db:"purpose_code" json:"purpose"`
 	ProcedureDate             string      `db:"PROCEDURE_DATE" json:"procedureDate"`
 	ProcedureDateTime         time.Time   `db:"PROCEDURE_DATE" json:"procedureDateTime"`
-	ProcedureStartTime        string      `db:"procedure_start_time" json:"procedureStartTime,string"`
-	ProcedureEndTime          string      `db:"procedure_end_time" json:"procedureEndTime,string"`
+	ProcedureStartTime        string      `db:"procedure_start_time" json:"procedureStartTime"`
+	ProcedureEndTime          string      `db:"procedure_end_time" json:"procedureEndTime"`
 	ProcedureBy               string      `db:"procedure_by" json:"procedureBy"`
 	AntibioticInjectionInd    int         `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjection"`
 	PhotoDorsalInd            int         `db:"PHOTO_DORSAL_IND" json:"pDorsal"`
@@ -511,7 +512,7 @@ type UploadProcedure struct {
 	FishHealthComments        string      `db:"FISH_HEALTH_COMMENTS" json:"fishHealthComment"`
 	EvalLocationCode          string      `db:"EVAL_LOCATION_CODE" json:"evalLocation"`
 	SpawnStatus               string      `db:"SPAWN_CODE" json:"spawnStatus"`
-	VisualReproStatusCode     string      `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus,string"`
+	VisualReproStatusCode     string      `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
 	UltrasoundReproStatusCode string      `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
 	ExpectedSpawnYear         int         `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
 	UltrasoundGonadLength     float64     `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
