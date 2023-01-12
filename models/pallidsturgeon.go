@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"time"
+	"encoding/json"
+)
 
 type Role struct {
 	ID          int    `db:"id" json:"id"`
@@ -478,49 +481,49 @@ type UploadProcedureData struct {
 }
 
 type UploadProcedure struct {
-	Id                        int       `db:"id" json:"id"`
-	Fid                       int       `db:"f_id" json:"fid"`
-	FFid                      string    `db:"f_fid" json:"fFid"`
-	MrFid                     string    `db:"MR_FID" json:"mrFid"`
-	SiteID                    int       `db:"site_id" json:"siteId"`
-	PurposeCode               string    `db:"purpose_code" json:"purpose"`
-	ProcedureDate             string    `db:"PROCEDURE_DATE" json:"procedureDate"`
-	ProcedureDateTime         time.Time `db:"PROCEDURE_DATE" json:"procedureDateTime"`
-	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
-	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
-	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
-	AntibioticInjectionInd    int       `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjection"`
-	PhotoDorsalInd            int       `db:"PHOTO_DORSAL_IND" json:"pDorsal"`
-	PhotoVentralInd           int       `db:"PHOTO_VENTRAL_IND" json:"pVentral"`
-	PhotoLeftInd              int       `db:"PHOTO_LEFT_IND" json:"pLeft"`
-	OldRadioTagNum            int       `db:"old_radio_tag_num" json:"oldRadioTagNum"`
-	OldFrequencyId            int       `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
-	DstSerialNum              int       `db:"dst_serial_num" json:"dstSerialNum"`
-	DstStartDate              string    `db:"dst_start_date" json:"dstStartDate"`
-	DstStartDateTime          time.Time `db:"dst_start_date" json:"dstStartDateTime"`
-	DstStartTime              string    `db:"dst_start_time" json:"dstStartTime"`
-	DstReimplantInd           int       `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
-	NewRadioTagNum            int       `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId            int       `db:"NEW_FREQUENCY_ID" json:"newFreqId"`
-	SexCode                   string    `db:"SEX_CODE" json:"sexCode"`
-	BloodSampleInd            int       `db:"BLOOD_SAMPLE_IND" json:"bloodSample"`
-	EggSampleInd              int       `db:"EGG_SAMPLE" json:"eggSample"`
-	Comments                  string    `db:"comments" json:"comments"`
-	FishHealthComments        string    `db:"FISH_HEALTH_COMMENTS" json:"fishHealthComment"`
-	EvalLocationCode          string    `db:"EVAL_LOCATION_CODE" json:"evalLocation"`
-	SpawnStatus               string    `db:"SPAWN_CODE" json:"spawnStatus"`
-	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
-	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
-	ExpectedSpawnYear         int       `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
-	UltrasoundGonadLength     float64   `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
-	GonadCondition            string    `db:"gonad_condition" json:"gonadCondition"`
-	EditInitials              string    `db:"edit_initials" json:"editInitials"`
-	LastEditComment           string    `db:"last_edit_comment" json:"lastEditComment"`
-	LastUpdated               time.Time `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId           int       `db:"upload_session_id" json:"uploadSessionId"`
-	UploadedBy                string    `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
-	Checkby                   string    `db:"checkby" json:"checkby"`
+	Id                        int         `db:"id" json:"id"`
+	Fid                       int         `db:"f_id" json:"fid"`
+	FFid                      string      `db:"f_fid" json:"fFid"`
+	MrFid                     string      `db:"MR_FID" json:"mrFid"`
+	SiteID                    int         `db:"site_id" json:"siteId"`
+	PurposeCode               string      `db:"purpose_code" json:"purpose"`
+	ProcedureDate             string      `db:"PROCEDURE_DATE" json:"procedureDate"`
+	ProcedureDateTime         time.Time   `db:"PROCEDURE_DATE" json:"procedureDateTime"`
+	ProcedureStartTime        json.Number `db:"procedure_start_time" json:"procedureStartTime"`
+	ProcedureEndTime          json.Number `db:"procedure_end_time" json:"procedureEndTime"`
+	ProcedureBy               string      `db:"procedure_by" json:"procedureBy"`
+	AntibioticInjectionInd    int         `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjection"`
+	PhotoDorsalInd            int         `db:"PHOTO_DORSAL_IND" json:"pDorsal"`
+	PhotoVentralInd           int         `db:"PHOTO_VENTRAL_IND" json:"pVentral"`
+	PhotoLeftInd              int         `db:"PHOTO_LEFT_IND" json:"pLeft"`
+	OldRadioTagNum            int         `db:"old_radio_tag_num" json:"oldRadioTagNum"`
+	OldFrequencyId            int         `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
+	DstSerialNum              int         `db:"dst_serial_num" json:"dstSerialNum"`
+	DstStartDate              string      `db:"dst_start_date" json:"dstStartDate"`
+	DstStartDateTime          time.Time   `db:"dst_start_date" json:"dstStartDateTime"`
+	DstStartTime              string      `db:"dst_start_time" json:"dstStartTime"`
+	DstReimplantInd           int         `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
+	NewRadioTagNum            int         `db:"new_radio_tag_num" json:"newRadioTagNum"`
+	NewFrequencyId            int         `db:"NEW_FREQUENCY_ID" json:"newFreqId"`
+	SexCode                   string      `db:"SEX_CODE" json:"sexCode"`
+	BloodSampleInd            int         `db:"BLOOD_SAMPLE_IND" json:"bloodSample"`
+	EggSampleInd              int         `db:"EGG_SAMPLE" json:"eggSample"`
+	Comments                  string      `db:"comments" json:"comments"`
+	FishHealthComments        string      `db:"FISH_HEALTH_COMMENTS" json:"fishHealthComment"`
+	EvalLocationCode          string      `db:"EVAL_LOCATION_CODE" json:"evalLocation"`
+	SpawnStatus               string      `db:"SPAWN_CODE" json:"spawnStatus"`
+	VisualReproStatusCode     string      `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
+	UltrasoundReproStatusCode string      `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
+	ExpectedSpawnYear         int         `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
+	UltrasoundGonadLength     float64     `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
+	GonadCondition            string      `db:"gonad_condition" json:"gonadCondition"`
+	EditInitials              string      `db:"edit_initials" json:"editInitials"`
+	LastEditComment           string      `db:"last_edit_comment" json:"lastEditComment"`
+	LastUpdated               time.Time   `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId           int         `db:"upload_session_id" json:"uploadSessionId"`
+	UploadedBy                string      `db:"uploaded_by" json:"uploadedBy"`
+	UploadFilename            string      `db:"upload_filename" json:"uploadFilename"`
+	Checkby                   string      `db:"checkby" json:"checkby"`
 }
 
 type SupplementalDataEntryWithCount struct {
