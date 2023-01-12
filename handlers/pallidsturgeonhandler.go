@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"encoding/json"
 
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
