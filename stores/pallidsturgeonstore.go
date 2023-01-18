@@ -786,6 +786,11 @@ func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFis
 	return err
 }
 
+func (s *PallidSturgeonStore) DeleteFishDataEntry(id string) error {
+	_, err := s.db.Exec("delete from ds_fish where f_id = :1", id)
+	return err
+}
+
 var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PROJECT,SEGMENT,SEASON,setdate, subsample, subsamplepass, subsamplen, recorder, 
 	gear, GEAR_TYPE, temp, turbidity, conductivity, do, distance, width, netrivermile, structurenumber, usgs, riverstage, discharge,
 	u1, u2, u3, u4, u5, u6, u7, MACRO, MESO, habitatrn, qc, micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, 

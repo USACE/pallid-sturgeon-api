@@ -75,6 +75,7 @@ func main() {
 	e.GET(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.GetFishDataEntries, PUBLIC))
 	e.POST(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.SaveFishDataEntry, PUBLIC))
 	e.PUT(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.UpdateFishDataEntry, PUBLIC))
+	// e.DELETE(urlContext+"/fishDataEntry/:id", auth.Authorize(PallidSturgeonH.DeleteFishDataEntry, PUBLIC))
 	e.GET(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.GetMoriverDataEntries, PUBLIC))
 	e.POST(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.SaveMoriverDataEntry, PUBLIC))
 	e.PUT(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.UpdateMoriverDataEntry, PUBLIC))
