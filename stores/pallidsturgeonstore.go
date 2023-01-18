@@ -700,7 +700,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	fishEntries := []models.UploadFish{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "f_id desc"
+		queryParams.OrderBy = "f_id asc"
 	}
 	fishDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(fishDataEntriesSqlWithSearch)
