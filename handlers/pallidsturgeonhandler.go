@@ -297,7 +297,6 @@ func (sd *PallidSturgeonHandler) DeleteFishDataEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	// return c.JSON(http.StatusOK, `{"result":"DELETE fish data entry id `+id+` was a success!"}`)
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
