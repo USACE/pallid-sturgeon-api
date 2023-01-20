@@ -464,7 +464,7 @@ func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
-	tableId, fId := c.QueryParam("tableId"), c.QueryParam("fId")
+	tableId, fId, mrId := c.QueryParam("tableId"), c.QueryParam("fId"), c.QueryParam("mrId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -476,7 +476,7 @@ func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, userInfo.OfficeCode, queryParams)
+	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, mrId, userInfo.OfficeCode, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -491,9 +491,6 @@ func (sd *PallidSturgeonHandler) SaveProcedureDataEntry(c echo.Context) error {
 	procedureData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	procedureData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	// procedureData.ProcedureDate = "12-Dec-2022"
-	// procedureData.DstStartDate = "12-Dec-2022"
 	procedureData.ProcedureDate = processStringTime(procedureData.ProcedureDate, "app")
 	procedureData.DstStartDate = processStringTime(procedureData.DstStartDate, "app")
 	err := sd.Store.SaveProcedureDataEntry(procedureData)
@@ -921,8 +918,6 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadSearch := range uploads.SearchUpload.Items {
 		// uploadSearch.SearchDateTime = processTimeString(uploadSearch.SearchDate)
-		// @TODO: remove hardcoded value and fix date formatting
-		// uploadSearch.SearchDate = "12-Dec-2022"
 		uploadSearch.SearchDate = processStringTime(uploadSearch.SearchDate, "db")
 		uploadSearch.LastUpdated = time.Now()
 		uploadSearch.UploadedBy = user.FirstName + " " + user.LastName
@@ -963,8 +958,6 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadMoriver := range uploads.MoriverUpload.Items {
 		// uploadMoriver.SetDateTime = processTimeString(uploadMoriver.SetDate)
-		// @TODO: remove hardcoded value and fix date formatting
-		// uploadMoriver.SetDate = "12-Dec-2022"
 		uploadMoriver.SetDate = processStringTime(uploadMoriver.SetDate, "db")
 		uploadMoriver.LastUpdated = time.Now()
 		uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
