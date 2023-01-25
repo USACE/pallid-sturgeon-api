@@ -25,21 +25,18 @@ func processTimeString(st string) time.Time {
 	return t
 }
 
-func processStringTime(st string,ty string) string {
+func processStringTime(st string, ty string) string {
 	t := ""
 
 	if len(st) > 0 {
-		if ty == "db" && strings.Index(st, "/") == 1 {
-			st = "0" + st
-		}
-
-		f := "01/02/2006"
+		f := "1/2/2006"
 
 		if ty == "app" {
-			f = "2006-01-02T15:04:05Z"
-		} 
+			f = "2006-01-02"
+		}
 
 		test, err := time.Parse(f, st)
+
 		if err != nil {
 			t = ""
 		} else {
