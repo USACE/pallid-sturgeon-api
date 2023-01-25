@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -362,73 +361,28 @@ type SitesWithCount struct {
 }
 
 type Sites struct {
-	SiteID             int           `db:"site_id" json:"siteId"`
-	SiteFID            string        `db:"site_fid" json:"siteFid"`
-	Year               int           `db:"year" json:"year"`
-	BrmID              sql.NullInt64 `db:"brm_id" json:"brmId"`
-	FieldofficeId      string        `db:"fieldoffice" json:"fieldoffice"`
-	ProjectId          int           `db:"project_id" json:"projectId"`
-	SegmentId          int           `db:"segment_id" json:"segmentId"`
-	SeasonId           string        `db:"season" json:"season"`
-	SampleUnitTypeCode string        `db:"sample_unit_type" json:"sampleUnitType"`
-	Bend               int           `db:"bend" json:"bend"`
-	Bendrn             string        `db:"bendrn" json:"bendrn"`
-	BendRiverMile      *string       `db:"bend_river_mile" json:"bendRiverMile"`
-	Complete           sql.NullInt64 `db:"complete" json:"complete"`
-	Approved           sql.NullInt64 `db:"approved" json:"approved"`
-	BkgColor           string        `db:"bkg_color" json:"bkgColor"`
-	EditInitials       string        `db:"edit_initials" json:"editInitials"`
-	LastEditComment    string        `db:"last_edit_comment" json:"last_edit_comment"`
-	LastUpdated        time.Time     `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId    sql.NullInt64 `db:"upload_session_id" json:"uploadSessionId"`
-	UploadedBy         string        `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename     string        `db:"upload_filename" json:"uploadFilename"`
+	SiteID             int       `db:"site_id" json:"siteId"`
+	SiteFID            string    `db:"site_fid" json:"siteFid"`
+	Year               int       `db:"year" json:"year"`
+	BrmID              *int      `db:"brm_id" json:"brmId"`
+	FieldofficeId      string    `db:"fieldoffice" json:"fieldoffice"`
+	ProjectId          int       `db:"project_id" json:"projectId"`
+	SegmentId          int       `db:"segment_id" json:"segmentId"`
+	SeasonId           string    `db:"season" json:"season"`
+	SampleUnitTypeCode string    `db:"sample_unit_type" json:"sampleUnitType"`
+	Bend               int       `db:"bend" json:"bend"`
+	Bendrn             string    `db:"bendrn" json:"bendrn"`
+	BendRiverMile      *string   `db:"bend_river_mile" json:"bendRiverMile"`
+	Complete           *int      `db:"complete" json:"complete"`
+	Approved           *int      `db:"approved" json:"approved"`
+	BkgColor           string    `db:"bkg_color" json:"bkgColor"`
+	EditInitials       string    `db:"edit_initials" json:"editInitials"`
+	LastEditComment    string    `db:"last_edit_comment" json:"last_edit_comment"`
+	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId    *int      `db:"upload_session_id" json:"uploadSessionId"`
+	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
+	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
 }
-
-// DS Fish
-
-type FishDataEntryDSWithCount struct {
-	Items      []DSFish `json:"items"`
-	TotalCount int      `json:"totalCount"`
-}
-
-type DSFish struct {
-	Id                 *int            `db:"id" json:"id"`
-	SiteID             int             `db:"site_id" json:"siteId"`
-	MrFid              string          `db:"mr_fid" json:"mrFid"`
-	Fid                int             `db:"f_id" json:"fid"`
-	Ffid               string          `db:"f_fid" json:"ffid"`
-	MrID               *int            `db:"mr_id" json:"mrId"`
-	Panelhook          string          `db:"panelhook" json:"panelHook"`
-	Bait               string          `db:"bait" json:"bait"`
-	Species            string          `db:"species" json:"species"`
-	Length             *float32        `db:"length" json:"length"`
-	Weight             *float32        `db:"weight" json:"weight"`
-	Fishcount          int             `db:"fishcount" json:"countF"`
-	FinCurl            string          `db:"fin_curl" json:"finCurl"`
-	Otolith            string          `db:"otolith" json:"otolith"`
-	Rayspine           string          `db:"rayspine" json:"raySpine"`
-	Scale              string          `db:"scale" json:"scale"`
-	Ftprefix           string          `db:"ftprefix" json:"ftPrefix"`
-	Ftnum              int             `db:"ftnum" json:"floyTag"`
-	Ftmr               string          `db:"ftmr" json:"mR"`
-	Comments           string          `db:"comments" json:"comments"`
-	Approved           int             `db:"approved" json:"approved"`
-	LastUpdated        time.Time       `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId    int             `db:"upload_session_id" json:"uploadSessionId"`
-	EditInitials       string          `db:"edit_initials" json:"editInitials"`
-	LastEditComment    string          `db:"last_edit_comment" json:"lastEditComment"`
-	UploadedBy         string          `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename     string          `db:"upload_filename" json:"uploadFilename"`
-	Project            *int            `db:"PROJECT_ID" json:"project"`
-	UniqueID           *int            `db:"uniqueidentifier" json:"uniqueID"`
-	Segment            *int            `db:"SEGMENT_ID" json:"segment"`
-	Fieldoffice        string          `db:"FIELDOFFICE" json:"fieldOffice"`
-	GeneticsVialNumber string          `db:"genetics_vial_number" json:"geneticsVialNumber"`
-	Condition          sql.NullFloat64 `db:"condition" json:"condition"`
-}
-
-// Upload Fish
 
 type FishDataEntryWithCount struct {
 	Items      []UploadFish `json:"items"`
@@ -473,10 +427,8 @@ type UploadFish struct {
 	Segment            *int      `db:"SEGMENT_ID" json:"segment"`
 	Fieldoffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
-	Condition          float64   `db:"condition" json:"condition"`
+	Condition          *float64  `db:"condition" json:"condition"`
 }
-
-// Upload Search
 
 type SearchDataEntryWithCount struct {
 	Items      []UploadSearch `json:"items"`
@@ -517,42 +469,6 @@ type UploadSearch struct {
 	UploadFilename  string    `db:"upload_filename" json:"uploadFilename"`
 }
 
-// DS Search
-type SearchDataEntryDSWithCount struct {
-	Items      []DSSearch `json:"items"`
-	TotalCount int        `json:"totalCount"`
-}
-
-type DSSearch struct {
-	SiteId          int             `db:"site_id" json:"siteId"`
-	SeId            int             `db:"se_id" json:"seId"`
-	SeFid           string          `db:"se_fid" json:"seFid"`
-	DsId            int             `db:"ds_id" json:"dsId"`
-	SiteFid         string          `db:"site_fid" json:"siteFid"`
-	SearchDate      string          `db:"search_date" json:"searchDate"`
-	SearchDateTime  time.Time       `db:"search_date" json:"searchDateTime"`
-	Recorder        string          `db:"recorder" json:"recorder"`
-	SearchTypeCode  string          `db:"search_type_code" json:"searchTypeCode"`
-	SearchDay       sql.NullInt64   `db:"search_day" json:"searchDay"`
-	StartTime       string          `db:"start_time" json:"startTime"`
-	StartLatitude   float64         `db:"start_latitude" json:"startLatitude"`
-	StartLongitude  float64         `db:"start_longitude" json:"startLongitude"`
-	StopTime        string          `db:"stop_time" json:"stopTime"`
-	StopLatitude    float64         `db:"stop_latitude" json:"stopLatitude"`
-	StopLongitude   float64         `db:"stop_longitude" json:"stopLongitude"`
-	Temp            sql.NullFloat64 `db:"temp" json:"temp"`
-	Conductivity    sql.NullFloat64 `db:"conductivity" json:"conductivity"`
-	Checkby         string          `db:"checkby" json:"checkby"`
-	EditInitials    string          `db:"edit_initials" json:"editInitials"`
-	LastEditComment string          `db:"last_edit_comment" json:"lastEditComment"`
-	LastUpdated     time.Time       `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId int             `db:"upload_session_id" json:"uploadSessionId"`
-	UploadedBy      string          `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename  string          `db:"upload_filename" json:"uploadFilename"`
-}
-
-// Upload Procedure
-
 type ProcedureDataEntryWithCount struct {
 	Items      []UploadProcedure `json:"items"`
 	TotalCount int               `json:"totalCount"`
@@ -575,30 +491,30 @@ type UploadProcedure struct {
 	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
 	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
 	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
-	AntibioticInjectionInd    int       `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjection"`
-	PhotoDorsalInd            int       `db:"PHOTO_DORSAL_IND" json:"pDorsal"`
-	PhotoVentralInd           int       `db:"PHOTO_VENTRAL_IND" json:"pVentral"`
-	PhotoLeftInd              int       `db:"PHOTO_LEFT_IND" json:"pLeft"`
-	OldRadioTagNum            int       `db:"old_radio_tag_num" json:"oldRadioTagNum"`
-	OldFrequencyId            int       `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
-	DstSerialNum              int       `db:"dst_serial_num" json:"dstSerialNum"`
+	AntibioticInjectionInd    *int      `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjection"`
+	PhotoDorsalInd            *int      `db:"PHOTO_DORSAL_IND" json:"pDorsal"`
+	PhotoVentralInd           *int      `db:"PHOTO_VENTRAL_IND" json:"pVentral"`
+	PhotoLeftInd              *int      `db:"PHOTO_LEFT_IND" json:"pLeft"`
+	OldRadioTagNum            *int      `db:"old_radio_tag_num" json:"oldRadioTagNum"`
+	OldFrequencyId            *int      `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
+	DstSerialNum              *int      `db:"dst_serial_num" json:"dstSerialNum"`
 	DstStartDate              string    `db:"dst_start_date" json:"dstStartDate"`
 	DstStartDateTime          time.Time `db:"dst_start_date" json:"dstStartDateTime"`
 	DstStartTime              string    `db:"dst_start_time" json:"dstStartTime"`
-	DstReimplantInd           int       `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
-	NewRadioTagNum            int       `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId            int       `db:"NEW_FREQUENCY_ID" json:"newFreqId"`
+	DstReimplantInd           *int      `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
+	NewRadioTagNum            *int      `db:"new_radio_tag_num" json:"newRadioTagNum"`
+	NewFrequencyId            *int      `db:"NEW_FREQUENCY_ID" json:"newFreqId"`
 	SexCode                   string    `db:"SEX_CODE" json:"sexCode"`
-	BloodSampleInd            int       `db:"BLOOD_SAMPLE_IND" json:"bloodSample"`
-	EggSampleInd              int       `db:"EGG_SAMPLE" json:"eggSample"`
+	BloodSampleInd            *int      `db:"BLOOD_SAMPLE_IND" json:"bloodSample"`
+	EggSampleInd              *int      `db:"EGG_SAMPLE" json:"eggSample"`
 	Comments                  string    `db:"comments" json:"comments"`
 	FishHealthComments        string    `db:"FISH_HEALTH_COMMENTS" json:"fishHealthComment"`
 	EvalLocationCode          string    `db:"EVAL_LOCATION_CODE" json:"evalLocation"`
 	SpawnStatus               string    `db:"SPAWN_CODE" json:"spawnStatus"`
 	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
 	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
-	ExpectedSpawnYear         int       `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
-	UltrasoundGonadLength     float64   `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
+	ExpectedSpawnYear         *int      `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
+	UltrasoundGonadLength     *float64  `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
 	GonadCondition            string    `db:"gonad_condition" json:"gonadCondition"`
 	EditInitials              string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment           string    `db:"last_edit_comment" json:"lastEditComment"`
@@ -607,59 +523,6 @@ type UploadProcedure struct {
 	UploadedBy                string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
 	Checkby                   string    `db:"checkby" json:"checkby"`
-}
-
-// DS Procedure
-
-type ProcedureDataEntryDSWithCount struct {
-	Items      []DSProcedure `json:"items"`
-	TotalCount int           `json:"totalCount"`
-}
-
-type DSProcedure struct {
-	Id                        int             `db:"id" json:"id"`
-	Fid                       int             `db:"f_id" json:"fid"`
-	FFid                      string          `db:"f_fid" json:"fFid"`
-	MrFid                     string          `db:"MR_FID" json:"mrFid"`
-	SiteID                    int             `db:"site_id" json:"siteId"`
-	PurposeCode               string          `db:"purpose_code" json:"purpose"`
-	ProcedureDate             sql.NullString  `db:"PROCEDURE_DATE" json:"procedureDate"`
-	ProcedureDateTime         time.Time       `db:"PROCEDURE_DATE" json:"procedureDateTime"`
-	ProcedureStartTime        string          `db:"procedure_start_time" json:"procedureStartTime"`
-	ProcedureEndTime          string          `db:"procedure_end_time" json:"procedureEndTime"`
-	ProcedureBy               string          `db:"procedure_by" json:"procedureBy"`
-	AntibioticInjectionInd    sql.NullInt64   `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjection"`
-	PhotoDorsalInd            sql.NullInt64   `db:"PHOTO_DORSAL_IND" json:"pDorsal"`
-	PhotoVentralInd           sql.NullInt64   `db:"PHOTO_VENTRAL_IND" json:"pVentral"`
-	PhotoLeftInd              sql.NullInt64   `db:"PHOTO_LEFT_IND" json:"pLeft"`
-	OldRadioTagNum            sql.NullInt64   `db:"old_radio_tag_num" json:"oldRadioTagNum"`
-	OldFrequencyId            sql.NullInt64   `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
-	DstSerialNum              sql.NullInt64   `db:"dst_serial_num" json:"dstSerialNum"`
-	DstStartDate              string          `db:"dst_start_date" json:"dstStartDate"`
-	DstStartDateTime          time.Time       `db:"dst_start_date" json:"dstStartDateTime"`
-	DstStartTime              string          `db:"dst_start_time" json:"dstStartTime"`
-	DstReimplantInd           sql.NullInt64   `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
-	NewRadioTagNum            sql.NullInt64   `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId            sql.NullInt64   `db:"NEW_FREQUENCY_ID" json:"newFreqId"`
-	SexCode                   string          `db:"SEX_CODE" json:"sexCode"`
-	BloodSampleInd            sql.NullInt64   `db:"BLOOD_SAMPLE_IND" json:"bloodSample"`
-	EggSampleInd              sql.NullInt64   `db:"EGG_SAMPLE" json:"eggSample"`
-	Comments                  string          `db:"comments" json:"comments"`
-	FishHealthComments        string          `db:"FISH_HEALTH_COMMENTS" json:"fishHealthComment"`
-	EvalLocationCode          string          `db:"EVAL_LOCATION_CODE" json:"evalLocation"`
-	SpawnStatus               string          `db:"SPAWN_CODE" json:"spawnStatus"`
-	VisualReproStatusCode     string          `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
-	UltrasoundReproStatusCode string          `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
-	ExpectedSpawnYear         sql.NullInt64   `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
-	UltrasoundGonadLength     sql.NullFloat64 `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
-	GonadCondition            string          `db:"gonad_condition" json:"gonadCondition"`
-	EditInitials              string          `db:"edit_initials" json:"editInitials"`
-	LastEditComment           string          `db:"last_edit_comment" json:"lastEditComment"`
-	LastUpdated               time.Time       `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId           int             `db:"upload_session_id" json:"uploadSessionId"`
-	UploadedBy                string          `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename            string          `db:"upload_filename" json:"uploadFilename"`
-	Checkby                   string          `db:"checkby" json:"checkby"`
 }
 
 type SupplementalDataEntryWithCount struct {
@@ -743,7 +606,7 @@ type UploadMoriver struct {
 	MrFid            string    `db:"mr_fid" json:"mrFid"`
 	SeFieldID        string    `db:"se_field_id" json:"seFieldId"`
 	Season           string    `db:"season" json:"season"`
-	SetDate          string    `db:"setdate" json:"setdate"` // TODO: date not displaying in table
+	SetDate          string    `db:"setdate" json:"setdate"`
 	SetDateTime      time.Time `db:"setdate" json:"setDateTime"`
 	Subsample        float64   `db:"subsample" json:"subsample"`
 	Subsamplepass    float64   `db:"subsamplepass" json:"subsamplepass"`
@@ -838,35 +701,35 @@ type UploadTelemetryData struct {
 }
 
 type UploadTelemetry struct {
-	TId                int             `db:"t_id" json:"tId"`
-	TFid               string          `db:"t_fid" json:"tFid"`
-	SeFid              string          `db:"se_fid" json:"seFieldId"`
-	SeId               int             `db:"se_id" json:"seId"`
-	SiteId             int             `db:"site_id" json:"siteId"`
-	Bend               sql.NullFloat64 `db:"bend" json:"bend"`
-	RadioTagNum        int             `db:"radio_tag_num" json:"radioTagNum"`
-	FrequencyIdCode    int             `db:"frequency_id_code" json:"frequencyIdCode"`
-	CaptureTime        string          `db:"capture_time" json:"captureDate"`
-	CaptureLatitude    float64         `db:"capture_latitude" json:"captureLatitude"`
-	CaptureLongitude   float64         `db:"capture_longitude" json:"captureLongitude"`
-	PositionConfidence sql.NullFloat64 `db:"position_confidence" json:"positionConfidence"`
-	MacroId            string          `db:"macro_id" json:"macroId"`
-	MesoId             string          `db:"meso_id" json:"mesoId"`
-	Depth              sql.NullFloat64 `db:"depth" json:"depth"`
-	Temp               sql.NullFloat64 `db:"temp" json:"temp"`
-	Conductivity       sql.NullFloat64 `db:"conductivity" json:"conductivity"`
-	Turbidity          sql.NullFloat64 `db:"turbidity" json:"turbidity"`
-	Silt               sql.NullFloat64 `db:"silt" json:"silt"`
-	Sand               sql.NullFloat64 `db:"sand" json:"sand"`
-	Gravel             sql.NullFloat64 `db:"gravel" json:"gravel"`
-	Checkby            string          `db:"checkby" json:"checkby"`
-	EditInitials       string          `db:"edit_initials" json:"editInitials"`
-	LastEditComment    string          `db:"last_edit_comment" json:"lastEditComment"`
-	Comments           string          `db:"comments" json:"comments"`
-	LastUpdated        time.Time       `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId    int             `db:"upload_session_id" json:"uploadSessionId"`
-	UploadedBy         string          `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename     string          `db:"upload_filename" json:"uploadFilename"`
+	TId                int       `db:"t_id" json:"tId"`
+	TFid               string    `db:"t_fid" json:"tFid"`
+	SeFid              string    `db:"se_fid" json:"seFieldId"`
+	SeId               int       `db:"se_id" json:"seId"`
+	SiteId             int       `db:"site_id" json:"siteId"`
+	Bend               *float64  `db:"bend" json:"bend"`
+	RadioTagNum        int       `db:"radio_tag_num" json:"radioTagNum"`
+	FrequencyIdCode    int       `db:"frequency_id_code" json:"frequencyIdCode"`
+	CaptureTime        string    `db:"capture_time" json:"captureDate"`
+	CaptureLatitude    float64   `db:"capture_latitude" json:"captureLatitude"`
+	CaptureLongitude   float64   `db:"capture_longitude" json:"captureLongitude"`
+	PositionConfidence *float64  `db:"position_confidence" json:"positionConfidence"`
+	MacroId            string    `db:"macro_id" json:"macroId"`
+	MesoId             string    `db:"meso_id" json:"mesoId"`
+	Depth              *float64  `db:"depth" json:"depth"`
+	Temp               *float64  `db:"temp" json:"temp"`
+	Conductivity       *float64  `db:"conductivity" json:"conductivity"`
+	Turbidity          *float64  `db:"turbidity" json:"turbidity"`
+	Silt               *float64  `db:"silt" json:"silt"`
+	Sand               *float64  `db:"sand" json:"sand"`
+	Gravel             *float64  `db:"gravel" json:"gravel"`
+	Checkby            string    `db:"checkby" json:"checkby"`
+	EditInitials       string    `db:"edit_initials" json:"editInitials"`
+	LastEditComment    string    `db:"last_edit_comment" json:"lastEditComment"`
+	Comments           string    `db:"comments" json:"comments"`
+	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
+	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
+	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
 }
 
 type ProcedureOut struct {

@@ -44,7 +44,6 @@ func processStringTime(st string, ty string) string {
 		}
 	}
 	return t
-
 }
 
 func marshalQuery(c echo.Context) (models.SearchParams, error) {

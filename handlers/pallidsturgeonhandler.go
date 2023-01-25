@@ -902,7 +902,6 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		uploadSearch.UploadSessionId = sessionId
 		uploadSearch.EditInitials = uploads.EditInitials
 		uploadSearch.UploadFilename = uploads.SearchUpload.UploadFilename
-		// log.Printf("[uploadSearch] Data: %v", uploads.SearchUpload.Items)
 		err = sd.Store.SaveSearchUpload(uploadSearch)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())

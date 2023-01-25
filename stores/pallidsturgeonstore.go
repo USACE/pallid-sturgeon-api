@@ -642,8 +642,8 @@ var fishDataEntriesCountByMridSql = `select count(*) from ds_fish fi inner join 
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and fi.mr_id = :1`
 
-func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string, mrId string, officeCode string, queryParams models.SearchParams) (models.FishDataEntryDSWithCount, error) {
-	fishDataEntryWithCount := models.FishDataEntryDSWithCount{}
+func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string, mrId string, officeCode string, queryParams models.SearchParams) (models.FishDataEntryWithCount, error) {
+	fishDataEntryWithCount := models.FishDataEntryWithCount{}
 	query := ""
 	queryWithCount := ""
 	id := ""
@@ -697,7 +697,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 		}
 	}
 
-	fishEntries := []models.DSFish{}
+	fishEntries := []models.UploadFish{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "f_id desc"
@@ -723,7 +723,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	defer rows.Close()
 
 	for rows.Next() {
-		fishDataEntry := models.DSFish{}
+		fishDataEntry := models.UploadFish{}
 		err = rows.Scan(&fishDataEntry.Fid, &fishDataEntry.Ffid, &fishDataEntry.MrID, &fishDataEntry.SiteID, &fishDataEntry.Panelhook, &fishDataEntry.Bait, &fishDataEntry.Species, &fishDataEntry.Length, &fishDataEntry.Weight, &fishDataEntry.Fishcount, &fishDataEntry.Otolith, &fishDataEntry.Rayspine,
 			&fishDataEntry.Scale, &fishDataEntry.Ftprefix, &fishDataEntry.Ftnum, &fishDataEntry.Ftmr, &fishDataEntry.EditInitials, &fishDataEntry.LastEditComment, &fishDataEntry.UploadedBy, &fishDataEntry.GeneticsVialNumber, &fishDataEntry.Condition, &fishDataEntry.FinCurl)
 		if err != nil {
@@ -1364,8 +1364,8 @@ UPLOAD_SESSION_ID, ds_id from ds_search where site_id = :1`
 
 var searchDataEntriesCountBySiteIdSql = `select count(*) from ds_search where site_id = :1`
 
-func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string, queryParams models.SearchParams) (models.SearchDataEntryDSWithCount, error) {
-	searchDataEntryWithCount := models.SearchDataEntryDSWithCount{}
+func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string, queryParams models.SearchParams) (models.SearchDataEntryWithCount, error) {
+	searchDataEntryWithCount := models.SearchDataEntryWithCount{}
 	query := ""
 	queryWithCount := ""
 	id := ""
@@ -1413,7 +1413,7 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 		}
 	}
 
-	searchEntries := []models.DSSearch{}
+	searchEntries := []models.UploadSearch{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "se_id desc"
@@ -1439,7 +1439,7 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 	defer rows.Close()
 
 	for rows.Next() {
-		searchDataEntry := models.DSSearch{}
+		searchDataEntry := models.UploadSearch{}
 		err = rows.Scan(&searchDataEntry.SeFid, &searchDataEntry.SeId, &searchDataEntry.Checkby, &searchDataEntry.Conductivity, &searchDataEntry.EditInitials, &searchDataEntry.LastEditComment, &searchDataEntry.LastUpdated,
 			&searchDataEntry.Recorder, &searchDataEntry.SearchDate, &searchDataEntry.SearchDay, &searchDataEntry.SearchTypeCode, &searchDataEntry.SiteId, &searchDataEntry.StartLatitude, &searchDataEntry.StartLongitude,
 			&searchDataEntry.StartTime, &searchDataEntry.StopLatitude, &searchDataEntry.StopLongitude, &searchDataEntry.StopTime, &searchDataEntry.Temp, &searchDataEntry.UploadedBy, &searchDataEntry.UploadFilename,
@@ -1745,8 +1745,8 @@ inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and pr.f_fid = :1`
 
-func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string, officeCode string, queryParams models.SearchParams) (models.ProcedureDataEntryDSWithCount, error) {
-	procedureDataEntryWithCount := models.ProcedureDataEntryDSWithCount{}
+func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string, officeCode string, queryParams models.SearchParams) (models.ProcedureDataEntryWithCount, error) {
+	procedureDataEntryWithCount := models.ProcedureDataEntryWithCount{}
 	query := ""
 	queryWithCount := ""
 	id := ""
@@ -1794,7 +1794,7 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 		}
 	}
 
-	procedureEntries := []models.DSProcedure{}
+	procedureEntries := []models.UploadProcedure{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "id"
@@ -1820,7 +1820,7 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 	defer rows.Close()
 
 	for rows.Next() {
-		procedureDataEntry := models.DSProcedure{}
+		procedureDataEntry := models.UploadProcedure{}
 		err = rows.Scan(&procedureDataEntry.Id, &procedureDataEntry.Fid, &procedureDataEntry.FFid, &procedureDataEntry.SiteID, &procedureDataEntry.PurposeCode, &procedureDataEntry.ProcedureDate, &procedureDataEntry.ProcedureStartTime, &procedureDataEntry.ProcedureEndTime, &procedureDataEntry.ProcedureBy, &procedureDataEntry.AntibioticInjectionInd,
 			&procedureDataEntry.PhotoDorsalInd, &procedureDataEntry.PhotoVentralInd, &procedureDataEntry.PhotoLeftInd, &procedureDataEntry.OldRadioTagNum, &procedureDataEntry.OldFrequencyId, &procedureDataEntry.DstSerialNum, &procedureDataEntry.DstStartTime, &procedureDataEntry.DstReimplantInd,
 			&procedureDataEntry.NewRadioTagNum, &procedureDataEntry.NewFrequencyId, &procedureDataEntry.SexCode, &procedureDataEntry.Comments, &procedureDataEntry.FishHealthComments, &procedureDataEntry.SpawnStatus, &procedureDataEntry.EvalLocationCode, &procedureDataEntry.BloodSampleInd, &procedureDataEntry.EggSampleInd,
