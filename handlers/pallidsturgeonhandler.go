@@ -922,6 +922,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 
 	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
 		uploadProcedure.ProcedureDate = processStringTime(uploadProcedure.ProcedureDate, "db")
+		uploadProcedure.DstStartDate = processStringTime(uploadProcedure.DstStartDate, "db")
 		uploadProcedure.LastUpdated = time.Now()
 		uploadProcedure.UploadedBy = user.FirstName + " " + user.LastName
 		uploadProcedure.UploadSessionId = sessionId
