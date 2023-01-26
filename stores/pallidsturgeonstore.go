@@ -1682,7 +1682,7 @@ func (s *PallidSturgeonStore) UpdateTelemetryDataEntry(telemetryDataEntry models
 var procedureDataEntriesSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1697,7 +1697,7 @@ where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 var procedureDataEntriesByIdSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1714,7 +1714,7 @@ and pr.id = :1`
 var procedureDataEntriesByFidSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1731,7 +1731,7 @@ and pr.f_id = :1`
 var procedureDataEntriesByFfidSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1825,7 +1825,7 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 			&procedureDataEntry.PhotoDorsalInd, &procedureDataEntry.PhotoVentralInd, &procedureDataEntry.PhotoLeftInd, &procedureDataEntry.OldRadioTagNum, &procedureDataEntry.OldFrequencyId, &procedureDataEntry.DstSerialNum, &procedureDataEntry.DstStartTime, &procedureDataEntry.DstReimplantInd,
 			&procedureDataEntry.NewRadioTagNum, &procedureDataEntry.NewFrequencyId, &procedureDataEntry.SexCode, &procedureDataEntry.Comments, &procedureDataEntry.FishHealthComments, &procedureDataEntry.SpawnStatus, &procedureDataEntry.EvalLocationCode, &procedureDataEntry.BloodSampleInd, &procedureDataEntry.EggSampleInd,
 			&procedureDataEntry.VisualReproStatusCode, &procedureDataEntry.UltrasoundReproStatusCode, &procedureDataEntry.UltrasoundGonadLength, &procedureDataEntry.GonadCondition, &procedureDataEntry.ExpectedSpawnYear, &procedureDataEntry.LastUpdated, &procedureDataEntry.UploadSessionId, &procedureDataEntry.UploadedBy,
-			&procedureDataEntry.UploadFilename, &procedureDataEntry.Checkby, &procedureDataEntry.EditInitials, &procedureDataEntry.LastEditComment, &procedureDataEntry.MrFid)
+			&procedureDataEntry.UploadFilename, &procedureDataEntry.Checkby, &procedureDataEntry.EditInitials, &procedureDataEntry.LastEditComment, &procedureDataEntry.MrFid, &procedureDataEntry.DstStartDate)
 		if err != nil {
 			return procedureDataEntryWithCount, err
 		}
@@ -3151,7 +3151,7 @@ func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadP
 		uploadProcedure.OldRadioTagNum,
 		uploadProcedure.OldFrequencyId,
 		uploadProcedure.DstSerialNum,
-		uploadProcedure.DstStartDateTime,
+		uploadProcedure.DstStartDate,
 		uploadProcedure.DstStartTime,
 		uploadProcedure.DstReimplantInd,
 		uploadProcedure.NewRadioTagNum,
