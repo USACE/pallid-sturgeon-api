@@ -472,14 +472,14 @@ func (s *PallidSturgeonStore) GetHeaderData(siteId string) ([]models.HeaderData,
 	return headerDataItems, err
 }
 
-var siteDataEntriesSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,COALESCE(si.COMPLETE,0) as complete,
-COALESCE(si.APPROVED,0) as approved,si.UPLOAD_FILENAME,COALESCE(si.UPLOAD_SESSION_ID,0) as UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,COALESCE(si.BRM_ID,0) as brm_id,fnc.bkg_color,fnc.bend_river_mile
+var siteDataEntriesSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,si.complete,
+si.approved,si.UPLOAD_FILENAME,si.UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,si.brm_id,fnc.bkg_color,fnc.bend_river_mile
 from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id`
 
 var siteDataEntriesCountSql = `SELECT count(*) from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id`
 
-var siteDataEntriesBySiteIdSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,COALESCE(si.COMPLETE,0) as complete,
-COALESCE(si.APPROVED,0) as approved,si.UPLOAD_FILENAME,COALESCE(si.UPLOAD_SESSION_ID,0) as UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,COALESCE(si.BRM_ID,0) as brm_id,fnc.bkg_color,fnc.bend_river_mile
+var siteDataEntriesBySiteIdSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,si.complete,
+si.approved,si.UPLOAD_FILENAME,si.UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,si.brm_id,fnc.bkg_color,fnc.bend_river_mile
 from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id where site_id=:1`
 
 var siteDataEntriesCountBySiteIdSql = `SELECT count(*) from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id where site_id=:1`
@@ -609,14 +609,14 @@ func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.Sites) e
 }
 
 var fishDataEntriesSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, COALESCE(fi.condition,0) as condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var fishDataEntriesCountSql = `select count(*) from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var fishDataEntriesByFidSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, COALESCE(fi.condition,0) as condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and fi.f_id = :1`
 
@@ -625,7 +625,7 @@ where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_id = :1`
 
 var fishDataEntriesByFfidSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, COALESCE(fi.condition,0) as condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_fid = :1`
 
@@ -634,7 +634,7 @@ where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_fid = :1`
 
 var fishDataEntriesByMridSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, COALESCE(fi.condition,0) as condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and fi.mr_id = :1`
 
@@ -1351,20 +1351,20 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 	return supplementalDataEntryWithCount, err
 }
 
-var searchDataEntriesSql = `select SE_FID, SE_ID, CHECKBY, COALESCE(CONDUCTIVITY, 0) as conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, COALESCE(SEARCH_DAY, 0) as search_day, 
-SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, COALESCE(TEMP, 0) as temp, UPLOADED_BY, UPLOAD_FILENAME,
+var searchDataEntriesSql = `select SE_FID, SE_ID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, search_day, 
+SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
 UPLOAD_SESSION_ID, ds_id from ds_search`
 
 var searchDataEntriesCountSql = `select count(*) from ds_search`
 
-var searchDataEntriesBySeIdSql = `select SE_FID, SE_ID, CHECKBY, COALESCE(CONDUCTIVITY, 0) as conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, COALESCE(SEARCH_DAY, 0) as search_day, 
-SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, COALESCE(TEMP, 0) as temp, UPLOADED_BY, UPLOAD_FILENAME,
+var searchDataEntriesBySeIdSql = `select SE_FID, SE_ID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, search_day, 
+SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
 UPLOAD_SESSION_ID, ds_id from ds_search where se_id = :1`
 
 var searchDataEntriesCountBySeIdSql = `select count(*) from ds_search where se_id = :1`
 
-var searchDataEntriesBySiteIdSql = `select SE_FID, SE_ID, CHECKBY, COALESCE(CONDUCTIVITY, 0) as conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, COALESCE(SEARCH_DAY, 0) as search_day, 
-SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, COALESCE(TEMP, 0) as temp, UPLOADED_BY, UPLOAD_FILENAME,
+var searchDataEntriesBySiteIdSql = `select SE_FID, SE_ID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, search_day, 
+SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
 UPLOAD_SESSION_ID, ds_id from ds_search where site_id = :1`
 
 var searchDataEntriesCountBySiteIdSql = `select count(*) from ds_search where site_id = :1`
@@ -1502,9 +1502,9 @@ func (s *PallidSturgeonStore) UpdateSearchDataEntry(searchDataEntry models.Uploa
 	return err
 }
 
-var telemetryDataEntriesSql = `select COALESCE(te.BEND,0) as bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
-te.FREQUENCY_ID_CODE,COALESCE(te.GRAVEL,0) as gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,COALESCE(te.POSITION_CONFIDENCE,0) as position_confidence,te.RADIO_TAG_NUM,
-COALESCE(te.SAND,0) as sand,te.SE_FID,te.SE_ID,COALESCE(te.SILT,0) as silt,COALESCE(te.TEMP,0) as temp,COALESCE(te.TURBIDITY,0) as turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
+var telemetryDataEntriesSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
+te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
+te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
 te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
@@ -1515,9 +1515,9 @@ inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
-var telemetryDataEntriesBySeIdSql = `select COALESCE(te.BEND,0) as bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
-te.FREQUENCY_ID_CODE,COALESCE(te.GRAVEL,0) as gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,COALESCE(te.POSITION_CONFIDENCE,0) as position_confidence,te.RADIO_TAG_NUM,
-COALESCE(te.SAND,0) as sand,te.SE_FID,te.SE_ID,COALESCE(te.SILT,0) as silt,COALESCE(te.TEMP,0) as temp,COALESCE(te.TURBIDITY,0) as turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
+var telemetryDataEntriesBySeIdSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
+te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
+te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
 te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
@@ -1530,9 +1530,9 @@ inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and te.se_id = :1`
 
-var telemetryDataEntriesByTidSql = `select COALESCE(te.BEND,0) as bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,COALESCE(te.CONDUCTIVITY,0) as conductivity,COALESCE(te.DEPTH,0) as depth,te.EDIT_INITIALS,
-te.FREQUENCY_ID_CODE,COALESCE(te.GRAVEL,0) as gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,COALESCE(te.POSITION_CONFIDENCE,0) as position_confidence,te.RADIO_TAG_NUM,
-COALESCE(te.SAND,0) as sand,te.SE_FID,te.SE_ID,COALESCE(te.SILT,0) as silt,COALESCE(te.TEMP,0) as temp,COALESCE(te.TURBIDITY,0) as turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
+var telemetryDataEntriesByTidSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
+te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
+te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
 te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
@@ -1684,11 +1684,10 @@ func (s *PallidSturgeonStore) UpdateTelemetryDataEntry(telemetryDataEntry models
 	return err
 }
 
-var procedureDataEntriesSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, COALESCE(pr.ANTIBIOTIC_INJECTION_IND,0) as ANTIBIOTIC_INJECTION_IND, COALESCE(pr.PHOTO_DORSAL_IND,0) as PHOTO_DORSAL_IND, COALESCE(pr.PHOTO_VENTRAL_IND,0) as PHOTO_VENTRAL_IND, 
-COALESCE(pr.PHOTO_LEFT_IND,0) as PHOTO_LEFT_IND, COALESCE(pr.OLD_RADIO_TAG_NUM,0) as OLD_RADIO_TAG_NUM, COALESCE(pr.OLD_FREQUENCY_ID,0) as OLD_FREQUENCY_ID, COALESCE(pr.DST_SERIAL_NUM,0) as DST_SERIAL_NUM, pr.DST_START_TIME, COALESCE(pr.DST_REIMPLANT_IND,0) as DST_REIMPLANT_IND, COALESCE(pr.NEW_RADIO_TAG_NUM,0) as NEW_RADIO_TAG_NUM,
-COALESCE(pr.NEW_FREQUENCY_ID,0) as NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, COALESCE(pr.BLOOD_SAMPLE_IND,0) as BLOOD_SAMPLE_IND, COALESCE(pr.EGG_SAMPLE_IND,0) as EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, COALESCE(pr.ULTRASOUND_GONAD_LENGTH,0) as ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, 
-COALESCE(pr.EXPECTED_SPAWN_YEAR,0) as EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID
-from ds_procedure pr
+var procedureDataEntriesSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
+pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
+pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1700,11 +1699,10 @@ inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
-var procedureDataEntriesByIdSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, COALESCE(pr.ANTIBIOTIC_INJECTION_IND,0) as ANTIBIOTIC_INJECTION_IND, COALESCE(pr.PHOTO_DORSAL_IND,0) as PHOTO_DORSAL_IND, COALESCE(pr.PHOTO_VENTRAL_IND,0) as PHOTO_VENTRAL_IND, 
-COALESCE(pr.PHOTO_LEFT_IND,0) as PHOTO_LEFT_IND, COALESCE(pr.OLD_RADIO_TAG_NUM,0) as OLD_RADIO_TAG_NUM, COALESCE(pr.OLD_FREQUENCY_ID,0) as OLD_FREQUENCY_ID, COALESCE(pr.DST_SERIAL_NUM,0) as DST_SERIAL_NUM, pr.DST_START_TIME, COALESCE(pr.DST_REIMPLANT_IND,0) as DST_REIMPLANT_IND, COALESCE(pr.NEW_RADIO_TAG_NUM,0) as NEW_RADIO_TAG_NUM,
-COALESCE(pr.NEW_FREQUENCY_ID,0) as NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, COALESCE(pr.BLOOD_SAMPLE_IND,0) as BLOOD_SAMPLE_IND, COALESCE(pr.EGG_SAMPLE_IND,0) as EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, COALESCE(pr.ULTRASOUND_GONAD_LENGTH,0) as ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, 
-COALESCE(pr.EXPECTED_SPAWN_YEAR,0) as EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID
-from ds_procedure pr
+var procedureDataEntriesByIdSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
+pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
+pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1718,11 +1716,10 @@ inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and pr.id = :1`
 
-var procedureDataEntriesByFidSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, COALESCE(pr.ANTIBIOTIC_INJECTION_IND,0) as ANTIBIOTIC_INJECTION_IND, COALESCE(pr.PHOTO_DORSAL_IND,0) as PHOTO_DORSAL_IND, COALESCE(pr.PHOTO_VENTRAL_IND,0) as PHOTO_VENTRAL_IND, 
-COALESCE(pr.PHOTO_LEFT_IND,0) as PHOTO_LEFT_IND, COALESCE(pr.OLD_RADIO_TAG_NUM,0) as OLD_RADIO_TAG_NUM, COALESCE(pr.OLD_FREQUENCY_ID,0) as OLD_FREQUENCY_ID, COALESCE(pr.DST_SERIAL_NUM,0) as DST_SERIAL_NUM, pr.DST_START_TIME, COALESCE(pr.DST_REIMPLANT_IND,0) as DST_REIMPLANT_IND, COALESCE(pr.NEW_RADIO_TAG_NUM,0) as NEW_RADIO_TAG_NUM,
-COALESCE(pr.NEW_FREQUENCY_ID,0) as NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, COALESCE(pr.BLOOD_SAMPLE_IND,0) as BLOOD_SAMPLE_IND, COALESCE(pr.EGG_SAMPLE_IND,0) as EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, COALESCE(pr.ULTRASOUND_GONAD_LENGTH,0) as ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, 
-COALESCE(pr.EXPECTED_SPAWN_YEAR,0) as EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID
-from ds_procedure pr
+var procedureDataEntriesByFidSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
+pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
+pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1736,11 +1733,10 @@ inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and pr.f_id = :1`
 
-var procedureDataEntriesByFfidSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, COALESCE(pr.ANTIBIOTIC_INJECTION_IND,0) as ANTIBIOTIC_INJECTION_IND, COALESCE(pr.PHOTO_DORSAL_IND,0) as PHOTO_DORSAL_IND, COALESCE(pr.PHOTO_VENTRAL_IND,0) as PHOTO_VENTRAL_IND, 
-COALESCE(pr.PHOTO_LEFT_IND,0) as PHOTO_LEFT_IND, COALESCE(pr.OLD_RADIO_TAG_NUM,0) as OLD_RADIO_TAG_NUM, COALESCE(pr.OLD_FREQUENCY_ID,0) as OLD_FREQUENCY_ID, COALESCE(pr.DST_SERIAL_NUM,0) as DST_SERIAL_NUM, pr.DST_START_TIME, COALESCE(pr.DST_REIMPLANT_IND,0) as DST_REIMPLANT_IND, COALESCE(pr.NEW_RADIO_TAG_NUM,0) as NEW_RADIO_TAG_NUM,
-COALESCE(pr.NEW_FREQUENCY_ID,0) as NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, COALESCE(pr.BLOOD_SAMPLE_IND,0) as BLOOD_SAMPLE_IND, COALESCE(pr.EGG_SAMPLE_IND,0) as EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, COALESCE(pr.ULTRASOUND_GONAD_LENGTH,0) as ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, 
-COALESCE(pr.EXPECTED_SPAWN_YEAR,0) as EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID
-from ds_procedure pr
+var procedureDataEntriesByFfidSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
+pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
+pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1858,7 +1854,7 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 			&procedureDataEntry.PhotoDorsalInd, &procedureDataEntry.PhotoVentralInd, &procedureDataEntry.PhotoLeftInd, &procedureDataEntry.OldRadioTagNum, &procedureDataEntry.OldFrequencyId, &procedureDataEntry.DstSerialNum, &procedureDataEntry.DstStartTime, &procedureDataEntry.DstReimplantInd,
 			&procedureDataEntry.NewRadioTagNum, &procedureDataEntry.NewFrequencyId, &procedureDataEntry.SexCode, &procedureDataEntry.Comments, &procedureDataEntry.FishHealthComments, &procedureDataEntry.SpawnStatus, &procedureDataEntry.EvalLocationCode, &procedureDataEntry.BloodSampleInd, &procedureDataEntry.EggSampleInd,
 			&procedureDataEntry.VisualReproStatusCode, &procedureDataEntry.UltrasoundReproStatusCode, &procedureDataEntry.UltrasoundGonadLength, &procedureDataEntry.GonadCondition, &procedureDataEntry.ExpectedSpawnYear, &procedureDataEntry.LastUpdated, &procedureDataEntry.UploadSessionId, &procedureDataEntry.UploadedBy,
-			&procedureDataEntry.UploadFilename, &procedureDataEntry.Checkby, &procedureDataEntry.EditInitials, &procedureDataEntry.LastEditComment, &procedureDataEntry.MrFid)
+			&procedureDataEntry.UploadFilename, &procedureDataEntry.Checkby, &procedureDataEntry.EditInitials, &procedureDataEntry.LastEditComment, &procedureDataEntry.MrFid, &procedureDataEntry.DstStartDate)
 		if err != nil {
 			return procedureDataEntryWithCount, err
 		}
@@ -2925,7 +2921,7 @@ func (s *PallidSturgeonStore) GetMissouriDatasheetById(siteId string, officeCode
 }
 
 var searchDatasheetsBySiteId = `select si.site_id, se.se_id, se.recorder, se.search_type_code, se.start_time, se.start_latitude, se.start_longitude, se.stop_time, se.stop_latitude, se.stop_longitude, 
-COALESCE(se.temp, 0) as temp, COALESCE(se.conductivity, 0) as conductivity from ds_sites si inner join ds_search se on si.site_id = se.site_id where si.site_id = :1`
+se.temp, se.conductivity from ds_sites si inner join ds_search se on si.site_id = se.site_id where si.site_id = :1`
 
 var searchDatasheetsCountBySiteId = `select count(*) from ds_sites si inner join ds_search se on se.site_id = si.site_id where si.site_id = :1`
 
@@ -3173,7 +3169,7 @@ func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadP
 		uploadProcedure.FFid,
 		uploadProcedure.MrFid,
 		uploadProcedure.PurposeCode,
-		uploadProcedure.ProcedureDateTime,
+		uploadProcedure.ProcedureDate,
 		uploadProcedure.ProcedureStartTime,
 		uploadProcedure.ProcedureEndTime,
 		uploadProcedure.ProcedureBy,
@@ -3184,7 +3180,7 @@ func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadP
 		uploadProcedure.OldRadioTagNum,
 		uploadProcedure.OldFrequencyId,
 		uploadProcedure.DstSerialNum,
-		uploadProcedure.DstStartDateTime,
+		uploadProcedure.DstStartDate,
 		uploadProcedure.DstStartTime,
 		uploadProcedure.DstReimplantInd,
 		uploadProcedure.NewRadioTagNum,

@@ -330,8 +330,6 @@ func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	// moriverData.SetDate = "12-Dec-2022"
 	moriverData.SetDate = processStringTime(moriverData.SetDate, "app")
 	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
 	if err != nil {
@@ -349,14 +347,13 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	// moriverData.SetDate = "12-Dec-2022"
 	moriverData.SetDate = processStringTime(moriverData.SetDate, "app")
 	err := sd.Store.UpdateMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
+
+	return c.JSON(200, id)
 }
 
 func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) error {
@@ -397,7 +394,6 @@ func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error
 }
 
 func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) error {
-
 	supplementalData := models.UploadSupplemental{}
 	if err := c.Bind(&supplementalData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -434,8 +430,6 @@ func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
 	searchData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	searchData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	// searchData.SearchDate = "12-Dec-2022"
 	searchData.SearchDate = processStringTime(searchData.SearchDate, "app")
 	err := sd.Store.SaveSearchDataEntry(searchData)
 	if err != nil {
@@ -453,8 +447,6 @@ func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
 	searchData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	searchData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	// searchData.SearchDate = "12-Dec-2022"
 	searchData.SearchDate = processStringTime(searchData.SearchDate, "app")
 	err := sd.Store.UpdateSearchDataEntry(searchData)
 	if err != nil {
@@ -509,9 +501,6 @@ func (sd *PallidSturgeonHandler) UpdateProcedureDataEntry(c echo.Context) error 
 	procedureData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	procedureData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	// procedureData.ProcedureDate = "12-Dec-2022"
-	// procedureData.DstStartDate = "12-Dec-2022"
 	procedureData.ProcedureDate = processStringTime(procedureData.ProcedureDate, "app")
 	procedureData.DstStartDate = processStringTime(procedureData.DstStartDate, "app")
 	err := sd.Store.UpdateProcedureDataEntry(procedureData)
@@ -917,7 +906,6 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 
 	for _, uploadSearch := range uploads.SearchUpload.Items {
-		// uploadSearch.SearchDateTime = processTimeString(uploadSearch.SearchDate)
 		uploadSearch.SearchDate = processStringTime(uploadSearch.SearchDate, "db")
 		uploadSearch.LastUpdated = time.Now()
 		uploadSearch.UploadedBy = user.FirstName + " " + user.LastName
@@ -943,8 +931,8 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 
 	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
-		uploadProcedure.ProcedureDateTime = processTimeString(uploadProcedure.ProcedureDate)
-		uploadProcedure.DstStartDateTime = processTimeString(uploadProcedure.DstStartDate)
+		uploadProcedure.ProcedureDate = processStringTime(uploadProcedure.ProcedureDate, "db")
+		uploadProcedure.DstStartDate = processStringTime(uploadProcedure.DstStartDate, "db")
 		uploadProcedure.LastUpdated = time.Now()
 		uploadProcedure.UploadedBy = user.FirstName + " " + user.LastName
 		uploadProcedure.UploadSessionId = sessionId
@@ -957,7 +945,6 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 
 	for _, uploadMoriver := range uploads.MoriverUpload.Items {
-		// uploadMoriver.SetDateTime = processTimeString(uploadMoriver.SetDate)
 		uploadMoriver.SetDate = processStringTime(uploadMoriver.SetDate, "db")
 		uploadMoriver.LastUpdated = time.Now()
 		uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
