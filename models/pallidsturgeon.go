@@ -412,7 +412,7 @@ type UploadFish struct {
 	Rayspine           string    `db:"rayspine" json:"raySpine"`
 	Scale              string    `db:"scale" json:"scale"`
 	Ftprefix           string    `db:"ftprefix" json:"ftPrefix"`
-	Ftnum              int       `db:"ftnum" json:"floyTag"`
+	Ftnum              *int      `db:"ftnum" json:"floyTag"`
 	Ftmr               string    `db:"ftmr" json:"mR"`
 	Comments           string    `db:"comments" json:"comments"`
 	Approved           int       `db:"approved" json:"approved"`
