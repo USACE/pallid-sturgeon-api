@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -290,6 +289,17 @@ func (sd *PallidSturgeonHandler) UpdateFishDataEntry(c echo.Context) error {
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
+func (sd *PallidSturgeonHandler) DeleteFishDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteFishDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
 func (sd *PallidSturgeonHandler) GetMoriverDataEntries(c echo.Context) error {
 	tableId, fieldId := c.QueryParam("tableId"), c.QueryParam("fieldId")
 	queryParams, err := marshalQuery(c)
@@ -321,7 +331,6 @@ func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
 	moriverData.SetDate = processStringTime(moriverData.SetDate, "app")
-	log.Printf("[SaveMoriverDataEntry] SetDate: %s", moriverData.SetDate)
 	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -343,6 +352,7 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
@@ -398,6 +408,17 @@ func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) err
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
+func (sd *PallidSturgeonHandler) DeleteSupplementalDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteSupplementalDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
 func (sd *PallidSturgeonHandler) GetSearchDataEntries(c echo.Context) error {
 	tableId, siteId := c.QueryParam("tableId"), c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
@@ -446,7 +467,7 @@ func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
-	tableId, fId := c.QueryParam("tableId"), c.QueryParam("fId")
+	tableId, fId, mrId := c.QueryParam("tableId"), c.QueryParam("fId"), c.QueryParam("mrId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -458,7 +479,7 @@ func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, userInfo.OfficeCode, queryParams)
+	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, mrId, userInfo.OfficeCode, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -498,6 +519,17 @@ func (sd *PallidSturgeonHandler) UpdateProcedureDataEntry(c echo.Context) error 
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteProcedureDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteProcedureDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "successfully deleted procedure data entry id "+id)
 }
 
 func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
@@ -548,6 +580,17 @@ func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteTelemetryDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteTelemetryDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
