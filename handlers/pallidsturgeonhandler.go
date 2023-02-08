@@ -408,6 +408,17 @@ func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) err
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
+func (sd *PallidSturgeonHandler) DeleteSupplementalDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteSupplementalDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
 func (sd *PallidSturgeonHandler) GetSearchDataEntries(c echo.Context) error {
 	tableId, siteId := c.QueryParam("tableId"), c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
@@ -510,6 +521,17 @@ func (sd *PallidSturgeonHandler) UpdateProcedureDataEntry(c echo.Context) error 
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
+func (sd *PallidSturgeonHandler) DeleteProcedureDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteProcedureDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "successfully deleted procedure data entry id "+id)
+}
+
 func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
 	tableId, seId := c.QueryParam("tableId"), c.QueryParam("seId")
 	queryParams, err := marshalQuery(c)
@@ -558,6 +580,17 @@ func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteTelemetryDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteTelemetryDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 

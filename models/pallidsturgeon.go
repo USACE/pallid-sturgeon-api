@@ -484,6 +484,7 @@ type UploadProcedure struct {
 	Fid                       int       `db:"f_id" json:"fid"`
 	FFid                      string    `db:"f_fid" json:"fFid"`
 	MrFid                     string    `db:"MR_FID" json:"mrFid"`
+	Sid                       int       `db:"s_id" json:"sid"`
 	SiteID                    int       `db:"site_id" json:"siteId"`
 	PurposeCode               string    `db:"purpose_code" json:"purpose"`
 	ProcedureDate             string    `db:"PROCEDURE_DATE" json:"procedureDate"`
@@ -580,7 +581,11 @@ type UploadSupplemental struct {
 	Photo              string    `db:"photo" json:"photo"`
 	GeneticNeeds       string    `db:"genetic_needs" json:"geneticNeeds"`
 	OtherTagInfo       string    `db:"other_tag_info" json:"otherTagInfo"`
+	Complete           *int      `db:"complete" json:"complete"`
+	Approved           *int      `db:"approved" json:"approved"`
 	Comments           string    `db:"comments" json:"comments"`
+	Checkby            string    `db:"checkby" json:"checkby"`
+	Recorder           string    `db:"recorder" json:"recorder"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment    string    `db:"last_edit_comment" json:"lastEditComment"`
 	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
