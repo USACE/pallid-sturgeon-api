@@ -83,6 +83,45 @@ func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Proj
 	return projects, err
 }
 
+// For Data Summaries Project Filter
+var getProjectOneSql = `select * from project_lk where project_code <> 2`
+var getProjectTwoSql = `select * from project_lk where project_code = 2`
+
+func (s *PallidSturgeonStore) GetProjectsFilter(project string) ([]models.Project, error) {
+	projects := []models.Project{}
+	query := ""
+
+	if project == "1" {
+		query = getProjectOneSql
+	}
+
+	if project == "2" {
+		query = getProjectTwoSql
+	}
+
+	selectQuery, err := s.db.Prepare(query)
+	if err != nil {
+		return projects, err
+	}
+
+	rows, err := selectQuery.Query()
+	if err != nil {
+		return projects, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		project := models.Project{}
+		err = rows.Scan(&project.Code, &project.Description)
+		if err != nil {
+			return nil, err
+		}
+		projects = append(projects, project)
+	}
+
+	return projects, err
+}
+
 func (s *PallidSturgeonStore) GetRoles() ([]models.Role, error) {
 	roles := []models.Role{}
 	rows, err := s.db.Query("select * from role_lk order by id")
@@ -441,6 +480,27 @@ func (s *PallidSturgeonStore) GetSetSite2(setsite1 string) ([]models.SetSite2, e
 	}
 
 	return setSiteItems, err
+}
+
+func (s *PallidSturgeonStore) GetYears() ([]models.Year, error) {
+	rows, err := s.db.Query("select year from year_lk order by year desc")
+
+	items := []models.Year{}
+	if err != nil {
+		return items, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		year := models.Year{}
+		err = rows.Scan(&year.Year)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, year)
+	}
+
+	return items, err
 }
 
 var headerDataSql = `select si.site_id, si.year, si.fieldoffice, si.project_id, si.segment_id, si.season, si.bend,
@@ -2546,7 +2606,25 @@ var searchDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.sea
 
 func (s *PallidSturgeonStore) GetSearchDataSummary(year string, officeCode string, project string, approved string, season string, segment string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.SearchSummaryWithCount, error) {
 	searchSummariesWithCount := models.SearchSummaryWithCount{}
-	countQuery, err := s.db.Prepare(searchDataSummaryCountSql)
+	query := ""
+	queryWithCount := ""
+
+	if officeCode == "ZZ" {
+		query = searchDataSummarySql
+		queryWithCount = searchDataSummaryCountSql
+	}
+
+	if (officeCode == "MR") || (officeCode == "MT") {
+		query = searchDataSummarySql + fmt.Sprintln(" WHERE SEGMENT_ID <= 4")
+		queryWithCount = searchDataSummaryCountSql + fmt.Sprintln(" WHERE SEGMENT_ID <= 4")
+	}
+
+	if (officeCode == "SD") || (officeCode == "NE") || (officeCode == "MO") || (officeCode == "IA") || (officeCode == "KC") || (officeCode == "MI") {
+		query = searchDataSummarySql + fmt.Sprintln(" WHERE SEGMENT_ID >= 7")
+		queryWithCount = searchDataSummaryCountSql + fmt.Sprintln(" WHERE SEGMENT_ID >= 7")
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
 	if err != nil {
 		return searchSummariesWithCount, err
 	}
@@ -2569,7 +2647,7 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(year string, officeCode strin
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "se_id"
 	}
-	searchDataSummarySqlWithSearch := searchDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	searchDataSummarySqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(searchDataSummarySqlWithSearch)
 	if err != nil {
 		return searchSummariesWithCount, err
@@ -2663,30 +2741,32 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var telemetryDataSummarySql = `select t_id, 
-	COALESCE(year, 0) as year, 
-	COALESCE(field_office_code, 'ZZ') as field_office_code, 
-	COALESCE(project_code, 0) as project_code, 
-	COALESCE(segment_code, 0) as segment_code,
-	COALESCE(season_code, '') as season_code,
-	COALESCE(bend_number, 0) as bend_number, 
-	radio_tag_num, 
-	frequency_id, 
-	capture_time, 
-	capture_latitude, 
-	capture_longitude, 
-	COALESCE(position_confidence, 0) as position_confidence, 
-	COALESCE(macro_code, '') as macro_code, 
-	COALESCE(meso_code, '') as meso_code, 
-	COALESCE(depth, 0) as depth, 
-	COALESCE(conductivity, 0) as conductivity, 
-	COALESCE(turbidity, 0) as turbidity FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number,radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity 
+FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var telemetryDataSummaryCountSql = `select count(*) FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.TelemetrySummaryWithCount, error) {
 	telemetrySummaryWithCount := models.TelemetrySummaryWithCount{}
-	countQuery, err := s.db.Prepare(telemetryDataSummaryCountSql)
+	query := ""
+	queryWithCount := ""
+
+	if officeCode == "ZZ" {
+		query = telemetryDataSummarySql
+		queryWithCount = telemetryDataSummaryCountSql
+	}
+
+	if (officeCode == "MR") || (officeCode == "MT") {
+		query = telemetryDataSummarySql + fmt.Sprintln(" WHERE SEGMENT_CODE <= 4")
+		queryWithCount = telemetryDataSummaryCountSql + fmt.Sprintln(" WHERE SEGMENT_CODE <= 4")
+	}
+
+	if (officeCode == "SD") || (officeCode == "NE") || (officeCode == "MO") || (officeCode == "IA") || (officeCode == "KC") || (officeCode == "MI") {
+		query = telemetryDataSummarySql + fmt.Sprintln(" WHERE SEGMENT_CODE >= 7")
+		queryWithCount = telemetryDataSummaryCountSql + fmt.Sprintln(" WHERE SEGMENT_CODE >= 7")
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
 	if err != nil {
 		return telemetrySummaryWithCount, err
 	}
@@ -2709,7 +2789,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "t_id"
 	}
-	telemetryDataEntriesSqlWithSearch := telemetryDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	telemetryDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 
 	dbQuery, err := s.db.Prepare(telemetryDataEntriesSqlWithSearch)
 	if err != nil {
@@ -2820,24 +2900,32 @@ func (s *PallidSturgeonStore) GetFullProcedureDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var procedureDataSummarySql = `select pid_display, 
-	mr_id, 
-	COALESCE(year, 0) as year, 
-	COALESCE(field_office_code, 'ZZ') as field_office_code, 
-	COALESCE(project_code, 0) as project_code, 
-	COALESCE(segment_code, 0) as segment_code,
-	COALESCE(season_code, '') as season_code,
-	purpose_code, 
-	COALESCE(new_radio_tag_num, 0) as new_radio_tag_num, 
-	COALESCE(new_frequency_id, 0) as new_frequency_id, 
-	COALESCE(spawn_code, '') as spawn_code, 
-	COALESCE(expected_spawn_year, 0) as expected_spawn_year FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var procedureDataSummarySql = `select pid_display, mr_id, year, field_office_code, project_code, segment_code, season_code, purpose_code, new_radio_tag_num, new_frequency_id, spawn_code, expected_spawn_year 
+	FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var procedureDataSummaryCountSql = `select count(*) FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string, queryParams models.SearchParams) (models.ProcedureSummaryWithCount, error) {
 	procedureSummaryWithCount := models.ProcedureSummaryWithCount{}
-	countQuery, err := s.db.Prepare(procedureDataSummaryCountSql)
+	query := ""
+	queryWithCount := ""
+
+	if officeCode == "ZZ" {
+		query = procedureDataSummarySql
+		queryWithCount = procedureDataSummaryCountSql
+	}
+
+	if (officeCode == "MR") || (officeCode == "MT") {
+		query = procedureDataSummarySql + fmt.Sprintln(" WHERE SEGMENT_CODE <= 4")
+		queryWithCount = procedureDataSummaryCountSql + fmt.Sprintln(" WHERE SEGMENT_CODE <= 4")
+	}
+
+	if (officeCode == "SD") || (officeCode == "NE") || (officeCode == "MO") || (officeCode == "IA") || (officeCode == "KC") || (officeCode == "MI") {
+		query = procedureDataSummarySql + fmt.Sprintln(" WHERE SEGMENT_CODE >= 7")
+		queryWithCount = procedureDataSummaryCountSql + fmt.Sprintln(" WHERE SEGMENT_CODE >= 7")
+	}
+
+	countQuery, err := s.db.Prepare(queryWithCount)
 	if err != nil {
 		return procedureSummaryWithCount, err
 	}
@@ -2858,9 +2946,9 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 	procedureSummaries := []models.ProcedureSummary{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "mr_id"
+		queryParams.OrderBy = "pid_display"
 	}
-	procedureDataEntriesSqlWithSearch := procedureDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	procedureDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(procedureDataEntriesSqlWithSearch)
 	if err != nil {
 		return procedureSummaryWithCount, err
