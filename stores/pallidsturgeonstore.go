@@ -2981,7 +2981,7 @@ func (s *PallidSturgeonStore) GetSearchDatasheetById(siteId string, queryParams 
 	searchDatasheets := []models.UploadSearch{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "site_id"
+		queryParams.OrderBy = "mr_id"
 	}
 	sqlQueryWithSearch := searchDatasheetsBySiteId + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(sqlQueryWithSearch)
