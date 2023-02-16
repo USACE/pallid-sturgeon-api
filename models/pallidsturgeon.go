@@ -451,7 +451,7 @@ type UploadSearch struct {
 	SeFid           string    `db:"se_fid" json:"seFid"`
 	DsId            int       `db:"ds_id" json:"dsId"`
 	SiteFid         string    `db:"site_fid" json:"siteFid"`
-	SearchDate      string    `db:"search_date" json:"searchDate"`
+	SearchDate      *string   `db:"search_date" json:"searchDate"`
 	SearchDateTime  time.Time `db:"search_date" json:"searchDateTime"`
 	Recorder        string    `db:"recorder" json:"recorder"`
 	SearchTypeCode  string    `db:"search_type_code" json:"searchTypeCode"`
@@ -491,7 +491,7 @@ type UploadProcedure struct {
 	Sid                       int       `db:"s_id" json:"sid"`
 	SiteID                    int       `db:"site_id" json:"siteId"`
 	PurposeCode               string    `db:"purpose_code" json:"purpose"`
-	ProcedureDate             string    `db:"PROCEDURE_DATE" json:"procedureDate"`
+	ProcedureDate             *string   `db:"PROCEDURE_DATE" json:"procedureDate"`
 	ProcedureDateTime         time.Time `db:"PROCEDURE_DATE" json:"procedureDateTime"`
 	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
 	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
@@ -503,7 +503,7 @@ type UploadProcedure struct {
 	OldRadioTagNum            *int      `db:"old_radio_tag_num" json:"oldRadioTagNum"`
 	OldFrequencyId            *int      `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
 	DstSerialNum              *int      `db:"dst_serial_num" json:"dstSerialNum"`
-	DstStartDate              string    `db:"dst_start_date" json:"dstStartDate"`
+	DstStartDate              *string   `db:"dst_start_date" json:"dstStartDate"`
 	DstStartDateTime          time.Time `db:"dst_start_date" json:"dstStartDateTime"`
 	DstStartTime              string    `db:"dst_start_time" json:"dstStartTime"`
 	DstReimplantInd           *int      `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
@@ -615,7 +615,7 @@ type UploadMoriver struct {
 	MrFid            string    `db:"mr_fid" json:"mrFid"`
 	SeFieldID        string    `db:"se_field_id" json:"seFieldId"`
 	Season           string    `db:"season" json:"season"`
-	SetDate          string    `db:"setdate" json:"setdate"`
+	SetDate          *string   `db:"setdate" json:"setdate"`
 	SetDateTime      time.Time `db:"setdate" json:"setDateTime"`
 	Subsample        float64   `db:"subsample" json:"subsample"`
 	Subsamplepass    float64   `db:"subsamplepass" json:"subsamplepass"`

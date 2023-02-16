@@ -25,8 +25,8 @@ func processTimeString(st string) time.Time {
 	return t
 }
 
-func processStringTime(st string, ty string) string {
-	t := ""
+func processStringTime(st string, ty string) *string {
+	t := new(string)
 
 	if len(st) > 0 {
 		f := "1/2/2006"
@@ -38,12 +38,20 @@ func processStringTime(st string, ty string) string {
 		test, err := time.Parse(f, st)
 
 		if err != nil {
-			t = ""
+			*t = ""
 		} else {
-			t = test.Format("02-Jan-2006")
+			*t = test.Format("02-Jan-2006")
 		}
 	}
 	return t
+}
+
+func DerefString(s *string) string {
+	if s != nil {
+		return *s
+	}
+
+	return ""
 }
 
 func marshalQuery(c echo.Context) (models.SearchParams, error) {
