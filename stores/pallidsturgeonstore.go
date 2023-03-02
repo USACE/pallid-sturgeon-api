@@ -2985,7 +2985,7 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 	return procedureSummaryWithCount, err
 }
 
-var missouriDatasheetsBySiteId = `select site_id, mr_id, mr_fid, subsample, subsamplepass, subsamplen, recorder, conductivity, bkg_color, fish_count, supp_count, supp_bkg_color, setdate from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
+var missouriDatasheetsBySiteId = `select site_id, mr_id, mr_fid, subsample, subsamplepass, subsamplen, recorder, conductivity, bkg_color, fish_count, supp_count, supp_bkg_color, setdate, proc_count, proc_bkg_color from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
 
 var missouriDatasheetsCountBySiteId = `select count(*) from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
 
@@ -3029,7 +3029,7 @@ func (s *PallidSturgeonStore) GetMissouriDatasheetById(siteId string, officeCode
 	for rows.Next() {
 		datasheets := models.UploadMoriver{}
 		err = rows.Scan(&datasheets.SiteID, &datasheets.MrID, &datasheets.MrFid, &datasheets.Subsample, &datasheets.Subsamplepass, &datasheets.Subsamplen, &datasheets.Recorder, &datasheets.Conductivity, &datasheets.BkgColor,
-			&datasheets.FishCount, &datasheets.SuppCount, &datasheets.SuppBkgColor, &datasheets.SetDate)
+			&datasheets.FishCount, &datasheets.SuppCount, &datasheets.SuppBkgColor, &datasheets.SetDate, &datasheets.ProcCount, &datasheets.ProcBkgColor)
 		if err != nil {
 			return missouriDatasheetsWithCount, err
 		}
@@ -3041,8 +3041,21 @@ func (s *PallidSturgeonStore) GetMissouriDatasheetById(siteId string, officeCode
 	return missouriDatasheetsWithCount, err
 }
 
-var searchDatasheetsBySiteId = `select si.site_id, se.se_id, se.recorder, se.search_type_code, se.start_time, se.start_latitude, se.start_longitude, se.stop_time, se.stop_latitude, se.stop_longitude, 
-se.temp, se.conductivity from ds_sites si inner join ds_search se on si.site_id = se.site_id where si.site_id = :1`
+var searchDatasheetsBySiteId = `select si.site_id, se.se_id, se.recorder, se.search_type_code, se.start_time, se.start_latitude, se.start_longitude, se.stop_time, se.stop_latitude, se.stop_longitude,
+se.temp, se.conductivity
+,(select count(t.t_id)
+           from ds_sites s, ds_search se, ds_telemetry_fish t
+           where s.site_id = se.site_id
+           and t.se_id = se.se_id
+           and si.site_id = s.site_id) as telemetry_count
+ ,(CASE WHEN (select count(t.t_id)
+           from ds_sites s, ds_search se, ds_telemetry_fish t
+           where s.site_id = se.site_id
+           and t.se_id = se.se_id
+           and si.site_id = s.site_id) > 0 THEN '#DAF2EA'
+      ELSE NULL END) as bkg_color
+from ds_sites si inner join ds_search se on si.site_id = se.site_id
+where  si.site_id = :1`
 
 var searchDatasheetsCountBySiteId = `select count(*) from ds_sites si inner join ds_search se on se.site_id = si.site_id where si.site_id = :1`
 
@@ -3069,7 +3082,7 @@ func (s *PallidSturgeonStore) GetSearchDatasheetById(siteId string, queryParams 
 	searchDatasheets := []models.UploadSearch{}
 	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "mr_id"
+		queryParams.OrderBy = "se_id"
 	}
 	sqlQueryWithSearch := searchDatasheetsBySiteId + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
 	dbQuery, err := s.db.Prepare(sqlQueryWithSearch)
@@ -3086,7 +3099,7 @@ func (s *PallidSturgeonStore) GetSearchDatasheetById(siteId string, queryParams 
 	for rows.Next() {
 		datasheets := models.UploadSearch{}
 		err = rows.Scan(&datasheets.SiteId, &datasheets.SeId, &datasheets.Recorder, &datasheets.SearchTypeCode, &datasheets.StartTime, &datasheets.StartLatitude, &datasheets.StartLongitude, &datasheets.StopTime,
-			&datasheets.StopLatitude, &datasheets.StopLongitude, &datasheets.Temp, &datasheets.Conductivity)
+			&datasheets.StopLatitude, &datasheets.StopLongitude, &datasheets.Temp, &datasheets.Conductivity, &datasheets.TelemetryCount, &datasheets.BkgColor)
 		if err != nil {
 			return searchDatasheetsWithCount, err
 		}

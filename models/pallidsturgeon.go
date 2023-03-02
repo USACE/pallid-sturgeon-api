@@ -464,6 +464,8 @@ type UploadSearch struct {
 	StopLongitude   float64   `db:"stop_longitude" json:"stopLongitude"`
 	Temp            *float64  `db:"temp" json:"temp"`
 	Conductivity    *float64  `db:"conductivity" json:"conductivity"`
+	TelemetryCount  int       `db:"telemetry_count" json:"telemetryCount"`
+	BkgColor        string    `db:"bkg_color" json:"bkgColor"`
 	Checkby         string    `db:"checkby" json:"checkby"`
 	EditInitials    string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
@@ -688,8 +690,10 @@ type UploadMoriver struct {
 	Segment          *int      `db:"SEGMENT_ID" json:"segment"`
 	BkgColor         string    `db:"bkg_color" json:"bkgColor"`
 	SuppBkgColor     string    `db:"supp_bkg_color" json:"suppBkgColor"`
+	ProcBkgColor     string    `db:"proc_bkg_color" json:"procBkgColor"`
 	FishCount        int       `db:"fish_count" json:"fishCount"`
 	SuppCount        int       `db:"supp_count" json:"suppCount"`
+	ProcCount        int       `db:"proc_count" json:"procCount"`
 	Bend             int       `db:"bend" json:"bend"`
 	BendRn           string    `db:"bendrn" json:"bendrn"`
 	BendRiverMile    float64   `db:"bendrivermile" json:"bendrivermile"`
