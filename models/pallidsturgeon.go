@@ -116,6 +116,10 @@ type SetSite2 struct {
 	Description string `db:"description" json:"description"`
 }
 
+type Year struct {
+	Year string `db:"year" json:"year"`
+}
+
 type HeaderData struct {
 	SiteId         int     `db:"site_id" json:"siteId"`
 	Year           int     `db:"year" json:"year"`
@@ -265,19 +269,19 @@ type ProcedureSummaryWithCount struct {
 }
 
 type ProcedureSummary struct {
-	ID          int    `db:"pid_display" json:"id"`
-	UniqueID    int    `db:"mr_id" json:"uniqueId"`
-	Year        int    `db:"year" json:"year"`
-	FieldOffice string `db:"field_office_code" json:"fieldOffice"`
-	Project     int    `db:"project_code" json:"project"`
-	Segment     int    `db:"segment_code" json:"segment"`
-	Season      string `db:"season_code" json:"season"`
-	PurposeCode string `db:"purpose_code" json:"purposeCode"`
+	ID          int     `db:"pid_display" json:"id"`
+	UniqueID    int     `db:"mr_id" json:"uniqueId"`
+	Year        *int    `db:"year" json:"year"`
+	FieldOffice *string `db:"field_office_code" json:"fieldOffice"`
+	Project     *int    `db:"project_code" json:"project"`
+	Segment     *int    `db:"segment_code" json:"segment"`
+	Season      *string `db:"season_code" json:"season"`
+	PurposeCode string  `db:"purpose_code" json:"purposeCode"`
 	// ProcedureDate     time.Time `db:"procedure_date" json:"procedureDate"`
-	NewRadioTagNum    int    `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId    int    `db:"new_frequency_id" json:"newFrequencyId"`
-	SpawnCode         string `db:"spawn_code" json:"spawnCode"`
-	ExpectedSpawnYear int    `db:"expected_spawn_year" json:"expectedSpawnYear"`
+	NewRadioTagNum    *int    `db:"new_radio_tag_num" json:"newRadioTagNum"`
+	NewFrequencyId    *int    `db:"new_frequency_id" json:"newFrequencyId"`
+	SpawnCode         *string `db:"spawn_code" json:"spawnCode"`
+	ExpectedSpawnYear *int    `db:"expected_spawn_year" json:"expectedSpawnYear"`
 }
 
 type TelemetrySummaryWithCount struct {
@@ -286,27 +290,27 @@ type TelemetrySummaryWithCount struct {
 }
 
 type TelemetrySummary struct {
-	UniqueID           int     `db:"mr_id" json:"uniqueId"`
-	TId                string  `db:"t_id" json:"tId"`
-	TFid               string  `db:"t_fid" json:"tFid"`
-	SeId               string  `db:"se_id" json:"seFid"`
-	Year               int     `db:"year" json:"year"`
-	FieldOffice        string  `db:"field_office_code" json:"fieldOffice"`
-	Project            int     `db:"project_code" json:"project"`
-	Segment            int     `db:"segment_code" json:"segment"`
-	Season             string  `db:"season_code" json:"season"`
-	Bend               float64 `db:"bend_number" json:"bend"`
-	RadioTagNum        int     `db:"radio_tag_num" json:"radioTagNum"`
-	FrequencyIdCode    int     `db:"frequency_id" json:"frequencyIdCode"`
-	CaptureTime        string  `db:"capture_time" json:"captureTime"`
-	CaptureLatitude    float64 `db:"capture_latitude" json:"captureLatitude"`
-	CaptureLongitude   float64 `db:"capture_longitude" json:"captureLongitude"`
-	PositionConfidence float64 `db:"position_confidence" json:"positionConfidence"`
-	MacroId            string  `db:"macro_code" json:"macroId"`
-	MesoId             string  `db:"meso_code" json:"mesoId"`
-	Depth              float64 `db:"depth" json:"depth"`
-	Conductivity       float64 `db:"conductivity" json:"conductivity"`
-	Turbidity          float64 `db:"turbidity" json:"turbidity"`
+	UniqueID           int      `db:"mr_id" json:"uniqueId"`
+	TId                string   `db:"t_id" json:"tId"`
+	TFid               string   `db:"t_fid" json:"tFid"`
+	SeId               string   `db:"se_id" json:"seFid"`
+	Year               *int     `db:"year" json:"year"`
+	FieldOffice        *string  `db:"field_office_code" json:"fieldOffice"`
+	Project            *int     `db:"project_code" json:"project"`
+	Segment            *int     `db:"segment_code" json:"segment"`
+	Season             *string  `db:"season_code" json:"season"`
+	Bend               *float64 `db:"bend_number" json:"bend"`
+	RadioTagNum        int      `db:"radio_tag_num" json:"radioTagNum"`
+	FrequencyIdCode    int      `db:"frequency_id" json:"frequencyIdCode"`
+	CaptureTime        string   `db:"capture_time" json:"captureTime"`
+	CaptureLatitude    float64  `db:"capture_latitude" json:"captureLatitude"`
+	CaptureLongitude   float64  `db:"capture_longitude" json:"captureLongitude"`
+	PositionConfidence *float64 `db:"position_confidence" json:"positionConfidence"`
+	MacroId            *string  `db:"macro_code" json:"macroId"`
+	MesoId             *string  `db:"meso_code" json:"mesoId"`
+	Depth              *float64 `db:"depth" json:"depth"`
+	Conductivity       *float64 `db:"conductivity" json:"conductivity"`
+	Turbidity          *float64 `db:"turbidity" json:"turbidity"`
 }
 
 type Upload struct {
@@ -460,6 +464,8 @@ type UploadSearch struct {
 	StopLongitude   float64   `db:"stop_longitude" json:"stopLongitude"`
 	Temp            *float64  `db:"temp" json:"temp"`
 	Conductivity    *float64  `db:"conductivity" json:"conductivity"`
+	TelemetryCount  int       `db:"telemetry_count" json:"telemetryCount"`
+	BkgColor        string    `db:"bkg_color" json:"bkgColor"`
 	Checkby         string    `db:"checkby" json:"checkby"`
 	EditInitials    string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
@@ -684,8 +690,10 @@ type UploadMoriver struct {
 	Segment          *int      `db:"SEGMENT_ID" json:"segment"`
 	BkgColor         string    `db:"bkg_color" json:"bkgColor"`
 	SuppBkgColor     string    `db:"supp_bkg_color" json:"suppBkgColor"`
+	ProcBkgColor     string    `db:"proc_bkg_color" json:"procBkgColor"`
 	FishCount        int       `db:"fish_count" json:"fishCount"`
 	SuppCount        int       `db:"supp_count" json:"suppCount"`
+	ProcCount        int       `db:"proc_count" json:"procCount"`
 	Bend             int       `db:"bend" json:"bend"`
 	BendRn           string    `db:"bendrn" json:"bendrn"`
 	BendRiverMile    float64   `db:"bendrivermile" json:"bendrivermile"`
