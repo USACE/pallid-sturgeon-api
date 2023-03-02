@@ -285,6 +285,17 @@ func (sd *PallidSturgeonHandler) UpdateFishDataEntry(c echo.Context) error {
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
+func (sd *PallidSturgeonHandler) DeleteFishDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteFishDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
 func (sd *PallidSturgeonHandler) GetMoriverDataEntries(c echo.Context) error {
 	tableId, fieldId := c.QueryParam("tableId"), c.QueryParam("fieldId")
 	queryParams, err := marshalQuery(c)
@@ -315,8 +326,7 @@ func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	moriverData.SetDate = "12-Dec-2022"
+	moriverData.SetDate = processStringTime(DerefString(moriverData.SetDate), "app")
 	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -333,12 +343,12 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	moriverData.SetDate = "12-Dec-2022"
+	moriverData.SetDate = processStringTime(DerefString(moriverData.SetDate), "app")
 	err := sd.Store.UpdateMoriverDataEntry(moriverData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
@@ -380,7 +390,6 @@ func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error
 }
 
 func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) error {
-
 	supplementalData := models.UploadSupplemental{}
 	if err := c.Bind(&supplementalData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -392,6 +401,17 @@ func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) err
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteSupplementalDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteSupplementalDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
@@ -417,8 +437,7 @@ func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
 	searchData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	searchData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	searchData.SearchDate = "12-Dec-2022"
+	searchData.SearchDate = processStringTime(DerefString(searchData.SearchDate), "app")
 	err := sd.Store.SaveSearchDataEntry(searchData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -435,8 +454,7 @@ func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
 	searchData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	searchData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	searchData.SearchDate = "12-Dec-2022"
+	searchData.SearchDate = processStringTime(DerefString(searchData.SearchDate), "app")
 	err := sd.Store.UpdateSearchDataEntry(searchData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -445,7 +463,7 @@ func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
-	tableId, fId := c.QueryParam("tableId"), c.QueryParam("fId")
+	tableId, fId, mrId := c.QueryParam("tableId"), c.QueryParam("fId"), c.QueryParam("mrId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -457,7 +475,7 @@ func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, userInfo.OfficeCode, queryParams)
+	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, mrId, userInfo.OfficeCode, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -472,9 +490,8 @@ func (sd *PallidSturgeonHandler) SaveProcedureDataEntry(c echo.Context) error {
 	procedureData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	procedureData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	procedureData.ProcedureDate = "12-Dec-2022"
-	procedureData.DstStartDate = "12-Dec-2022"
+	procedureData.ProcedureDate = processStringTime(DerefString(procedureData.ProcedureDate), "app")
+	procedureData.DstStartDate = processStringTime(DerefString(procedureData.DstStartDate), "app")
 	err := sd.Store.SaveProcedureDataEntry(procedureData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -491,14 +508,24 @@ func (sd *PallidSturgeonHandler) UpdateProcedureDataEntry(c echo.Context) error 
 	procedureData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	procedureData.UploadedBy = user.FirstName + " " + user.LastName
-	// @TODO: remove hardcoded value and fix date formatting
-	procedureData.ProcedureDate = "12-Dec-2022"
-	procedureData.DstStartDate = "12-Dec-2022"
+	procedureData.ProcedureDate = processStringTime(DerefString(procedureData.ProcedureDate), "app")
+	procedureData.DstStartDate = processStringTime(DerefString(procedureData.DstStartDate), "app")
 	err := sd.Store.UpdateProcedureDataEntry(procedureData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteProcedureDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteProcedureDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "successfully deleted procedure data entry id "+id)
 }
 
 func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
@@ -549,6 +576,17 @@ func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteTelemetryDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteTelemetryDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
 }
 
@@ -894,9 +932,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 
 	for _, uploadSearch := range uploads.SearchUpload.Items {
-		uploadSearch.SearchDateTime = processTimeString(uploadSearch.SearchDate)
-		// @TODO: remove hardcoded value and fix date formatting
-		uploadSearch.SearchDate = "12-Dec-2022"
+		uploadSearch.SearchDate = processStringTime(DerefString(uploadSearch.SearchDate), "db")
 		uploadSearch.LastUpdated = time.Now()
 		uploadSearch.UploadedBy = user.FirstName + " " + user.LastName
 		uploadSearch.UploadSessionId = sessionId
@@ -921,8 +957,8 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 
 	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
-		uploadProcedure.ProcedureDateTime = processTimeString(uploadProcedure.ProcedureDate)
-		uploadProcedure.DstStartDateTime = processTimeString(uploadProcedure.DstStartDate)
+		uploadProcedure.ProcedureDate = processStringTime(DerefString(uploadProcedure.ProcedureDate), "db")
+		uploadProcedure.DstStartDate = processStringTime(DerefString(uploadProcedure.DstStartDate), "db")
 		uploadProcedure.LastUpdated = time.Now()
 		uploadProcedure.UploadedBy = user.FirstName + " " + user.LastName
 		uploadProcedure.UploadSessionId = sessionId
@@ -935,9 +971,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	}
 
 	for _, uploadMoriver := range uploads.MoriverUpload.Items {
-		uploadMoriver.SetDateTime = processTimeString(uploadMoriver.SetDate)
-		// @TODO: remove hardcoded value and fix date formatting
-		uploadMoriver.SetDate = "12-Dec-2022"
+		uploadMoriver.SetDate = processStringTime(DerefString(uploadMoriver.SetDate), "db")
 		uploadMoriver.LastUpdated = time.Now()
 		uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
 		uploadMoriver.UploadSessionId = sessionId
