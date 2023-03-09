@@ -3043,19 +3043,22 @@ func (s *PallidSturgeonStore) GetMissouriDatasheetById(siteId string, officeCode
 
 var searchDatasheetsBySiteId = `select si.site_id, se.se_id, se.recorder, se.search_type_code, se.start_time, se.start_latitude, se.start_longitude, se.stop_time, se.stop_latitude, se.stop_longitude,
 se.temp, se.conductivity
-,(select count(t.t_id)
-           from ds_sites s, ds_search se, ds_telemetry_fish t
-           where s.site_id = se.site_id
-           and t.se_id = se.se_id
-           and si.site_id = s.site_id) as telemetry_count
- ,(CASE WHEN (select count(t.t_id)
-           from ds_sites s, ds_search se, ds_telemetry_fish t
-           where s.site_id = se.site_id
-           and t.se_id = se.se_id
-           and si.site_id = s.site_id) > 0 THEN '#DAF2EA'
+, (select count(t.t_id)
+           from ds_sites s, ds_search sea, ds_telemetry_fish t
+           where s.site_id = sea.site_id
+           and t.se_id = sea.se_id
+           and si.site_id = s.site_id
+           and sea.se_id =se.se_id) as telemetry_count
+,(CASE WHEN (select count(t.t_id)
+           from ds_sites s, ds_search sea, ds_telemetry_fish t
+           where s.site_id = sea.site_id
+           and t.se_id = sea.se_id
+           and si.site_id = s.site_id
+           and sea.se_id =se.se_id) > 0 THEN '#DAF2EA'
       ELSE NULL END) as bkg_color
 from ds_sites si inner join ds_search se on si.site_id = se.site_id
-where  si.site_id = :1`
+where  si.site_id = :1
+`
 
 var searchDatasheetsCountBySiteId = `select count(*) from ds_sites si inner join ds_search se on se.site_id = si.site_id where si.site_id = :1`
 
