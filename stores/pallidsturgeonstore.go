@@ -2599,7 +2599,7 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary(year string, officeCode s
 	return file.Name(), err
 }
 
-var searchDataSummarySql = `SELECT year,fieldoffice,project_id,segment_id,season,se_id,search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude,stop_longitude,temp,conductivity
+var searchDataSummarySql = `SELECT year,fieldoffice,project_id,segment_id,season,se_id,search_date,recorder,search_type_code,start_time,start_latitude,start_longitude,stop_time,stop_latitude,stop_longitude,temp,conductivity,bend,bend_river_mile,bendrn,site_id,checkby,search_day
 FROM table (pallid_data_api.search_datasummary_fnc(:1,:2,:3,:4,:5,:6,:7,to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var searchDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.search_datasummary_fnc(:1,:2,:3,:4,:5,:6,:7,to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
@@ -2662,7 +2662,7 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(year string, officeCode strin
 	for rows.Next() {
 		summary := models.SearchSummary{}
 		err = rows.Scan(&summary.Year, &summary.FieldOffice, &summary.Project, &summary.Segment, &summary.Season, &summary.SeID, &summary.SearchDate, &summary.Recorder, &summary.SearchTypeCode, &summary.StartTime,
-			&summary.StartLatitude, &summary.StartLongitude, &summary.StopTime, &summary.StopLatitude, &summary.StopLongitude, &summary.Temp, &summary.Conductivity)
+			&summary.StartLatitude, &summary.StartLongitude, &summary.StopTime, &summary.StopLatitude, &summary.StopLongitude, &summary.Temp, &summary.Conductivity, &summary.Bend, &summary.BendRiverMile, &summary.Bendrn, &summary.SiteID, &summary.Checkby, &summary.SearchDay)
 		if err != nil {
 			return searchSummariesWithCount, err
 		}
@@ -2741,8 +2741,10 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number,radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity 
-FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number,radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity,
+se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
+FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY'))) func
+inner join ds_search se on se.se_id = func.se_id`
 
 var telemetryDataSummaryCountSql = `select count(*) FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -2821,7 +2823,16 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 			&summary.MesoId,
 			&summary.Depth,
 			&summary.Conductivity,
-			&summary.Turbidity)
+			&summary.Turbidity,
+			&summary.SeId,
+			&summary.SiteID,
+			&summary.SearchDate,
+			&summary.SearchDay,
+			&summary.Temp,
+			&summary.Silt,
+			&summary.Sand,
+			&summary.Gravel,
+			&summary.Comments)
 		if err != nil {
 			return telemetrySummaryWithCount, err
 		}
@@ -2900,7 +2911,8 @@ func (s *PallidSturgeonStore) GetFullProcedureDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var procedureDataSummarySql = `select pid_display, mr_id, year, field_office_code, project_code, segment_code, season_code, purpose_code, new_radio_tag_num, new_frequency_id, spawn_code, expected_spawn_year 
+var procedureDataSummarySql = `select pid_display, mr_id, year, field_office_code, project_code, segment_code, season_code, purpose_code, new_radio_tag_num, new_frequency_id, spawn_code, expected_spawn_year,
+bend_number, bend_r_or_n, bend_river_mile,mr_id
 	FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var procedureDataSummaryCountSql = `select count(*) FROM table (pallid_data_api.procedure_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
@@ -2973,7 +2985,11 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 			&summary.NewRadioTagNum,
 			&summary.NewFrequencyId,
 			&summary.SpawnCode,
-			&summary.ExpectedSpawnYear)
+			&summary.ExpectedSpawnYear,
+			&summary.Bend,
+			&summary.Bendrn,
+			&summary.BendRiverMile,
+			&summary.UniqueID)
 		if err != nil {
 			return procedureSummaryWithCount, err
 		}

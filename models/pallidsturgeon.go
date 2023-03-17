@@ -237,25 +237,29 @@ type SearchSummaryWithCount struct {
 }
 
 type SearchSummary struct {
-	SeID           int     `db:"se_id" json:"seId"`
-	SiteID         int     `db:"site_id" json:"site_id"`
-	Year           int     `db:"year" json:"year"`
-	FieldOffice    string  `db:"fieldoffice" json:"fieldoffice"`
-	Project        int     `db:"project_id" json:"projectId"`
-	Segment        int     `db:"segment_id" json:"segmentId"`
-	Season         string  `db:"season" json:"season"`
-	SearchDate     string  `db:"Search_date" json:"searchDate"`
-	Recorder       string  `db:"recorder" json:"recorder"`
-	SearchTypeCode string  `db:"search_type_code" json:"searchTypeCode"`
-	StartTime      string  `db:"start_time" json:"startTime"`
-	StartLatitude  float64 `db:"start_latitude" json:"startLatitude"`
-	StartLongitude float64 `db:"start_longitude" json:"startLongitude"`
-	StopTime       string  `db:"stop_time" json:"stopTime"`
-	StopLatitude   float64 `db:"stop_latitude" json:"stopLatitude"`
-	StopLongitude  float64 `db:"stop_longitude" json:"stopLongitude"`
-	Temp           *string `db:"temp" json:"temp"`
-	Conductivity   *string `db:"conductivity" json:"conductivity"`
-	Checkby        string  `db:"checkby" json:"checkby"`
+	SeID           int      `db:"se_id" json:"seId"`
+	SiteID         int      `db:"site_id" json:"site_id"`
+	Year           int      `db:"year" json:"year"`
+	FieldOffice    string   `db:"fieldoffice" json:"fieldoffice"`
+	Project        int      `db:"project_id" json:"projectId"`
+	Segment        int      `db:"segment_id" json:"segmentId"`
+	Season         string   `db:"season" json:"season"`
+	SearchDate     string   `db:"Search_date" json:"searchDate"`
+	Recorder       string   `db:"recorder" json:"recorder"`
+	SearchTypeCode string   `db:"search_type_code" json:"searchTypeCode"`
+	StartTime      string   `db:"start_time" json:"startTime"`
+	StartLatitude  float64  `db:"start_latitude" json:"startLatitude"`
+	StartLongitude float64  `db:"start_longitude" json:"startLongitude"`
+	StopTime       string   `db:"stop_time" json:"stopTime"`
+	StopLatitude   float64  `db:"stop_latitude" json:"stopLatitude"`
+	StopLongitude  float64  `db:"stop_longitude" json:"stopLongitude"`
+	Temp           *string  `db:"temp" json:"temp"`
+	Conductivity   *string  `db:"conductivity" json:"conductivity"`
+	Checkby        string   `db:"checkby" json:"checkby"`
+	Bend           *int     `db:"bend" json:"bend"`
+	Bendrn         string   `db:"bendrn" json:"bendrn"`
+	BendRiverMile  *float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	SearchDay      *int     `db:"search_day" json:"searchDay"`
 }
 
 type SummaryWithCount struct {
@@ -282,6 +286,9 @@ type ProcedureSummary struct {
 	NewFrequencyId    *int    `db:"new_frequency_id" json:"newFrequencyId"`
 	SpawnCode         *string `db:"spawn_code" json:"spawnCode"`
 	ExpectedSpawnYear *int    `db:"expected_spawn_year" json:"expectedSpawnYear"`
+	Bend              int     `db:"bend_number" json:"bend"`
+	Bendrn            string  `db:"bend_r_or_n" json:"bendrn"`
+	BendRiverMile     float64 `db:"bend_river_mile" json:"bendRiverMile"`
 }
 
 type TelemetrySummaryWithCount struct {
@@ -290,10 +297,10 @@ type TelemetrySummaryWithCount struct {
 }
 
 type TelemetrySummary struct {
-	UniqueID           int      `db:"mr_id" json:"uniqueId"`
-	TId                string   `db:"t_id" json:"tId"`
+	TId                int      `db:"t_id" json:"tId"`
 	TFid               string   `db:"t_fid" json:"tFid"`
-	SeId               string   `db:"se_id" json:"seFid"`
+	SeId               int      `db:"se_id" json:"seId"`
+	SiteID             int      `db:"site_id" json:"site_id"`
 	Year               *int     `db:"year" json:"year"`
 	FieldOffice        *string  `db:"field_office_code" json:"fieldOffice"`
 	Project            *int     `db:"project_code" json:"project"`
@@ -311,6 +318,13 @@ type TelemetrySummary struct {
 	Depth              *float64 `db:"depth" json:"depth"`
 	Conductivity       *float64 `db:"conductivity" json:"conductivity"`
 	Turbidity          *float64 `db:"turbidity" json:"turbidity"`
+	SearchDate         string   `db:"Search_date" json:"searchDate"`
+	SearchDay          *int     `db:"search_day" json:"searchDay"`
+	Temp               *float64 `db:"temp" json:"temp"`
+	Silt               *int     `db:"silt" json:"silt"`
+	Sand               *int     `db:"sand" json:"sand"`
+	Gravel             *int     `db:"gravel" json:"gravel"`
+	Comments           string   `db:"comments" json:"comments"`
 }
 
 type Upload struct {
