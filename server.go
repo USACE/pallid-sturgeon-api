@@ -50,6 +50,7 @@ func main() {
 	e.GET(urlContext+"/version", PallidSturgeonH.Version)
 
 	e.GET(urlContext+"/projects", auth.Authorize(PallidSturgeonH.GetProjects, PUBLIC))
+	e.GET(urlContext+"/projectsFilter", auth.Authorize(PallidSturgeonH.GetProjectsFilter, PUBLIC))
 	e.GET(urlContext+"/roles", auth.Authorize(PallidSturgeonH.GetRoles, PUBLIC))
 	e.GET(urlContext+"/fieldOffices", auth.Authorize(PallidSturgeonH.GetFieldOffices, PUBLIC))
 	e.GET(urlContext+"/seasons", auth.Authorize(PallidSturgeonH.GetSeasons, PUBLIC))
@@ -67,6 +68,7 @@ func main() {
 	e.GET(urlContext+"/otolith", auth.Authorize(PallidSturgeonH.GetOtolith, PUBLIC))
 	e.GET(urlContext+"/setsite1", auth.Authorize(PallidSturgeonH.GetSetSite1, PUBLIC))
 	e.GET(urlContext+"/setsite2", auth.Authorize(PallidSturgeonH.GetSetSite2, PUBLIC))
+	e.GET(urlContext+"/years", auth.Authorize(PallidSturgeonH.GetYears, PUBLIC))
 	e.GET(urlContext+"/headerData", auth.Authorize(PallidSturgeonH.GetHeaderData, PUBLIC))
 
 	e.GET(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.GetSiteDataEntries, PUBLIC))

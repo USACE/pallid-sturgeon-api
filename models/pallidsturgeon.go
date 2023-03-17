@@ -116,6 +116,10 @@ type SetSite2 struct {
 	Description string `db:"description" json:"description"`
 }
 
+type Year struct {
+	Year string `db:"year" json:"year"`
+}
+
 type HeaderData struct {
 	SiteId         int     `db:"site_id" json:"siteId"`
 	Year           int     `db:"year" json:"year"`
@@ -233,25 +237,29 @@ type SearchSummaryWithCount struct {
 }
 
 type SearchSummary struct {
-	SeID           int     `db:"se_id" json:"seId"`
-	SiteID         int     `db:"site_id" json:"site_id"`
-	Year           int     `db:"year" json:"year"`
-	FieldOffice    string  `db:"fieldoffice" json:"fieldoffice"`
-	Project        int     `db:"project_id" json:"projectId"`
-	Segment        int     `db:"segment_id" json:"segmentId"`
-	Season         string  `db:"season" json:"season"`
-	SearchDate     string  `db:"Search_date" json:"searchDate"`
-	Recorder       string  `db:"recorder" json:"recorder"`
-	SearchTypeCode string  `db:"search_type_code" json:"searchTypeCode"`
-	StartTime      string  `db:"start_time" json:"startTime"`
-	StartLatitude  float64 `db:"start_latitude" json:"startLatitude"`
-	StartLongitude float64 `db:"start_longitude" json:"startLongitude"`
-	StopTime       string  `db:"stop_time" json:"stopTime"`
-	StopLatitude   float64 `db:"stop_latitude" json:"stopLatitude"`
-	StopLongitude  float64 `db:"stop_longitude" json:"stopLongitude"`
-	Temp           *string `db:"temp" json:"temp"`
-	Conductivity   *string `db:"conductivity" json:"conductivity"`
-	Checkby        string  `db:"checkby" json:"checkby"`
+	SeID           int      `db:"se_id" json:"seId"`
+	SiteID         int      `db:"site_id" json:"site_id"`
+	Year           int      `db:"year" json:"year"`
+	FieldOffice    string   `db:"fieldoffice" json:"fieldoffice"`
+	Project        int      `db:"project_id" json:"projectId"`
+	Segment        int      `db:"segment_id" json:"segmentId"`
+	Season         string   `db:"season" json:"season"`
+	SearchDate     string   `db:"Search_date" json:"searchDate"`
+	Recorder       string   `db:"recorder" json:"recorder"`
+	SearchTypeCode string   `db:"search_type_code" json:"searchTypeCode"`
+	StartTime      string   `db:"start_time" json:"startTime"`
+	StartLatitude  float64  `db:"start_latitude" json:"startLatitude"`
+	StartLongitude float64  `db:"start_longitude" json:"startLongitude"`
+	StopTime       string   `db:"stop_time" json:"stopTime"`
+	StopLatitude   float64  `db:"stop_latitude" json:"stopLatitude"`
+	StopLongitude  float64  `db:"stop_longitude" json:"stopLongitude"`
+	Temp           *string  `db:"temp" json:"temp"`
+	Conductivity   *string  `db:"conductivity" json:"conductivity"`
+	Checkby        string   `db:"checkby" json:"checkby"`
+	Bend           *int     `db:"bend" json:"bend"`
+	Bendrn         string   `db:"bendrn" json:"bendrn"`
+	BendRiverMile  *float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	SearchDay      *int     `db:"search_day" json:"searchDay"`
 }
 
 type SummaryWithCount struct {
@@ -265,19 +273,22 @@ type ProcedureSummaryWithCount struct {
 }
 
 type ProcedureSummary struct {
-	ID          int    `db:"pid_display" json:"id"`
-	UniqueID    int    `db:"mr_id" json:"uniqueId"`
-	Year        int    `db:"year" json:"year"`
-	FieldOffice string `db:"field_office_code" json:"fieldOffice"`
-	Project     int    `db:"project_code" json:"project"`
-	Segment     int    `db:"segment_code" json:"segment"`
-	Season      string `db:"season_code" json:"season"`
-	PurposeCode string `db:"purpose_code" json:"purposeCode"`
+	ID          int     `db:"pid_display" json:"id"`
+	UniqueID    int     `db:"mr_id" json:"uniqueId"`
+	Year        *int    `db:"year" json:"year"`
+	FieldOffice *string `db:"field_office_code" json:"fieldOffice"`
+	Project     *int    `db:"project_code" json:"project"`
+	Segment     *int    `db:"segment_code" json:"segment"`
+	Season      *string `db:"season_code" json:"season"`
+	PurposeCode string  `db:"purpose_code" json:"purposeCode"`
 	// ProcedureDate     time.Time `db:"procedure_date" json:"procedureDate"`
-	NewRadioTagNum    int    `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId    int    `db:"new_frequency_id" json:"newFrequencyId"`
-	SpawnCode         string `db:"spawn_code" json:"spawnCode"`
-	ExpectedSpawnYear int    `db:"expected_spawn_year" json:"expectedSpawnYear"`
+	NewRadioTagNum    *int    `db:"new_radio_tag_num" json:"newRadioTagNum"`
+	NewFrequencyId    *int    `db:"new_frequency_id" json:"newFrequencyId"`
+	SpawnCode         *string `db:"spawn_code" json:"spawnCode"`
+	ExpectedSpawnYear *int    `db:"expected_spawn_year" json:"expectedSpawnYear"`
+	Bend              int     `db:"bend_number" json:"bend"`
+	Bendrn            string  `db:"bend_r_or_n" json:"bendrn"`
+	BendRiverMile     float64 `db:"bend_river_mile" json:"bendRiverMile"`
 }
 
 type TelemetrySummaryWithCount struct {
@@ -286,27 +297,34 @@ type TelemetrySummaryWithCount struct {
 }
 
 type TelemetrySummary struct {
-	UniqueID           int     `db:"mr_id" json:"uniqueId"`
-	TId                string  `db:"t_id" json:"tId"`
-	TFid               string  `db:"t_fid" json:"tFid"`
-	SeId               string  `db:"se_id" json:"seFid"`
-	Year               int     `db:"year" json:"year"`
-	FieldOffice        string  `db:"field_office_code" json:"fieldOffice"`
-	Project            int     `db:"project_code" json:"project"`
-	Segment            int     `db:"segment_code" json:"segment"`
-	Season             string  `db:"season_code" json:"season"`
-	Bend               float64 `db:"bend_number" json:"bend"`
-	RadioTagNum        int     `db:"radio_tag_num" json:"radioTagNum"`
-	FrequencyIdCode    int     `db:"frequency_id" json:"frequencyIdCode"`
-	CaptureTime        string  `db:"capture_time" json:"captureTime"`
-	CaptureLatitude    float64 `db:"capture_latitude" json:"captureLatitude"`
-	CaptureLongitude   float64 `db:"capture_longitude" json:"captureLongitude"`
-	PositionConfidence float64 `db:"position_confidence" json:"positionConfidence"`
-	MacroId            string  `db:"macro_code" json:"macroId"`
-	MesoId             string  `db:"meso_code" json:"mesoId"`
-	Depth              float64 `db:"depth" json:"depth"`
-	Conductivity       float64 `db:"conductivity" json:"conductivity"`
-	Turbidity          float64 `db:"turbidity" json:"turbidity"`
+	TId                int      `db:"t_id" json:"tId"`
+	TFid               string   `db:"t_fid" json:"tFid"`
+	SeId               int      `db:"se_id" json:"seId"`
+	SiteID             int      `db:"site_id" json:"site_id"`
+	Year               *int     `db:"year" json:"year"`
+	FieldOffice        *string  `db:"field_office_code" json:"fieldOffice"`
+	Project            *int     `db:"project_code" json:"project"`
+	Segment            *int     `db:"segment_code" json:"segment"`
+	Season             *string  `db:"season_code" json:"season"`
+	Bend               *float64 `db:"bend_number" json:"bend"`
+	RadioTagNum        int      `db:"radio_tag_num" json:"radioTagNum"`
+	FrequencyIdCode    int      `db:"frequency_id" json:"frequencyIdCode"`
+	CaptureTime        string   `db:"capture_time" json:"captureTime"`
+	CaptureLatitude    float64  `db:"capture_latitude" json:"captureLatitude"`
+	CaptureLongitude   float64  `db:"capture_longitude" json:"captureLongitude"`
+	PositionConfidence *float64 `db:"position_confidence" json:"positionConfidence"`
+	MacroId            *string  `db:"macro_code" json:"macroId"`
+	MesoId             *string  `db:"meso_code" json:"mesoId"`
+	Depth              *float64 `db:"depth" json:"depth"`
+	Conductivity       *float64 `db:"conductivity" json:"conductivity"`
+	Turbidity          *float64 `db:"turbidity" json:"turbidity"`
+	SearchDate         string   `db:"Search_date" json:"searchDate"`
+	SearchDay          *int     `db:"search_day" json:"searchDay"`
+	Temp               *float64 `db:"temp" json:"temp"`
+	Silt               *int     `db:"silt" json:"silt"`
+	Sand               *int     `db:"sand" json:"sand"`
+	Gravel             *int     `db:"gravel" json:"gravel"`
+	Comments           string   `db:"comments" json:"comments"`
 }
 
 type Upload struct {
@@ -460,6 +478,8 @@ type UploadSearch struct {
 	StopLongitude   float64   `db:"stop_longitude" json:"stopLongitude"`
 	Temp            *float64  `db:"temp" json:"temp"`
 	Conductivity    *float64  `db:"conductivity" json:"conductivity"`
+	TelemetryCount  int       `db:"telemetry_count" json:"telemetryCount"`
+	BkgColor        string    `db:"bkg_color" json:"bkgColor"`
 	Checkby         string    `db:"checkby" json:"checkby"`
 	EditInitials    string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
@@ -684,8 +704,10 @@ type UploadMoriver struct {
 	Segment          *int      `db:"SEGMENT_ID" json:"segment"`
 	BkgColor         string    `db:"bkg_color" json:"bkgColor"`
 	SuppBkgColor     string    `db:"supp_bkg_color" json:"suppBkgColor"`
+	ProcBkgColor     string    `db:"proc_bkg_color" json:"procBkgColor"`
 	FishCount        int       `db:"fish_count" json:"fishCount"`
 	SuppCount        int       `db:"supp_count" json:"suppCount"`
+	ProcCount        int       `db:"proc_count" json:"procCount"`
 	Bend             int       `db:"bend" json:"bend"`
 	BendRn           string    `db:"bendrn" json:"bendrn"`
 	BendRiverMile    float64   `db:"bendrivermile" json:"bendrivermile"`
