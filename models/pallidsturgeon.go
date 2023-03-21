@@ -525,7 +525,7 @@ type UploadProcedure struct {
 	DstReimplantInd           *int      `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
 	NewRadioTagNum            *int      `db:"new_radio_tag_num" json:"newRadioTagNum"`
 	NewFrequencyId            *int      `db:"NEW_FREQUENCY_ID" json:"newFreqId"`
-	SexCode                   string    `db:"SEX_CODE" json:"sexCode"`
+	SexCode                   string    `db:"sex_code" json:"sex"`
 	BloodSampleInd            *int      `db:"BLOOD_SAMPLE_IND" json:"bloodSample"`
 	EggSampleInd              *int      `db:"EGG_SAMPLE" json:"eggSample"`
 	Comments                  string    `db:"comments" json:"comments"`
