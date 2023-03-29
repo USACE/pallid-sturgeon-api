@@ -888,6 +888,8 @@ type UploadSessionLog struct {
 	UploadSessionId string `db:"upload_session_id" json:"uploadSessionId"`
 }
 
+// Export Data Models
+
 type ExportSite struct {
 	SiteID         int     `db:"site_id" json:"siteId"`
 	SiteYear       int     `db:"year" json:"year"`
@@ -905,4 +907,214 @@ type ExportSite struct {
 	Bendrn         string  `db:"bendrn" json:"bendrn"`
 	BendRiverMile  float64 `db:"bend_river_mile" json:"bendRiverMile"`
 	SampleUnitDesc string  `db:"sample_unit_desc" json:"sampleUnitDesc"`
+}
+
+type ExportMissouriDataEntry struct {
+	SiteID           int      `db:"site_id" json:"siteId"`
+	SiteFid          *string  `db:"site_fid" json:"siteFid"`
+	MrID             int      `db:"mr_id" json:"mrId"`
+	MrFid            *string  `db:"mr_fid" json:"mrFid"`
+	SetDate          *string  `db:"setdate" json:"setdate"`
+	Subsample        *float64 `db:"subsample" json:"subsample"`
+	Subsamplepass    *float64 `db:"subsamplepass" json:"subsamplepass"`
+	SubsampleROrN    string   `db:"subsample_r_or_n" json:"subsampleROrN"`
+	Subsamplen       string   `db:"subsamplen" json:"subsamplen"`
+	Recorder         string   `db:"recorder" json:"recorder"`
+	Gear             string   `db:"gear" json:"gear"`
+	Temp             *float64 `db:"temp" json:"temp"`
+	Turbidity        *float64 `db:"turbidity" json:"turbidity"`
+	Conductivity     *float64 `db:"conductivity" json:"conductivity"`
+	Do               *float64 `db:"do" json:"dissolvedOxygen"`
+	Distance         *float64 `db:"distance" json:"distance"`
+	Width            *float64 `db:"width" json:"width"`
+	Netrivermile     *float64 `db:"netrivermile" json:"netrivermile"`
+	Structurenumber  string   `db:"structurenumber" json:"structurenumber"`
+	Usgs             string   `db:"usgs" json:"usgs"`
+	Riverstage       *float64 `db:"riverstage" json:"riverstage"`
+	Discharge        *float64 `db:"discharge" json:"discharge"`
+	U1               string   `db:"u1" json:"u1"`
+	U2               string   `db:"u2" json:"u2"`
+	U3               string   `db:"u3" json:"u3"`
+	U4               string   `db:"u4" json:"u4"`
+	U5               string   `db:"u5" json:"u5"`
+	U6               string   `db:"u6" json:"u6"`
+	U7               string   `db:"u7" json:"u7"`
+	Macro            string   `db:"macro" json:"macro"`
+	Meso             string   `db:"meso" json:"meso"`
+	Habitatrn        string   `db:"habitatrn" json:"habitatrn"`
+	Qc               string   `db:"qc" json:"qc"`
+	StartTime        string   `db:"starttime" json:"startTime"`
+	StartLatitude    *float64 `db:"startlatitude" json:"startlatitude"`
+	StartLongitude   *float64 `db:"startlongitude" json:"startlongitude"`
+	StopTime         string   `db:"stoptime" json:"stoptime"`
+	StopLatitude     *float64 `db:"stoplatitude" json:"stoplatitude"`
+	StopLongitude    *float64 `db:"stop_longitude" json:"stoplongitude"`
+	Depth1           *float64 `db:"depth1" json:"depth1"`
+	Velocitybot1     *float64 `db:"velocitybot1" json:"velocitybot1"`
+	Velocity08_1     *float64 `db:"velocity08_1" json:"velocity081"`
+	Velocity02or06_1 *float64 `db:"velocity02or06_1" json:"velocity02or061"`
+	Depth2           *float64 `db:"depth2" json:"depth2"`
+	Velocitybot2     *float64 `db:"velocitybot2" json:"velocitybot2"`
+	Velocity08_2     *float64 `db:"velocity08_2" json:"velocity082"`
+	Velocity02or06_2 *float64 `db:"velocity02or06_2" json:"velocity02or062"`
+	Depth3           *float64 `db:"depth3" json:"depth3"`
+	Velocitybot3     *float64 `db:"velocitybot3" json:"velocitybot3"`
+	Velocity08_3     *float64 `db:"velocity08_3" json:"velocity083"`
+	Velocity02or06_3 *float64 `db:"velocity02or06_3" json:"velocity02or063"`
+	Watervel         *float64 `db:"watervel" json:"watervel"`
+	Cobble           *float64 `db:"cobble" json:"cobble"`
+	Organic          *float64 `db:"organic" json:"organic"`
+	Silt             *float64 `db:"silt" json:"silt"`
+	Sand             *float64 `db:"sand" json:"sand"`
+	Gravel           *float64 `db:"gravel" json:"gravel"`
+	Comments         string   `db:"comments" json:"comments"`
+	Complete         string   `db:"co" json:"complete"`
+	Checkby          string   `db:"ch" json:"checkby"`
+}
+
+type ExportFishDataEntry struct {
+	SiteID             int       `db:"site_id" json:"siteId"`
+	Fid                int       `db:"f_id" json:"fid"`
+	Ffid               string    `db:"f_fid" json:"ffid"`
+	MrId               *int      `db:"mr_id" json:"mrId"`
+	MrFid              string    `db:"mr_fid" json:"mrFid"`
+	Project            *int      `db:"PROJECT_ID" json:"project"`
+	Segment            *int      `db:"SEGMENT_ID" json:"segment"`
+	Fieldoffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
+	Season             string    `db:"season" json:"season"`
+	Bend               string    `db:"bend" json:"bend"`
+	Bendrn             string    `db:"bendrn" json:"bendrn"`
+	Panelhook          string    `db:"panelhook" json:"panelHook"`
+	Bait               string    `db:"bait" json:"bait"`
+	Species            string    `db:"species" json:"species"`
+	Length             *float32  `db:"length" json:"length"`
+	Weight             *float32  `db:"weight" json:"weight"`
+	Fishcount          *int      `db:"fishcount" json:"countF"`
+	FinCurl            string    `db:"fin_curl" json:"finCurl"`
+	Otolith            string    `db:"otolith" json:"otolith"`
+	Rayspine           string    `db:"rayspine" json:"raySpine"`
+	Scale              string    `db:"scale" json:"scale"`
+	Ftprefix           string    `db:"ftprefix" json:"ftPrefix"`
+	Ftnum              *string   `db:"ftnum" json:"floyTag"`
+	Ftmr               string    `db:"ftmr" json:"mR"`
+	Comments           string    `db:"comments" json:"comments"`
+	Approved           *int      `db:"approved" json:"approved"`
+	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
+	EditInitials       string    `db:"edit_initials" json:"editInitials"`
+	LastEditComment    string    `db:"last_edit_comment" json:"lastEditComment"`
+	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
+	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
+	Condition          *float64  `db:"condition" json:"condition"`
+	UploadFileName     string    `db:"upload_filename" json:"uploadFilename"`
+	UploadSessionId    *int      `db:"upload_session_id" json:"uploadSessionId"`
+}
+
+type ExportSuppDataEntry struct {
+	SiteID             int       `db:"site_id" json:"siteId"`
+	Sid                int       `db:"s_id" json:"sid"`
+	Fid                int       `db:"f_id" json:"fid"`
+	FFid               string    `db:"f_fid" json:"fFid"`
+	MrId               int       `db:"mr_id" json:"mrId"`
+	MrFid              string    `db:"mr_fid" json:"mrFid"`
+	Project            *int      `db:"PROJECT_ID" json:"project"`
+	Segment            *int      `db:"SEGMENT_ID" json:"segment"`
+	Fieldoffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
+	Season             string    `db:"season" json:"season"`
+	Bend               string    `db:"bend" json:"bend"`
+	Bendrn             string    `db:"bendrn" json:"bendrn"`
+	Tagnumber          string    `db:"tagnumber" json:"tagnumber"`
+	Pitrn              string    `db:"pitrn" json:"pitrn"`
+	Scuteloc           string    `db:"scuteloc" json:"scuteloc"`
+	Scutenum           *int      `db:"scutenum" json:"scutenum"`
+	Scuteloc2          string    `db:"scuteloc2" json:"scuteloc2"`
+	Scutenum2          *int      `db:"scutenum2" json:"scutenum2"`
+	Elhv               string    `db:"elhv" json:"elhv"`
+	Elcolor            string    `db:"elcolor" json:"elcolor"`
+	Erhv               string    `db:"erhv" json:"erhv"`
+	Ercolor            string    `db:"ercolor" json:"ercolor"`
+	Cwtyn              string    `db:"cwtyn" json:"cwtyn"`
+	Dangler            string    `db:"dangler" json:"dangler"`
+	Genetic            string    `db:"genetic" json:"genetic"`
+	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
+	Broodstock         *int      `db:"broodstock" json:"broodstock"`
+	HatchWild          *int      `db:"hatch_wild" json:"hatchWild"`
+	SpeciesId          *int      `db:"species_id" json:"speciesId"`
+	Archive            *int      `db:"archive" json:"archive"`
+	Head               *int      `db:"head" json:"head"`
+	Snouttomouth       *int      `db:"snouttomouth" json:"snouttomouth"`
+	Inter              *int      `db:"inter" json:"inter"`
+	Mouthwidth         *int      `db:"mouthwidth" json:"mouthwidth"`
+	MIb                *int      `db:"m_ib" json:"mIb"`
+	LOb                *int      `db:"l_ob" json:"lOb"`
+	LIb                *int      `db:"l_ib" json:"lIb"`
+	RIb                *int      `db:"r_ib" json:"rIb"`
+	ROb                *int      `db:"r_ob" json:"rOb"`
+	Anal               *int      `db:"anal" json:"anal"`
+	Dorsal             *int      `db:"dorsal" json:"dorsal"`
+	Status             string    `db:"status" json:"status"`
+	HatcheryOrigin     string    `db:"hatchery_origin" json:"hatcheryOrigin"`
+	Sex                string    `db:"sex" json:"sex"`
+	Stage              string    `db:"stage" json:"stage"`
+	Recapture          string    `db:"recapture" json:"recapture"`
+	Photo              string    `db:"photo" json:"photo"`
+	GeneticNeeds       string    `db:"genetic_needs" json:"geneticNeeds"`
+	OtherTagInfo       string    `db:"other_tag_info" json:"otherTagInfo"`
+	Complete           *int      `db:"complete" json:"complete"`
+	Approved           *int      `db:"approved" json:"approved"`
+	Comments           string    `db:"comments" json:"comments"`
+	Checkby            string    `db:"checkby" json:"checkby"`
+	Recorder           string    `db:"recorder" json:"recorder"`
+	EditInitials       string    `db:"edit_initials" json:"editInitials"`
+	LastEditComment    string    `db:"last_edit_comment" json:"lastEditComment"`
+	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId    *int      `db:"upload_session_id" json:"uploadSessionId"`
+	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
+	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+}
+
+type ExportProcDataEntry struct {
+	Id                        int       `db:"id" json:"id"`
+	Fid                       int       `db:"f_id" json:"fid"`
+	FFid                      string    `db:"f_fid" json:"fFid"`
+	MrFid                     string    `db:"MR_FID" json:"mrFid"`
+	Sid                       int       `db:"s_id" json:"sid"`
+	SiteID                    int       `db:"site_id" json:"siteId"`
+	PurposeCode               string    `db:"purpose_code" json:"purpose"`
+	ProcedureDate             *string   `db:"PROCEDURE_DATE" json:"procedureDate"`
+	ProcedureDateTime         time.Time `db:"PROCEDURE_DATE" json:"procedureDateTime"`
+	ProcedureStartTime        string    `db:"procedure_start_time" json:"procedureStartTime"`
+	ProcedureEndTime          string    `db:"procedure_end_time" json:"procedureEndTime"`
+	ProcedureBy               string    `db:"procedure_by" json:"procedureBy"`
+	AntibioticInjectionInd    *int      `db:"ANTIBIOTIC_INJECTION_IND" json:"antibioticInjection"`
+	PhotoDorsalInd            *int      `db:"PHOTO_DORSAL_IND" json:"pDorsal"`
+	PhotoVentralInd           *int      `db:"PHOTO_VENTRAL_IND" json:"pVentral"`
+	PhotoLeftInd              *int      `db:"PHOTO_LEFT_IND" json:"pLeft"`
+	OldRadioTagNum            *int      `db:"old_radio_tag_num" json:"oldRadioTagNum"`
+	OldFrequencyId            *int      `db:"OLD_FREQUENCY_ID" json:"oldFrequencyId"`
+	DstSerialNum              *int      `db:"dst_serial_num" json:"dstSerialNum"`
+	DstStartDate              *string   `db:"dst_start_date" json:"dstStartDate"`
+	DstStartDateTime          time.Time `db:"dst_start_date" json:"dstStartDateTime"`
+	DstStartTime              string    `db:"dst_start_time" json:"dstStartTime"`
+	DstReimplantInd           *int      `db:"DST_REIMPLANT_IND" json:"dstReimplant"`
+	NewRadioTagNum            *int      `db:"new_radio_tag_num" json:"newRadioTagNum"`
+	NewFrequencyId            *int      `db:"NEW_FREQUENCY_ID" json:"newFreqId"`
+	SexCode                   string    `db:"sex_code" json:"sex"`
+	BloodSampleInd            *int      `db:"BLOOD_SAMPLE_IND" json:"bloodSample"`
+	EggSampleInd              *int      `db:"EGG_SAMPLE" json:"eggSample"`
+	Comments                  string    `db:"comments" json:"comments"`
+	FishHealthComments        string    `db:"FISH_HEALTH_COMMENTS" json:"fishHealthComment"`
+	EvalLocationCode          string    `db:"EVAL_LOCATION_CODE" json:"evalLocation"`
+	SpawnStatus               string    `db:"SPAWN_CODE" json:"spawnStatus"`
+	VisualReproStatusCode     string    `db:"VISUAL_REPRO_STATUS" json:"visualReproStatus"`
+	UltrasoundReproStatusCode string    `db:"ULTRASOUND_REPRO_STATUS" json:"ultrasoundReproStatus"`
+	ExpectedSpawnYear         *int      `db:"EXPECTED_SPAWN_YEAR" json:"expectedSpawnYear"`
+	UltrasoundGonadLength     *float64  `db:"ultrasound_gonad_length" json:"ultrasoundGonadLength"`
+	GonadCondition            string    `db:"gonad_condition" json:"gonadCondition"`
+	EditInitials              string    `db:"edit_initials" json:"editInitials"`
+	LastEditComment           string    `db:"last_edit_comment" json:"lastEditComment"`
+	LastUpdated               time.Time `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId           int       `db:"upload_session_id" json:"uploadSessionId"`
+	UploadedBy                string    `db:"uploaded_by" json:"uploadedBy"`
+	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
+	Checkby                   string    `db:"checkby" json:"checkby"`
 }

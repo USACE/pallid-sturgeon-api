@@ -131,6 +131,10 @@ func main() {
 	e.GET(urlContext+"/uploadSessionLogs", auth.Authorize(PallidSturgeonH.GetUploadSessionLogs, PUBLIC))
 
 	e.GET(urlContext+"/export/sites", auth.Authorize(PallidSturgeonH.GetSitesExport, PUBLIC))
+	e.GET(urlContext+"/export/missouriDataEntries", auth.Authorize(PallidSturgeonH.GetMissouriDataEntriesExport, PUBLIC))
+	e.GET(urlContext+"/export/fishDataEntries", auth.Authorize(PallidSturgeonH.GetFishDataEntriesExport, PUBLIC))
+	e.GET(urlContext+"/export/suppDataEntries", auth.Authorize(PallidSturgeonH.GetSuppDataEntriesExport, PUBLIC))
+	e.GET(urlContext+"/export/procDataEntries", auth.Authorize(PallidSturgeonH.GetProcDataEntriesExport, PUBLIC))
 
 	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
 	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))

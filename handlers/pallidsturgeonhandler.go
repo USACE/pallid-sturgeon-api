@@ -1277,6 +1277,8 @@ func (sd *PallidSturgeonHandler) GetUploadSessionLogs(c echo.Context) error {
 	return c.JSON(http.StatusOK, bends)
 }
 
+// Exports
+
 func (sd *PallidSturgeonHandler) GetSitesExport(c echo.Context) error {
 	year, segmentCode, seasonCode, bendrn := c.QueryParam("year"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn")
 
@@ -1286,6 +1288,51 @@ func (sd *PallidSturgeonHandler) GetSitesExport(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	exportData, err := sd.Store.GetSitesExport(year, userInfo.OfficeCode, userInfo.ProjectCode, segmentCode, seasonCode, bendrn)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, exportData)
+}
+
+func (sd *PallidSturgeonHandler) GetMissouriDataEntriesExport(c echo.Context) error {
+	siteID, segmentCode, seasonCode, bend := c.QueryParam("siteID"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bend")
+
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	exportData, err := sd.Store.GetMissouriDataEntriesExport(siteID, userInfo.OfficeCode, userInfo.ProjectCode, segmentCode, seasonCode, bend)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, exportData)
+}
+
+func (sd *PallidSturgeonHandler) GetFishDataEntriesExport(c echo.Context) error {
+	mrID := c.QueryParam("mrID")
+
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	exportData, err := sd.Store.GetFishDataEntriesExport(mrID, userInfo.OfficeCode)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, exportData)
+}
+
+func (sd *PallidSturgeonHandler) GetSuppDataEntriesExport(c echo.Context) error {
+	mrID := c.QueryParam("mrID")
+
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	exportData, err := sd.Store.GetSuppDataEntriesExport(mrID, userInfo.OfficeCode)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

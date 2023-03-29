@@ -3954,6 +3954,8 @@ func (s *PallidSturgeonStore) GetUploadSessionLogs(user string, uploadSessionId 
 	return logs, err
 }
 
+// Exports
+
 var getSitesExportSql = `select site_id,COALESCE(site_fid, 0) as site_fid,year,fieldoffice,field_office_description,project_id,project_description,segment_id,segment_description,season,season_description,sample_unit_type,bend,bendrn,
 COALESCE(bend_river_mile, 0) as bend_river_mile,sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
 
@@ -3970,6 +3972,130 @@ func (s *PallidSturgeonStore) GetSitesExport(year string, officeCode string, pro
 		export := models.ExportSite{}
 		err = rows.Scan(&export.SiteID, &export.SiteFID, &export.SiteYear, &export.FieldOfficeID, &export.FieldOffice, &export.ProjectId, &export.Project, &export.SegmentId, &export.Segment, &export.SeasonId, &export.Season,
 			&export.SampleUnitType, &export.Bend, &export.Bendrn, &export.BendRiverMile, &export.SampleUnitDesc)
+		if err != nil {
+			return nil, err
+		}
+		exportData = append(exportData, export)
+	}
+
+	return exportData, err
+}
+
+var getMissouriDataEntryExportSql = `select mr_fid,mr_id,site_id,setdate, subsample, subsamplepass, subsamplen, recorder, gear, temp, turbidity, conductivity, do, distance, width, netrivermile, structurenumber, usgs, riverstage, discharge,
+u1, u2, u3, u4, u5, u6, u7, MACRO, MESO, habitatrn, qc, starttime, startlatitude, startlongitude, stoptime, stoplatitude, stoplongitude, depth1, velocitybot1, velocity08_1, velocity02or06_1, depth2, velocitybot2, velocity08_2, velocity02or06_2,depth3, 
+velocitybot3, velocity08_3, velocity02or06_3, watervel, cobble, ORGANIC, silt, sand, gravel, co, comments, ch from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
+
+func (s *PallidSturgeonStore) GetMissouriDataEntriesExport(siteId string, officeCode string, project string, segment string, season string, bend string) ([]models.ExportMissouriDataEntry, error) {
+	rows, err := s.db.Query(getMissouriDataEntryExportSql, siteId, officeCode, project, segment, season, bend)
+
+	exportData := []models.ExportMissouriDataEntry{}
+	if err != nil {
+		return exportData, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		export := models.ExportMissouriDataEntry{}
+		err = rows.Scan(&export.MrFid, &export.MrID, &export.SiteID, &export.SetDate, &export.Subsample, &export.Subsamplepass, &export.Subsamplen, &export.Recorder, &export.Gear, &export.Temp, &export.Turbidity, &export.Conductivity, &export.Do, &export.Distance, &export.Width,
+			&export.Netrivermile, &export.Structurenumber, &export.Usgs, &export.Riverstage, &export.Discharge, &export.U1, &export.U2, &export.U3, &export.U4, &export.U5, &export.U6, &export.U7, &export.Macro, &export.Meso, &export.Habitatrn, &export.Qc, &export.StartTime,
+			&export.StartLatitude, &export.StartLongitude, &export.StopTime, &export.StopLatitude, &export.StopLongitude, &export.Depth1, &export.Velocitybot1, &export.Velocity08_1, &export.Velocity02or06_1, &export.Depth2, &export.Velocitybot2, &export.Velocity08_2,
+			&export.Velocity02or06_2, &export.Depth3, &export.Velocitybot3, &export.Velocity08_3, &export.Velocity02or06_3, &export.Watervel, &export.Cobble, &export.Organic, &export.Silt, &export.Sand, &export.Gravel, &export.Complete, &export.Comments, &export.Checkby)
+		if err != nil {
+			return nil, err
+		}
+		exportData = append(exportData, export)
+	}
+
+	return exportData, err
+}
+
+var getFishDataEntryExportSql = `select fi.f_id, fi.f_fid, fi.mr_id, fi.mr_fid, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, 
+fi.ftnum, fi.ftmr, fi.edit_initials, fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl, si.project_id, si.segment_id, si.fieldoffice, fi.last_updated, fi.upload_filename,
+fi.upload_session_id from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
+and fi.mr_id = :1`
+
+func (s *PallidSturgeonStore) GetFishDataEntriesExport(mrId string, officeCode string) ([]models.ExportFishDataEntry, error) {
+	rows, err := s.db.Query(getFishDataEntryExportSql, officeCode, officeCode, officeCode, mrId)
+
+	exportData := []models.ExportFishDataEntry{}
+	if err != nil {
+		return exportData, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		export := models.ExportFishDataEntry{}
+		err = rows.Scan(&export.Fid, &export.Ffid, &export.MrId, &export.MrFid, &export.SiteID, &export.Panelhook, &export.Bait, &export.Species, &export.Length, &export.Weight, &export.Fishcount, &export.Otolith,
+			&export.Rayspine, &export.Scale, &export.Ftprefix, &export.Ftnum, &export.Ftmr, &export.EditInitials, &export.LastEditComment, &export.UploadedBy, &export.GeneticsVialNumber, &export.Condition, &export.FinCurl,
+			&export.Project, &export.Segment, &export.Fieldoffice, &export.Fieldoffice, &export.UploadFileName, &export.UploadSessionId)
+		if err != nil {
+			return nil, err
+		}
+		exportData = append(exportData, export)
+	}
+
+	return exportData, err
+}
+
+var getSuppDataEntryExportSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
+su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder,
+si.project_id, si.segment_id, si.fieldoffice, si.season, si.bend, si.bendrn, su.upload_session_id, su.upload_filename
+from ds_supplemental su
+inner join ds_moriver mo on su.mr_id = mo.mr_id
+inner join ds_sites si on si.site_id = mo.site_id
+where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
+and su.mr_id = :1`
+
+func (s *PallidSturgeonStore) GetSuppDataEntriesExport(mrId string, officeCode string) ([]models.ExportSuppDataEntry, error) {
+	rows, err := s.db.Query(getSuppDataEntryExportSql, officeCode, officeCode, officeCode, mrId)
+
+	exportData := []models.ExportSuppDataEntry{}
+	if err != nil {
+		return exportData, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		export := models.ExportSuppDataEntry{}
+		err = rows.Scan(&export.Sid, &export.Fid, &export.FFid, &export.MrId, &export.SiteID, &export.Tagnumber, &export.Pitrn, &export.Scuteloc, &export.Scutenum, &export.Scuteloc2, &export.Scutenum2, &export.Elhv, &export.Elcolor,
+			&export.Erhv, &export.Ercolor, &export.Cwtyn, &export.Dangler, &export.Genetic, &export.GeneticsVialNumber, &export.Broodstock, &export.HatchWild, &export.SpeciesId, &export.Head, &export.Snouttomouth,
+			&export.Inter, &export.Mouthwidth, &export.MIb, &export.LOb, &export.LIb, &export.RIb, &export.ROb, &export.Anal, &export.Dorsal, &export.Status, &export.HatcheryOrigin, &export.Sex, &export.Stage, &export.Recapture, &export.Photo,
+			&export.GeneticNeeds, &export.OtherTagInfo, &export.Comments, &export.EditInitials, &export.LastEditComment, &export.UploadedBy, &export.Complete, &export.Approved, &export.Checkby, &export.Recorder, &export.Project, &export.Segment,
+			&export.Fieldoffice, &export.Season, &export.Bend, &export.Bendrn, &export.UploadSessionId, &export.UploadFilename)
+		if err != nil {
+			return nil, err
+		}
+		exportData = append(exportData, export)
+	}
+
+	return exportData, err
+}
+
+var getProcDataEntryExportSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
+pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
+pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id from ds_procedure pr
+inner join ds_fish fi on fi.f_id = pr.f_id
+inner join ds_moriver mo on mo.mr_id = fi.mr_id
+inner join ds_sites si on si.site_id = mo.site_id
+where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
+and fi.mr_id = :1`
+
+func (s *PallidSturgeonStore) GetProcDataEntriesExport(mrId string, officeCode string) ([]models.ExportProcDataEntry, error) {
+	rows, err := s.db.Query(getProcDataEntryExportSql, officeCode, officeCode, officeCode, mrId)
+
+	exportData := []models.ExportProcDataEntry{}
+	if err != nil {
+		return exportData, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		export := models.ExportProcDataEntry{}
+		// @TODO: map query fields to data model!
+		err = rows.Scan()
 		if err != nil {
 			return nil, err
 		}
