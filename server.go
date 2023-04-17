@@ -132,9 +132,11 @@ func main() {
 
 	e.GET(urlContext+"/export/sites", auth.Authorize(PallidSturgeonH.GetSitesExport, PUBLIC))
 
-	e.GET(urlContext+"/userRoleOffice/:email", auth.Authorize(userH.GetUserRoleOffice, PUBLIC))
+	e.GET(urlContext+"/userRoleOffices/:email", auth.Authorize(userH.GetUserRoleOffices, PUBLIC))
+	e.GET(urlContext+"/userRoleOffice/:id", auth.Authorize(userH.GetUserRoleOfficeById, PUBLIC))
 	e.GET(urlContext+"/userAccessRequests", auth.Authorize(userH.GetUserAccessRequests, ADMIN))
 	e.GET(urlContext+"/users", auth.Authorize(userH.GetUsers, PUBLIC))
+	e.GET(urlContext+"/userList", auth.Authorize(userH.GetUsers2, ADMIN))
 	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, ADMIN))
 	e.PUT(urlContext+"/userRoleOffice", auth.Authorize(userH.UpdateUserRoleOffice, PUBLIC))
 

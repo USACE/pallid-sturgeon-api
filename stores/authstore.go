@@ -16,9 +16,9 @@ type AuthStore struct {
 	//config *config.AppConfig
 }
 
-var userSql = "select id, edipi, username, email, first_name,last_name from users_t where email=:1"
+var userSql = `select id, edipi, username, email, first_name,last_name from users_t where email=:1`
 
-var userByIdSql = "select id, edipi, username, email, first_name,last_name from users_t where id=:1"
+var userByIdSql = `select id, edipi, username, email, first_name,last_name from users_t where id=:1`
 
 // var userSql = `select id,username,email,rate,
 // 				(select bool_or(is_admin)
@@ -27,9 +27,9 @@ var userByIdSql = "select id, edipi, username, email, first_name,last_name from 
 // 				from wpt_user
 // 				where id=$1 and deleted=false`
 
-var insertUserSql = "insert into users_t (username,email,first_name,last_name,edipi) values (:1,:2,:3,:4,:5)"
+var insertUserSql = `insert into users_t (username,email,first_name,last_name,edipi) values (:1,:2,:3,:4,:5)`
 
-var getUsersSql = `select u.id, u.username, u.first_name, u.last_name, u.email, uro.role_id, r.description, uro.office_id, f.field_office_code, uro.project_code from users_t u 
+var getUsersSql = `select uro.id, uro.user_id, u.username, u.first_name, u.last_name, u.email, uro.role_id, r.description, uro.office_id, f.field_office_code, uro.project_code from users_t u 
 	inner join user_role_office_lk uro on uro.user_id = u.id 
 	inner join role_lk r on r.id = uro.role_id 
 	inner join field_office_lk f on f.fo_id = uro.office_id order by u.last_name`
@@ -39,17 +39,27 @@ var getUsersByRoleTypeSql = `select u.id, u.username, u.first_name, u.last_name,
 						inner join role_lk r on r.id = uro.role_id
 						where r.description = :1`
 
-var getUserAccessRequestSql = "select id, username, first_name, last_name, email from users_t where id not in (select user_id from user_role_office_lk) order by last_name"
+var getUserAccessRequestSql = `select id, username, first_name, last_name, email from users_t where id not in (select user_id from user_role_office_lk) order by last_name`
 
-var insertUserRoleOfficeSql = "insert into user_role_office_lk (id,user_id,role_id,office_id,project_code) values (user_role_office_seq.nextval,:1,:2,:3,:4)"
+var insertUserRoleOfficeSql = `insert into user_role_office_lk (id,user_id,role_id,office_id,project_code) values (user_role_office_seq.nextval,:1,:2,:3,:4)`
 
-var updateUserRoleOfficesSql = `update user_role_office_lk set role_id = :2, office_id = :3, project_code = :4 where user_id = :1`
+var updateUserRoleOfficesSql = `update user_role_office_lk set role_id = :2, office_id = :3, project_code = :4 where id = :1`
 
 var getUserRoleOfficeSql = `select uro.id, uro.user_id, uro.role_id, uro.office_id, r.description, f.FIELD_OFFICE_CODE, project_code from user_role_office_lk uro 
 							inner join users_t u on u.id = uro.user_id
 							inner join role_lk r on r.id = uro.role_id
 							inner join field_office_lk f on f.fo_id = uro.office_id
 							where u.email = :1`
+
+var getUserRoleOfficeByIdSql = `select uro.id, uro.user_id, uro.role_id, uro.office_id, r.description, f.FIELD_OFFICE_CODE, project_code from user_role_office_lk uro 
+							inner join users_t u on u.id = uro.user_id
+							inner join role_lk r on r.id = uro.role_id
+							inner join field_office_lk f on f.fo_id = uro.office_id
+							where uro.id = :1`
+
+// Fetch List of Unique Users
+var getUsersSql2 = `select distinct uro.user_id, u.username, u.first_name, u.last_name, uro.role_id from users_t u 
+inner join user_role_office_lk uro on uro.user_id = u.id`
 
 func InitAuthStore(appConfig *config.AppConfig) (*AuthStore, error) {
 	connectString := fmt.Sprintf("%s:%s/%s", appConfig.Dbhost, appConfig.Dbport, appConfig.Dbname)
@@ -143,7 +153,7 @@ func (auth *AuthStore) GetUsers() ([]models.User, error) {
 
 	for rows.Next() {
 		user := models.User{}
-		err = rows.Scan(&user.ID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.RoleID, &user.Role, &user.OfficeID, &user.OfficeCode, &user.ProjectCode)
+		err = rows.Scan(&user.ID, &user.UserID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.RoleID, &user.Role, &user.OfficeID, &user.OfficeCode, &user.ProjectCode)
 		if err != nil {
 			return users, err
 		}
@@ -155,7 +165,7 @@ func (auth *AuthStore) GetUsers() ([]models.User, error) {
 }
 
 func (auth *AuthStore) UpdateUserRoleOffice(userRoleOffice models.UserRoleOffice) error {
-	_, err := auth.db.Exec(updateUserRoleOfficesSql, userRoleOffice.RoleID, userRoleOffice.OfficeID, userRoleOffice.ProjectCode, userRoleOffice.UserID)
+	_, err := auth.db.Exec(updateUserRoleOfficesSql, userRoleOffice.RoleID, userRoleOffice.OfficeID, userRoleOffice.ProjectCode, userRoleOffice.ID)
 
 	return err
 }
@@ -234,25 +244,27 @@ func (auth *AuthStore) AddUserRoleOffice(userRoleOffice models.UserRoleOffice) e
 	return err
 }
 
-func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, error) {
-	userRoleOffice := models.UserRoleOffice{}
+func (auth *AuthStore) GetUserRoleOffices(email string) ([]models.UserRoleOffice, error) {
+	userRoleOffices := []models.UserRoleOffice{}
 	selectQuery, err := auth.db.Prepare(getUserRoleOfficeSql)
 	if err != nil {
-		return userRoleOffice, err
+		return userRoleOffices, err
 	}
 
 	rows, err := selectQuery.Query(email)
 	if err != nil {
-		return userRoleOffice, err
-	}
-
-	for rows.Next() {
-		err = rows.Scan(&userRoleOffice.ID, &userRoleOffice.UserID, &userRoleOffice.RoleID, &userRoleOffice.OfficeID, &userRoleOffice.Role, &userRoleOffice.OfficeCode, &userRoleOffice.ProjectCode)
-		if err != nil {
-			return userRoleOffice, err
-		}
+		return userRoleOffices, err
 	}
 	defer rows.Close()
+
+	for rows.Next() {
+		userRoleOffice := models.UserRoleOffice{}
+		err = rows.Scan(&userRoleOffice.ID, &userRoleOffice.UserID, &userRoleOffice.RoleID, &userRoleOffice.OfficeID, &userRoleOffice.Role, &userRoleOffice.OfficeCode, &userRoleOffice.ProjectCode)
+		if err != nil {
+			return userRoleOffices, err
+		}
+		userRoleOffices = append(userRoleOffices, userRoleOffice)
+	}
 
 	// if userRoleOffice.OfficeCode == "" {
 	// 	message := []byte("There is a new user role request. Please login to appove or deny the request.")
@@ -273,6 +285,52 @@ func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, e
 	// 	}
 	// }
 
+	return userRoleOffices, err
+}
+
+func (auth *AuthStore) GetUserRoleOfficeById(id string) (models.UserRoleOffice, error) {
+	userRoleOffice := models.UserRoleOffice{}
+	selectQuery, err := auth.db.Prepare(getUserRoleOfficeByIdSql)
+	if err != nil {
+		return userRoleOffice, err
+	}
+
+	rows, err := selectQuery.Query(id)
+	if err != nil {
+		return userRoleOffice, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&userRoleOffice.ID, &userRoleOffice.UserID, &userRoleOffice.RoleID, &userRoleOffice.OfficeID, &userRoleOffice.Role, &userRoleOffice.OfficeCode, &userRoleOffice.ProjectCode)
+		if err != nil {
+			return userRoleOffice, err
+		}
+	}
+	defer rows.Close()
+
+	return userRoleOffice, err
+}
+
+func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, error) {
+	userRoleOffice := models.UserRoleOffice{}
+	selectQuery, err := auth.db.Prepare(getUserRoleOfficeSql)
+	if err != nil {
+		return userRoleOffice, err
+	}
+
+	rows, err := selectQuery.Query(email)
+	if err != nil {
+		return userRoleOffice, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&userRoleOffice.ID, &userRoleOffice.UserID, &userRoleOffice.RoleID, &userRoleOffice.OfficeID, &userRoleOffice.Role, &userRoleOffice.OfficeCode, &userRoleOffice.ProjectCode)
+		if err != nil {
+			return userRoleOffice, err
+		}
+	}
+	defer rows.Close()
+
 	return userRoleOffice, err
 }
 
@@ -289,3 +347,24 @@ func (auth *AuthStore) GetUserRoleOffice(email string) (models.UserRoleOffice, e
 // 	fmt.Println("Email Sent Successfully!")
 // 	return nil
 // }
+
+func (auth *AuthStore) GetUsers2() ([]models.User, error) {
+	rows, err := auth.db.Query(getUsersSql2)
+
+	users := []models.User{}
+	if err != nil {
+		return users, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		user := models.User{}
+		err = rows.Scan(&user.UserID, &user.UserName, &user.FirstName, &user.LastName, &user.RoleID)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, err
+}
