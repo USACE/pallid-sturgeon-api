@@ -20,17 +20,18 @@ func (ps *PallidSturgeonHandler) Version(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetProjects(c echo.Context) error {
+	id := c.QueryParam("id")
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	projects, err := sd.Store.GetProjects(userInfo.OfficeCode)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	return c.JSON(http.StatusOK, projects)
 }
 
@@ -371,15 +372,13 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) error {
-	tableId, fieldId, geneticsVial, pitTag, mrId, fId := c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("geneticsVial"), c.QueryParam("pitTag"), c.QueryParam("mrId"), c.QueryParam("fId")
+	id, tableId, fieldId, geneticsVial, pitTag, mrId, fId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("geneticsVial"), c.QueryParam("pitTag"), c.QueryParam("mrId"), c.QueryParam("fId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -481,14 +480,13 @@ func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
-	tableId, fId, mrId := c.QueryParam("tableId"), c.QueryParam("fId"), c.QueryParam("mrId")
+	id, tableId, fId, mrId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fId"), c.QueryParam("mrId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -547,14 +545,13 @@ func (sd *PallidSturgeonHandler) DeleteProcedureDataEntry(c echo.Context) error 
 }
 
 func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
-	tableId, seId := c.QueryParam("tableId"), c.QueryParam("seId")
+	id, tableId, seId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("seId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -956,20 +953,25 @@ func (sd *PallidSturgeonHandler) GetFullProcedureDataSummary(c echo.Context) err
 }
 
 func (sd *PallidSturgeonHandler) GetMissouriDatasheetById(c echo.Context) error {
-	siteId, project, segment, season, bend := c.QueryParam("siteId"), c.QueryParam("project"), c.QueryParam("segment"), c.QueryParam("season"), c.QueryParam("bend")
+	id, siteId, project, segment, season, bend := c.QueryParam("id"), c.QueryParam("siteId"), c.QueryParam("project"), c.QueryParam("segment"), c.QueryParam("season"), c.QueryParam("bend")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
 
-	missouriData, err := sd.Store.GetMissouriDatasheetById(siteId, userInfo.OfficeCode, project, segment, season, bend, queryParams)
+	missouriData, err := sd.Store.GetMissouriDatasheetById(siteId, userInfo.OfficeCode, projectVal, segment, season, bend, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -1128,13 +1130,13 @@ func (sd *PallidSturgeonHandler) CallStoreProcedures(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetErrorCount(c echo.Context) error {
+	id := c.QueryParam("id")
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	errorCounts, err := sd.Store.GetErrorCount(userInfo.OfficeCode)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -1143,10 +1145,9 @@ func (sd *PallidSturgeonHandler) GetErrorCount(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetOfficeErrorLogs(c echo.Context) error {
+	id := c.QueryParam("id")
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -1159,10 +1160,9 @@ func (sd *PallidSturgeonHandler) GetOfficeErrorLogs(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetUsgNoVialNumbers(c echo.Context) error {
+	id := c.QueryParam("id")
 
-	user := c.Get("PSUSER").(models.User)
-
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -1175,13 +1175,13 @@ func (sd *PallidSturgeonHandler) GetUsgNoVialNumbers(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
+	id := c.QueryParam("id")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -1194,13 +1194,13 @@ func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetBafiDataSheets(c echo.Context) error {
+	id := c.QueryParam("id")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -1213,13 +1213,13 @@ func (sd *PallidSturgeonHandler) GetBafiDataSheets(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetUncheckedDataSheets(c echo.Context) error {
+	id := c.QueryParam("id")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	user := c.Get("PSUSER").(models.User)
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -1279,13 +1279,13 @@ func (sd *PallidSturgeonHandler) GetUploadSessionLogs(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSitesExport(c echo.Context) error {
-	year, segmentCode, seasonCode, bendrn := c.QueryParam("year"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn")
+	id, year, segmentCode, seasonCode, bendrn := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn")
 
-	user := c.Get("PSUSER").(models.User)
-	userInfo, err := sd.Store.GetUser(user.Email)
+	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
+
 	exportData, err := sd.Store.GetSitesExport(year, userInfo.OfficeCode, userInfo.ProjectCode, segmentCode, seasonCode, bendrn)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())

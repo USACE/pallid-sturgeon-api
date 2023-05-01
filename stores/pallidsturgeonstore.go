@@ -3102,8 +3102,7 @@ se.temp, se.conductivity
            and sea.se_id =se.se_id) > 0 THEN '#DAF2EA'
       ELSE NULL END) as bkg_color
 from ds_sites si inner join ds_search se on si.site_id = se.site_id
-where  si.site_id = :1
-`
+where  si.site_id = :1`
 
 var searchDatasheetsCountBySiteId = `select count(*) from ds_sites si inner join ds_search se on se.site_id = si.site_id where si.site_id = :1`
 
