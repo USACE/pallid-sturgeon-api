@@ -139,22 +139,22 @@ type FishSummaryWithCount struct {
 }
 
 type FishSummary struct {
-	UniqueID        int     `db:"mr_id" json:"uniqueID"`
-	FishID          int     `db:"f_id" json:"fishId"`
-	Year            int     `db:"year" json:"year"`
-	FieldOffice     string  `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
-	Project         int     `db:"PROJECT_CODE" json:"project"`
-	Segment         int     `db:"SEGMENT_CODE" json:"segment"`
-	Season          string  `db:"SEASON_CODE" json:"season"`
-	Bend            int     `db:"BEND_NUMBER" json:"bend"`
-	Bendrn          string  `db:"BEND_R_OR_N" json:"bendrn"`
-	BendRiverMile   float64 `db:"bend_river_mile" json:"bendRiverMile"`
-	Panelhook       string  `db:"panelhook" json:"panelhook"`
-	Species         string  `db:"SPECIES_CODE" json:"species"`
-	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN_CODE" json:"hatcheryOrigin"`
-	CheckedBy       string  `db:"checkby" json:"checkedby"`
-	EditInitials    string  `db:"edit_initials" json:"editInitials"`
-	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
+	UniqueID        int      `db:"mr_id" json:"uniqueID"`
+	FishID          int      `db:"f_id" json:"fishId"`
+	Year            int      `db:"year" json:"year"`
+	FieldOffice     string   `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
+	Project         int      `db:"PROJECT_CODE" json:"project"`
+	Segment         int      `db:"SEGMENT_CODE" json:"segment"`
+	Season          string   `db:"SEASON_CODE" json:"season"`
+	Bend            *int     `db:"BEND_NUMBER" json:"bend"`
+	Bendrn          string   `db:"BEND_R_OR_N" json:"bendrn"`
+	BendRiverMile   *float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	Panelhook       string   `db:"panelhook" json:"panelhook"`
+	Species         string   `db:"SPECIES_CODE" json:"species"`
+	HatcheryOrigin  string   `db:"HATCHERY_ORIGIN_CODE" json:"hatcheryOrigin"`
+	CheckedBy       string   `db:"checkby" json:"checkedby"`
+	EditInitials    string   `db:"edit_initials" json:"editInitials"`
+	LastEditComment string   `db:"last_edit_comment" json:"lastEditComment"`
 }
 
 type SuppSummaryWithCount struct {
@@ -163,23 +163,23 @@ type SuppSummaryWithCount struct {
 }
 
 type SuppSummary struct {
-	FishCode        string  `db:"fish_code" json:"fishCode"`
-	UniqueID        int     `db:"mr_id" json:"uniqueID"`
-	FishID          int     `db:"f_id" json:"fishId"`
-	Year            int     `db:"year" json:"year"`
-	SuppID          int     `db:"sid_display" json:"suppId"`
-	FieldOffice     string  `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
-	Project         int     `db:"PROJECT_CODE" json:"project"`
-	Segment         int     `db:"SEGMENT_CODE" json:"segment"`
-	Season          string  `db:"SEASON_CODE" json:"season"`
-	Bend            int     `db:"BEND_NUMBER" json:"bend"`
-	Bendrn          string  `db:"BEND_R_OR_N" json:"bendrn"`
-	BendRiverMile   float64 `db:"bend_river_mile" json:"bendRiverMile"`
-	HatcheryOrigin  string  `db:"HATCHERY_ORIGIN_CODE" json:"hatcheryOrigin"`
-	TagNumber       string  `db:"tag_number" json:"tagNumber"`
-	CheckedBy       string  `db:"checkby" json:"checkedby"`
-	EditInitials    string  `db:"edit_initials" json:"editInitials"`
-	LastEditComment string  `db:"last_edit_comment" json:"lastEditComment"`
+	FishCode        string   `db:"fish_code" json:"fishCode"`
+	UniqueID        int      `db:"mr_id" json:"uniqueID"`
+	FishID          int      `db:"f_id" json:"fishId"`
+	Year            int      `db:"year" json:"year"`
+	SuppID          int      `db:"sid_display" json:"suppId"`
+	FieldOffice     string   `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
+	Project         int      `db:"PROJECT_CODE" json:"project"`
+	Segment         int      `db:"SEGMENT_CODE" json:"segment"`
+	Season          string   `db:"SEASON_CODE" json:"season"`
+	Bend            *int     `db:"BEND_NUMBER" json:"bend"`
+	Bendrn          *string  `db:"BEND_R_OR_N" json:"bendrn"`
+	BendRiverMile   *float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	HatcheryOrigin  *string  `db:"HATCHERY_ORIGIN_CODE" json:"hatcheryOrigin"`
+	TagNumber       *string  `db:"tag_number" json:"tagNumber"`
+	CheckedBy       string   `db:"checkby" json:"checkedby"`
+	EditInitials    string   `db:"edit_initials" json:"editInitials"`
+	LastEditComment string   `db:"last_edit_comment" json:"lastEditComment"`
 }
 
 type MissouriSummaryWithCount struct {
@@ -194,15 +194,16 @@ type MissouriSummary struct {
 	Project         int       `db:"PROJECT_CODE" json:"project"`
 	Segment         int       `db:"SEGMENT_CODE" json:"segment"`
 	Season          string    `db:"SEASON_CODE" json:"season"`
-	Bend            int       `db:"BEND_NUMBER" json:"bend"`
+	Bend            *int      `db:"BEND_NUMBER" json:"bend"`
 	Bendrn          string    `db:"BEND_R_OR_N" json:"bendrn"`
-	BendRiverMile   float64   `db:"bend_river_mile" json:"bendRiverMile"`
-	Subsample       int       `db:"subsample" json:"subsample"`
-	Pass            int       `db:"subsample_pass" json:"pass"`
-	SetDate         time.Time `db:"set_date" json:"setDate"`
+	BendRiverMile   *float64  `db:"bend_river_mile" json:"bendRiverMile"`
+	Subsample       *int      `db:"subsample" json:"subsample"`
+	Pass            *int      `db:"subsample_pass" json:"pass"`
+	SetDate         *string   `db:"set_date" json:"setDate"`
+	SetDateTime     time.Time `db:"set_date" json:"setDateTime"`
 	Conductivity    *string   `db:"conductivity" json:"conductivity"`
 	CheckedBy       string    `db:"checkby" json:"checkedby"`
-	Approved        int       `db:"approved" json:"approved"`
+	Approved        *int      `db:"approved" json:"approved"`
 	EditInitials    string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment string    `db:"last_edit_comment" json:"lastEditComment"`
 }
@@ -220,7 +221,7 @@ type GeneticSummary struct {
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"GeneticsVialNumber"`
 	PitTag             string    `db:"pit_tag" json:"pitTag"`
 	River              string    `db:"river" json:"river"`
-	RiverMile          float64   `db:"river_mile" json:"riverMile"`
+	RiverMile          *float64  `db:"river_mile" json:"riverMile"`
 	State              string    `db:"state" json:"state"`
 	SetDate            time.Time `db:"set_date" json:"setDate"`
 	Broodstock         string    `db:"broodstock_yn" json:"broodstock"`
