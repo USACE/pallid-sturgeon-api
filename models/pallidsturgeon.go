@@ -328,6 +328,27 @@ type TelemetrySummary struct {
 	Comments           string   `db:"comments" json:"comments"`
 }
 
+type LastLocationSummaryWithCount struct {
+	Items      []LastLocationSummary `json:"items"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+type LastLocationSummary struct {
+	TID              int      `db:"t_id" json:"tId"`
+	Year             *int     `db:"year" json:"year"`
+	FieldOffice      *string  `db:"fieldoffice" json:"fieldoffice"`
+	Project          *int     `db:"project_id" json:"project"`
+	Segment          *int     `db:"segment_id" json:"segment"`
+	Bend             *float64 `db:"bend" json:"bend"`
+	RadioTagNum      int      `db:"radio_tag_num" json:"radioTagNum"`
+	CaptureTime      string   `db:"capture_time" json:"captureTime"`
+	CaptureLatitude  float64  `db:"capture_latitude" json:"captureLatitude"`
+	CaptureLongitude float64  `db:"capture_longitude" json:"captureLongitude"`
+	SearchDate       *string  `db:"search_date" json:"searchDate"`
+	DaysToReplace    *int     `db:"days_to_replace" json:"daysToReplace"`
+	// CaptureDate      *string  `db:"capture_date" json:"captureDate"`
+}
+
 type Upload struct {
 	EditInitials       string                 `db:"edit_initials" json:"editInitials"`
 	SiteUpload         UploadSiteData         `json:"siteUpload"`

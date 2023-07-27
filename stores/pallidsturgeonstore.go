@@ -3012,6 +3012,75 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 	return procedureSummaryWithCount, err
 }
 
+var lastLocationDataSummarySql = `select year, f.t_id, s.fieldoffice, radio_tag_num, s.segment_id, f.bend, capture_latitude, capture_longitude, search_date, capture_time, round((728-(sysdate - procedure_date)),0) as days_to_replace, s.project_id
+from ds_sites s, ds_search se, ds_telemetry_fish f, ds_procedure p where s.site_id = se.site_id and se.se_id = f.se_id and p.new_radio_tag_num = f.radio_tag_num 
+and year = :1`
+
+var lastLocationDataSummaryCountSql = `select count(*) from ds_sites s, ds_search se, ds_telemetry_fish f, ds_procedure p where s.site_id = se.site_id and se.se_id = f.se_id and p.new_radio_tag_num = f.radio_tag_num 
+and year = :1`
+
+func (s *PallidSturgeonStore) GetLastLocationDataSummary(year string, officeCode string, project string, segment string, daysToReplace string, queryParams models.SearchParams) (models.LastLocationSummaryWithCount, error) {
+	summaryWithCount := models.LastLocationSummaryWithCount{}
+	countQuery, err := s.db.Prepare(lastLocationDataSummaryCountSql)
+	if err != nil {
+		return summaryWithCount, err
+	}
+
+	countrows, err := countQuery.Query(year)
+	if err != nil {
+		return summaryWithCount, err
+	}
+	defer countrows.Close()
+
+	for countrows.Next() {
+		err = countrows.Scan(&summaryWithCount.TotalCount)
+		if err != nil {
+			return summaryWithCount, err
+		}
+	}
+
+	summaryData := []models.LastLocationSummary{}
+	offset := queryParams.PageSize * queryParams.Page
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "t_id"
+	}
+	sqlQueryWithSearch := lastLocationDataSummarySql + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	dbQuery, err := s.db.Prepare(sqlQueryWithSearch)
+	if err != nil {
+		return summaryWithCount, err
+	}
+
+	rows, err := dbQuery.Query(year)
+	if err != nil {
+		return summaryWithCount, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		summary := models.LastLocationSummary{}
+		err = rows.Scan(&summary.Year,
+			&summary.TID,
+			&summary.FieldOffice,
+			&summary.RadioTagNum,
+			&summary.Segment,
+			&summary.Bend,
+			&summary.CaptureLatitude,
+			&summary.CaptureLongitude,
+			&summary.SearchDate,
+			&summary.CaptureTime,
+			&summary.DaysToReplace,
+			&summary.Project)
+		if err != nil {
+			return summaryWithCount, err
+		}
+		summaryData = append(summaryData, summary)
+	}
+
+	summaryWithCount.Items = summaryData
+
+	return summaryWithCount, err
+}
+
 var missouriDatasheetsBySiteId = `select site_id, mr_id, mr_fid, subsample, subsamplepass, subsamplen, recorder, conductivity, bkg_color, fish_count, supp_count, supp_bkg_color, setdate, proc_count, proc_bkg_color from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
 
 var missouriDatasheetsCountBySiteId = `select count(*) from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`

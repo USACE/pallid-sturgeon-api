@@ -952,6 +952,32 @@ func (sd *PallidSturgeonHandler) GetFullProcedureDataSummary(c echo.Context) err
 	return c.Inline(fileName, fileName)
 }
 
+func (sd *PallidSturgeonHandler) GetLastLocationDataSummary(c echo.Context) error {
+	id, year, fieldoffice, project, segment, daysToReplace := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("fieldoffice"), c.QueryParam("project"), c.QueryParam("segment"), c.QueryParam("daysToReplace")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	dataSummary, err := sd.Store.GetLastLocationDataSummary(year, fieldoffice, projectVal, segment, daysToReplace, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, dataSummary)
+}
+
 func (sd *PallidSturgeonHandler) GetMissouriDatasheetById(c echo.Context) error {
 	id, siteId, project, segment, season, bend := c.QueryParam("id"), c.QueryParam("siteId"), c.QueryParam("project"), c.QueryParam("segment"), c.QueryParam("season"), c.QueryParam("bend")
 	queryParams, err := marshalQuery(c)
