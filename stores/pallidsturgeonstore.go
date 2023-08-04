@@ -1036,12 +1036,13 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	return moriverDataEntryWithCount, err
 }
 
-var insertSupplementalDataSql = `insert into ds_supplemental(s_id, f_id, f_fid, mr_id,TAGNUMBER, PITRN,SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM2,ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic, genetics_vial_number,
-BROODSTOCK, HATCH_WILD, species_id,head, snouttomouth, inter, mouthwidth, m_ib,l_ob, l_ib, r_ib,r_ob, anal, dorsal, status, HATCHERY_ORIGIN,SEX, stage, recapture, photo,genetic_needs, other_tag_info,comments,
-edit_initials,last_edit_comment, last_updated, uploaded_by, complete, approved, checkby, recorder) 
-values (supp_seq.nextval,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48)`
+var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,TAGNUMBER, PITRN,SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM2,ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic, genetics_vial_number,
+	BROODSTOCK, HATCH_WILD, species_id,head, snouttomouth, inter, mouthwidth, m_ib,l_ob, l_ib, r_ib,r_ob, anal, dorsal, status, HATCHERY_ORIGIN,SEX, stage, recapture, photo,genetic_needs, other_tag_info,comments,
+	edit_initials,last_edit_comment, last_updated, uploaded_by, complete, approved, checkby, recorder)
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48) returning s_id into :49`
 
-func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) error {
+func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
+	var id int
 	_, err := s.db.Exec(insertSupplementalDataSql,
 		supplementalDataEntry.Fid,
 		supplementalDataEntry.FFid,
@@ -1091,8 +1092,9 @@ func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry mo
 		supplementalDataEntry.Approved,
 		supplementalDataEntry.Checkby,
 		supplementalDataEntry.Recorder,
+		sql.Out{Dest: &id},
 	)
-	return err
+	return id, err
 }
 
 var updateSupplementalDataSql = `UPDATE ds_supplemental SET 
@@ -1572,15 +1574,16 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 	return searchDataEntryWithCount, err
 }
 
-var insertSearchDataSql = `insert into ds_search (se_id, SE_FID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE,
+var insertSearchDataSql = `insert into ds_search (SE_FID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE,
 SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
-UPLOAD_SESSION_ID, ds_id) values (search_seq.nextval,:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21)`
+UPLOAD_SESSION_ID, ds_id) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21) returning se_id into :22`
 
-func (s *PallidSturgeonStore) SaveSearchDataEntry(searchDataEntry models.UploadSearch) error {
+func (s *PallidSturgeonStore) SaveSearchDataEntry(searchDataEntry models.UploadSearch) (int, error) {
+	var id int
 	_, err := s.db.Exec(insertSearchDataSql, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
 		searchDataEntry.SearchDate, searchDataEntry.SearchTypeCode, searchDataEntry.SiteId, searchDataEntry.StartLatitude, searchDataEntry.StartLongitude, searchDataEntry.StartTime, searchDataEntry.StopLatitude,
-		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.DsId)
-	return err
+		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.DsId, sql.Out{Dest: &id})
+	return id, err
 }
 
 var updateSearchDataSql = `UPDATE ds_search SET 
@@ -1748,15 +1751,16 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 	return telemetryDataEntryWithCount, err
 }
 
-var insertTelemetryDataSql = `insert into ds_telemetry_fish (t_id, BEND,CAPTURE_LATITUDE,CAPTURE_LONGITUDE,CAPTURE_TIME,CHECKBY,COMMENTS,conductivity,depth,EDIT_INITIALS,FREQUENCY_ID_CODE,gravel,LAST_EDIT_COMMENT,
+var insertTelemetryDataSql = `insert into ds_telemetry_fish (BEND,CAPTURE_LATITUDE,CAPTURE_LONGITUDE,CAPTURE_TIME,CHECKBY,COMMENTS,conductivity,depth,EDIT_INITIALS,FREQUENCY_ID_CODE,gravel,LAST_EDIT_COMMENT,
 	LAST_UPDATED,MACRO_ID,MESO_ID,POSITION_CONFIDENCE,RADIO_TAG_NUM,sand,SE_FID,SE_ID,silt,temp,turbidity,T_FID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID) 
-	values (telemetry_id_seq.nextval, :1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27)`
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27) returning t_id into :28`
 
-func (s *PallidSturgeonStore) SaveTelemetryDataEntry(telemetryDataEntry models.UploadTelemetry) error {
+func (s *PallidSturgeonStore) SaveTelemetryDataEntry(telemetryDataEntry models.UploadTelemetry) (int, error) {
+	var id int
 	_, err := s.db.Exec(insertTelemetryDataSql, telemetryDataEntry.Bend, telemetryDataEntry.CaptureLatitude, telemetryDataEntry.CaptureLongitude, telemetryDataEntry.CaptureTime, telemetryDataEntry.Checkby, telemetryDataEntry.Comments, telemetryDataEntry.Conductivity, telemetryDataEntry.Depth,
 		telemetryDataEntry.EditInitials, telemetryDataEntry.FrequencyIdCode, telemetryDataEntry.Gravel, telemetryDataEntry.LastEditComment, telemetryDataEntry.LastUpdated, telemetryDataEntry.MacroId, telemetryDataEntry.MesoId, telemetryDataEntry.PositionConfidence, telemetryDataEntry.RadioTagNum,
-		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId)
-	return err
+		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId, sql.Out{Dest: &id})
+	return id, err
 }
 
 var updateTelemetryDataSql = `UPDATE ds_telemetry_fish SET 
@@ -1982,18 +1986,19 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 	return procedureDataEntryWithCount, err
 }
 
-var insertProcedureDataSql = `insert into ds_procedure (ID, S_ID, F_ID, F_FID, PURPOSE_CODE, PROCEDURE_DATE, PROCEDURE_START_TIME, PROCEDURE_END_TIME, PROCEDURE_BY, ANTIBIOTIC_INJECTION_IND, PHOTO_DORSAL_IND, PHOTO_VENTRAL_IND, PHOTO_LEFT_IND, OLD_RADIO_TAG_NUM, OLD_FREQUENCY_ID, DST_SERIAL_NUM, DST_START_DATE, DST_START_TIME, 
+var insertProcedureDataSql = `insert into ds_procedure (S_ID, F_ID, F_FID, PURPOSE_CODE, PROCEDURE_DATE, PROCEDURE_START_TIME, PROCEDURE_END_TIME, PROCEDURE_BY, ANTIBIOTIC_INJECTION_IND, PHOTO_DORSAL_IND, PHOTO_VENTRAL_IND, PHOTO_LEFT_IND, OLD_RADIO_TAG_NUM, OLD_FREQUENCY_ID, DST_SERIAL_NUM, DST_START_DATE, DST_START_TIME, 
 	DST_REIMPLANT_IND, NEW_RADIO_TAG_NUM, NEW_FREQUENCY_ID, SEX_CODE, COMMENTS, FISH_HEALTH_COMMENTS, SPAWN_CODE, EVAL_LOCATION_CODE, BLOOD_SAMPLE_IND, EGG_SAMPLE_IND, VISUAL_REPRO_STATUS_CODE, ULTRASOUND_REPRO_STATUS_CODE, ULTRASOUND_GONAD_LENGTH, GONAD_CONDITION, EXPECTED_SPAWN_YEAR, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, 
 	UPLOAD_FILENAME, CHECKBY, EDIT_INITIALS, LAST_EDIT_COMMENT, MR_FID) 
-	values (procedure_seq.nextval, :1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40)`
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40) returning id into :41`
 
-func (s *PallidSturgeonStore) SaveProcedureDataEntry(procedureDataEntry models.UploadProcedure) error {
+func (s *PallidSturgeonStore) SaveProcedureDataEntry(procedureDataEntry models.UploadProcedure) (int, error) {
+	var id int
 	_, err := s.db.Exec(insertProcedureDataSql, procedureDataEntry.Sid, procedureDataEntry.Fid, procedureDataEntry.FFid, procedureDataEntry.PurposeCode, procedureDataEntry.ProcedureDate, procedureDataEntry.ProcedureStartTime, procedureDataEntry.ProcedureEndTime, procedureDataEntry.ProcedureBy, procedureDataEntry.AntibioticInjectionInd,
 		procedureDataEntry.PhotoDorsalInd, procedureDataEntry.PhotoVentralInd, procedureDataEntry.PhotoLeftInd, procedureDataEntry.OldRadioTagNum, procedureDataEntry.OldFrequencyId, procedureDataEntry.DstSerialNum, procedureDataEntry.DstStartDate, procedureDataEntry.DstStartTime, procedureDataEntry.DstReimplantInd,
 		procedureDataEntry.NewRadioTagNum, procedureDataEntry.NewFrequencyId, procedureDataEntry.SexCode, procedureDataEntry.Comments, procedureDataEntry.FishHealthComments, procedureDataEntry.SpawnStatus, procedureDataEntry.EvalLocationCode, procedureDataEntry.BloodSampleInd, procedureDataEntry.EggSampleInd,
 		procedureDataEntry.VisualReproStatusCode, procedureDataEntry.UltrasoundReproStatusCode, procedureDataEntry.UltrasoundGonadLength, procedureDataEntry.GonadCondition, procedureDataEntry.ExpectedSpawnYear, procedureDataEntry.LastUpdated, procedureDataEntry.UploadSessionId, procedureDataEntry.UploadedBy,
-		procedureDataEntry.UploadFilename, procedureDataEntry.Checkby, procedureDataEntry.EditInitials, procedureDataEntry.LastEditComment, procedureDataEntry.MrFid)
-	return err
+		procedureDataEntry.UploadFilename, procedureDataEntry.Checkby, procedureDataEntry.EditInitials, procedureDataEntry.LastEditComment, procedureDataEntry.MrFid, sql.Out{Dest: &id})
+	return id, err
 }
 
 var updateProcedureDataSql = `update ds_procedure set 
