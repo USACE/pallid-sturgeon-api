@@ -245,7 +245,7 @@ type SearchSummary struct {
 	Project        int      `db:"project_id" json:"projectId"`
 	Segment        int      `db:"segment_id" json:"segmentId"`
 	Season         string   `db:"season" json:"season"`
-	SearchDate     string   `db:"Search_date" json:"searchDate"`
+	SearchDate     *string  `db:"search_date" json:"searchDate"`
 	Recorder       string   `db:"recorder" json:"recorder"`
 	SearchTypeCode string   `db:"search_type_code" json:"searchTypeCode"`
 	StartTime      string   `db:"start_time" json:"startTime"`
@@ -319,7 +319,7 @@ type TelemetrySummary struct {
 	Depth              *float64 `db:"depth" json:"depth"`
 	Conductivity       *float64 `db:"conductivity" json:"conductivity"`
 	Turbidity          *float64 `db:"turbidity" json:"turbidity"`
-	SearchDate         string   `db:"Search_date" json:"searchDate"`
+	SearchDate         *string  `db:"search_date" json:"searchDate"`
 	SearchDay          *int     `db:"search_day" json:"searchDay"`
 	Temp               *float64 `db:"temp" json:"temp"`
 	Silt               *int     `db:"silt" json:"silt"`
@@ -420,21 +420,21 @@ type UploadFish struct {
 	Fid                int       `db:"f_id" json:"fid"`
 	Ffid               string    `db:"f_fid" json:"ffid"`
 	MrID               *int      `db:"mr_id" json:"mrId"`
-	Panelhook          string    `db:"panelhook" json:"panelHook"`
-	Bait               string    `db:"bait" json:"bait"`
-	Species            string    `db:"species" json:"species"`
+	Panelhook          *string   `db:"panelhook" json:"panelHook"`
+	Bait               *string   `db:"bait" json:"bait"`
+	Species            *string   `db:"species" json:"species"`
 	Length             *float32  `db:"length" json:"length"`
 	Weight             *float32  `db:"weight" json:"weight"`
-	Fishcount          int       `db:"fishcount" json:"countF"`
-	FinCurl            string    `db:"fin_curl" json:"finCurl"`
-	Otolith            string    `db:"otolith" json:"otolith"`
-	Rayspine           string    `db:"rayspine" json:"raySpine"`
-	Scale              string    `db:"scale" json:"scale"`
-	Ftprefix           string    `db:"ftprefix" json:"ftPrefix"`
+	Fishcount          *int      `db:"fishcount" json:"countF"`
+	FinCurl            *string   `db:"fin_curl" json:"finCurl"`
+	Otolith            *string   `db:"otolith" json:"otolith"`
+	Rayspine           *string   `db:"rayspine" json:"raySpine"`
+	Scale              *string   `db:"scale" json:"scale"`
+	Ftprefix           *string   `db:"ftprefix" json:"ftPrefix"`
 	Ftnum              *string   `db:"ftnum" json:"floyTag"`
-	Ftmr               string    `db:"ftmr" json:"mR"`
+	Ftmr               *string   `db:"ftmr" json:"mR"`
 	Comments           string    `db:"comments" json:"comments"`
-	Approved           int       `db:"approved" json:"approved"`
+	Approved           *int      `db:"approved" json:"approved"`
 	LastUpdated        time.Time `db:"last_updated" json:"lastUpdated"`
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
 	EditInitials       string    `db:"edit_initials" json:"editInitials"`

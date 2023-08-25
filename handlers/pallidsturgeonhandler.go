@@ -398,12 +398,12 @@ func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error
 	supplementalData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	supplementalData.UploadedBy = user.FirstName + " " + user.LastName
-	err := sd.Store.SaveSupplementalDataEntry(supplementalData)
+	id, err := sd.Store.SaveSupplementalDataEntry(supplementalData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(200, err)
+	return c.JSON(200, id)
 }
 
 func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) error {
@@ -455,12 +455,12 @@ func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
 	user := c.Get("PSUSER").(models.User)
 	searchData.UploadedBy = user.FirstName + " " + user.LastName
 	searchData.SearchDate = processStringTime(DerefString(searchData.SearchDate), "app")
-	err := sd.Store.SaveSearchDataEntry(searchData)
+	id, err := sd.Store.SaveSearchDataEntry(searchData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(200, err)
+	return c.JSON(200, id)
 }
 
 func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
@@ -508,12 +508,12 @@ func (sd *PallidSturgeonHandler) SaveProcedureDataEntry(c echo.Context) error {
 	procedureData.UploadedBy = user.FirstName + " " + user.LastName
 	procedureData.ProcedureDate = processStringTime(DerefString(procedureData.ProcedureDate), "app")
 	procedureData.DstStartDate = processStringTime(DerefString(procedureData.DstStartDate), "app")
-	err := sd.Store.SaveProcedureDataEntry(procedureData)
+	id, err := sd.Store.SaveProcedureDataEntry(procedureData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(200, err)
+	return c.JSON(200, id)
 }
 
 func (sd *PallidSturgeonHandler) UpdateProcedureDataEntry(c echo.Context) error {
@@ -571,12 +571,12 @@ func (sd *PallidSturgeonHandler) SaveTelemetryDataEntry(c echo.Context) error {
 	telemetryData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	telemetryData.UploadedBy = user.FirstName + " " + user.LastName
-	err := sd.Store.SaveTelemetryDataEntry(telemetryData)
+	id, err := sd.Store.SaveTelemetryDataEntry(telemetryData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(200, err)
+	return c.JSON(200, id)
 }
 
 func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error {
