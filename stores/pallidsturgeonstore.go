@@ -787,11 +787,11 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	}
 
 	fishEntries := []models.UploadFish{}
-	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "f_id asc"
 	}
-	fishDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+
+	fishDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s", queryParams.OrderBy)
 	dbQuery, err := s.db.Prepare(fishDataEntriesSqlWithSearch)
 	if err != nil {
 		return fishDataEntryWithCount, err
@@ -1372,11 +1372,10 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 	}
 
 	supplementalEntries := []models.UploadSupplemental{}
-	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "s_id"
 	}
-	supplementalDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	supplementalDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s", queryParams.OrderBy)
 	dbQuery, err := s.db.Prepare(supplementalDataEntriesSqlWithSearch)
 	if err != nil {
 		return supplementalDataEntryWithCount, err
@@ -1710,11 +1709,10 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 	}
 
 	telemetryEntries := []models.UploadTelemetry{}
-	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "t_id asc"
 	}
-	telemetryDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	telemetryDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s", queryParams.OrderBy)
 	dbQuery, err := s.db.Prepare(telemetryDataEntriesSqlWithSearch)
 	if err != nil {
 		return telemetryDataEntryWithCount, err
@@ -1944,11 +1942,10 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 	}
 
 	procedureEntries := []models.UploadProcedure{}
-	offset := queryParams.PageSize * queryParams.Page
 	if queryParams.OrderBy == "" {
 		queryParams.OrderBy = "id"
 	}
-	procedureDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s OFFSET %s ROWS FETCH NEXT %s ROWS ONLY", queryParams.OrderBy, strconv.Itoa(offset), strconv.Itoa(queryParams.PageSize))
+	procedureDataEntriesSqlWithSearch := query + fmt.Sprintf(" order by %s", queryParams.OrderBy)
 	dbQuery, err := s.db.Prepare(procedureDataEntriesSqlWithSearch)
 	if err != nil {
 		return procedureDataEntryWithCount, err
