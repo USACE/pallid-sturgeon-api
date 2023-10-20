@@ -868,6 +868,7 @@ fin_curl = :25
 WHERE f_id = :1`
 
 func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFish) error {
+	log.Printf("store: fishData - %f", *fishDataEntry.Weight)
 	_, err := s.db.Exec(updateFishDataSql, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
 		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy,

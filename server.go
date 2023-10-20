@@ -97,6 +97,9 @@ func main() {
 	e.PUT(urlContext+"/procedureDataEntry", auth.Authorize(PallidSturgeonH.UpdateProcedureDataEntry, PUBLIC))
 	e.DELETE(urlContext+"/procedureDataEntry/:id", auth.Authorize(PallidSturgeonH.DeleteProcedureDataEntry, PUBLIC))
 
+	e.POST(urlContext+"/submitFishDataEntries", auth.Authorize(PallidSturgeonH.SubmitFishDataEntries, PUBLIC))
+	e.POST(urlContext+"/submitTelemetryDataEntries", auth.Authorize(PallidSturgeonH.SubmitTelemetryDataEntries, PUBLIC))
+
 	e.GET(urlContext+"/fishFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullFishDataSummary, PUBLIC))
 	e.GET(urlContext+"/fishDataSummary", auth.Authorize(PallidSturgeonH.GetFishDataSummary, PUBLIC))
 	e.GET(urlContext+"/suppFullDataSummary", auth.Authorize(PallidSturgeonH.GetFullSuppDataSummary, PUBLIC))

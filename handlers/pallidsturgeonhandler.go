@@ -288,6 +288,37 @@ func (sd *PallidSturgeonHandler) SaveFishDataEntry(c echo.Context) error {
 	return c.JSON(200, id)
 }
 
+func (sd *PallidSturgeonHandler) SubmitFishDataEntries(c echo.Context) error {
+	var idList []int
+	data := []models.UploadFish{}
+	if err := c.Bind(&data); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	user := c.Get("PSUSER").(models.User)
+
+	for _, fishData := range data {
+		fishData.LastUpdated = time.Now()
+		fishData.UploadedBy = user.FirstName + " " + user.LastName
+		if fishData.Fid == 0 {
+			// if unique id is not set, then insert data
+			id, err := sd.Store.SaveFishDataEntry(fishData)
+			idList = append(idList, id)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, err.Error())
+			}
+		} else {
+			// if unique id is set, then update data
+			err := sd.Store.UpdateFishDataEntry(fishData)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, err.Error())
+			}
+		}
+	}
+
+	return c.JSON(200, idList)
+}
+
 func (sd *PallidSturgeonHandler) UpdateFishDataEntry(c echo.Context) error {
 
 	fishData := models.UploadFish{}
@@ -592,6 +623,37 @@ func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error 
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) SubmitTelemetryDataEntries(c echo.Context) error {
+	var idList []int
+	data := []models.UploadTelemetry{}
+	if err := c.Bind(&data); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	user := c.Get("PSUSER").(models.User)
+
+	for _, telemetryData := range data {
+		telemetryData.LastUpdated = time.Now()
+		telemetryData.UploadedBy = user.FirstName + " " + user.LastName
+		if telemetryData.TId == 0 {
+			// if unique id is not set, then insert data
+			id, err := sd.Store.SaveTelemetryDataEntry(telemetryData)
+			idList = append(idList, id)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, err.Error())
+			}
+		} else {
+			// if unique id is set, then update data
+			err := sd.Store.UpdateTelemetryDataEntry(telemetryData)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, err.Error())
+			}
+		}
+	}
+
+	return c.JSON(200, idList)
 }
 
 func (sd *PallidSturgeonHandler) DeleteTelemetryDataEntry(c echo.Context) error {
