@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/csv"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -1003,113 +1005,190 @@ func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
-	var err error
-	uploads := models.Upload{}
-	if err := c.Bind(&uploads); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-
-	sessionId, err := sd.Store.GetUploadSessionId()
+	// Retrieve single uploaded file from the request.
+	file, err := c.FormFile("files")
+	log.Printf("file: %v", file)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, &models.Response{
+			Message: "Failed! No files were submitted",
+			Status:  "Failed",
+			Data:    nil,
+		})
 	}
 
-	user := c.Get("PSUSER").(models.User)
-
-	for _, uploadSite := range uploads.SiteUpload.Items {
-		uploadSite.LastUpdated = time.Now()
-		uploadSite.UploadedBy = user.FirstName + " " + user.LastName
-		uploadSite.UploadSessionId = sessionId
-		uploadSite.EditInitials = uploads.EditInitials
-		uploadSite.UploadFilename = uploads.SiteUpload.UploadFilename
-		err = sd.Store.SaveSiteUpload(uploadSite)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-	}
-
-	for _, uploadFish := range uploads.FishUpload.Items {
-		uploadFish.LastUpdated = time.Now()
-		uploadFish.UploadedBy = user.FirstName + " " + user.LastName
-		uploadFish.UploadSessionId = sessionId
-		uploadFish.EditInitials = uploads.EditInitials
-		uploadFish.UploadFilename = uploads.FishUpload.UploadFilename
-		err = sd.Store.SaveFishUpload(uploadFish)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-	}
-
-	for _, uploadSearch := range uploads.SearchUpload.Items {
-		uploadSearch.SearchDate = processStringTime(DerefString(uploadSearch.SearchDate), "db")
-		uploadSearch.LastUpdated = time.Now()
-		uploadSearch.UploadedBy = user.FirstName + " " + user.LastName
-		uploadSearch.UploadSessionId = sessionId
-		uploadSearch.EditInitials = uploads.EditInitials
-		uploadSearch.UploadFilename = uploads.SearchUpload.UploadFilename
-		err = sd.Store.SaveSearchUpload(uploadSearch)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-	}
-
-	for _, uploadSupplemental := range uploads.SupplementalUpload.Items {
-		uploadSupplemental.LastUpdated = time.Now()
-		uploadSupplemental.UploadedBy = user.FirstName + " " + user.LastName
-		uploadSupplemental.UploadSessionId = sessionId
-		uploadSupplemental.EditInitials = uploads.EditInitials
-		uploadSupplemental.UploadFilename = uploads.SupplementalUpload.UploadFilename
-		err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-	}
-
-	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
-		uploadProcedure.ProcedureDate = processStringTime(DerefString(uploadProcedure.ProcedureDate), "db")
-		uploadProcedure.DstStartDate = processStringTime(DerefString(uploadProcedure.DstStartDate), "db")
-		uploadProcedure.LastUpdated = time.Now()
-		uploadProcedure.UploadedBy = user.FirstName + " " + user.LastName
-		uploadProcedure.UploadSessionId = sessionId
-		uploadProcedure.EditInitials = uploads.EditInitials
-		uploadProcedure.UploadFilename = uploads.ProcedureUpload.UploadFilename
-		err = sd.Store.SaveProcedureUpload(uploadProcedure)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-	}
-
-	for _, uploadMoriver := range uploads.MoriverUpload.Items {
-		uploadMoriver.SetDate = processStringTime(DerefString(uploadMoriver.SetDate), "db")
-		uploadMoriver.LastUpdated = time.Now()
-		uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
-		uploadMoriver.UploadSessionId = sessionId
-		uploadMoriver.EditInitials = uploads.EditInitials
-		uploadMoriver.UploadFilename = uploads.MoriverUpload.UploadFilename
-		err = sd.Store.SaveMoriverUpload(uploadMoriver)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-	}
-
-	for _, uploadTelemetry := range uploads.TelemetryUpload.Items {
-		uploadTelemetry.LastUpdated = time.Now()
-		uploadTelemetry.UploadedBy = user.FirstName + " " + user.LastName
-		uploadTelemetry.UploadSessionId = sessionId
-		uploadTelemetry.EditInitials = uploads.EditInitials
-		uploadTelemetry.UploadFilename = uploads.TelemetryUpload.UploadFilename
-		err = sd.Store.SaveTelemetryUpload(uploadTelemetry)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-	}
-
-	procedureOut, err := sd.Store.CallStoreProcedures(user.FirstName+" "+user.LastName, sessionId)
+	// Open file
+	fileContent, err := file.Open()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, &models.Response{
+			Message: "Failed! Unable to open the file",
+			Status:  "Failed",
+			Data:    nil,
+		})
 	}
+	log.Printf("src: %v", fileContent)
+	defer fileContent.Close()
 
-	return c.JSON(http.StatusOK, procedureOut)
+	// Create the CSV reader
+	csvReader := csv.NewReader(fileContent)
+
+	// Read the CSV headers
+	headers, err := csvReader.Read()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, &models.Response{
+			Message: "Failed! Unable to read the CSV file headers",
+			Status:  "Failed",
+			Data:    nil,
+		})
+	}
+	log.Printf("headers: %v", headers)
+
+	// Read the CSV data rows
+	var data []map[string]interface{}
+	for {
+		row, err := csvReader.Read()
+		if err != nil {
+			c.JSON(http.StatusOK, &models.Response{
+				Message: "Failed! Unable to read the CSV file row",
+				Status:  "Failed",
+				Data:    nil,
+			})
+			break
+		}
+
+		// Convert the row values to the appropriate types
+		m := make(map[string]interface{})
+		for i, val := range row {
+			f, err := strconv.ParseFloat(val, 64)
+			if err == nil {
+				m[headers[i]] = f
+				continue
+			}
+
+			b, err := strconv.ParseBool(val)
+			if err == nil {
+				m[headers[i]] = b
+				continue
+			}
+
+			m[headers[i]] = val
+		}
+		data = append(data, m)
+	}
+	log.Printf("data loop: %v", data)
+
+	// var err error
+	// uploads := models.Upload{}
+	// if err := c.Bind(&uploads); err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	// log.Printf("uploads: %v", uploads)
+
+	// sessionId, err := sd.Store.GetUploadSessionId()
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	// user := c.Get("PSUSER").(models.User)
+
+	// for _, uploadSite := range uploads.SiteUpload.Items {
+	// 	uploadSite.LastUpdated = time.Now()
+	// 	uploadSite.UploadedBy = user.FirstName + " " + user.LastName
+	// 	uploadSite.UploadSessionId = sessionId
+	// 	uploadSite.EditInitials = uploads.EditInitials
+	// 	uploadSite.UploadFilename = uploads.SiteUpload.UploadFilename
+	// 	err = sd.Store.SaveSiteUpload(uploadSite)
+	// 	if err != nil {
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// }
+
+	// for _, uploadFish := range uploads.FishUpload.Items {
+	// 	uploadFish.LastUpdated = time.Now()
+	// 	uploadFish.UploadedBy = user.FirstName + " " + user.LastName
+	// 	uploadFish.UploadSessionId = sessionId
+	// 	uploadFish.EditInitials = uploads.EditInitials
+	// 	uploadFish.UploadFilename = uploads.FishUpload.UploadFilename
+	// 	err = sd.Store.SaveFishUpload(uploadFish)
+	// 	if err != nil {
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// }
+
+	// for _, uploadSearch := range uploads.SearchUpload.Items {
+	// 	uploadSearch.SearchDate = processStringTime(DerefString(uploadSearch.SearchDate), "db")
+	// 	uploadSearch.LastUpdated = time.Now()
+	// 	uploadSearch.UploadedBy = user.FirstName + " " + user.LastName
+	// 	uploadSearch.UploadSessionId = sessionId
+	// 	uploadSearch.EditInitials = uploads.EditInitials
+	// 	uploadSearch.UploadFilename = uploads.SearchUpload.UploadFilename
+	// 	err = sd.Store.SaveSearchUpload(uploadSearch)
+	// 	if err != nil {
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// }
+
+	// for _, uploadSupplemental := range uploads.SupplementalUpload.Items {
+	// 	uploadSupplemental.LastUpdated = time.Now()
+	// 	uploadSupplemental.UploadedBy = user.FirstName + " " + user.LastName
+	// 	uploadSupplemental.UploadSessionId = sessionId
+	// 	uploadSupplemental.EditInitials = uploads.EditInitials
+	// 	uploadSupplemental.UploadFilename = uploads.SupplementalUpload.UploadFilename
+	// 	err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
+	// 	if err != nil {
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// }
+
+	// for _, uploadProcedure := range uploads.ProcedureUpload.Items {
+	// 	uploadProcedure.ProcedureDate = processStringTime(DerefString(uploadProcedure.ProcedureDate), "db")
+	// 	uploadProcedure.DstStartDate = processStringTime(DerefString(uploadProcedure.DstStartDate), "db")
+	// 	uploadProcedure.LastUpdated = time.Now()
+	// 	uploadProcedure.UploadedBy = user.FirstName + " " + user.LastName
+	// 	uploadProcedure.UploadSessionId = sessionId
+	// 	uploadProcedure.EditInitials = uploads.EditInitials
+	// 	uploadProcedure.UploadFilename = uploads.ProcedureUpload.UploadFilename
+	// 	err = sd.Store.SaveProcedureUpload(uploadProcedure)
+	// 	if err != nil {
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// }
+
+	// for _, uploadMoriver := range uploads.MoriverUpload.Items {
+	// 	uploadMoriver.SetDate = processStringTime(DerefString(uploadMoriver.SetDate), "db")
+	// 	uploadMoriver.LastUpdated = time.Now()
+	// 	uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
+	// 	uploadMoriver.UploadSessionId = sessionId
+	// 	uploadMoriver.EditInitials = uploads.EditInitials
+	// 	uploadMoriver.UploadFilename = uploads.MoriverUpload.UploadFilename
+	// 	err = sd.Store.SaveMoriverUpload(uploadMoriver)
+	// 	if err != nil {
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// }
+
+	// for _, uploadTelemetry := range uploads.TelemetryUpload.Items {
+	// 	uploadTelemetry.LastUpdated = time.Now()
+	// 	uploadTelemetry.UploadedBy = user.FirstName + " " + user.LastName
+	// 	uploadTelemetry.UploadSessionId = sessionId
+	// 	uploadTelemetry.EditInitials = uploads.EditInitials
+	// 	uploadTelemetry.UploadFilename = uploads.TelemetryUpload.UploadFilename
+	// 	err = sd.Store.SaveTelemetryUpload(uploadTelemetry)
+	// 	if err != nil {
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// }
+
+	// procedureOut, err := sd.Store.CallStoreProcedures(user.FirstName+" "+user.LastName, sessionId)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, err.Error())
+	// }
+
+	return c.JSON(http.StatusOK, &models.Response{
+		Message: "Data uploaded successfully",
+		Status:  "Success",
+		Data:    nil,
+	})
 }
 
 func (sd *PallidSturgeonHandler) CallStoreProcedures(c echo.Context) error {
