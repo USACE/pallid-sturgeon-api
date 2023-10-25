@@ -1,6 +1,10 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -1002,10 +1006,29 @@ func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
 	return c.JSON(http.StatusOK, sessionId)
 }
 
+
 func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	var err error
+
+	var buffer bytes.Buffer
+	chunk := make([]byte, 150 * 1024) // 150KB
+
+	for {
+		n, err := c.Request().Body.Read(chunk)
+		if err != nil && err != io.EOF {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		// ugly but keeps chunk in expected order
+		if n == 0 {
+			break
+		}
+
+		buffer.Write(chunk[:n])
+	}
+
 	uploads := models.Upload{}
-	if err := c.Bind(&uploads); err != nil {
+	if err := json.Unmarshal(buffer.Bytes(), &uploads); err !=nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
@@ -1022,6 +1045,9 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		uploadSite.UploadSessionId = sessionId
 		uploadSite.EditInitials = uploads.EditInitials
 		uploadSite.UploadFilename = uploads.SiteUpload.UploadFilename
+
+		fmt.Println("uploadSite Data to store in DB", uploadSite)
+
 		err = sd.Store.SaveSiteUpload(uploadSite)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -1034,6 +1060,8 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		uploadFish.UploadSessionId = sessionId
 		uploadFish.EditInitials = uploads.EditInitials
 		uploadFish.UploadFilename = uploads.FishUpload.UploadFilename
+
+		fmt.Println("uploadFish Data to store in DB", uploadFish)
 		err = sd.Store.SaveFishUpload(uploadFish)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -1047,6 +1075,8 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		uploadSearch.UploadSessionId = sessionId
 		uploadSearch.EditInitials = uploads.EditInitials
 		uploadSearch.UploadFilename = uploads.SearchUpload.UploadFilename
+
+		fmt.Println("uploadSearch Data to store in DB", uploadSearch)
 		err = sd.Store.SaveSearchUpload(uploadSearch)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -1059,6 +1089,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		uploadSupplemental.UploadSessionId = sessionId
 		uploadSupplemental.EditInitials = uploads.EditInitials
 		uploadSupplemental.UploadFilename = uploads.SupplementalUpload.UploadFilename
+		fmt.Println("uploadSupplemental Data to store in DB", uploadSupplemental)
 		err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -1073,6 +1104,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		uploadProcedure.UploadSessionId = sessionId
 		uploadProcedure.EditInitials = uploads.EditInitials
 		uploadProcedure.UploadFilename = uploads.ProcedureUpload.UploadFilename
+		fmt.Println("uploadProcedure Data to store in DB", uploadProcedure)
 		err = sd.Store.SaveProcedureUpload(uploadProcedure)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -1086,6 +1118,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		uploadMoriver.UploadSessionId = sessionId
 		uploadMoriver.EditInitials = uploads.EditInitials
 		uploadMoriver.UploadFilename = uploads.MoriverUpload.UploadFilename
+		fmt.Println("uploadMoriver Data to store in DB", uploadMoriver)
 		err = sd.Store.SaveMoriverUpload(uploadMoriver)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -1098,6 +1131,7 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 		uploadTelemetry.UploadSessionId = sessionId
 		uploadTelemetry.EditInitials = uploads.EditInitials
 		uploadTelemetry.UploadFilename = uploads.TelemetryUpload.UploadFilename
+		fmt.Println("uploadTelemetry Data to store in DB", uploadTelemetry)
 		err = sd.Store.SaveTelemetryUpload(uploadTelemetry)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
