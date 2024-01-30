@@ -626,96 +626,96 @@ type UploadMoriverData struct {
 }
 
 type UploadMoriver struct {
-	SiteID           int       `db:"site_id" json:"siteId"`
-	SiteFid          string    `db:"site_fid" json:"siteFid"`
-	MrID             int       `db:"mr_id" json:"mrId"`
-	MrFid            string    `db:"mr_fid" json:"mrFid"`
-	SeFieldID        string    `db:"se_field_id" json:"seFieldId"`
-	Season           string    `db:"season" json:"season"`
-	SetDate          *string   `db:"setdate" json:"setdate"`
-	SetDateTime      time.Time `db:"setdate" json:"setDateTime"`
-	Subsample        float64   `db:"subsample" json:"subsample"`
-	Subsamplepass    float64   `db:"subsamplepass" json:"subsamplepass"`
-	SubsampleROrN    string    `db:"subsample_r_or_n" json:"subsampleROrN"`
-	Subsamplen       string    `db:"subsamplen" json:"subsamplen"`
-	Recorder         string    `db:"recorder" json:"recorder"`
-	Gear             string    `db:"gear" json:"gear"`
-	GearType         string    `db:"gear_type" json:"gearType"`
-	Temp             float64   `db:"temp" json:"temp"`
-	Turbidity        *float64  `db:"turbidity" json:"turbidity"`
-	Conductivity     *float64  `db:"conductivity" json:"conductivity"`
-	Do               *float64  `db:"do" json:"dissolvedOxygen"`
-	Distance         *float64  `db:"distance" json:"distance"`
-	Width            *float64  `db:"width" json:"width"`
-	Netrivermile     *float64  `db:"netrivermile" json:"netrivermile"`
-	Structurenumber  string    `db:"structurenumber" json:"structurenumber"`
-	Usgs             string    `db:"usgs" json:"usgs"`
-	Riverstage       *float64  `db:"riverstage" json:"riverstage"`
-	Discharge        *float64  `db:"discharge" json:"discharge"`
-	U1               string    `db:"u1" json:"u1"`
-	U2               string    `db:"u2" json:"u2"`
-	U3               string    `db:"u3" json:"u3"`
-	U4               string    `db:"u4" json:"u4"`
-	U5               string    `db:"u5" json:"u5"`
-	U6               string    `db:"u6" json:"u6"`
-	U7               string    `db:"u7" json:"u7"`
-	Macro            string    `db:"macro" json:"macro"`
-	Meso             string    `db:"meso" json:"meso"`
-	Habitatrn        string    `db:"habitatrn" json:"habitatrn"`
-	Qc               string    `db:"qc" json:"qc"`
-	MicroStructure   string    `db:"micro_structure" json:"microStructure"`
-	StructureFlow    string    `db:"structure_flow" json:"structureFlow"`
-	StructureMod     string    `db:"structure_mod" json:"structureMod"`
-	SetSite1         string    `db:"set_site_1" json:"setSite1"`
-	SetSite2         string    `db:"set_site_2" json:"setSite2"`
-	SetSite3         string    `db:"set_site_3" json:"setSite3"`
-	StartTime        string    `db:"starttime" json:"startTime"`
-	StartLatitude    float64   `db:"startlatitude" json:"startlatitude"`
-	StartLongitude   float64   `db:"startlongitude" json:"startlongitude"`
-	StopTime         string    `db:"stoptime" json:"stoptime"`
-	StopLatitude     *float64  `db:"stoplatitude" json:"stoplatitude"`
-	StopLongitude    *float64  `db:"stop_longitude" json:"stoplongitude"`
-	Depth1           *float64  `db:"depth1" json:"depth1"`
-	Velocitybot1     *float64  `db:"velocitybot1" json:"velocitybot1"`
-	Velocity08_1     *float64  `db:"velocity08_1" json:"velocity081"`
-	Velocity02or06_1 *float64  `db:"velocity02or06_1" json:"velocity02or061"`
-	Depth2           *float64  `db:"depth2" json:"depth2"`
-	Velocitybot2     *float64  `db:"velocitybot2" json:"velocitybot2"`
-	Velocity08_2     *float64  `db:"velocity08_2" json:"velocity082"`
-	Velocity02or06_2 *float64  `db:"velocity02or06_2" json:"velocity02or062"`
-	Depth3           *float64  `db:"depth3" json:"depth3"`
-	Velocitybot3     *float64  `db:"velocitybot3" json:"velocitybot3"`
-	Velocity08_3     *float64  `db:"velocity08_3" json:"velocity083"`
-	Velocity02or06_3 *float64  `db:"velocity02or06_3" json:"velocity02or063"`
-	Watervel         *float64  `db:"watervel" json:"watervel"`
-	Cobble           *float64  `db:"cobble" json:"cobble"`
-	Organic          *float64  `db:"organic" json:"organic"`
-	Silt             *float64  `db:"silt" json:"silt"`
-	Sand             *float64  `db:"sand" json:"sand"`
-	Gravel           *float64  `db:"gravel" json:"gravel"`
-	Comments         string    `db:"comments" json:"comments"`
-	Complete         *float64  `db:"complete" json:"complete"`
-	Checkby          string    `db:"checkby" json:"checkby"`
-	NoTurbidity      string    `db:"no_turbidity" json:"noTurbidity"`
-	NoVelocity       string    `db:"no_velocity" json:"noVelocity"`
-	EditInitials     string    `db:"edit_initials" json:"editInitials"`
-	LastEditComment  string    `db:"last_edit_comment" json:"lastEditComment"`
-	Project          *int      `db:"PROJECT_ID" json:"project"`
-	FieldOffice      string    `db:"FIELDOFFICE" json:"fieldOffice"`
-	Segment          *int      `db:"SEGMENT_ID" json:"segment"`
-	BkgColor         string    `db:"bkg_color" json:"bkgColor"`
-	SuppBkgColor     string    `db:"supp_bkg_color" json:"suppBkgColor"`
-	ProcBkgColor     string    `db:"proc_bkg_color" json:"procBkgColor"`
-	FishCount        int       `db:"fish_count" json:"fishCount"`
-	SuppCount        int       `db:"supp_count" json:"suppCount"`
-	ProcCount        int       `db:"proc_count" json:"procCount"`
-	Bend             int       `db:"bend" json:"bend"`
-	BendRn           string    `db:"bendrn" json:"bendrn"`
-	BendRiverMile    float64   `db:"bendrivermile" json:"bendrivermile"`
-	LastUpdated      time.Time `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId"`
-	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
-	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
+	SiteID           int       `db:"site_id" json:"siteId" csv:"SITEID"`
+	SiteFid          string    `db:"site_fid" json:"siteFid" csv:"SITEFID"`
+	MrID             int       `db:"mr_id" json:"mrId" csv:"MRID"`
+	MrFid            string    `db:"mr_fid" json:"mrFid" csv:"MRFID"`
+	SeFieldID        string    `db:"se_field_id" json:"seFieldId" csv:"SEFIELDID"`
+	Season           string    `db:"season" json:"season" csv:"SEASON"`
+	SetDate          *string   `db:"setdate" json:"setdate" csv:"SETDATE"`
+	SetDateTime      time.Time `db:"setdate" json:"setDateTime" csv:"SETDATETIME"`
+	Subsample        float64   `db:"subsample" json:"subsample" csv:"SUBSAMPLE"`
+	Subsamplepass    float64   `db:"subsamplepass" json:"subsamplepass" csv:"SUBSAMPLEPASS"`
+	SubsampleROrN    string    `db:"subsample_r_or_n" json:"subsampleROrN" csv:"SUBSAMPLERORN"`
+	Subsamplen       string    `db:"subsamplen" json:"subsamplen" csv:"SUBSAMPLEN"`
+	Recorder         string    `db:"recorder" json:"recorder" csv:"RECORDER"`
+	Gear             string    `db:"gear" json:"gear" csv:"GEAR"`
+	GearType         string    `db:"gear_type" json:"gearType" csv:"GEARTYPE"`
+	Temp             float64   `db:"temp" json:"temp" csv:"TEMP"`
+	Turbidity        *float64  `db:"turbidity" json:"turbidity" csv:"TURBIDITY"`
+	Conductivity     *float64  `db:"conductivity" json:"conductivity" csv:"CONDUCTIVITY"`
+	Do               *float64  `db:"do" json:"dissolvedOxygen" csv:"DISSOLVEDOXYGEN"`
+	Distance         *float64  `db:"distance" json:"distance" csv:"DISTANCE"`
+	Width            *float64  `db:"width" json:"width" csv:"WIDTH"`
+	Netrivermile     *float64  `db:"netrivermile" json:"netrivermile" csv:"NETRIVERMILE"`
+	Structurenumber  string    `db:"structurenumber" json:"structurenumber" csv:"STRUCTURENUMBER"`
+	Usgs             string    `db:"usgs" json:"usgs" csv:"USGS"`
+	Riverstage       *float64  `db:"riverstage" json:"riverstage" csv:"RIVERSTAGE"`
+	Discharge        *float64  `db:"discharge" json:"discharge" csv:"DISCHARGE"`
+	U1               string    `db:"u1" json:"u1" csv:"U1"`
+	U2               string    `db:"u2" json:"u2" csv:"U2"`
+	U3               string    `db:"u3" json:"u3" csv:"U3"`
+	U4               string    `db:"u4" json:"u4" csv:"U4"`
+	U5               string    `db:"u5" json:"u5" csv:"U5"`
+	U6               string    `db:"u6" json:"u6" csv:"U6"`
+	U7               string    `db:"u7" json:"u7" csv:"U7"`
+	Macro            string    `db:"macro" json:"macro" csv:"MACRO"`
+	Meso             string    `db:"meso" json:"meso" csv:"MESO"`
+	Habitatrn        string    `db:"habitatrn" json:"habitatrn" csv:"HABITATRN"`
+	Qc               string    `db:"qc" json:"qc" csv:"QC"`
+	MicroStructure   string    `db:"micro_structure" json:"microStructure" csv:"MICROSTRUCTURE"`
+	StructureFlow    string    `db:"structure_flow" json:"structureFlow" csv:"STRUCTUREFLOW"`
+	StructureMod     string    `db:"structure_mod" json:"structureMod" csv:"STRUCTUREMOD"`
+	SetSite1         string    `db:"set_site_1" json:"setSite1" csv:"SETSITE1"`
+	SetSite2         string    `db:"set_site_2" json:"setSite2" csv:"SETSITE2"`
+	SetSite3         string    `db:"set_site_3" json:"setSite3" csv:"SETSITE3"`
+	StartTime        string    `db:"starttime" json:"startTime" csv:"STARTTIME"`
+	StartLatitude    float64   `db:"startlatitude" json:"startlatitude" csv:"STARTLATITUDE"`
+	StartLongitude   float64   `db:"startlongitude" json:"startlongitude" csv:"STARTLONGITUDE"`
+	StopTime         string    `db:"stoptime" json:"stoptime" csv:"STOPTIME"`
+	StopLatitude     *float64  `db:"stoplatitude" json:"stoplatitude" csv:"STOPLATITUDE"`
+	StopLongitude    *float64  `db:"stop_longitude" json:"stoplongitude" csv:"STOPLONGITUDE"`
+	Depth1           *float64  `db:"depth1" json:"depth1" csv:"DEPTH1"`
+	Velocitybot1     *float64  `db:"velocitybot1" json:"velocitybot1" csv:"VELOCITYBOT1"`
+	Velocity08_1     *float64  `db:"velocity08_1" json:"velocity081" csv:"VELOCITY081"`
+	Velocity02or06_1 *float64  `db:"velocity02or06_1" json:"velocity02or061" csv:"VELOCITY02OR061"`
+	Depth2           *float64  `db:"depth2" json:"depth2" csv:"DEPTH2"`
+	Velocitybot2     *float64  `db:"velocitybot2" json:"velocitybot2" csv:"VELOCITYBOT2"`
+	Velocity08_2     *float64  `db:"velocity08_2" json:"velocity082" csv:"VELOCITY082"`
+	Velocity02or06_2 *float64  `db:"velocity02or06_2" json:"velocity02or062" csv:"VELOCITY02OR062"`
+	Depth3           *float64  `db:"depth3" json:"depth3" csv:"DEPTH3"`
+	Velocitybot3     *float64  `db:"velocitybot3" json:"velocitybot3" csv:"VELOCITYBOT3"`
+	Velocity08_3     *float64  `db:"velocity08_3" json:"velocity083" csv:"VELOCITY083"`
+	Velocity02or06_3 *float64  `db:"velocity02or06_3" json:"velocity02or063" csv:"VELOCITY02OR063"`
+	Watervel         *float64  `db:"watervel" json:"watervel" csv:"WATERVEL"`
+	Cobble           *float64  `db:"cobble" json:"cobble" csv:"COBBLE"`
+	Organic          *float64  `db:"organic" json:"organic" csv:"ORGANIC"`
+	Silt             *float64  `db:"silt" json:"silt" csv:"SILT"`
+	Sand             *float64  `db:"sand" json:"sand" csv:"SAND"`
+	Gravel           *float64  `db:"gravel" json:"gravel" csv:"GRAVEL"`
+	Comments         string    `db:"comments" json:"comments" csv:"COMMENTS"`
+	Complete         *float64  `db:"complete" json:"complete" csv:"COMPLETE"`
+	Checkby          string    `db:"checkby" json:"checkby" csv:"CHECKBY"`
+	NoTurbidity      string    `db:"no_turbidity" json:"noTurbidity" csv:"NOTURBIDITY"`
+	NoVelocity       string    `db:"no_velocity" json:"noVelocity" csv:"NOVELOCITY"`
+	EditInitials     string    `db:"edit_initials" json:"editInitials" csv:"EDITINITIALS"`
+	LastEditComment  string    `db:"last_edit_comment" json:"lastEditComment" csv:"LASTEDITCOMMENT"`
+	Project          *int      `db:"PROJECT_ID" json:"project" csv:"PROJECT"`
+	FieldOffice      string    `db:"FIELDOFFICE" json:"fieldOffice" csv:"FIELDOFFICE"`
+	Segment          *int      `db:"SEGMENT_ID" json:"segment" csv:"SEGMENT"`
+	BkgColor         string    `db:"bkg_color" json:"bkgColor" csv:"BKGCOLOR"`
+	SuppBkgColor     string    `db:"supp_bkg_color" json:"suppBkgColor" csv:"SUPPBKGCOLOR"`
+	ProcBkgColor     string    `db:"proc_bkg_color" json:"procBkgColor" csv:"PROCBKGCOLOR"`
+	FishCount        int       `db:"fish_count" json:"fishCount" csv:"FISHCOUNT"`
+	SuppCount        int       `db:"supp_count" json:"suppCount" csv:"SUPPCOUNT"`
+	ProcCount        int       `db:"proc_count" json:"procCount" csv:"PROCCOUNT"`
+	Bend             int       `db:"bend" json:"bend" csv:"BEND"`
+	BendRn           string    `db:"bendrn" json:"bendrn" csv:"BENDRN"`
+	BendRiverMile    float64   `db:"bendrivermile" json:"bendrivermile" csv:"BENDRIVERMILE"`
+	LastUpdated      time.Time `db:"last_updated" json:"lastUpdated" csv:"LASTUPDATED"`
+	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId" csv:"UPLOADSESSIONID"`
+	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy" csv:"UPLOADEDBY"`
+	UploadFilename   string    `db:"upload_filename" json:"uploadFilename" csv:"UPLOADFILENAME"`
 }
 
 type TelemetryDataEntryWithCount struct {

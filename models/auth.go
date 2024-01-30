@@ -70,7 +70,9 @@ type KeyCloakRole struct {
 }
 
 type Response struct {
-	Message string `json:"message"`
+	Message string   `json:"message"`
+	Status  string   `json:"status"`
+	Data    []string `json:"data"`
 }
 
 type Jwks struct {
