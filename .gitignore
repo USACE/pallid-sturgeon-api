@@ -1,5 +1,5 @@
 # local config files
 envvars.list
-/.vscode
+.vscode/*
 
 *.exe
