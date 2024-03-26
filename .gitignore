@@ -1,3 +1,5 @@
+# local config files
 envvars.list
+/.vscode
+
 *.exe
-launch.json

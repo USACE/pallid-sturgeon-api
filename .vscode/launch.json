@@ -19,12 +19,12 @@
       },
       "env": {
         "DB_USER": "PSPA",
-        "DB_PASS": "",
+        "DB_PASS": "N3w!t3rN!PLv3R!",
         "DB_NAME": "MAE1DEV",
-        "LIB_DIR": "/usr/local/app/oracle/instantclient_21_1",
+        "LIB_DIR": "/usr/lib/instantclient",
         "DB_HOST": "host.docker.internal",
         "DB_PORT": "1521",
-        "IPPK": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvsDqkHsCOcN7L9qRB1TJpB48oXPDGG2iHabPC42PPzWSjCJXjylKfxVDIoY85nWKPmTdqrgduCcpJf89KQb1kvYqBWIrXr7Q1buTKB3vWl90k69ovLBL2q+wvCSB8EhL1U0AXwHyNUrxdQMoVdrzkUrFP7rR1eheiTYSgg84JzzcQQJGp9+j2veEv8YJmwtUzRdnxnPvvXBYjNvONjTU+04R0+KUBBC8sHTbZLZzw0PpOCueKReCKVeaOYhRtjLhXzbWpgbf3DDM0IVZYOkKJUuLZgtj6euHImlF64vxOSTTIwt7jssYtDW3yQFg3vdZYQLSUlzAdNw+WYdNN6c8YwIDAQAB"
+        "IPPK": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmbJTsmnMNmgtEfem3WK06CTwgdkgN1ceD5Ty8bTQAP5oP1X6qxEkXVa93tuApCCJjQncTMVxTFfHBq9n17JZkNtm8wTr2KQZPbHHKl0x9sHPbqyZYuMfxfr3d/wexzOiuoMGOvpno+mb7oiJLyk2kkUmLUsHjH6mZBch2ILF9fosYKQ/UvLTjbq4yQZy9zpgg7VLkqlhqfcRQGvqzZlvyedK/9uLQcjo6NkjfZt0YqUykAb9ApcHlbN8+GDNbQAxjPssEGF8orR2dFaEvtWIFm4X9ank3rEceEiDqyHxmpW00ozYkIJ5pxvOBNnusha/Dp/mMuFApXfdC8VDakdUSQIDAQAB"
       },
       "args": []
     }
