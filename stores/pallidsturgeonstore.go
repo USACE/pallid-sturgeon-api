@@ -224,10 +224,18 @@ func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, err
 	return sampleUnitTypes, err
 }
 
-func (s *PallidSturgeonStore) GetSeasons(projectCode string) ([]models.Season, error) {
-	rows, err := s.db.Query("select s_id, season_code, season_description, field_app, project_code from season_lk where project_code = :1 order by s_id", projectCode)
+var getSeasonsSql = `select distinct s.s_id,si.SEASON, s.season_description from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,null,null,null))
+fnc on si.site_id = fnc.site_id inner join season_lk s on s.season_code = si.season`
 
+func (s *PallidSturgeonStore) GetSeasons(year string, officeCode string, projectCode string) ([]models.Season, error) {
 	seasons := []models.Season{}
+
+	selectQuery, err := s.db.Prepare(getSeasonsSql)
+	if err != nil {
+		return seasons, err
+	}
+
+	rows, err := selectQuery.Query(year, officeCode, projectCode)
 	if err != nil {
 		return seasons, err
 	}
@@ -235,7 +243,7 @@ func (s *PallidSturgeonStore) GetSeasons(projectCode string) ([]models.Season, e
 
 	for rows.Next() {
 		season := models.Season{}
-		err = rows.Scan(&season.ID, &season.Code, &season.Description, &season.FieldAppFlag, &season.ProjectCode)
+		err = rows.Scan(&season.ID, &season.Code, &season.Description)
 		if err != nil {
 			return nil, err
 		}
@@ -245,7 +253,7 @@ func (s *PallidSturgeonStore) GetSeasons(projectCode string) ([]models.Season, e
 	return seasons, err
 }
 
-var getSegmentsSql = `select segment_code as code, segment_description as description from fieldoffice_segment_v where field_office_code = :1 and project_code = :2`
+var getSegmentsSql = `select distinct segment_code as code, segment_description as description from fieldoffice_segment_v where (CASE when :1 != 'ZZ' THEN field_office_code ELSE :2 END) = :3 and project_code = :4 order by code asc`
 
 func (s *PallidSturgeonStore) GetSegments(officeCode string, projectCode string) ([]models.Segment, error) {
 	segments := []models.Segment{}
@@ -255,7 +263,7 @@ func (s *PallidSturgeonStore) GetSegments(officeCode string, projectCode string)
 		return segments, err
 	}
 
-	rows, err := selectQuery.Query(officeCode, projectCode)
+	rows, err := selectQuery.Query(officeCode, officeCode, officeCode, projectCode)
 	if err != nil {
 		return segments, err
 	}

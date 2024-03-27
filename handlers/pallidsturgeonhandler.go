@@ -63,8 +63,8 @@ func (sd *PallidSturgeonHandler) GetFieldOffices(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetSeasons(c echo.Context) error {
-	project := c.QueryParam("project")
-	seasons, err := sd.Store.GetSeasons(project)
+	year, office, project := c.QueryParam("year"), c.QueryParam("office"), c.QueryParam("project")
+	seasons, err := sd.Store.GetSeasons(year, office, project)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
