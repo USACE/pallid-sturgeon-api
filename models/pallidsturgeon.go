@@ -121,16 +121,16 @@ type Year struct {
 }
 
 type HeaderData struct {
-	SiteId         int     `db:"site_id" json:"siteId"`
-	Year           int     `db:"year" json:"year"`
-	FieldOffice    string  `db:"fieldoffice" json:"fieldoffice"`
-	Project        int     `db:"project_id" json:"project"`
-	Segment        int     `db:"segment_id" json:"segment"`
-	Season         string  `db:"season" json:"season"`
-	Bend           int     `db:"bend" json:"bend"`
-	Bendrn         string  `db:"bendrn" json:"bendrn"`
-	BendRiverMile  float64 `db:"bendrivermile" json:"bendrivermile"`
-	SampleUnitType string  `db:"sample_unit_type" json:"sampleUnitType"`
+	SiteId         int      `db:"site_id" json:"siteId"`
+	Year           int      `db:"year" json:"year"`
+	FieldOffice    string   `db:"fieldoffice" json:"fieldoffice"`
+	Project        int      `db:"project_id" json:"project"`
+	Segment        int      `db:"segment_id" json:"segment"`
+	Season         string   `db:"season" json:"season"`
+	Bend           int      `db:"bend" json:"bend"`
+	Bendrn         string   `db:"bendrn" json:"bendrn"`
+	BendRiverMile  *float64 `db:"bendrivermile" json:"bendrivermile"`
+	SampleUnitType string   `db:"sample_unit_type" json:"sampleUnitType"`
 }
 
 type FishSummaryWithCount struct {

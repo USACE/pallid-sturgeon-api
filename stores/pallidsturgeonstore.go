@@ -541,14 +541,12 @@ func (s *PallidSturgeonStore) GetYears() ([]models.Year, error) {
 }
 
 var headerDataSql = `select si.site_id, si.year, si.fieldoffice, si.project_id, si.segment_id, si.season, si.bend,
-si.bendrn, si.sample_unit_type, COALESCE(mo.bendrivermile,0.0) as bendrivermile from ds_sites si
-inner join ds_moriver mo on si.site_id = mo.site_id
-where si.site_id=:1
-group by si.site_id, si.year, si.fieldoffice, si.project_id, si.segment_id, si.season, si.bend,
-si.bendrn, si.sample_unit_type, mo.bendrivermile`
+si.bendrn, si.sample_unit_type, fnc.bend_river_mile from ds_sites si 
+join table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,null,null,null)) fnc on si.site_id = fnc.site_id
+where fnc.site_id=:4`
 
-func (s *PallidSturgeonStore) GetHeaderData(siteId string) ([]models.HeaderData, error) {
-	rows, err := s.db.Query(headerDataSql, siteId)
+func (s *PallidSturgeonStore) GetHeaderData(year string, siteId string, office string, project string) ([]models.HeaderData, error) {
+	rows, err := s.db.Query(headerDataSql, year, office, project, siteId)
 
 	headerDataItems := []models.HeaderData{}
 	if err != nil {
