@@ -15,12 +15,13 @@ RUN go get -d -v \
     go build -ldflags="-w -s" -o /go/bin/pallid_sturgeon_api
 
 # not SCRATCH IMAGE
+# remove curl -o instantclient-basiclite.zip https://download.oracle.com/otn_software/linux/instantclient/instantclient-basiclite-linuxx64.zip -SL && \
 FROM alpine:latest
 RUN apk add build-base
 RUN apk add --no-cache bash
 RUN apk --no-cache add libaio libnsl libc6-compat curl && \
     cd /tmp && \
-    curl -o instantclient-basiclite.zip https://download.oracle.com/otn_software/linux/instantclient/instantclient-basiclite-linuxx64.zip -SL && \
+    curl -o instantclient-basiclite.zip https://download.oracle.com/otn_software/linux/instantclient/2114000/instantclient-basic-linux.x64-21.14.0.0.0dbru.zip -SL && \
     unzip instantclient-basiclite.zip && \
     mv instantclient*/ /usr/lib/instantclient && \
     rm instantclient-basiclite.zip && \
