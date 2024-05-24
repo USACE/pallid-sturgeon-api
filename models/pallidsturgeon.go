@@ -890,20 +890,20 @@ type UploadSessionLog struct {
 }
 
 type ExportSite struct {
-	SiteID         int     `db:"site_id" json:"siteId"`
-	SiteYear       int     `db:"year" json:"year"`
-	SiteFID        int     `db:"site_fid" json:"siteFid"`
-	FieldOfficeID  string  `db:"fieldoffice" json:"fieldoffice"`
-	FieldOffice    string  `db:"field_office_description" json:"fieldOfficeDescription"`
-	ProjectId      int     `db:"project_id" json:"projectId"`
-	Project        string  `db:"project_description" json:"projectDescription"`
-	SegmentId      int     `db:"segment_id" json:"segmentId"`
-	Segment        string  `db:"segment_description" json:"segmentDescription"`
-	SeasonId       string  `db:"season" json:"season"`
-	Season         string  `db:"season_description" json:"seasonDescription"`
-	SampleUnitType string  `db:"sample_unit_type" json:"sampleUnitType"`
-	Bend           int     `db:"bend" json:"bend"`
-	Bendrn         string  `db:"bendrn" json:"bendrn"`
-	BendRiverMile  float64 `db:"bend_river_mile" json:"bendRiverMile"`
-	SampleUnitDesc string  `db:"sample_unit_desc" json:"sampleUnitDesc"`
+	SiteID         int      `db:"site_id" json:"SITE_ID"`
+	SiteYear       int      `db:"year" json:"SITE_YEAR"`
+	SiteFID        *string  `db:"site_fid" json:"SITE_FID"`
+	FieldOfficeID  string   `db:"fieldoffice" json:"FIELDOFFICE_ID"`
+	FieldOffice    string   `db:"field_office_description" json:"FIELD_OFFICE"`
+	ProjectId      int      `db:"project_id" json:"PROJECT_ID"`
+	Project        string   `db:"project_description" json:"PROJECT"`
+	SegmentId      int      `db:"segment_id" json:"SEGMENT_ID"`
+	Segment        string   `db:"segment_description" json:"SEGMENT"`
+	SeasonId       string   `db:"season" json:"SEASON_ID"`
+	Season         string   `db:"season_description" json:"SEASON"`
+	SampleUnitType string   `db:"sample_unit_type" json:"SAMPLE_UNIT_TYPE"`
+	Bend           int      `db:"bend" json:"BEND"`
+	Bendrn         string   `db:"bendrn" json:"BENDRN"`
+	BendRiverMile  *float64 `db:"bend_river_mile" json:"BENDRIVERMILE"`
+	SampleUnitDesc string   `db:"sample_unit_desc" json:"SAMPLE_UNIT_DESC"`
 }
