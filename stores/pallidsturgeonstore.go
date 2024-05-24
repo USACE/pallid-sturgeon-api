@@ -3972,8 +3972,7 @@ func (s *PallidSturgeonStore) GetUploadSessionLogs(user string, uploadSessionId 
 	return logs, err
 }
 
-var getSitesExportSql = `select site_id,COALESCE(site_fid, 0) as site_fid,year,fieldoffice,field_office_description,project_id,project_description,segment_id,segment_description,season,season_description,sample_unit_type,bend,bendrn,
-COALESCE(bend_river_mile, 0) as bend_river_mile,sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
+var getSitesExportSql = `select site_id, year, site_fid, fieldoffice, field_office_description, project_id, project_description, segment_id, segment_description, season, season_description, sample_unit_type, bend, bendrn, bend_river_mile, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
 
 func (s *PallidSturgeonStore) GetSitesExport(year string, officeCode string, project string, segment string, season string, bendrn string) ([]models.ExportSite, error) {
 	rows, err := s.db.Query(getSitesExportSql, year, officeCode, project, bendrn, season, segment)
@@ -3986,8 +3985,7 @@ func (s *PallidSturgeonStore) GetSitesExport(year string, officeCode string, pro
 
 	for rows.Next() {
 		export := models.ExportSite{}
-		err = rows.Scan(&export.SiteID, &export.SiteFID, &export.SiteYear, &export.FieldOfficeID, &export.FieldOffice, &export.ProjectId, &export.Project, &export.SegmentId, &export.Segment, &export.SeasonId, &export.Season,
-			&export.SampleUnitType, &export.Bend, &export.Bendrn, &export.BendRiverMile, &export.SampleUnitDesc)
+		err = rows.Scan(&export.SiteID, &export.SiteYear, &export.SiteFID, &export.FieldOfficeID, &export.FieldOffice, &export.ProjectId, &export.Project, &export.SeasonId, &export.Segment, &export.SeasonId, &export.Season, &export.SampleUnitType, &export.Bend, &export.Bendrn, &export.BendRiverMile, &export.SampleUnitDesc)
 		if err != nil {
 			return nil, err
 		}
