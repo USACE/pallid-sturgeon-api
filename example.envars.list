@@ -1,0 +1,7 @@
+DB_USER=PSPA
+DB_PASS=ADD_PASWORD
+DB_NAME=MAE1DEV
+DB_HOST=host.docker.internal
+DB_PORT=1522
+LIB_DIR=/usr/lib/instantclient
+IPPK=${workspaceFolder}/props/local.pem
