@@ -191,9 +191,9 @@ func (sd *PallidSturgeonHandler) GetYears(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) GetHeaderData(c echo.Context) error {
-	siteId, office, year, project, mrId := c.QueryParam("siteId"), c.QueryParam("office"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("mrId")
+	siteId, office, year, project := c.QueryParam("siteId"), c.QueryParam("office"), c.QueryParam("year"), c.QueryParam("project")
 
-	headerDataItems, err := sd.Store.GetHeaderData(year, siteId, office, project, mrId)
+	headerDataItems, err := sd.Store.GetHeaderData(year, siteId, office, project)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &models.Response{
 			Message: err.Error(),
