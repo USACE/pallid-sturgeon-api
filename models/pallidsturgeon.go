@@ -586,7 +586,7 @@ type UploadSupplemental struct {
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
 	Broodstock         *int      `db:"broodstock" json:"broodstock"`
 	HatchWild          *int      `db:"hatch_wild" json:"hatchWild"`
-	SpeciesId          *int      `db:"species_id" json:"speciesId"`
+	Species	           *string   `db:"species" json:"species"`
 	Archive            *int      `db:"archive" json:"archive"`
 	Head               *int      `db:"head" json:"head"`
 	Snouttomouth       *int      `db:"snouttomouth" json:"snouttomouth"`
