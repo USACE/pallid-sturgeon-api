@@ -901,7 +901,7 @@ type ExportSite struct {
 	Segment        string   `db:"segment_description" json:"SEGMENT"`
 	SeasonId       string   `db:"season" json:"SEASON_ID"`
 	Season         string   `db:"season_description" json:"SEASON"`
-	SampleUnitType string   `db:"sample_unit_type" json:"SAMPLE_UNIT_TYPE"`
+	SampleUnitType string   `db:"sample_unit_type" json:"SAMPLE UNIT TYPE"`
 	Bend           int      `db:"bend" json:"BEND"`
 	Bendrn         string   `db:"bendrn" json:"BENDRN"`
 	BendRiverMile  *float64 `db:"bend_river_mile" json:"BENDRIVERMILE"`

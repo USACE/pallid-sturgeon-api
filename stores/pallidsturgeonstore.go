@@ -3972,7 +3972,7 @@ func (s *PallidSturgeonStore) GetUploadSessionLogs(user string, uploadSessionId 
 	return logs, err
 }
 
-var getSitesExportSql = `select site_id, site_fid, year, fieldoffice, field_office_description, project_id, project_description, segment_id, segment_description, season, season_description, bend, bendrn, bend_river_mile, sample_unit_type, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
+var getSitesExportSql = `select site_id, COALESCE(site_fid, 0) as site_fid, year, fieldoffice, field_office_description, project_id, project_description, segment_id, segment_description, season, season_description, bend, bendrn, bend_river_mile, sample_unit_type, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
 
 func (s *PallidSturgeonStore) GetSitesExport(year string, officeCode string, project string, segment string, season string, bendrn string) ([]models.ExportSite, error) {
 	rows, err := s.db.Query(getSitesExportSql, year, officeCode, project, bendrn, season, segment)
