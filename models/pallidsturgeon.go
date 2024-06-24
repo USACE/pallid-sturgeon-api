@@ -551,6 +551,10 @@ type UploadSupplemental struct {
 	SiteID             int       `db:"site_id" json:"siteId"`
 	FFid               string    `db:"f_fid" json:"fFid"`
 	MrId               int       `db:"mr_id" json:"mrId"`
+	NetRiverMile       *float64  `db:"netrivermile" json:"netrivermile"`
+	Length             *float32  `db:"length" json:"length"`
+	Weight             *float32  `db:"weight" json:"weight"`
+	Condition          *float64  `db:"condition" json:"condition"`
 	MrFid              string    `db:"mr_fid" json:"mrFid"`
 	Tagnumber          string    `db:"tagnumber" json:"tagnumber"`
 	Pitrn              string    `db:"pitrn" json:"pitrn"`

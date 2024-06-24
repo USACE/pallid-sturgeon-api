@@ -1181,99 +1181,113 @@ func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry 
 	return err
 }
 
-var supplementalDataEntriesSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
+var supplementalDataEntriesSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
 su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var supplementalDataEntriesCountBySql = `SELECT count(*) from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
-var supplementalDataEntriesByFidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
+var supplementalDataEntriesByFidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
 su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.f_id = :1`
 
 var supplementalDataEntriesCountByFidSql = `SELECT count(*) from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.f_id = :1`
 
-var supplementalDataEntriesByFfidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
+var supplementalDataEntriesByFfidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
 su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.f_fid = :1`
 
 var supplementalDataEntriesCountByFfidSql = `SELECT count(*) from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.f_fid = :1`
 
-var supplementalDataEntriesByGeneticsVialSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
+var supplementalDataEntriesByGeneticsVialSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
 su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.genetics_vial_number = :1`
 
 var supplementalDataEntriesCountByGeneticsVialSql = `SELECT count(*) from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.genetics_vial_number = :1`
 
-var supplementalDataEntriesByGeneticsPitTagSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
+var supplementalDataEntriesByGeneticsPitTagSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
 su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.TAGNUMBER = :1`
 
 var supplementalDataEntriesCountByPitTagSql = `SELECT count(*) from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.TAGNUMBER = :1`
 
-var supplementalDataEntriesByMrIdSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
+var supplementalDataEntriesByMrIdSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
 su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.mr_id = :1`
 
 var supplementalDataEntriesCountByMrIdSql = `SELECT count(*) from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.mr_id = :1`
 
-var supplementalDataEntriesBySidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
+var supplementalDataEntriesBySidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
 su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.s_id = :1`
 
 var supplementalDataEntriesCountBySidSql = `SELECT count(*) from ds_supplemental su
 inner join ds_moriver mo on su.mr_id = mo.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
+inner join ds_fish fi on fi.mr_id = mo.mr_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and su.s_id = :1`
 
@@ -1382,6 +1396,10 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			&supplementalDataEntry.FFid,
 			&supplementalDataEntry.MrId,
 			&supplementalDataEntry.SiteID,
+			&supplementalDataEntry.NetRiverMile,
+			&supplementalDataEntry.Length,
+			&supplementalDataEntry.Weight,
+			&supplementalDataEntry.Condition,
 			&supplementalDataEntry.Tagnumber,
 			&supplementalDataEntry.Pitrn,
 			&supplementalDataEntry.Scuteloc,
