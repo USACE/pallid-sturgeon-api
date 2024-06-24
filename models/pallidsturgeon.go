@@ -120,19 +120,6 @@ type Year struct {
 	Year string `db:"year" json:"year"`
 }
 
-type HeaderData struct {
-	SiteId         int      `db:"site_id" json:"siteId"`
-	Year           int      `db:"year" json:"year"`
-	FieldOffice    string   `db:"fieldoffice" json:"fieldoffice"`
-	Project        int      `db:"project_id" json:"project"`
-	Segment        int      `db:"segment_id" json:"segment"`
-	Season         string   `db:"season" json:"season"`
-	Bend           int      `db:"bend" json:"bend"`
-	Bendrn         string   `db:"bendrn" json:"bendrn"`
-	BendRiverMile  *float64 `db:"bendrivermile" json:"bendrivermile"`
-	SampleUnitType string   `db:"sample_unit_type" json:"sampleUnitType"`
-}
-
 type FishSummaryWithCount struct {
 	Items      []FishSummary `json:"items"`
 	TotalCount int           `json:"totalCount"`
@@ -564,6 +551,10 @@ type UploadSupplemental struct {
 	SiteID             int       `db:"site_id" json:"siteId"`
 	FFid               string    `db:"f_fid" json:"fFid"`
 	MrId               int       `db:"mr_id" json:"mrId"`
+	NetRiverMile       *float64  `db:"netrivermile" json:"netrivermile"`
+	Length             *float32  `db:"length" json:"length"`
+	Weight             *float32  `db:"weight" json:"weight"`
+	Condition          *float64  `db:"condition" json:"condition"`
 	MrFid              string    `db:"mr_fid" json:"mrFid"`
 	Tagnumber          string    `db:"tagnumber" json:"tagnumber"`
 	Pitrn              string    `db:"pitrn" json:"pitrn"`

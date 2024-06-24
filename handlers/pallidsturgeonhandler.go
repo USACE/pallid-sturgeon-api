@@ -190,21 +190,6 @@ func (sd *PallidSturgeonHandler) GetYears(c echo.Context) error {
 	return c.JSON(http.StatusOK, year)
 }
 
-func (sd *PallidSturgeonHandler) GetHeaderData(c echo.Context) error {
-	siteId, office, year, project := c.QueryParam("siteId"), c.QueryParam("office"), c.QueryParam("year"), c.QueryParam("project")
-
-	headerDataItems, err := sd.Store.GetHeaderData(year, siteId, office, project)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, &models.Response{
-			Message: err.Error(),
-			Status:  "Failed",
-			Data:    nil,
-		})
-	}
-
-	return c.JSON(http.StatusOK, headerDataItems)
-}
-
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	id, year, projectCode, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
