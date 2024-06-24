@@ -540,33 +540,6 @@ func (s *PallidSturgeonStore) GetYears() ([]models.Year, error) {
 	return items, err
 }
 
-var headerDataSql = `select si.site_id, si.year, si.fieldoffice, si.project_id, si.segment_id, si.season, si.bend,
-si.bendrn, si.sample_unit_type, fnc.bend_river_mile from ds_sites si 
-join table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,null,null,null)) fnc on si.site_id = fnc.site_id
-where fnc.site_id=:4`
-
-func (s *PallidSturgeonStore) GetHeaderData(year string, siteId string, office string, project string) ([]models.HeaderData, error) {
-	rows, err := s.db.Query(headerDataSql, year, office, project, siteId)
-
-	headerDataItems := []models.HeaderData{}
-	if err != nil {
-		return headerDataItems, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		headerData := models.HeaderData{}
-		err = rows.Scan(&headerData.SiteId, &headerData.Year, &headerData.FieldOffice, &headerData.Project, &headerData.Segment, &headerData.Season,
-			&headerData.Bend, &headerData.Bendrn, &headerData.SampleUnitType, &headerData.BendRiverMile)
-		if err != nil {
-			return nil, err
-		}
-		headerDataItems = append(headerDataItems, headerData)
-	}
-
-	return headerDataItems, err
-}
-
 var siteDataEntriesSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,si.complete,
 si.approved,si.UPLOAD_FILENAME,si.UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,si.brm_id,fnc.bkg_color,fnc.bend_river_mile
 from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id`
