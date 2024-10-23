@@ -3,3 +3,5 @@ envvars.list
 .vscode/*
 
 *.exe
+scan*.txt
+scratch
