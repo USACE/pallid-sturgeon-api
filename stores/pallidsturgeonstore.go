@@ -3,7 +3,6 @@ package stores
 import (
 	"database/sql"
 	"encoding/csv"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -23,24 +22,7 @@ type PallidSturgeonStore struct {
 	db     *sqlx.DB
 	config *config.AppConfig
 }
-func processTimeString(st interface{}) (string, error) {
-	var t string
-	if st == nil {
-		return "", errors.New("Input is nil")
-	}
-	s, okay := st.(string)
-	if !okay {
-		return "", errors.New("Input is not a string")
-	}
-	test, err := time.Parse("2006-01-02 15:04:05 -0700 MST", s)
-	formattedTime := test.Format("2006-01-02")
 
-	if err != nil {
-		return "", err
-	}
-	t = formattedTime
-	return t, nil
-}	
 var getUserSql = `select u.id, u.username, u.first_name, u.last_name, u.email, r.description, f.FIELD_OFFICE_CODE, project_code from users_t u
 							inner join user_role_office_lk uro on uro.user_id = u.id
 							inner join role_lk r on r.id = uro.role_id
@@ -2377,15 +2359,6 @@ func (s *PallidSturgeonStore) GetFullMissouriDataSummary(year string, officeCode
 
 			if val == nil {
 				v = ""
-			} else if (cols[i] == "SET_DATE") {
-				if p, okay := val.(string); okay {
-				v, err = processTimeString(p)
-				} else {
-				v, err = processTimeString(fmt.Sprintf("%v", val))
-				}
-				if err != nil {
-					fmt.Printf("error", err)
-				}
 			} else {
 				v = fmt.Sprintf("%v", val)
 			}
