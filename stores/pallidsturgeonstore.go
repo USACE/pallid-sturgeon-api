@@ -2625,6 +2625,15 @@ func (s *PallidSturgeonStore) GetFullSearchDataSummary(year string, officeCode s
 
 			if val == nil {
 				v = ""
+			} else if (cols[i] == "SEARCH_DATE") {
+				if p, okay := val.(string); okay {
+				v, err = processTimeString(p)
+				} else {
+				v, err = processTimeString(fmt.Sprintf("%v", val))
+				}
+				if err != nil {
+					fmt.Printf("error", err)
+				}
 			} else {
 				v = fmt.Sprintf("%v", val)
 			}
