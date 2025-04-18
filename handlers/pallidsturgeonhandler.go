@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 	"time"
-
+	
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
 	"github.com/labstack/echo/v4"
@@ -24,15 +24,15 @@ func (sd *PallidSturgeonHandler) GetProjects(c echo.Context) error {
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to achieve user role", err))
 	}
 
 	projects, err := sd.Store.GetProjects(userInfo.OfficeCode)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve projects", err))
 	}
 
-	return c.JSON(http.StatusOK, projects)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Projects retrieved successfully", projects))
 }
 
 func (sd *PallidSturgeonHandler) GetProjectsFilter(c echo.Context) error {
@@ -40,173 +40,173 @@ func (sd *PallidSturgeonHandler) GetProjectsFilter(c echo.Context) error {
 
 	projects, err := sd.Store.GetProjectsFilter(project)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieved projects filter data", err))
 	}
-	return c.JSON(http.StatusOK, projects)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Projects filter data retrieved successfully", projects))
 }
 
 func (sd *PallidSturgeonHandler) GetRoles(c echo.Context) error {
 	roles, err := sd.Store.GetRoles()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve roles", err))
 	}
-	return c.JSON(http.StatusOK, roles)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Roles retrieved successfully", roles))
 }
 
 func (sd *PallidSturgeonHandler) GetFieldOffices(c echo.Context) error {
 	showAll := c.QueryParam("showAll")
 	fieldOffices, err := sd.Store.GetFieldOffices(showAll)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve field office data", err))
 	}
-	return c.JSON(http.StatusOK, fieldOffices)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Field offices retrieved successfully", fieldOffices))
 }
 
 func (sd *PallidSturgeonHandler) GetSeasons(c echo.Context) error {
 	year, office, project := c.QueryParam("year"), c.QueryParam("office"), c.QueryParam("project")
 	seasons, err := sd.Store.GetSeasons(year, office, project)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve seasons", err))
 	}
-	return c.JSON(http.StatusOK, seasons)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Seasons data retrieved successfully", seasons))
 }
 
 func (sd *PallidSturgeonHandler) GetSampleUnitTypes(c echo.Context) error {
 	sampleUnitTypes, err := sd.Store.GetSampleUnitTypes()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sample unit types", err))
 	}
-	return c.JSON(http.StatusOK, sampleUnitTypes)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Sample unit type data retrieved successfully", sampleUnitTypes))
 }
 
 func (sd *PallidSturgeonHandler) GetSegments(c echo.Context) error {
 	office, project := c.QueryParam("office"), c.QueryParam("project")
 	segments, err := sd.Store.GetSegments(office, project)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve segments", err))
 	}
-	return c.JSON(http.StatusOK, segments)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Segments data retrieved successfully", segments))
 }
 
 func (sd *PallidSturgeonHandler) GetSampleUnit(c echo.Context) error {
 	sampleUnitType, segment := c.QueryParam("sampleUnitType"), c.QueryParam("segment")
 	bends, err := sd.Store.GetSampleUnit(sampleUnitType, segment)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sample unit data", err))
 	}
-	return c.JSON(http.StatusOK, bends)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Sample unit data retrieved successfully", bends))
 }
 
 func (sd *PallidSturgeonHandler) GetBendRn(c echo.Context) error {
 	bends, err := sd.Store.GetBendRn()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bendrn data", err))
 	}
-	return c.JSON(http.StatusOK, bends)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Bends retrieved successfully", bends))
 }
 
 func (sd *PallidSturgeonHandler) GetMeso(c echo.Context) error {
 	macro := c.QueryParam("macro")
 	mesoItems, err := sd.Store.GetMeso(macro)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve meso", err))
 	}
-	return c.JSON(http.StatusOK, mesoItems)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Meso retrieved successfully", mesoItems))
 }
 
 func (sd *PallidSturgeonHandler) GetStructureFlow(c echo.Context) error {
 	microStructure := c.QueryParam("microStructure")
 	structureFlowItems, err := sd.Store.GetStructureFlow(microStructure)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve structure flow", err))
 	}
-	return c.JSON(http.StatusOK, structureFlowItems)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Structure flow retrieved successfully", structureFlowItems))
 }
 
 func (sd *PallidSturgeonHandler) GetStructureMod(c echo.Context) error {
 	structureFlow := c.QueryParam("structureFlow")
 	structureModItems, err := sd.Store.GetStructureMod(structureFlow)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve structure mod", err))
 	}
-	return c.JSON(http.StatusOK, structureModItems)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Structure mod retrieved successfully", structureModItems))
 }
 
 func (sd *PallidSturgeonHandler) GetSpecies(c echo.Context) error {
 	species, err := sd.Store.GetSpecies()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve species data", err))
 	}
-	return c.JSON(http.StatusOK, species)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Species retrieved successfully", species))
 }
 
 func (sd *PallidSturgeonHandler) GetFtPrefixes(c echo.Context) error {
 	ftPrefixes, err := sd.Store.GetFtPrefixes()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve ftprefixes", err))
 	}
-	return c.JSON(http.StatusOK, ftPrefixes)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("FtPrefixes retrieved successfully", ftPrefixes))
 }
 
 func (sd *PallidSturgeonHandler) GetMr(c echo.Context) error {
 	mr, err := sd.Store.GetMr()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve MR data", err))
 	}
-	return c.JSON(http.StatusOK, mr)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("MR data retrieved successfully", mr))
 }
 
 func (sd *PallidSturgeonHandler) GetOtolith(c echo.Context) error {
 	otolith, err := sd.Store.GetOtolith()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve otolith data", err))
 	}
-	return c.JSON(http.StatusOK, otolith)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Otolith data retrieved successfully", otolith))
 }
 
 func (sd *PallidSturgeonHandler) GetSetSite1(c echo.Context) error {
 	microstructure := c.QueryParam("microstructure")
 	setSiteItems, err := sd.Store.GetSetSite1(microstructure)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve SetSite1 data", err))
 	}
-	return c.JSON(http.StatusOK, setSiteItems)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("SetSite1 data retrieved successfully", setSiteItems))
 }
 
 func (sd *PallidSturgeonHandler) GetSetSite2(c echo.Context) error {
 	setsite1 := c.QueryParam("setsite1")
 	setSiteItems, err := sd.Store.GetSetSite2(setsite1)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve SetSite2 data", err))
 	}
-	return c.JSON(http.StatusOK, setSiteItems)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("SetSite2 data retrieved successfully", setSiteItems))
 }
 
 func (sd *PallidSturgeonHandler) GetYears(c echo.Context) error {
 	year, err := sd.Store.GetYears()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve years", err))
 	}
-	return c.JSON(http.StatusOK, year)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Years retrieved successfully", year))
 }
 
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	id, year, projectCode, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	siteDataEntries, err := sd.Store.GetSiteDataEntries(siteId, year, userInfo.OfficeCode, projectCode, segmentCode, seasonCode, bendrn, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve site data entries", err))
 	}
-	return c.JSON(http.StatusOK, siteDataEntries)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Site data entries retrieved successfully", siteDataEntries))
 }
 
 func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
@@ -248,19 +248,19 @@ func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {
 	id, tableId, fieldId, mrId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("mrId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	dataSummary, err := sd.Store.GetFishDataEntries(tableId, fieldId, mrId, userInfo.OfficeCode, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve fish data entry data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Fish data entries retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) SaveFishDataEntry(c echo.Context) error {
@@ -310,21 +310,21 @@ func (sd *PallidSturgeonHandler) GetMoriverDataEntries(c echo.Context) error {
 	tableId, fieldId := c.QueryParam("tableId"), c.QueryParam("fieldId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	user := c.Get("PSUSER").(models.User)
 
 	userInfo, err := sd.Store.GetUser(user.Email)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	dataSummary, err := sd.Store.GetMoriverDataEntries(tableId, fieldId, userInfo.OfficeCode, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Missouri River data entries data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Missouri River data entries retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
@@ -366,19 +366,19 @@ func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) erro
 	id, tableId, fieldId, geneticsVial, pitTag, mrId, fId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("geneticsVial"), c.QueryParam("pitTag"), c.QueryParam("mrId"), c.QueryParam("fId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, mrId, fId, userInfo.OfficeCode, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve supplemental data entry data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Supplemental data entries retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error {
@@ -427,14 +427,14 @@ func (sd *PallidSturgeonHandler) GetSearchDataEntries(c echo.Context) error {
 	tableId, siteId := c.QueryParam("tableId"), c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	dataSummary, err := sd.Store.GetSearchDataEntries(tableId, siteId, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search data entries", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Search data entries retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
@@ -474,19 +474,19 @@ func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
 	id, tableId, fId, mrId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fId"), c.QueryParam("mrId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, mrId, userInfo.OfficeCode, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve procedure data entry data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Procedure data entries retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) SaveProcedureDataEntry(c echo.Context) error {
@@ -539,19 +539,19 @@ func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
 	id, tableId, seId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("seId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	dataSummary, err := sd.Store.GetTelemetryDataEntries(tableId, seId, userInfo.OfficeCode, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve telemtry data entry data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Telemetry data entries retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) SaveTelemetryDataEntry(c echo.Context) error {
@@ -624,12 +624,12 @@ func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {
 	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 	// set project
 	projectVal := ""
@@ -641,9 +641,9 @@ func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {
 
 	dataSummary, err := sd.Store.GetFishDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve fish data summary data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Fish data summary data retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) GetFullSuppDataSummary(c echo.Context) error {
@@ -673,12 +673,12 @@ func (sd *PallidSturgeonHandler) GetSuppDataSummary(c echo.Context) error {
 	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 	// set project
 	projectVal := ""
@@ -690,9 +690,9 @@ func (sd *PallidSturgeonHandler) GetSuppDataSummary(c echo.Context) error {
 
 	dataSummary, err := sd.Store.GetSuppDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve supplemental data summary data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Supplemental data summary data retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) error {
@@ -722,12 +722,12 @@ func (sd *PallidSturgeonHandler) GetMissouriDataSummary(c echo.Context) error {
 	id, project, year, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("project"), c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 	// set project
 	projectVal := ""
@@ -739,10 +739,10 @@ func (sd *PallidSturgeonHandler) GetMissouriDataSummary(c echo.Context) error {
 
 	dataSummary, err := sd.Store.GetMissouriDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Missouri data summary data", err))
 	}
 
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Missouri data summary data retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) GetFullGeneticDataSummary(c echo.Context) error {
@@ -773,12 +773,12 @@ func (sd *PallidSturgeonHandler) GetGeneticDataSummary(c echo.Context) error {
 	id, year, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("fromDate"), c.QueryParam("toDate"), c.QueryParam("broodstock"), c.QueryParam("hatchwild"), c.QueryParam("speciesId"), c.QueryParam("archive")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 	// set project
 	projectVal := ""
@@ -790,9 +790,9 @@ func (sd *PallidSturgeonHandler) GetGeneticDataSummary(c echo.Context) error {
 
 	dataSummary, err := sd.Store.GetGeneticDataSummary(year, userInfo.OfficeCode, projectVal, fromDate, toDate, broodstock, hatchwild, speciesId, archive, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve genetic data summary data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK,models.NewSuccessResponse("Genetic data summaries retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) GetFullSearchDataSummary(c echo.Context) error {
@@ -823,12 +823,12 @@ func (sd *PallidSturgeonHandler) GetSearchDataSummary(c echo.Context) error {
 	id, year, project, approved, season, segment, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("segment"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 	// set project
 	projectVal := ""
@@ -840,21 +840,21 @@ func (sd *PallidSturgeonHandler) GetSearchDataSummary(c echo.Context) error {
 
 	dataSummary, err := sd.Store.GetSearchDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, segment, month, fromDate, toDate, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search data summary data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Search data summary data retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) GetTelemetryDataSummary(c echo.Context) error {
 	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 	// set project
 	projectVal := ""
@@ -866,9 +866,9 @@ func (sd *PallidSturgeonHandler) GetTelemetryDataSummary(c echo.Context) error {
 
 	dataSummary, err := sd.Store.GetTelemetryDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve telemetry data summary data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Telemetry data summary data retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) GetFullTelemetryDataSummary(c echo.Context) error {
@@ -898,12 +898,12 @@ func (sd *PallidSturgeonHandler) GetProcedureDataSummary(c echo.Context) error {
 	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 	// set project
 	projectVal := ""
@@ -915,9 +915,9 @@ func (sd *PallidSturgeonHandler) GetProcedureDataSummary(c echo.Context) error {
 
 	dataSummary, err := sd.Store.GetProcedureDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve procedure data summary data", err))
 	}
-	return c.JSON(http.StatusOK, dataSummary)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Procedure data summary retrieved successfully", dataSummary))
 }
 
 func (sd *PallidSturgeonHandler) GetFullProcedureDataSummary(c echo.Context) error {
@@ -947,12 +947,12 @@ func (sd *PallidSturgeonHandler) GetMissouriDatasheetById(c echo.Context) error 
 	id, siteId, project, segment, season, bend := c.QueryParam("id"), c.QueryParam("siteId"), c.QueryParam("project"), c.QueryParam("segment"), c.QueryParam("season"), c.QueryParam("bend")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 	// set project
 	projectVal := ""
@@ -964,25 +964,25 @@ func (sd *PallidSturgeonHandler) GetMissouriDatasheetById(c echo.Context) error 
 
 	missouriData, err := sd.Store.GetMissouriDatasheetById(siteId, userInfo.OfficeCode, projectVal, segment, season, bend, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Missouri Data", err))
 	}
 
-	return c.JSON(http.StatusOK, missouriData)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Missouri data retrieved successfully", missouriData))
 }
 
 func (sd *PallidSturgeonHandler) GetSearchDatasheetById(c echo.Context) error {
 	siteId := c.QueryParam("siteId")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	searchData, err := sd.Store.GetSearchDatasheetById(siteId, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Search Datasheet data", err))
 	}
 
-	return c.JSON(http.StatusOK, searchData)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Search Datasheet data retrieved successfully", searchData))
 }
 
 func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
@@ -1169,65 +1169,65 @@ func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
 	id := c.QueryParam("id")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	unapprovedDataSheets, err := sd.Store.GetUnapprovedDataSheets(userInfo.ProjectCode, userInfo.OfficeCode, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve unapproved data sheets", err))
 	}
-	return c.JSON(http.StatusOK, unapprovedDataSheets)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Unapproved data sheets retrieved successfully", unapprovedDataSheets))
 }
 
 func (sd *PallidSturgeonHandler) GetBafiDataSheets(c echo.Context) error {
 	id := c.QueryParam("id")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	bafiDataSheets, err := sd.Store.GetBafiDataSheets(userInfo.OfficeCode, userInfo.ProjectCode, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bafi data sheets", err))
 	}
-	return c.JSON(http.StatusOK, bafiDataSheets)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Bafi datasheets retrieved successfully", bafiDataSheets))
 }
 
 func (sd *PallidSturgeonHandler) GetUncheckedDataSheets(c echo.Context) error {
 	id := c.QueryParam("id")
 	queryParams, err := marshalQuery(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	uncheckedDataSheets, err := sd.Store.GetUncheckedDataSheets(userInfo.OfficeCode, userInfo.ProjectCode, queryParams)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieved unchecked data sheets", err))
 	}
-	return c.JSON(http.StatusOK, uncheckedDataSheets)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Unchecked data sheets retrieved successfully", uncheckedDataSheets))
 }
 
 func (sd *PallidSturgeonHandler) GetDownloadInfo(c echo.Context) error {
 	downloadInfo, err := sd.Store.GetDownloadInfo()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve download info", err))
 	}
-	return c.JSON(http.StatusOK, downloadInfo)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Download info retrieved successfully", downloadInfo))
 }
 
 func (sd *PallidSturgeonHandler) UploadDownloadZip(c echo.Context) error {
@@ -1239,9 +1239,9 @@ func (sd *PallidSturgeonHandler) UploadDownloadZip(c echo.Context) error {
 
 	downloadInfo, err := sd.Store.UploadDownloadZip(files[0])
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve download zip", err))
 	}
-	return c.JSON(http.StatusOK, downloadInfo)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Download zips retrieved successfully", downloadInfo))
 }
 
 func (sd *PallidSturgeonHandler) GetDownloadZip(c echo.Context) error {

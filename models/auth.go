@@ -69,12 +69,6 @@ type KeyCloakRole struct {
 	RoleId   string `json:"id"`
 }
 
-type Response struct {
-	Message string   `json:"message"`
-	Status  string   `json:"status"`
-	Data    []string `json:"data"`
-}
-
 type Jwks struct {
 	Keys []JSONWebKeys `json:"keys"`
 }
