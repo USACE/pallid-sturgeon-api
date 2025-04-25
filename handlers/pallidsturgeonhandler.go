@@ -1274,12 +1274,12 @@ func (sd *PallidSturgeonHandler) GetSitesExport(c echo.Context) error {
 
 	userInfo, err := sd.Store.GetUserRoleById(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
 	exportData, err := sd.Store.GetSitesExport(year, userInfo.OfficeCode, userInfo.ProjectCode, segmentCode, seasonCode, bendrn)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sites data", err))
 	}
-	return c.JSON(http.StatusOK, exportData)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Sites data retrieved successfully", exportData))
 }
