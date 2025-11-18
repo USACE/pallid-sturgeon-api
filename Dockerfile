@@ -23,12 +23,12 @@ RUN apk update
 RUN apk upgrade 
 RUN apk --no-cache add libaio libnsl libc6-compat curl && \
     cd /tmp && \
-    curl -o instantclient-basiclite.zip https://download.oracle.com/otn_software/linux/instantclient/2114000/instantclient-basic-linux.x64-21.14.0.0.0dbru.zip -SL && \
+    curl -o instantclient-basiclite.zip https://download.oracle.com/otn_software/linux/instantclient/2120000/instantclient-basic-linux.x64-21.20.0.0.0dbru.zip -SL && \
     unzip instantclient-basiclite.zip && \
     mv instantclient*/ /usr/lib/instantclient && \
     rm instantclient-basiclite.zip && \
-    ln -s /usr/lib/instantclient/libclntsh.so.19.1 /usr/lib/libclntsh.so && \
-    ln -s /usr/lib/instantclient/libocci.so.19.1 /usr/lib/libocci.so && \
+    ln -s /usr/lib/instantclient/libclntsh.so.21.20 /usr/lib/libclntsh.so && \
+    ln -s /usr/lib/instantclient/libocci.so.21.20 /usr/lib/libocci.so && \
     ln -s /usr/lib/instantclient/libociicus.so /usr/lib/libociicus.so && \
     ln -s /usr/lib/instantclient/libnnz19.so /usr/lib/libnnz19.so && \
     ln -s /usr/lib/libnsl.so.2 /usr/lib/libnsl.so.1 && \
