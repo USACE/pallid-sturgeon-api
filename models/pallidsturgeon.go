@@ -270,13 +270,13 @@ type ProcedureSummary struct {
 	Season      *string `db:"season_code" json:"season"`
 	PurposeCode string  `db:"purpose_code" json:"purposeCode"`
 	// ProcedureDate     time.Time `db:"procedure_date" json:"procedureDate"`
-	NewRadioTagNum    *int    `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId    *int    `db:"new_frequency_id" json:"newFrequencyId"`
-	SpawnCode         *string `db:"spawn_code" json:"spawnCode"`
-	ExpectedSpawnYear *int    `db:"expected_spawn_year" json:"expectedSpawnYear"`
-	Bend              int     `db:"bend_number" json:"bend"`
-	Bendrn            string  `db:"bend_r_or_n" json:"bendrn"`
-	BendRiverMile     float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	NewRadioTagNum    *int     `db:"new_radio_tag_num" json:"newRadioTagNum"`
+	NewFrequencyId    *int     `db:"new_frequency_id" json:"newFrequencyId"`
+	SpawnCode         *string  `db:"spawn_code" json:"spawnCode"`
+	ExpectedSpawnYear *int     `db:"expected_spawn_year" json:"expectedSpawnYear"`
+	Bend              int      `db:"bend_number" json:"bend"`
+	Bendrn            string   `db:"bend_r_or_n" json:"bendrn"`
+	BendRiverMile     *float64 `db:"bend_river_mile" json:"bendRiverMile"`
 }
 
 type TelemetrySummaryWithCount struct {
