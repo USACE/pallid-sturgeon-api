@@ -1,4 +1,4 @@
-FROM golang:1.24.6-alpine AS builder
+FROM golang:1.25.3-alpine AS builder
 RUN apk add build-base
 # Install Git
 RUN apk update && apk add --no-cache git
@@ -35,10 +35,10 @@ RUN apk -U upgrade && \
     ln -s /lib64/ld-linux-x86-64.so.2 /usr/lib/ld-linux-x86-64.so.2 && \
     apk -U upgrade
 
-ENV ORACLE_BASE=/usr/lib/instantclient
-ENV LD_LIBRARY_PATH=/usr/lib/instantclient
-ENV TNS_ADMIN=/usr/lib/instantclient
-ENV ORACLE_HOME=/usr/lib/instantclient
+ENV ORACLE_BASE /usr/lib/instantclient
+ENV LD_LIBRARY_PATH /usr/lib/instantclient
+ENV TNS_ADMIN /usr/lib/instantclient
+ENV ORACLE_HOME /usr/lib/instantclient
 
 COPY --from=builder /go/bin/pallid_sturgeon_api /go/bin/pallid_sturgeon_api
 ENTRYPOINT ["/go/bin/pallid_sturgeon_api"]
