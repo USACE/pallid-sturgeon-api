@@ -19,9 +19,8 @@ RUN go get -d -v \
 FROM alpine:latest
 RUN apk add build-base
 # RUN apk add --no-cache bash
-RUN apk update
-RUN apk upgrade 
-RUN apk --no-cache add libaio libnsl libc6-compat curl && \
+RUN apk -U upgrade && \
+    apk --no-cache add libaio libnsl libc6-compat curl && \
     cd /tmp && \
     curl -o instantclient-basiclite.zip https://download.oracle.com/otn_software/linux/instantclient/2120000/instantclient-basic-linux.x64-21.20.0.0.0dbru.zip -SL && \
     unzip instantclient-basiclite.zip && \
@@ -33,7 +32,8 @@ RUN apk --no-cache add libaio libnsl libc6-compat curl && \
     ln -s /usr/lib/instantclient/libnnz19.so /usr/lib/libnnz19.so && \
     ln -s /usr/lib/libnsl.so.2 /usr/lib/libnsl.so.1 && \
     ln -s /lib/libc.so.6 /usr/lib/libresolv.so.2 && \
-    ln -s /lib64/ld-linux-x86-64.so.2 /usr/lib/ld-linux-x86-64.so.2
+    ln -s /lib64/ld-linux-x86-64.so.2 /usr/lib/ld-linux-x86-64.so.2 && \
+    apk -U upgrade
 
 ENV ORACLE_BASE=/usr/lib/instantclient
 ENV LD_LIBRARY_PATH=/usr/lib/instantclient
