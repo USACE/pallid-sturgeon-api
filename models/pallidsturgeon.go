@@ -154,6 +154,10 @@ type SuppSummary struct {
 	UniqueID        int      `db:"mr_id" json:"uniqueID"`
 	FishID          int      `db:"f_id" json:"fishId"`
 	Year            int      `db:"year" json:"year"`
+	NetRiverMile	*float64 `db:"netrivermile" json:"netRiverMile"`
+	Length			*float32 `db:"length" json:"length"`
+	Weight			*float32 `db:"weight" json:"weight"`
+	Condition		*float64 `db:"condition" json:"condition"`
 	SuppID          int      `db:"sid_display" json:"suppId"`
 	FieldOffice     string   `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
 	Project         int      `db:"PROJECT_CODE" json:"project"`

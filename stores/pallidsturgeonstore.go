@@ -2261,7 +2261,7 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 	return file.Name(), err
 }
 
-var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, HATCHERY_ORIGIN_CODE, tag_number,checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, netrivermile, length, weight, condition, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, HATCHERY_ORIGIN_CODE, tag_number,checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var suppDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -2304,7 +2304,7 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 
 	for rows.Next() {
 		summary := models.SuppSummary{}
-		err = rows.Scan(&summary.FishCode, &summary.UniqueID, &summary.FishID, &summary.SuppID, &summary.Year,
+		err = rows.Scan(&summary.FishCode, &summary.UniqueID, &summary.FishID, &summary.SuppID, &summary.Year, &summary.NetRiverMile, &summary.Length, &summary.Weight, &summary.Condition,
 			&summary.FieldOffice, &summary.Project, &summary.Segment, &summary.Season, &summary.Bend, &summary.Bendrn,
 			&summary.BendRiverMile, &summary.HatcheryOrigin, &summary.TagNumber, &summary.CheckedBy)
 		if err != nil {
