@@ -139,6 +139,8 @@ func main() {
 	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, ADMIN))
 	e.PUT(urlContext+"/userRoleOffice", auth.Authorize(userH.UpdateUserRoleOffice, PUBLIC))
 
+	e.GET(urlContext+"/moriverLocations", auth.Authorize(PallidSturgeonH.GetMoriverLocations, PUBLIC))
+
 	// e.Logger.Fatal(e.Start(":8080"))
 	// force update
 	e.Logger.Debug(e.Start(":8080"))

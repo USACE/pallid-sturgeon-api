@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"fmt"
 	
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
@@ -360,6 +361,22 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetMoriverLocations(c echo.Context) error {
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+	fmt.Printf("[moriverLocations] page=%d pageSize=%d orderBy=%s\n",
+				queryParams.Page, queryParams.PageSize, queryParams.OrderBy)
+
+	locations, err := sd.Store.GetMoriverLocations(queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Missouri River locations data", err))
+	}
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Missouri River locations retrieved successfully", locations))
 }
 
 func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) error {

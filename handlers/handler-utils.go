@@ -71,6 +71,15 @@ func marshalQuery(c echo.Context) (models.SearchParams, error) {
 	}
 
 	sizeStr := c.QueryParam("size")
+	if sizeStr == "" {
+		sizeStr = c.QueryParam("pageSize")
+	}
+	if sizeStr == "" {
+		sizeStr = c.QueryParam("page_size")
+	}
+	if sizeStr == "" {
+		sizeStr = c.QueryParam("pagesize")
+	}
 
 	if sizeStr != "" {
 		size, err = strconv.Atoi(sizeStr)
@@ -80,6 +89,12 @@ func marshalQuery(c echo.Context) (models.SearchParams, error) {
 	}
 
 	orderbyString := c.QueryParam("orderby")
+	if orderbyString == "" {
+		orderbyString = c.QueryParam("orderBy")
+	}
+	if orderbyString == "" {
+		orderbyString = c.QueryParam("order_by")
+	}
 
 	if orderbyString != "" && orderbyString != "undefined" {
 		orderby = orderbyString

@@ -1033,6 +1033,86 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	return moriverDataEntryWithCount, err
 }
 
+var moriverLocationsSql = `SELECT mr_id, site_id, FIELDOFFICE, setdate, startlatitude, startlongitude
+	FROM ds_moriver WHERE startlatitude IS NOT NULL AND startlongitude IS NOT NULL`
+
+var moriverLocationsCountSql = `SELECT count(*) FROM (select distinct mr_id from ds_moriver WHERE startlatitude IS NOT NULL and startlongitude IS NOT NULL)`
+
+func (s *PallidSturgeonStore) GetMoriverLocations(queryParams models.SearchParams) (models.MoriverLocationsWithCount, error) {
+	out := models.MoriverLocationsWithCount{}
+
+	if queryParams.Page < 0 {
+		queryParams.Page = 0
+	}
+	if queryParams.PageSize <= 0 {
+		queryParams.PageSize = 20
+	}
+	if queryParams.OrderBy == "" {
+		queryParams.OrderBy = "mr_id desc"
+	}
+
+	queryParams.OrderBy = strings.ReplaceAll(strings.TrimSpace(queryParams.OrderBy), ";", "")
+	if queryParams.OrderBy == "" || queryParams.OrderBy == "undefined" {
+		queryParams.OrderBy = "mr_id desc"
+	}
+	offset := queryParams.PageSize * queryParams.Page
+
+	countStmt, err := s.db.Prepare(moriverLocationsCountSql)
+	if err != nil {
+		return out, err
+	}
+
+	countRows, err := countStmt.Query()
+	if err != nil {
+		return out, err
+	}
+	defer countRows.Close()
+
+	for countRows.Next() {
+		err = countRows.Scan(&out.TotalCount)
+		if err != nil {
+			return out, err
+		}
+	}
+
+	sql := moriverLocationsSql + fmt.Sprintf(
+		" order by %s OFFSET %d ROWS FETCH NEXT %d ROWS ONLY",
+		queryParams.OrderBy, offset, queryParams.PageSize,
+	)
+
+	stmt, err := s.db.Prepare(sql)
+	if err != nil {
+		return out, err
+	}
+
+	rows, err := stmt.Query()
+	if err != nil {
+		return out, err
+	}
+	defer rows.Close()
+
+	locations := []models.MoriverLocation{}
+	for rows.Next() {
+		loc := models.MoriverLocation{}
+		err = rows.Scan(
+			&loc.MrID,
+			&loc.SiteID,
+			&loc.FieldOffice,
+			&loc.SetDate,
+			&loc.StartLatitude,
+			&loc.StartLongitude,
+		)
+		fmt.Println("DEBUG FieldOffice: ", loc.FieldOffice)
+		if err != nil {
+			return out, err
+		}
+		locations = append(locations, loc)
+	}
+
+	out.Items = locations
+	return out, nil
+}
+
 var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,TAGNUMBER, PITRN,SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM2,ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic, genetics_vial_number,
 	BROODSTOCK, HATCH_WILD, species_id,head, snouttomouth, inter, mouthwidth, m_ib,l_ob, l_ib, r_ib,r_ob, anal, dorsal, status, HATCHERY_ORIGIN,SEX, stage, recapture, photo,genetic_needs, other_tag_info,comments,
 	edit_initials,last_edit_comment, last_updated, uploaded_by, complete, approved, checkby, recorder)
