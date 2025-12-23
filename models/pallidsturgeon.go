@@ -299,6 +299,7 @@ type TelemetrySummary struct {
 	Segment            *int     `db:"segment_code" json:"segment"`
 	Season             *string  `db:"season_code" json:"season"`
 	Bend               *float64 `db:"bend_number" json:"bend"`
+	TBend			   *int     `db:"t_bend" json:"t_bend"`
 	RadioTagNum        int      `db:"radio_tag_num" json:"radioTagNum"`
 	FrequencyIdCode    int      `db:"frequency_id" json:"frequencyIdCode"`
 	CaptureTime        string   `db:"capture_time" json:"captureTime"`
