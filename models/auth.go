@@ -1,19 +1,19 @@
 package models
 
 type JwtClaim struct {
-	Sub   string
-	Name  string
-	Email string
-	Roles []interface{}
+	CacUid    *string
+	Name      string
+	Email     string
+	FirstName string
+	LastName  string
+	Roles     []interface{}
 }
 
 type SearchParams struct {
-	Page        int    `json:"page"`
-	PageSize    int    `json:"size"`
-	OrderBy     string `json:"orderBy"`
-	Filter      string `json:"filter"`
-	PhaseType   string `json:"phaseType"`
-	PhaseStatus string `json:"phaseStatus"`
+	Page     int    `json:"page"`
+	PageSize int    `json:"size"`
+	OrderBy  string `json:"orderBy"`
+	Filter   string `json:"filter"`
 }
 
 // type User struct {
@@ -26,10 +26,28 @@ type SearchParams struct {
 // }
 
 type User struct {
-	UserID   string `db:"user_id" json:"userId"`
-	UserName string `db:"user_name" json:"userName"`
-	Email    string `db:"email" json:"email"`
-	Deleted  bool   `db:"deleted" json:"-"`
+	ID          int     `db:"id" json:"id"`
+	UserID      int     `db:"user_id" json:"userId"`
+	UserName    string  `db:"user_name" json:"userName"`
+	FirstName   string  `db:"first_name" json:"firstName"`
+	LastName    string  `db:"last_name" json:"lastName"`
+	Email       string  `db:"email" json:"email"`
+	CacUid      *string `db:"edipi" json:"cacUid"`
+	RoleID      int     `db:"role_id" json:"roleId"`
+	OfficeID    int     `db:"office_id" json:"officeId"`
+	Role        string  `db:"description" json:"role"`
+	OfficeCode  string  `db:"code" json:"officeCode"`
+	ProjectCode string  `db:"project_code" json:"projectCode"`
+}
+
+type UserRoleOffice struct {
+	ID          int    `db:"id" json:"id"`
+	UserID      int    `db:"user_id" json:"userId"`
+	RoleID      int    `db:"role_id" json:"roleId"`
+	OfficeID    int    `db:"office_id" json:"officeId"`
+	Role        string `db:"description" json:"role"`
+	OfficeCode  string `db:"code" json:"officeCode"`
+	ProjectCode string `db:"project_code" json:"projectCode"`
 }
 
 type KeyCloakResponse struct {
@@ -49,10 +67,6 @@ type KeyCloakUser struct {
 type KeyCloakRole struct {
 	RoleName string `json:"roleName"`
 	RoleId   string `json:"id"`
-}
-
-type Response struct {
-	Message string `json:"message"`
 }
 
 type Jwks struct {

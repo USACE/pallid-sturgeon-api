@@ -1,100 +1,100 @@
 package handlers
 
 import (
-	// "strconv"
-	// "strings"
+	"strconv"
+	"strings"
+	"time"
 
-	// "di2e.net/cwbi/pallid_sturgeon_api/server/models"
-	// "github.com/labstack/echo/v4"
+	"github.com/USACE/pallid_sturgeon_api/server/models"
+	"github.com/labstack/echo/v4"
 )
 
-// func marshalQuery(c echo.Context) (models.SearchParams, error) {
-// 	var page int = 0
-// 	var size int = 100
-// 	var orderby string = "id"
-// 	var filter string = ""
-// 	var phaseType string = ""
-// 	var phaseStatus string = ""
-// 	var err error
+func processTimeString(st string) time.Time {
+	t := time.Time{}
+	if len(st) > 0 {
+		if !strings.HasPrefix(st, "1") {
+			st = "0" + st
+		}
+		test, err := time.Parse("01/02/2006", st)
+		if err != nil {
+			t = time.Time{}
+		}
+		t = test
+	}
 
-// 	pageStr := c.QueryParam("page")
+	return t
+}
 
-// 	if pageStr != "" {
-// 		page, err = strconv.Atoi(pageStr)
-// 		if err != nil {
-// 			return models.SearchParams{}, err
-// 		}
-// 	}
+func processStringTime(st string, ty string) *string {
+	t := new(string)
 
-// 	sizeStr := c.QueryParam("size")
+	if len(st) > 0 {
+		f := "1/2/2006"
 
-// 	if sizeStr != "" {
-// 		size, err = strconv.Atoi(sizeStr)
-// 		if err != nil {
-// 			return models.SearchParams{}, err
-// 		}
-// 	}
+		if ty == "app" {
+			f = "2006-01-02"
+		}
 
-// 	ordebyString := c.QueryParam("orderby")
+		test, err := time.Parse(f, st)
 
-// 	if ordebyString != "" && ordebyString != "undefined" {
-// 		orderby = ordebyString
-// 	}
+		if err != nil {
+			*t = ""
+		} else {
+			*t = test.Format("02-Jan-2006")
+		}
+	}
+	return t
+}
 
-// 	filterStr := c.QueryParam("filter")
+func DerefString(s *string) string {
+	if s != nil {
+		return *s
+	}
 
-// 	if filterStr != "" {
-// 		filter = filterStr
-// 		if strings.Contains(filterStr, "project_type") {
-// 			filter = strings.ReplaceAll(filter, "project_type", "projt.type_name")
-// 		}
-// 		if strings.Contains(filterStr, "id ILIKE") {
-// 			filter = strings.ReplaceAll(filter, "id ILIKE", "CAST(p.id AS TEXT) ILIKE")
-// 		}
-// 		if strings.Contains(filterStr, "id IN") {
-// 			filter = strings.ReplaceAll(filter, "id IN", "p.id IN")
-// 		}
-// 		if strings.Contains(filterStr, "fiscal_year ILIKE") {
-// 			filter = strings.ReplaceAll(filter, "fiscal_year ILIKE", "CAST(fiscal_year AS TEXT) ILIKE")
-// 		}
-// 		if strings.Contains(filterStr, "project_type") {
-// 			filter = strings.ReplaceAll(filter, "project_type", "projt.type_name")
-// 		}
-// 		if strings.Contains(filterStr, "phase ILIKE") {
-// 			filter = strings.ReplaceAll(filter, "phase ILIKE", "pht.phase_name ILIKE")
-// 		}
-// 		if strings.Contains(filterStr, "phase IN") {
-// 			filter = strings.ReplaceAll(filter, "phase IN", "pht.phase_name IN")
-// 		}
-// 		if strings.Contains(filterStr, "project_manager") {
-// 			filter = strings.ReplaceAll(filter, "project_manager", "pl.user_name")
-// 		}
-// 		if strings.Contains(filterStr, "lead_engineer") {
-// 			filter = strings.ReplaceAll(filter, "lead_engineer", "le.user_name")
-// 		}
-// 		if strings.Contains(filterStr, "current_task") {
-// 			filter = strings.ReplaceAll(filter, "current_task", "b.task_name")
-// 		}
-// 		if strings.Contains(filterStr, "percent_complete ILIKE") {
-// 			filter = strings.ReplaceAll(filter, "percent_complete ILIKE", "CAST(percent_complete AS TEXT) ILIKE")
-// 		}
-// 		if strings.Contains(filterStr, "slippage ILIKE") {
-// 			filter = strings.ReplaceAll(filter, "slippage ILIKE", "CAST((b.actual_date - b.projected_end_date) AS TEXT) ILIKE")
-// 		}
-// 		if strings.Contains(filterStr, "slippage IN") {
-// 			filter = strings.ReplaceAll(filter, "slippage IN", "(b.actual_date - b.projected_end_date) IN")
-// 		}
-// 	}
+	return ""
+}
 
-// 	phaseType = c.QueryParam("phaseType")
-// 	phaseStatus = c.QueryParam("phaseStatus")
+func marshalQuery(c echo.Context) (models.SearchParams, error) {
+	var page int = 0
+	var size int = 20
+	var orderby string = ""
+	var filter string = ""
+	var err error
 
-// 	return models.SearchParams{
-// 		Page:        page,
-// 		PageSize:    size,
-// 		OrderBy:     orderby,
-// 		Filter:      filter,
-// 		PhaseType:   phaseType,
-// 		PhaseStatus: phaseStatus,
-// 	}, nil
-// }
+	pageStr := c.QueryParam("page")
+
+	if pageStr != "" {
+		page, err = strconv.Atoi(pageStr)
+		if err != nil {
+			return models.SearchParams{}, err
+		}
+	}
+
+	sizeStr := c.QueryParam("size")
+
+	if sizeStr != "" {
+		size, err = strconv.Atoi(sizeStr)
+		if err != nil {
+			return models.SearchParams{}, err
+		}
+	}
+
+	orderbyString := c.QueryParam("orderby")
+
+	if orderbyString != "" && orderbyString != "undefined" {
+		orderby = orderbyString
+	}
+
+	filterString := c.QueryParam("filter")
+
+	if filterString != "" && filterString != "undefined" {
+		filter = filterString
+	}
+
+	return models.SearchParams{
+		Page:     page,
+		PageSize: size,
+		OrderBy:  orderby,
+		Filter:   filter,
+	}, nil
+}

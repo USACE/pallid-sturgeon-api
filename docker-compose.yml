@@ -1,69 +1,8 @@
 version: "3"
-
 services:
-  postgres:
-    image: mdillon/postgis
-    volumes:
-      - ./database/sql:/sql
-      - ./database/sql/init.sql:/docker-entrypoint-initdb.d/z_init.sql
-    environment:
-      - POSTGRES_PASSWORD=postgres
-  api:
-    build:
-      context: ./
-    environment:
-      # NOTE: AWS_ Variables provided by execution role in deployed version
-      - AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-      - AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-      - AWS_DEFAULT_REGION=us-east-1
-      - SD_APPLICATION_KEY=appkey
-      - SD_AUTH_DISABLED=False
-      - SD_AUTH_JWT_MOCKED=True
-      - SD_AWS_S3_REGION=us-east-1
-      - SD_AWS_S3_BUCKET=corpsmap-data
-      - SD_AWS_S3_ENDPOINT=http://minio:9000
-      - SD_AWS_S3_DISABLE_SSL=True
-      - SD_AWS_S3_FORCE_PATH_STYLE=True
-      - SD_LAMBDACONTEXT=false
-      - SD_DBUSER=sd_user
-      - SD_DBPASS=password
-      - SD_DBNAME=postgres
-      - SD_DBHOST=postgres
-      - SD_DBSSLMODE=disable
-      - SD_HEARTBEATKEY=password
-    ports:
-      - "80:80"
-  minio:
-    image: minio/minio
-    environment:
-      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
-      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-    command: server /data
-    ports:
-      - "9000:9000"
-  # configure minio on startup (create buckets, etc)
-  # inspired by https://github.com/minio/minio/issues/4769
-  # and         https://gist.github.com/haxoza/22afe7cc4a9da7e8bdc09aad393a99cc    
-  minio_init:
-    image: minio/mc
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      echo 'sleeping for 10 seconds while minio starts...';
-      sleep 10;
-      /usr/bin/mc config host add minio http://minio:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
-      /usr/bin/mc mb   minio/corpsmap-data-incoming   minio/corpsmap-data;
-      /usr/bin/mc policy set public minio/corpsmap-data;
-      /usr/bin/mc cp --recursive /media/projects/ minio/corpsmap-data/sd/projects/ ;
-      exit 0;
-      "
-    volumes:
-      - ./data:/media
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=postgres@postgres.com
-      - PGADMIN_DEFAULT_PASSWORD=postgres
-    ports:
-      - "8081:80"
+    pallid-api:
+        image: pallid-sturgeon-api:latest
+        env_file: ./envvars.list
+        ports:
+          - "700:80"
+          - "701:8080"

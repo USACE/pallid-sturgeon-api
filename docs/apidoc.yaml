@@ -7,10 +7,82 @@ info:
 servers:
   - url: http://localhost:8080/psapi
 paths:
+  /projects:
+    get:
+      summary: List projects
+      operationId: GetProjects
+      tags:
+        - projects
+      responses:
+        '200':
+          description: Array of projects
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/project"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /fieldOfficeSegments:
+    get:
+      summary: List fieldOfficeSegments
+      operationId: GetFieldOfficeSegments
+      tags:
+        - fieldOfficeSegments
+      responses:
+        '200':
+          description: Array of fieldOfficeSegments
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/fieldOfficeSegment"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /fieldOffices:
+    get:
+      summary: List fieldOffices
+      operationId: GetFieldOffices
+      tags:
+        - fieldOffices
+      responses:
+        '200':
+          description: Array of fieldOffices
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/fieldOffice"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /seasons:
     get:
-      summary: List Seasons
-      operationId: GetSeasons
+      summary: List seasons
+      operationId: GetsSeasons
       tags:
         - seasons
       responses:
@@ -31,15 +103,234 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /siteUpload:
+  /sampleMethods:
+    get:
+      summary: List sampleMethods
+      operationId: GetSampleMethods
+      tags:
+        - sampleMethods
+      responses:
+        '200':
+          description: Array of sampleMethods
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/sampleMethod"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /sampleUnitTypes:
+    get:
+      summary: List sampleUnitTypes
+      operationId: GetSampleUnitTypes
+      tags:
+        - sampleUnitTypes
+      responses:
+        '200':
+          description: Array of sampleUnitTypes
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/sampleUnitType"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /segments:
+    get:
+      summary: List segments
+      operationId: GetSegments
+      tags:
+        - segments
+      responses:
+        '200':
+          description: Array of segments
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/segment"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /bends:
+    get:
+      summary: List bends
+      operationId: GetBends
+      tags:
+        - bends
+      responses:
+        '200':
+          description: Array of bends
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/bend"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /downloadInfo:
+    get:
+      summary: Download Info
+      operationId: GetDownloadInfo
+      tags:
+        - downloadInfo
+      responses:
+        '200':
+          description: downloadInfo
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/downloadInfo"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                /upload:
+  /downloadZip:
+    get:
+      summary: Download Zip
+      operationId: downloadZip
+      tags:
+        - downloadZip
+      responses:
+        '200':
+          description: downloadZip
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/downloadZip"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                /upload:
+  /siteDataEntry:
+    get:
+      summary: List Site Entries
+      operationId: GetSiteEntries
+      tags:
+        - siteEntries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: projectCode
+          in: query
+          required: false
+          description: The project code
+          schema:
+            type: string
+        - name: segmentCode
+          in: query
+          required: false
+          description: The segment code
+          schema:
+            type: string
+        - name: seasonCode
+          in: query
+          required: false
+          description: The season code
+          schema:
+            type: string
+        - name: bendrn
+          in: query
+          required: false
+          description: The bendrn
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of siteDataEntries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/uploadSite"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                /upload:
     post:
       tags:
-      - "siteUpload"
-      summary: "Add a site upload"
+      - "saveSiteEntries"
+      summary: "Create Site Entries"
       description: ""
-      operationId: "addSiteUpload"
+      operationId: "saveSiteEntries"
       requestBody:
-        description: "Site upload object that needs to be uploaded"
+        description: "object of site entries"
         required: true
         content:
           application/json:
@@ -53,16 +344,99 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/Error" 
+    put:
+      tags:
+      - "updateSiteEntries"
+      summary: "Update Site Entries"
+      description: ""
+      operationId: "updateSiteEntries"
+      requestBody:
+        description: "object of site entries"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadSite"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 
+  /fishDataEntry:
+    get:
+      summary: List Fish Entries
+      operationId: GetFishEntries
+      tags:
+        - fishEntries
+      parameters:
+        - name: tableId
+          in: query
+          required: false
+          description: The table id
+          schema:
+            type: string
+        - name: fieldId
+          in: query
+          required: false
+          description: The field id
+          schema:
+            type: string
+        - name: mrId
+          in: query
+          required: false
+          description: The mr id
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of fishDataEntries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/uploadFish"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/Error"
-  /fishUpload:
+                /upload:
     post:
       tags:
-      - "fishUpload"
-      summary: "Add a fish upload"
+      - "saveFishEntries"
+      summary: "Create Fish Entries"
       description: ""
-      operationId: "addFishUpload"
+      operationId: "saveFishEntries"
       requestBody:
-        description: "Fish upload object that needs to be uploaded"
+        description: "object of fish entries"
         required: true
         content:
           application/json:
@@ -76,9 +450,1519 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/Error" 
+    put:
+      tags:
+      - "updateFishEntries"
+      summary: "Update Fish Entries"
+      description: ""
+      operationId: "updateFishEntries"
+      requestBody:
+        description: "object of fish entries"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadFish"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 
+  /moriverDataEntry:
+    get:
+      summary: List Moriver Entries
+      operationId: GetMoriverEntries
+      tags:
+        - moriverEntries
+      parameters:
+        - name: tableId
+          in: query
+          required: false
+          description: The table id
+          schema:
+            type: string
+        - name: fieldId
+          in: query
+          required: false
+          description: The field id
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of moriverDataEntries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/uploadMoriver"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/Error"
+    post:
+      tags:
+      - "saveMoriverEntries"
+      summary: "Create Moriver Entries"
+      description: ""
+      operationId: "saveMoriverEntries"
+      requestBody:
+        description: "object of moriver entries"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadMoriver"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 
+    put:
+      tags:
+      - "updateMoriverEntries"
+      summary: "Update Moriver Entries"
+      description: ""
+      operationId: "updateMoriverEntries"
+      requestBody:
+        description: "object of moriver entries"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadMoriver"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 
+  /supplementalDataEntry:
+    get:
+      summary: List Supplemental Entries
+      operationId: GetSupplementalEntries
+      tags:
+        - supplementalEntries
+      parameters:
+        - name: tableId
+          in: query
+          required: false
+          description: The table id
+          schema:
+            type: string
+        - name: fieldId
+          in: query
+          required: false
+          description: The field id
+          schema:
+            type: string
+        - name: geneticsVial
+          in: query
+          required: false
+          description: The field id
+          schema:
+            type: string
+        - name: pitTag
+          in: query
+          required: false
+          description: The field id
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of supplementalDataEntries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/uploadSupplemental"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+      - "saveSupplementalEntries"
+      summary: "Create Supplemental Entries"
+      description: ""
+      operationId: "saveSupplementalEntries"
+      requestBody:
+        description: "object of supplemental entries"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadSupplemental"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 
+    put:
+      tags:
+      - "updateSupplementalEntries"
+      summary: "Update Supplemental Entries"
+      description: ""
+      operationId: "updateSupplementalEntries"
+      requestBody:
+        description: "object of supplemental entries"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/uploadSupplemental"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /errorCount:
+    get:
+      summary: List errorCounts
+      operationId: GetErrorCounts
+      tags:
+        - errorCounts
+      responses:
+        '200':
+          description: Array of errorCounts
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/errorCount"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /usgNoVialNumbers:
+    get:
+      summary: List usgNoVialNumbers
+      operationId: GetUsgNoVialNumbers
+      tags:
+        - usgNoVialNumbers
+      responses:
+        '200':
+          description: Array of usgNoVialNumbers
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/usgNoVialNumber"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /unapprovedDataSheets:
+    get:
+      summary: List unapprovedDataSheets
+      operationId: GetUnapprovedDataSheets
+      tags:
+        - unapprovedDataSheets
+      responses:
+        '200':
+          description: Array of unapprovedDataSheets
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/unapprovedDataSheet"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /uncheckedDataSheets:
+    get:
+      summary: List uncheckedDataSheets
+      operationId: GetUncheckedDataSheets
+      tags:
+        - uncheckedDataSheets
+      parameters:
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of uncheckedDataSheets
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/uncheckedDataSheet"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /fishFullDataSummary:
+    get:
+      summary: List Full Fish Summaries
+      operationId: GetFullFishSummaries
+      tags:
+        - fullFishSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of fishSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /fishDataSummary:
+    get:
+      summary: List Fish Summaries
+      operationId: GetFishSummaries
+      tags:
+        - fishSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of fishSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/fishSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /suppFullDataSummary:
+    get:
+      summary: List Full Supp Summaries
+      operationId: GetFullSuppSummaries
+      tags:
+        - suppFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /suppDataSummary:
+    get:
+      summary: List Supp Summaries
+      operationId: GetSuppSummaries
+      tags:
+        - suppSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/suppSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /missouriFullDataSummary:
+    get:
+      summary: List Full Missouri Summaries
+      operationId: GetMissouriFullSummaries
+      tags:
+        - missouriFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /missouriDataSummary:
+    get:
+      summary: List Missouri Summaries
+      operationId: GetMissouriSummaries
+      tags:
+        - missouriSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/missouriSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /geneticFullDataSummary:
+    get:
+      summary: List Full Genetic Summaries
+      operationId: GetFullGeneticSummaries
+      tags:
+        - geneticFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: broodstock
+          in: query
+          required: false
+          description: The broodstock
+          schema:
+            type: string
+        - name: hatchwild
+          in: query
+          required: false
+          description: The hatchwild
+          schema:
+            type: string
+        - name: speciesId
+          in: query
+          required: false
+          description: The speciesId
+          schema:
+            type: string
+        - name: archive
+          in: query
+          required: false
+          description: The archive
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of GeneticSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /geneticDataSummary:
+    get:
+      summary: List Genetic Summaries
+      operationId: GetGeneticSummaries
+      tags:
+        - geneticSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: broodstock
+          in: query
+          required: false
+          description: The broodstock
+          schema:
+            type: string
+        - name: hatchwild
+          in: query
+          required: false
+          description: The hatchwild
+          schema:
+            type: string
+        - name: speciesId
+          in: query
+          required: false
+          description: The speciesId
+          schema:
+            type: string
+        - name: archive
+          in: query
+          required: false
+          description: The archive
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of GeneticSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/geneticSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /searchFullDataSummary:
+    get:
+      summary: List Full Search Summaries
+      operationId: GetFullSearchSummaries
+      tags:
+        - searchFullSummaries
+      responses:
+        '200':
+          description: Array of SearchSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /searchDataSummary:
+    get:
+      summary: List Search Summaries
+      operationId: GetSearchSummaries
+      tags:
+        - searchSummaries
+      parameters:
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+        - name: filter
+          in: query
+          required: false
+          description: The filter
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SearchSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/searchSummary"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /telemetryFullDataSummary:
+    get:
+      summary: List Full Telemetry Summaries
+      operationId: GetFullTelemetrySummaries
+      tags:
+        - telemetryFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /telemetryDataSummary:
+    get:
+      summary: List Telemetry Summaries
+      operationId: GetTelemetrySummaries
+      tags:
+        - telemetrySummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /procedureFullDataSummary:
+    get:
+      summary: List Full Procedure Summaries
+      operationId: GetFullProcedureSummaries
+      tags:
+        - procedureFullSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /procedureDataSummary:
+    get:
+      summary: List Procedure Summaries
+      operationId: GetProcedureSummaries
+      tags:
+        - procedureSummaries
+      parameters:
+        - name: year
+          in: query
+          required: false
+          description: The year
+          schema:
+            type: string
+        - name: officeCode
+          in: query
+          required: false
+          description: The office code
+          schema:
+            type: string
+        - name: project
+          in: query
+          required: false
+          description: The project
+          schema:
+            type: string
+        - name: approved
+          in: query
+          required: false
+          description: The approved
+          schema:
+            type: string
+        - name: season
+          in: query
+          required: false
+          description: The season
+          schema:
+            type: string
+        - name: spice
+          in: query
+          required: false
+          description: The spice
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          description: The month
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          required: false
+          description: The fromDate
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: The toDate
+          schema:
+            type: string
+        - name: orderby
+          in: query
+          required: false
+          description: The orderby
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: The page
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          description: The size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of SuppSummaries
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:    
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /upload:
+    post:
+      tags:
+      - "upload"
+      summary: "upload all data"
+      description: ""
+      operationId: "addUpload"
+      requestBody:
+        description: "Collection of different types of uploads"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/upload"
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error" 
 components:
   schemas:
+    project:
+      type: object
+      required:
+        - code
+        - description
+      properties:
+        code:
+          type: integer
+          format: int32
+        description:
+          type: string
     season:
       type: object
       required:
@@ -100,25 +1984,506 @@ components:
         ProjectCode:
           type: integer
           format: int32
+    fieldOffice:
+      type: object
+      required:
+        - id
+        - code
+        - description
+        - state
+      properties:
+        id:
+          type: integer
+          format: int32
+        code:
+          type: string
+        description:
+          type: string
+        state:
+          type: string
+    sampleMethod:
+      type: object
+      required:
+        - code
+        - description
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+    sampleUnitType:
+      type: object
+      required:
+        - code
+        - description
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+    segment:
+      type: object
+      required:
+        - id
+        - code
+        - type
+      properties:
+        id:
+          type: integer
+          format: int32
+        code:
+          type: integer
+          format: int32
+        description:
+          type: string
+        type:
+          type: string
+        upperRiverMile:
+          type: integer
+          format: int32
+        lowerRiverMile:
+          type: integer
+          format: int32
+        rpma:
+          type: integer
+          format: int32
+    bend:
+      type: object
+      required:
+        - id
+        - code
+        - bendNumber
+        - state
+      properties:
+        id:
+          type: integer
+          format: int32
+        bendNumber:
+          type: integer
+          format: int32
+        description:
+          type: string
+        segmentCode:
+          type: integer
+          format: int32
+        upperRiverMile:
+          type: integer
+          format: int32
+        lowerRiverMile:
+          type: integer
+          format: int32
+        state:
+          type: integer
+          format: int32
+    fishSummary:
+      type: object
+      properties:
+        uniqueID:
+          type: integer
+          format: int32
+        fishId:
+          type: integer
+          format: int32
+        year:
+          type: integer
+          format: int32
+        fieldOffice:
+          type: string
+        project:
+          type: integer
+          format: int32
+        segment:
+          type: integer
+          format: int32
+        season:
+          type: string
+        bend:
+          type: integer
+          format: int32
+        bendrn:
+          type: string
+        bendRiverMile:
+          type: number
+          format: float64
+        panelhook:
+          type: string
+        species:
+          type: string
+        hatcheryOrigin:
+          type: string
+        checkedby:
+          type: string
+    suppSummary:
+      type: object
+      properties:
+        fishCode:
+          type: string
+        uniqueID:
+          type: integer
+          format: int32
+        fishId:
+          type: integer
+          format: int32
+        year:
+          type: integer
+          format: int32
+        SuppID:
+          type: integer
+          format: int32
+        fieldOffice:
+          type: string
+        project:
+          type: integer
+          format: int32
+        segment:
+          type: integer
+          format: int32
+        season:
+          type: string
+        bend:
+          type: integer
+          format: int32
+        bendrn:
+          type: string
+        bendRiverMile:
+          type: number
+          format: float64
+        hatcheryOrigin:
+          type: string
+        checkedby:
+          type: string
+    missouriSummary:
+      type: object
+      properties:
+        uniqueID:
+          type: integer
+          format: int32
+        year:
+          type: integer
+          format: int32
+        fieldOffice:
+          type: string
+        project:
+          type: integer
+          format: int32
+        segment:
+          type: integer
+          format: int32
+        season:
+          type: string
+        bend:
+          type: integer
+          format: int32
+        bendrn:
+          type: string
+        bendRiverMile:
+          type: number
+          format: float64
+        subsample:
+          type: integer
+          format: int32
+        pass:
+          type: integer
+          format: int32
+        setDate:
+          type: string
+        conductivity:
+          type: string
+        checkedby:
+          type: string
+    geneticSummary:
+      type: object
+      properties:
+        year:
+          type: integer
+          format: int32
+        fieldOffice:
+          type: string
+        project:
+          type: integer
+          format: int32
+        sturgeonType:
+          type: string
+        GeneticsVialNumber:
+          type: string
+        pitTag:
+          type: string
+        river:
+          type: string
+        riverMile:
+          type: number
+          format: float64
+        state:
+          type: string
+        setDate:
+          type: string
+        conductivity:
+          type: string
+        checkedby:
+          type: string
+        broodstock:
+          type: string
+        hatchWild:
+          type: string
+        speciesId:
+          type: string
+        archive:
+          type: string
+    searchSummary:
+      type: object
+      properties:
+        seId:
+          type: integer
+          format: int32
+        siteId:
+          type: integer
+          format: int32
+        seFid:
+          type: string
+          maxLength: 199
+        dsId:
+          type: integer
+          format: int32
+        siteFid:
+          type: string
+          maxLength: 199
+        searchDate:
+          type: string
+        recorder:
+          type: string
+          maxLength: 3
+        startTime:
+          type: string
+          maxLength: 11
+        startLatitude:
+          type: number
+        startLongitude:
+          type: number
+        stopTime:
+          type: string
+          maxLength: 11
+        stopLatitud:
+          type: number
+        stopLongitude:
+          type: number
+        temp:
+          type: string
+        conductivity:
+          type: string
+    fishDataEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        mrId:
+          type: integer
+          format: int32
+        panelhook:
+          type: string
+          maxLength: 5
+        bait:
+          type: string
+          maxLength: 1
+        species:
+          type: string
+          maxLength: 4
+        length:
+          type: number
+        weight:
+          type: number
+        fishcount:
+          type: integer
+          format: int32
+        finCurl:
+          type: string
+          maxLength: 1
+        otolith:
+          type: string
+          maxLength: 1
+        rayspine:
+          type: string
+          maxLength: 1
+        scale:
+          type: string
+          maxLength: 1
+        ftprefix:
+          type: string
+          maxLength: 3
+        ftnum:
+          type: string
+          maxLength: 7
+        ftmr:
+          type: string
+          maxLength: 1
+        uniqueID:
+          type: integer
+          format: int32
+    upload:
+      type: object
+      properties:
+        editInitials:
+          type: string
+          maxLength: 1
+        siteUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSite"
+        fishUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadFish"
+        telemetryUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadTelemetry"
+        searchUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSearch"
+        procedureUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadProcedure"
+        supplementalUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSupplemental"
+        moriverUpload:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadMoriver"
+    uploadSiteData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSite"
+    uploadFishData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadFish"
+    uploadTelemetryData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadTelemetry"
+    uploadSearchData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSearch"
+    uploadProcedureData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadProcedure"
+    uploadSupplementalData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadSupplemental"
+    uploadMoriverData:
+      type: object
+      properties:
+        uploadFilename:
+          type: string
+          maxLength: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/uploadMoriver"
+    procedureOut:
+      type: object
+      required:
+        - uploadSessionId
+        - uploadBy
+      properties:
+        uploadSessionId:
+          type: integer
+          format: int32
+        uploadBy:
+          type: string
+          maxLength: 20
+        siteCntFinal:
+          type: integer
+          format: int32
+        mrCntFinal:
+          type: integer
+          format: int32
+        fishCntFinal:
+          type: integer
+          format: int32
+        searchCntFinal:
+          type: integer
+          format: int32
+        suppCntFinal:
+          type: integer
+          format: int32
+        telemetryCntFinal:
+          type: integer
+          format: int32
+        procedureCntFinal:
+          type: integer
+          format: int32
+        noSiteCnt:
+          type: integer
+          format: int32
+        siteMatch:
+          type: integer
+          format: int32
+        noSiteIDMsg:
+          type: string
     uploadSite:
       type: object
       required:
         - siteId
-        - uploadSessionId
-        - uploadFilename
       properties:
         siteId:
           type: integer
           format: int32
         siteFid:
           type: string
+          maxLength: 50
         siteYear:
           type: integer
           format: int32
         fieldofficeID:
           type: string
+          maxLength: 10
         fieldOffice:
           type: string
+          maxLength: 255
         projectId:
           type: integer
           format: int32
@@ -129,44 +2494,50 @@ components:
           format: int32
         segment:
           type: string
+          maxLength: 255
         seasonId:
           type: string
+          maxLength: 5
         season:
           type: string
+          maxLength: 5
         bend:
           type: integer
           format: int32
         bendrn:
           type: string
+          maxLength: 10
         bendRiverMile:
           type: number
         comments:
           type: string
-        uploadSessionId:
-          type: integer
-          format: int32
+          maxLength: 2000
         uploadFilename:
           type: string
+          maxLength: 200
     uploadFish:
       type: object
       required:
         - siteId
-        - uploadSessionId
-        - uploadFilename
       properties:
         siteId:
           type: integer
           format: int32
         fFid:
           type: string
+          maxLength: 50
         mrFid:
           type: string
+          maxLength: 50
         panelhook:
           type: string
+          maxLength: 5
         bait:
           type: string
+          maxLength: 1
         species:
           type: string
+          maxLength: 4
         length:
           type: number
         weight:
@@ -176,25 +2547,535 @@ components:
           format: int32
         finCurl:
           type: string
+          maxLength: 1
         otolith:
           type: string
+          maxLength: 1
         rayspine:
           type: string
+          maxLength: 1
         scale:
           type: string
+          maxLength: 1
         ftprefix:
           type: string
+          maxLength: 3
         ftnum:
           type: string
+          maxLength: 7
         ftmr:
           type: string
+          maxLength: 1
         comments:
           type: string
-        uploadSessionId:
-          type: integer
-          format: int32
+          maxLength: 2000
         uploadFilename:
           type: string
+          maxLength: 200
+    uploadTelemetry:
+      type: object
+      required:
+        - tFid
+      properties:
+        tFid:
+          type: string
+          maxLength: 50
+        seFid:
+          type: string
+          maxLength: 199
+        bend:
+          type: number
+        radioTagNum:
+          type: integer
+          format: int32
+        frequencyIdCode:
+          type: integer
+          format: int32
+        captureTime:
+          type: string
+          maxLength: 9
+        captureLatitude:
+          type: number
+        captureLongitude:
+          type: number
+        positionConfidence:
+          type: number
+        macroId:
+          type: string
+          maxLength: 10
+        mesoId:
+          type: string
+          maxLength: 10
+        depth:
+          type: number
+        temp:
+          type: number
+        conductivity:
+          type: number
+        turbidity:
+          type: number
+        silt:
+          type: number
+        sand:
+          type: number
+        gravel:
+          type: number
+        comments:
+          type: string
+          maxLength: 20
+        uploadFilename:
+          type: string
+          maxLength: 200
+    uploadSearch:
+      type: object
+      required:
+        - siteId
+      properties:
+        siteId:
+          type: integer
+          format: int32
+        seFid:
+          type: string
+          maxLength: 199
+        dsId:
+          type: integer
+          format: int32
+        siteFid:
+          type: string
+          maxLength: 199
+        searchDate:
+          type: string
+        recorder:
+          type: string
+          maxLength: 3
+        searchTypeCode:
+          type: string
+          maxLength: 2
+        searchDay:
+          type: integer
+          format: int32
+        startTime:
+          type: string
+          maxLength: 11
+        startLatitude:
+          type: number
+        startLongitude:
+          type: number
+        stopTime:
+          type: string
+          maxLength: 11
+        stopLatitud:
+          type: number
+        stopLongitude:
+          type: number
+        temp:
+          type: number
+        conductivity:
+          type: number
+        uploadFilename:
+          type: string
+          maxLength: 200
+    uploadProcedure:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int32
+        f_fid:
+          type: string
+          maxLength: 50
+        purposeCode:
+          type: string
+          maxLength: 2
+        procedurDate:
+          type: string
+        procedureStartTime:
+          type: string
+          maxLength: 11
+        procedureEndTime:
+          type: string
+          maxLength: 11
+        procedureBy:
+          type: string
+          maxLength: 3
+        antibioticInjectionInd:
+          type: integer
+          format: int32
+        photoDorsalInd:
+          type: integer
+          format: int32
+        photoVentralInd:
+          type: integer
+          format: int32
+        photoLeftInd:
+          type: integer
+          format: int32
+        oldRadioTagNum:
+          type: integer
+          format: int32
+        oldFrequencyId:
+          type: integer
+          format: int32
+        dstSerialNum:
+          type: integer
+          format: int32
+        dstStartDate:
+          type: string
+        dstStartTime:
+          type: string
+        dstReimplantInd:
+          type: integer
+          format: int32
+        newRadioTagNum:
+          type: integer
+          format: int32
+        newFrequencyId:
+          type: integer
+          format: int32
+        sexCode:
+          type: string
+          maxLength: 1
+        bloodSampleInd:
+          type: integer
+          format: int32
+        eggSampleInd:
+          type: integer
+          format: int32
+        comments:
+          type: string
+          maxLength: 2000
+        fishHealthComments:
+          type: string
+          maxLength: 2000
+        evalLocationCode:
+          type: string
+          maxLength: 2
+        spawnCode:
+          type: string
+          maxLength: 2
+        visualReproStatusCode:
+          type: string
+          maxLength: 4
+        ultrasoundReproStatusCode:
+          type: string
+          maxLength: 4
+        expectedSpawnYear:
+          type: integer
+          format: int32
+        ltrasoundGonadLength:
+          type: number
+        gonadCondition:
+          type: string
+          maxLength: 50
+        uploadedBy:
+          type: string
+          maxLength: 20
+        uploadFilename:
+          type: string
+          maxLength: 200
+    uploadSupplemental:
+      type: object
+      required:
+        - siteId
+      properties:
+        siteId:
+          type: integer
+          format: int32
+        fFid:
+          type: string
+          maxLength: 50
+        mrFid:
+          type: string
+          maxLength: 50
+        tagnumber:
+          type: string
+          maxLength: 20
+        pitrn:
+          type: string
+          maxLength: 5
+        scuteloc:
+          type: string
+          maxLength: 1
+        scutenum:
+          type: number
+        scuteloc2:
+          type: string
+          maxLength: 1
+        scutenum2:
+          type: number
+          maxLength: 1
+        elhv:
+          type: string
+          maxLength: 1
+        elcolor:
+          type: string
+          maxLength: 1
+        erhv:
+          type: string
+          maxLength: 1
+        ercolor:
+          type: string
+          maxLength: 1
+        cwtyn:
+          type: string
+          maxLength: 1
+        dangler:
+          type: string
+          maxLength: 1
+        genetic:
+          type: string
+          maxLength: 1
+        geneticsVialNumber:
+          type: string
+          maxLength: 20
+        broodstock:
+          type: number
+        hatchWild:
+          type: number
+        speciesId:
+          type: integer
+          format: int32
+        archive:
+          type: integer
+          format: int32
+        head:
+          type: number
+        snouttomouth:
+          type: number
+        inter:
+          type: number
+        outhwidth:
+          type: number
+        mIb:
+          type: number
+        lOb:
+          type: number
+        lIb:
+          type: number
+        rIb:
+          type: number
+        rOb:
+          type: number
+        anal:
+          type: number
+        orsal:
+          type: number
+        status:
+          type: string
+        hatcheryOrigin:
+          type: string
+          maxLength: 1
+        sex:
+          type: string
+          maxLength: 5
+        stage:
+          type: string
+          maxLength: 5
+        recapture:
+          type: string
+          maxLength: 1
+        photo:
+          type: string
+          maxLength: 1
+        geneticNeeds:
+          type: string
+          maxLength: 100
+        otherTagInfo:
+          type: string
+          maxLength: 500
+        comments:
+          type: string
+          maxLength: 20
+        uploadBy:
+          type: string
+          maxLength: 20
+        uploadFilename:
+          type: string
+          maxLength: 200
+    uploadMoriver:
+      type: object
+      required:
+        - siteId
+      properties:
+        siteId:
+          type: integer
+          format: int32
+        siteFid:
+          type: string
+          maxLength: 50
+        mrFid:
+          type: string
+          maxLength: 50
+        season:
+          type: string
+          maxLength: 5
+        setdate:
+          type: string
+        subsample:
+          type: number
+        subsamplepass:
+          type: number
+        subsamplen:
+          type: string
+          maxLength: 1
+        recorder:
+          type: string
+          maxLength: 3
+        gear:
+          type: string
+          maxLength: 10
+        gearType:
+          type: string
+          maxLength: 1
+        temp:
+          type: number
+        turbidity:
+          type: number
+        conductivity:
+          type: number
+        do:
+          type: number
+        distance:
+          type: number
+        width:
+          type: number
+        netrivermile:
+          type: number
+        structurenumber:
+          type: string
+          maxLength: 10
+        usgs:
+          type: string
+          maxLength: 8
+        riverstage:
+          type: number
+        discharge:
+          type: number
+        u1:
+          type: string
+          maxLength: 3
+        u2:
+          type: string
+          maxLength: 3
+        u3:
+          type: string
+          maxLength: 4
+        u4:
+          type: string
+          maxLength: 4
+        u5:
+          type: string
+          maxLength: 6
+        u6:
+          type: string
+          maxLength: 6
+        u7:
+          type: string
+          maxLength: 8
+        macro:
+          type: string
+          maxLength: 4
+        meso:
+          type: string
+          maxLength: 5
+        habitatrn:
+          type: string
+          maxLength: 1
+        qc:
+          type: string
+          maxLength: 1
+        microStructure:
+          type: string
+          maxLength: 5
+        structureFlow:
+          type: string
+          maxLength: 1
+        structureMod:
+          type: string
+          maxLength: 1
+        setSite_1:
+          type: string
+          maxLength: 5
+        setSite_2:
+          type: string
+          maxLength: 1
+        setSite_3:
+          type: string
+          maxLength: 1
+        startTime:
+          type: string
+          maxLength: 11
+        startLatitude:
+          type: number
+        startLongitude:
+          type: number
+        stopTime:
+          type: string
+          maxLength: 11
+        stopLatitude:
+          type: number
+        stopLongitude:
+          type: number
+        depth1:
+          type: number
+        velocitybot1:
+          type: number
+        velocity08_1:
+          type: number
+        velocity02or06_1:
+          type: number
+        depth2:
+          type: number
+        velocitybot2:
+          type: number
+        velocity08_2:
+          type: number
+        velocity02or06_2:
+          type: number
+        depth3:
+          type: number
+        velocitybot3:
+          type: number
+        velocity08_3:
+          type: number
+        velocity02or06_3:
+          type: number
+        watervel:
+          type: number
+        cobble:
+          type: number
+        organic:
+          type: number
+        silt:
+          type: number
+        sand:
+          type: number
+        gravel:
+          type: number
+        comments:
+          type: string
+          maxLength: 2000
+        complete:
+          type: number
+        checkby:
+          type: string
+          maxLength: 3
+        noTurbidity:
+          type: string
+          maxLength: 1
+        noVelocity:
+          type: string
+          maxLength: 1
+        uploadFilename:
+          type: string
+          maxLength: 200
+    errorCount:
+        year:
+          type: number
+        count:
+          type: number
     Error:
       type: object
       required:

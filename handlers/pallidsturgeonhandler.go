@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"net/http"
+	"os"
+	"strconv"
 	"time"
-
-	"di2e.net/cwbi/pallid_sturgeon_api/server/models"
-	"di2e.net/cwbi/pallid_sturgeon_api/server/stores"
+	
+	"github.com/USACE/pallid_sturgeon_api/server/models"
+	"github.com/USACE/pallid_sturgeon_api/server/stores"
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,209 +16,1270 @@ type PallidSturgeonHandler struct {
 }
 
 func (ps *PallidSturgeonHandler) Version(c echo.Context) error {
-	return c.String(http.StatusOK, "Pallid Sturgeon API v0.01")
+	return c.String(http.StatusOK, "Pallid Sturgeon API v0.02")
+}
+
+func (sd *PallidSturgeonHandler) GetProjects(c echo.Context) error {
+	id := c.QueryParam("id")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to achieve user role", err))
+	}
+
+	projects, err := sd.Store.GetProjects(userInfo.OfficeCode)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve projects", err))
+	}
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Projects retrieved successfully", projects))
+}
+
+func (sd *PallidSturgeonHandler) GetProjectsFilter(c echo.Context) error {
+	project := c.QueryParam("project")
+
+	projects, err := sd.Store.GetProjectsFilter(project)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieved projects filter data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Projects filter data retrieved successfully", projects))
+}
+
+func (sd *PallidSturgeonHandler) GetRoles(c echo.Context) error {
+	roles, err := sd.Store.GetRoles()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve roles", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Roles retrieved successfully", roles))
+}
+
+func (sd *PallidSturgeonHandler) GetFieldOffices(c echo.Context) error {
+	showAll := c.QueryParam("showAll")
+	fieldOffices, err := sd.Store.GetFieldOffices(showAll)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve field office data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Field offices retrieved successfully", fieldOffices))
 }
 
 func (sd *PallidSturgeonHandler) GetSeasons(c echo.Context) error {
-	seasons, err := sd.Store.GetSeasons()
+	year, office, project := c.QueryParam("year"), c.QueryParam("office"), c.QueryParam("project")
+	seasons, err := sd.Store.GetSeasons(year, office, project)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve seasons", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Seasons data retrieved successfully", seasons))
+}
+
+func (sd *PallidSturgeonHandler) GetSampleUnitTypes(c echo.Context) error {
+	sampleUnitTypes, err := sd.Store.GetSampleUnitTypes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sample unit types", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Sample unit type data retrieved successfully", sampleUnitTypes))
+}
+
+func (sd *PallidSturgeonHandler) GetSegments(c echo.Context) error {
+	office, project := c.QueryParam("office"), c.QueryParam("project")
+	segments, err := sd.Store.GetSegments(office, project)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve segments", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Segments data retrieved successfully", segments))
+}
+
+func (sd *PallidSturgeonHandler) GetSampleUnit(c echo.Context) error {
+	sampleUnitType, segment := c.QueryParam("sampleUnitType"), c.QueryParam("segment")
+	bends, err := sd.Store.GetSampleUnit(sampleUnitType, segment)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sample unit data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Sample unit data retrieved successfully", bends))
+}
+
+func (sd *PallidSturgeonHandler) GetBendRn(c echo.Context) error {
+	bends, err := sd.Store.GetBendRn()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bendrn data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Bends retrieved successfully", bends))
+}
+
+func (sd *PallidSturgeonHandler) GetMeso(c echo.Context) error {
+	macro := c.QueryParam("macro")
+	mesoItems, err := sd.Store.GetMeso(macro)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve meso", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Meso retrieved successfully", mesoItems))
+}
+
+func (sd *PallidSturgeonHandler) GetStructureFlow(c echo.Context) error {
+	microStructure := c.QueryParam("microStructure")
+	structureFlowItems, err := sd.Store.GetStructureFlow(microStructure)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve structure flow", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Structure flow retrieved successfully", structureFlowItems))
+}
+
+func (sd *PallidSturgeonHandler) GetStructureMod(c echo.Context) error {
+	structureFlow := c.QueryParam("structureFlow")
+	structureModItems, err := sd.Store.GetStructureMod(structureFlow)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve structure mod", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Structure mod retrieved successfully", structureModItems))
+}
+
+func (sd *PallidSturgeonHandler) GetSpecies(c echo.Context) error {
+	species, err := sd.Store.GetSpecies()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve species data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Species retrieved successfully", species))
+}
+
+func (sd *PallidSturgeonHandler) GetFtPrefixes(c echo.Context) error {
+	ftPrefixes, err := sd.Store.GetFtPrefixes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve ftprefixes", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("FtPrefixes retrieved successfully", ftPrefixes))
+}
+
+func (sd *PallidSturgeonHandler) GetMr(c echo.Context) error {
+	mr, err := sd.Store.GetMr()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve MR data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("MR data retrieved successfully", mr))
+}
+
+func (sd *PallidSturgeonHandler) GetOtolith(c echo.Context) error {
+	otolith, err := sd.Store.GetOtolith()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve otolith data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Otolith data retrieved successfully", otolith))
+}
+
+func (sd *PallidSturgeonHandler) GetSetSite1(c echo.Context) error {
+	microstructure := c.QueryParam("microstructure")
+	setSiteItems, err := sd.Store.GetSetSite1(microstructure)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve SetSite1 data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("SetSite1 data retrieved successfully", setSiteItems))
+}
+
+func (sd *PallidSturgeonHandler) GetSetSite2(c echo.Context) error {
+	setsite1 := c.QueryParam("setsite1")
+	setSiteItems, err := sd.Store.GetSetSite2(setsite1)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve SetSite2 data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("SetSite2 data retrieved successfully", setSiteItems))
+}
+
+func (sd *PallidSturgeonHandler) GetYears(c echo.Context) error {
+	year, err := sd.Store.GetYears()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve years", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Years retrieved successfully", year))
+}
+
+func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
+	id, year, projectCode, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	siteDataEntries, err := sd.Store.GetSiteDataEntries(siteId, year, userInfo.OfficeCode, projectCode, segmentCode, seasonCode, bendrn, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve site data entries", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Site data entries retrieved successfully", siteDataEntries))
+}
+
+func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
+	code, sampleUnitType, segment := c.QueryParam("code"), c.QueryParam("sampleUnitType"), c.QueryParam("segment")
+	siteData := models.Sites{}
+	if err := c.Bind(&siteData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	siteData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	siteData.UploadedBy = user.FirstName + " " + user.LastName
+	id, err := sd.Store.SaveSiteDataEntry(code, sampleUnitType, segment, siteData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateSiteDataEntry(c echo.Context) error {
+
+	siteData := models.Sites{}
+	if err := c.Bind(&siteData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	siteData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	siteData.UploadedBy = user.FirstName + " " + user.LastName
+	err := sd.Store.UpdateSiteDataEntry(siteData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {
+	id, tableId, fieldId, mrId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("mrId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	dataSummary, err := sd.Store.GetFishDataEntries(tableId, fieldId, mrId, userInfo.OfficeCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve fish data entry data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Fish data entries retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) SaveFishDataEntry(c echo.Context) error {
+	fishData := models.UploadFish{}
+	if err := c.Bind(&fishData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	fishData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	fishData.UploadedBy = user.FirstName + " " + user.LastName
+	id, err := sd.Store.SaveFishDataEntry(fishData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateFishDataEntry(c echo.Context) error {
+
+	fishData := models.UploadFish{}
+	if err := c.Bind(&fishData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	fishData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	fishData.UploadedBy = user.FirstName + " " + user.LastName
+	err := sd.Store.UpdateFishDataEntry(fishData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteFishDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteFishDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetMoriverDataEntries(c echo.Context) error {
+	tableId, fieldId := c.QueryParam("tableId"), c.QueryParam("fieldId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	user := c.Get("PSUSER").(models.User)
+
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	dataSummary, err := sd.Store.GetMoriverDataEntries(tableId, fieldId, userInfo.OfficeCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Missouri River data entries data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Missouri River data entries retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
+	moriverData := models.UploadMoriver{}
+	if err := c.Bind(&moriverData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	moriverData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	moriverData.UploadedBy = user.FirstName + " " + user.LastName
+	moriverData.SetDate = processStringTime(DerefString(moriverData.SetDate), "app")
+	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
+	moriverData := models.UploadMoriver{}
+	if err := c.Bind(&moriverData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	moriverData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	moriverData.UploadedBy = user.FirstName + " " + user.LastName
+	moriverData.SetDate = processStringTime(DerefString(moriverData.SetDate), "app")
+	err := sd.Store.UpdateMoriverDataEntry(moriverData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) error {
+	id, tableId, fieldId, geneticsVial, pitTag, mrId, fId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fieldId"), c.QueryParam("geneticsVial"), c.QueryParam("pitTag"), c.QueryParam("mrId"), c.QueryParam("fId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	dataSummary, err := sd.Store.GetSupplementalDataEntries(tableId, fieldId, geneticsVial, pitTag, mrId, fId, userInfo.OfficeCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve supplemental data entry data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Supplemental data entries retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) SaveSupplementalDataEntry(c echo.Context) error {
+	supplementalData := models.UploadSupplemental{}
+	if err := c.Bind(&supplementalData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	supplementalData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	supplementalData.UploadedBy = user.FirstName + " " + user.LastName
+	id, err := sd.Store.SaveSupplementalDataEntry(supplementalData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateSupplementalDataEntry(c echo.Context) error {
+	supplementalData := models.UploadSupplemental{}
+	if err := c.Bind(&supplementalData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	supplementalData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	supplementalData.UploadedBy = user.FirstName + " " + user.LastName
+	err := sd.Store.UpdateSupplementalDataEntry(supplementalData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteSupplementalDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteSupplementalDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetSearchDataEntries(c echo.Context) error {
+	tableId, siteId := c.QueryParam("tableId"), c.QueryParam("siteId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	dataSummary, err := sd.Store.GetSearchDataEntries(tableId, siteId, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search data entries", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Search data entries retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
+	searchData := models.UploadSearch{}
+	if err := c.Bind(&searchData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	searchData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	searchData.UploadedBy = user.FirstName + " " + user.LastName
+	searchData.SearchDate = processStringTime(DerefString(searchData.SearchDate), "app")
+	id, err := sd.Store.SaveSearchDataEntry(searchData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
+	searchData := models.UploadSearch{}
+	if err := c.Bind(&searchData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	searchData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	searchData.UploadedBy = user.FirstName + " " + user.LastName
+	searchData.SearchDate = processStringTime(DerefString(searchData.SearchDate), "app")
+	err := sd.Store.UpdateSearchDataEntry(searchData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetProcedureDataEntries(c echo.Context) error {
+	id, tableId, fId, mrId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("fId"), c.QueryParam("mrId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	dataSummary, err := sd.Store.GetProcedureDataEntries(tableId, fId, mrId, userInfo.OfficeCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve procedure data entry data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Procedure data entries retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) SaveProcedureDataEntry(c echo.Context) error {
+	procedureData := models.UploadProcedure{}
+	if err := c.Bind(&procedureData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	procedureData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	procedureData.UploadedBy = user.FirstName + " " + user.LastName
+	procedureData.ProcedureDate = processStringTime(DerefString(procedureData.ProcedureDate), "app")
+	procedureData.DstStartDate = processStringTime(DerefString(procedureData.DstStartDate), "app")
+	id, err := sd.Store.SaveProcedureDataEntry(procedureData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateProcedureDataEntry(c echo.Context) error {
+	procedureData := models.UploadProcedure{}
+	if err := c.Bind(&procedureData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	procedureData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	procedureData.UploadedBy = user.FirstName + " " + user.LastName
+	procedureData.ProcedureDate = processStringTime(DerefString(procedureData.ProcedureDate), "app")
+	procedureData.DstStartDate = processStringTime(DerefString(procedureData.DstStartDate), "app")
+	err := sd.Store.UpdateProcedureDataEntry(procedureData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteProcedureDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteProcedureDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, "successfully deleted procedure data entry id "+id)
+}
+
+func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
+	id, tableId, seId := c.QueryParam("id"), c.QueryParam("tableId"), c.QueryParam("seId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	dataSummary, err := sd.Store.GetTelemetryDataEntries(tableId, seId, userInfo.OfficeCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve telemtry data entry data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Telemetry data entries retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) SaveTelemetryDataEntry(c echo.Context) error {
+	telemetryData := models.UploadTelemetry{}
+	if err := c.Bind(&telemetryData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	telemetryData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	telemetryData.UploadedBy = user.FirstName + " " + user.LastName
+	id, err := sd.Store.SaveTelemetryDataEntry(telemetryData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(200, id)
+}
+
+func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error {
+	telemetryData := models.UploadTelemetry{}
+	if err := c.Bind(&telemetryData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	telemetryData.LastUpdated = time.Now()
+	user := c.Get("PSUSER").(models.User)
+	telemetryData.UploadedBy = user.FirstName + " " + user.LastName
+	err := sd.Store.UpdateTelemetryDataEntry(telemetryData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) DeleteTelemetryDataEntry(c echo.Context) error {
+	id := c.Param("id")
+
+	err := sd.Store.DeleteTelemetryDataEntry(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (sd *PallidSturgeonHandler) GetFullFishDataSummary(c echo.Context) error {
+	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	fileName, err := sd.Store.GetFullFishDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
+}
+
+func (sd *PallidSturgeonHandler) GetFishDataSummary(c echo.Context) error {
+	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	dataSummary, err := sd.Store.GetFishDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve fish data summary data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Fish data summary data retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) GetFullSuppDataSummary(c echo.Context) error {
+	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	fileName, err := sd.Store.GetFullSuppDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
+}
+
+func (sd *PallidSturgeonHandler) GetSuppDataSummary(c echo.Context) error {
+	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	dataSummary, err := sd.Store.GetSuppDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve supplemental data summary data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Supplemental data summary data retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) GetFullMissouriDataSummary(c echo.Context) error {
+	id, project, year, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("project"), c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	fileName, err := sd.Store.GetFullMissouriDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
+}
+
+func (sd *PallidSturgeonHandler) GetMissouriDataSummary(c echo.Context) error {
+	id, project, year, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("project"), c.QueryParam("year"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	dataSummary, err := sd.Store.GetMissouriDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Missouri data summary data", err))
+	}
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Missouri data summary data retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) GetFullGeneticDataSummary(c echo.Context) error {
+	id, year, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("fromDate"), c.QueryParam("toDate"), c.QueryParam("broodstock"), c.QueryParam("hatchwild"), c.QueryParam("speciesId"), c.QueryParam("archive")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	fileName, err := sd.Store.GetFullGeneticDataSummary(year, userInfo.OfficeCode, projectVal, fromDate, toDate, broodstock, hatchwild, speciesId, archive)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
+}
+
+func (sd *PallidSturgeonHandler) GetGeneticDataSummary(c echo.Context) error {
+	id, year, project, fromDate, toDate, broodstock, hatchwild, speciesId, archive := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("fromDate"), c.QueryParam("toDate"), c.QueryParam("broodstock"), c.QueryParam("hatchwild"), c.QueryParam("speciesId"), c.QueryParam("archive")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	dataSummary, err := sd.Store.GetGeneticDataSummary(year, userInfo.OfficeCode, projectVal, fromDate, toDate, broodstock, hatchwild, speciesId, archive, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve genetic data summary data", err))
+	}
+	return c.JSON(http.StatusOK,models.NewSuccessResponse("Genetic data summaries retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) GetFullSearchDataSummary(c echo.Context) error {
+	id, year, project, approved, season, segment, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("segment"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	fileName, err := sd.Store.GetFullSearchDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, segment, month, fromDate, toDate)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
+}
+
+func (sd *PallidSturgeonHandler) GetSearchDataSummary(c echo.Context) error {
+	id, year, project, approved, season, segment, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("segment"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	dataSummary, err := sd.Store.GetSearchDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, segment, month, fromDate, toDate, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search data summary data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Search data summary data retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) GetTelemetryDataSummary(c echo.Context) error {
+	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	dataSummary, err := sd.Store.GetTelemetryDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve telemetry data summary data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Telemetry data summary data retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) GetFullTelemetryDataSummary(c echo.Context) error {
+	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	fileName, err := sd.Store.GetFullTelemetryDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
+}
+
+func (sd *PallidSturgeonHandler) GetProcedureDataSummary(c echo.Context) error {
+	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	dataSummary, err := sd.Store.GetProcedureDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve procedure data summary data", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Procedure data summary retrieved successfully", dataSummary))
+}
+
+func (sd *PallidSturgeonHandler) GetFullProcedureDataSummary(c echo.Context) error {
+	id, year, project, approved, season, spice, month, fromDate, toDate := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("approved"), c.QueryParam("season"), c.QueryParam("spice"), c.QueryParam("month"), c.QueryParam("fromDate"), c.QueryParam("toDate")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	fileName, err := sd.Store.GetFullProcedureDataSummary(year, userInfo.OfficeCode, projectVal, approved, season, spice, month, fromDate, toDate)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	defer os.Remove(fileName)
+	return c.Inline(fileName, fileName)
+}
+
+func (sd *PallidSturgeonHandler) GetMissouriDatasheetById(c echo.Context) error {
+	id, siteId, project, segment, season, bend := c.QueryParam("id"), c.QueryParam("siteId"), c.QueryParam("project"), c.QueryParam("segment"), c.QueryParam("season"), c.QueryParam("bend")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+	// set project
+	projectVal := ""
+	if userInfo.ProjectCode == "2" {
+		projectVal = "2"
+	} else {
+		projectVal = project
+	}
+
+	missouriData, err := sd.Store.GetMissouriDatasheetById(siteId, userInfo.OfficeCode, projectVal, segment, season, bend, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Missouri Data", err))
+	}
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Missouri data retrieved successfully", missouriData))
+}
+
+func (sd *PallidSturgeonHandler) GetSearchDatasheetById(c echo.Context) error {
+	siteId := c.QueryParam("siteId")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	searchData, err := sd.Store.GetSearchDatasheetById(siteId, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Search Datasheet data", err))
+	}
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Search Datasheet data retrieved successfully", searchData))
+}
+
+func (sd *PallidSturgeonHandler) GetUploadSessionId(c echo.Context) error {
+	sessionId, err := sd.Store.GetUploadSessionId()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, sessionId)
+}
+
+func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
+	var err error
+	uploads := models.Upload{}
+	if err := c.Bind(&uploads); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	sessionId, err := sd.Store.GetUploadSessionId()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	user := c.Get("PSUSER").(models.User)
+
+	for _, uploadSite := range uploads.SiteUpload.Items {
+		uploadSite.LastUpdated = time.Now()
+		uploadSite.UploadedBy = user.FirstName + " " + user.LastName
+		uploadSite.UploadSessionId = sessionId
+		uploadSite.EditInitials = uploads.EditInitials
+		uploadSite.UploadFilename = uploads.SiteUpload.UploadFilename
+		err = sd.Store.SaveSiteUpload(uploadSite)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	for _, uploadFish := range uploads.FishUpload.Items {
+		uploadFish.LastUpdated = time.Now()
+		uploadFish.UploadedBy = user.FirstName + " " + user.LastName
+		uploadFish.UploadSessionId = sessionId
+		uploadFish.EditInitials = uploads.EditInitials
+		uploadFish.UploadFilename = uploads.FishUpload.UploadFilename
+		err = sd.Store.SaveFishUpload(uploadFish)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	for _, uploadSearch := range uploads.SearchUpload.Items {
+		uploadSearch.SearchDate = processStringTime(DerefString(uploadSearch.SearchDate), "db")
+		uploadSearch.LastUpdated = time.Now()
+		uploadSearch.UploadedBy = user.FirstName + " " + user.LastName
+		uploadSearch.UploadSessionId = sessionId
+		uploadSearch.EditInitials = uploads.EditInitials
+		uploadSearch.UploadFilename = uploads.SearchUpload.UploadFilename
+		err = sd.Store.SaveSearchUpload(uploadSearch)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	for _, uploadSupplemental := range uploads.SupplementalUpload.Items {
+		uploadSupplemental.LastUpdated = time.Now()
+		uploadSupplemental.UploadedBy = user.FirstName + " " + user.LastName
+		uploadSupplemental.UploadSessionId = sessionId
+		uploadSupplemental.EditInitials = uploads.EditInitials
+		uploadSupplemental.UploadFilename = uploads.SupplementalUpload.UploadFilename
+		err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
+		uploadProcedure.ProcedureDate = processStringTime(DerefString(uploadProcedure.ProcedureDate), "db")
+		uploadProcedure.DstStartDate = processStringTime(DerefString(uploadProcedure.DstStartDate), "db")
+		uploadProcedure.LastUpdated = time.Now()
+		uploadProcedure.UploadedBy = user.FirstName + " " + user.LastName
+		uploadProcedure.UploadSessionId = sessionId
+		uploadProcedure.EditInitials = uploads.EditInitials
+		uploadProcedure.UploadFilename = uploads.ProcedureUpload.UploadFilename
+		err = sd.Store.SaveProcedureUpload(uploadProcedure)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	for _, uploadMoriver := range uploads.MoriverUpload.Items {
+		uploadMoriver.SetDate = processStringTime(DerefString(uploadMoriver.SetDate), "db")
+		uploadMoriver.LastUpdated = time.Now()
+		uploadMoriver.UploadedBy = user.FirstName + " " + user.LastName
+		uploadMoriver.UploadSessionId = sessionId
+		uploadMoriver.EditInitials = uploads.EditInitials
+		uploadMoriver.UploadFilename = uploads.MoriverUpload.UploadFilename
+		err = sd.Store.SaveMoriverUpload(uploadMoriver)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	for _, uploadTelemetry := range uploads.TelemetryUpload.Items {
+		uploadTelemetry.LastUpdated = time.Now()
+		uploadTelemetry.UploadedBy = user.FirstName + " " + user.LastName
+		uploadTelemetry.UploadSessionId = sessionId
+		uploadTelemetry.EditInitials = uploads.EditInitials
+		uploadTelemetry.UploadFilename = uploads.TelemetryUpload.UploadFilename
+		err = sd.Store.SaveTelemetryUpload(uploadTelemetry)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+	}
+
+	procedureOut, err := sd.Store.CallStoreProcedures(user.FirstName+" "+user.LastName, sessionId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, procedureOut)
+}
+
+func (sd *PallidSturgeonHandler) CallStoreProcedures(c echo.Context) error {
+	var err error
+	uploadSessionId := c.Param("uploadSessionId")
+	id, err := strconv.Atoi(uploadSessionId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	user := c.Get("PSUSER").(models.User)
+	procedureOut, err := sd.Store.CallStoreProcedures(user.FirstName+" "+user.LastName, id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, procedureOut)
+}
+
+func (sd *PallidSturgeonHandler) GetErrorCount(c echo.Context) error {
+	id := c.QueryParam("id")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	errorCounts, err := sd.Store.GetErrorCount(userInfo.OfficeCode)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, errorCounts)
+}
+
+func (sd *PallidSturgeonHandler) GetOfficeErrorLogs(c echo.Context) error {
+	id := c.QueryParam("id")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	officeErrorLogs, err := sd.Store.GetOfficeErrorLogs(userInfo.OfficeCode)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, officeErrorLogs)
+}
+
+func (sd *PallidSturgeonHandler) GetUsgNoVialNumbers(c echo.Context) error {
+	id := c.QueryParam("id")
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	usgNoVialNumbers, err := sd.Store.GetUsgNoVialNumbers(userInfo.OfficeCode, userInfo.ProjectCode)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, usgNoVialNumbers)
+}
+
+func (sd *PallidSturgeonHandler) GetUnapprovedDataSheets(c echo.Context) error {
+	id := c.QueryParam("id")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	unapprovedDataSheets, err := sd.Store.GetUnapprovedDataSheets(userInfo.ProjectCode, userInfo.OfficeCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve unapproved data sheets", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Unapproved data sheets retrieved successfully", unapprovedDataSheets))
+}
+
+func (sd *PallidSturgeonHandler) GetBafiDataSheets(c echo.Context) error {
+	id := c.QueryParam("id")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	bafiDataSheets, err := sd.Store.GetBafiDataSheets(userInfo.OfficeCode, userInfo.ProjectCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bafi data sheets", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Bafi datasheets retrieved successfully", bafiDataSheets))
+}
+
+func (sd *PallidSturgeonHandler) GetUncheckedDataSheets(c echo.Context) error {
+	id := c.QueryParam("id")
+	queryParams, err := marshalQuery(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
+	}
+
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
+	}
+
+	uncheckedDataSheets, err := sd.Store.GetUncheckedDataSheets(userInfo.OfficeCode, userInfo.ProjectCode, queryParams)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieved unchecked data sheets", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Unchecked data sheets retrieved successfully", uncheckedDataSheets))
+}
+
+func (sd *PallidSturgeonHandler) GetDownloadInfo(c echo.Context) error {
+	downloadInfo, err := sd.Store.GetDownloadInfo()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve download info", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Download info retrieved successfully", downloadInfo))
+}
+
+func (sd *PallidSturgeonHandler) UploadDownloadZip(c echo.Context) error {
+	form, err := c.MultipartForm()
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, seasons)
+	files := form.File["file"]
+
+	downloadInfo, err := sd.Store.UploadDownloadZip(files[0])
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve download zip", err))
+	}
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Download zips retrieved successfully", downloadInfo))
 }
 
-func (sd *PallidSturgeonHandler) SiteUpload(c echo.Context) error {
-	var err error
-	uploadSites := []models.UploadSite{}
-	if err := c.Bind(&uploadSites); err != nil {
-		return err
+func (sd *PallidSturgeonHandler) GetDownloadZip(c echo.Context) error {
+
+	downloadZipName, err := sd.Store.GetDownloadZip()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	for _, uploadSite := range uploadSites {
-		uploadSite.LastUpdated = time.Now()
-		uploadSite.UploadedBy = "DeeLiang"
-		err = sd.Store.SaveSiteUpload(uploadSite)
-		if err != nil {
-			return err
-		}
-
-		err = sd.Store.UploadSiteDatasheetCheck(uploadSite.UploadedBy, uploadSite.UploadSessionId)
-		if err != nil {
-			return err
-		}
-
-		err = sd.Store.UploadSiteDatasheet(uploadSite.UploadedBy)
-		if err != nil {
-			return err
-		}
-	}
-
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
+	defer os.Remove(downloadZipName)
+	return c.Inline(downloadZipName, downloadZipName)
 }
 
-func (sd *PallidSturgeonHandler) FishUpload(c echo.Context) error {
-	var err error
-	uploadFishs := []models.UploadFish{}
-	if err := c.Bind(&uploadFishs); err != nil {
-		return err
+func (sd *PallidSturgeonHandler) GetUploadSessionLogs(c echo.Context) error {
+	uploadSessionId := c.QueryParam("uploadSessionId")
+
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	for _, uploadFish := range uploadFishs {
-		uploadFish.LastUpdated = time.Now()
-		uploadFish.UploadedBy = "DeeLiang"
-		err = sd.Store.SaveFishUpload(uploadFish)
-		if err != nil {
-			return err
-		}
-
-		err = sd.Store.UploadFishDatasheetCheck(uploadFish.UploadedBy, uploadFish.UploadSessionId)
-		if err != nil {
-			return err
-		}
-
-		err = sd.Store.UploadFishDatasheet(uploadFish.UploadedBy)
-		if err != nil {
-			return err
-		}
+	bends, err := sd.Store.GetUploadSessionLogs(userInfo.FirstName+" "+userInfo.LastName, uploadSessionId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
+	return c.JSON(http.StatusOK, bends)
 }
 
-func (sd *PallidSturgeonHandler) SearchUpload(c echo.Context) error {
-	var err error
-	uploadSearches := []models.UploadSearch{}
-	if err := c.Bind(&uploadSearches); err != nil {
-		return err
-	}
-	for _, uploadSearch := range uploadSearches {
-		uploadSearch.LastUpdated = time.Now()
-		uploadSearch.UploadedBy = "DeeLiang"
-		err = sd.Store.SaveSearchUpload(uploadSearch)
-		if err != nil {
-			return err
-		}
+func (sd *PallidSturgeonHandler) GetSitesExport(c echo.Context) error {
+	id, year, segmentCode, seasonCode, bendrn := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn")
 
-		// err = sd.Store.UploadSearchDatasheetCheck(uploadSearch.UploadedBy, uploadSearch.UploadSessionId)
-		// if err != nil {
-		// 	return err
-		// }
-
-		// err = sd.Store.UploadSearchDatasheet(uploadSearch.UploadedBy)
-		// if err != nil {
-		// 	return err
-		// }
+	userInfo, err := sd.Store.GetUserRoleById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
-}
-
-func (sd *PallidSturgeonHandler) SupplementalUpload(c echo.Context) error {
-	var err error
-	uploadSupplementals := []models.UploadSupplemental{}
-	if err := c.Bind(&uploadSupplementals); err != nil {
-		return err
+	exportData, err := sd.Store.GetSitesExport(year, userInfo.OfficeCode, userInfo.ProjectCode, segmentCode, seasonCode, bendrn)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sites data", err))
 	}
-	for _, uploadSupplemental := range uploadSupplementals {
-		uploadSupplemental.LastUpdated = time.Now()
-		uploadSupplemental.UploadedBy = "DeeLiang"
-		err = sd.Store.SaveSupplementalUpload(uploadSupplemental)
-		if err != nil {
-			return err
-		}
-
-		// err = sd.Store.UploadSearchDatasheetCheck(uploadSupplemental.UploadedBy, uploadSupplemental.UploadSessionId)
-		// if err != nil {
-		// 	return err
-		// }
-
-		// err = sd.Store.UploadSearchDatasheet(uploadSupplemental.UploadedBy)
-		// if err != nil {
-		// 	return err
-		// }
-	}
-
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
-}
-
-func (sd *PallidSturgeonHandler) ProcedureUpload(c echo.Context) error {
-	var err error
-	uploadProcedures := []models.UploadProcedure{}
-	if err := c.Bind(&uploadProcedures); err != nil {
-		return err
-	}
-	for _, uploadProcedure := range uploadProcedures {
-		uploadProcedure.LastUpdated = time.Now()
-		uploadProcedure.UploadedBy = "DeeLiang"
-		err = sd.Store.SaveProcedureUpload(uploadProcedure)
-		if err != nil {
-			return err
-		}
-
-		// err = sd.Store.UploadSearchDatasheetCheck(uploadProcedure.UploadedBy, uploadProcedure.UploadSessionId)
-		// if err != nil {
-		// 	return err
-		// }
-
-		// err = sd.Store.UploadSearchDatasheet(uploadProcedure.UploadedBy)
-		// if err != nil {
-		// 	return err
-		// }
-	}
-
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
-}
-
-func (sd *PallidSturgeonHandler) MrUpload(c echo.Context) error {
-	var err error
-	uploadMrs := []models.UploadMr{}
-	if err := c.Bind(&uploadMrs); err != nil {
-		return err
-	}
-	for _, uploadMr := range uploadMrs {
-		uploadMr.LastUpdated = time.Now()
-		uploadMr.UploadedBy = "DeeLiang"
-		err = sd.Store.SaveMrUpload(uploadMr)
-		if err != nil {
-			return err
-		}
-
-		// err = sd.Store.UploadSearchDatasheetCheck(uploadMr.UploadedBy, uploadMr.UploadSessionId)
-		// if err != nil {
-		// 	return err
-		// }
-
-		// err = sd.Store.UploadSearchDatasheet(uploadMr.UploadedBy)
-		// if err != nil {
-		// 	return err
-		// }
-	}
-
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
-}
-
-func (sd *PallidSturgeonHandler) TelemetryFishUpload(c echo.Context) error {
-	var err error
-	uploadTelemetryFishes := []models.UploadTelemetryFish{}
-	if err := c.Bind(&uploadTelemetryFishes); err != nil {
-		return err
-	}
-	for _, uploadTelemetryFish := range uploadTelemetryFishes {
-		uploadTelemetryFish.LastUpdated = time.Now()
-		uploadTelemetryFish.UploadedBy = "DeeLiang"
-		err = sd.Store.SaveTelemetryFishUpload(uploadTelemetryFish)
-		if err != nil {
-			return err
-		}
-
-		// err = sd.Store.UploadSearchDatasheetCheck(uploadTelemetryFish.UploadedBy, uploadTelemetryFish.UploadSessionId)
-		// if err != nil {
-		// 	return err
-		// }
-
-		// err = sd.Store.UploadSearchDatasheet(uploadTelemetryFish.UploadedBy)
-		// if err != nil {
-		// 	return err
-		// }
-	}
-
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Sites data retrieved successfully", exportData))
 }

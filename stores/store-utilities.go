@@ -1,27 +1,31 @@
 package stores
 
 import (
-	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/jmoiron/sqlx"
 
-	_ "github.com/jackc/pgx/stdlib"
+	_ "github.com/jackc/pgx/v4/stdlib"
 
 	_ "github.com/godror/godror"
 
-	"di2e.net/cwbi/pallid_sturgeon_api/server/config"
+	"github.com/USACE/pallid_sturgeon_api/server/config"
 )
 
 func InitStores(appConfig *config.AppConfig) (*PallidSturgeonStore, error) {
-	dburl := fmt.Sprintf("user=%s password=%s connectString=%s:%s/%s poolMaxSessions=50 poolSessionTimeout=42s",
-		appConfig.Dbuser, appConfig.Dbpass, appConfig.Dbhost, appConfig.Dbport, appConfig.Dbname)
-	db, err := sql.Open("godror", dburl)
+	connectString := fmt.Sprintf("%s:%s/%s", appConfig.Dbhost, appConfig.Dbport, appConfig.Dbname)
+	db, err := sqlx.Connect(
+		"godror",
+		"user="+appConfig.Dbuser+" password="+appConfig.Dbpass+" connectString="+connectString+" poolMaxSessions=100 poolSessionMaxLifetime=2m0s",
+	)
+	
 	if err != nil {
-		fmt.Println(err)
+		log.Printf("[InitStores] m=GetDb,msg=connection has failed: %s", err)
 		return nil, err
+	} else {
+		db.SetMaxIdleConns(0)	
 	}
-	//defer db.Close()
 
 	ss := PallidSturgeonStore{
 		db:     db,
