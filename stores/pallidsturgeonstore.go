@@ -243,7 +243,7 @@ func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, err
 }
 
 var getSeasonsSql = `select distinct s.s_id,si.SEASON, s.season_description from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,null,null,null))
-fnc on si.site_id = fnc.site_id inner join season_lk s on s.season_code = si.season`
+fnc on si.site_id = fnc.site_id inner join season_lk s on s.season_code = si.season and s.project_code = :4`
 
 func (s *PallidSturgeonStore) GetSeasons(year string, officeCode string, projectCode string) ([]models.Season, error) {
 	seasons := []models.Season{}
@@ -253,7 +253,7 @@ func (s *PallidSturgeonStore) GetSeasons(year string, officeCode string, project
 		return seasons, err
 	}
 
-	rows, err := selectQuery.Query(year, officeCode, projectCode)
+	rows, err := selectQuery.Query(year, officeCode, projectCode, projectCode)
 	if err != nil {
 		return seasons, err
 	}
