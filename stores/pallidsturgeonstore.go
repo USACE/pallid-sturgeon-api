@@ -2791,7 +2791,7 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number,radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity, se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
+var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number, t_bend, radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity, se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
 FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY'))) func
 inner join ds_search se on se.se_id = func.se_id`
 
@@ -2862,6 +2862,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 			&summary.Segment,
 			&summary.Season,
 			&summary.Bend,
+			&summary.TBend,
 			&summary.RadioTagNum,
 			&summary.FrequencyIdCode,
 			&summary.CaptureTime,
