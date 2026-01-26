@@ -243,7 +243,7 @@ func (s *PallidSturgeonStore) GetSampleUnitTypes() ([]models.SampleUnitType, err
 }
 
 var getSeasonsSql = `select distinct s.s_id,si.SEASON, s.season_description from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,null,null,null))
-fnc on si.site_id = fnc.site_id inner join season_lk s on s.season_code = si.season`
+fnc on si.site_id = fnc.site_id inner join season_lk s on s.season_code = si.season and s.project_code = :4`
 
 func (s *PallidSturgeonStore) GetSeasons(year string, officeCode string, projectCode string) ([]models.Season, error) {
 	seasons := []models.Season{}
@@ -253,7 +253,7 @@ func (s *PallidSturgeonStore) GetSeasons(year string, officeCode string, project
 		return seasons, err
 	}
 
-	rows, err := selectQuery.Query(year, officeCode, projectCode)
+	rows, err := selectQuery.Query(year, officeCode, projectCode, projectCode)
 	if err != nil {
 		return seasons, err
 	}
@@ -2261,7 +2261,7 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 	return file.Name(), err
 }
 
-var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, HATCHERY_ORIGIN_CODE, tag_number,checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var suppDataSummarySql = `SELECT fish_code, mr_id, f_id, sid_display, year, netrivermile, length, weight, condition, FIELD_OFFICE_CODE, PROJECT_CODE, SEGMENT_CODE, SEASON_CODE, BEND_NUMBER, BEND_R_OR_N, bend_river_mile, HATCHERY_ORIGIN_CODE, tag_number,checkby FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
 var suppDataSummaryCountSql = `SELECT count(*) FROM table (pallid_data_api.supp_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
 
@@ -2304,7 +2304,7 @@ func (s *PallidSturgeonStore) GetSuppDataSummary(year string, officeCode string,
 
 	for rows.Next() {
 		summary := models.SuppSummary{}
-		err = rows.Scan(&summary.FishCode, &summary.UniqueID, &summary.FishID, &summary.SuppID, &summary.Year,
+		err = rows.Scan(&summary.FishCode, &summary.UniqueID, &summary.FishID, &summary.SuppID, &summary.Year, &summary.NetRiverMile, &summary.Length, &summary.Weight, &summary.Condition,
 			&summary.FieldOffice, &summary.Project, &summary.Segment, &summary.Season, &summary.Bend, &summary.Bendrn,
 			&summary.BendRiverMile, &summary.HatcheryOrigin, &summary.TagNumber, &summary.CheckedBy)
 		if err != nil {
@@ -2791,7 +2791,7 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number,radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity, se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
+var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number, t_bend, radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity, se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
 FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY'))) func
 inner join ds_search se on se.se_id = func.se_id`
 
@@ -2862,6 +2862,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataSummary(year string, officeCode st
 			&summary.Segment,
 			&summary.Season,
 			&summary.Bend,
+			&summary.TBend,
 			&summary.RadioTagNum,
 			&summary.FrequencyIdCode,
 			&summary.CaptureTime,
