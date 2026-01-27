@@ -1,4 +1,4 @@
-FROM golang:1.24.6-alpine AS builder
+FROM golang:1.25.5-alpine AS builder
 RUN apk add build-base
 # Install Git
 RUN apk update && apk add --no-cache git
@@ -8,7 +8,6 @@ WORKDIR /go/src/app
 COPY . .
 
 # Install Dependencies
-RUN go get -d -v
 # Build
 RUN go get -d -v \
   && GOOS=linux GOARCH=amd64 CGO_ENABLED=1 \
@@ -33,7 +32,8 @@ RUN apk --no-cache add libaio libnsl libc6-compat curl && \
     ln -s /usr/lib/instantclient/libnnz19.so /usr/lib/libnnz19.so && \
     ln -s /usr/lib/libnsl.so.2 /usr/lib/libnsl.so.1 && \
     ln -s /lib/libc.so.6 /usr/lib/libresolv.so.2 && \
-    ln -s /lib64/ld-linux-x86-64.so.2 /usr/lib/ld-linux-x86-64.so.2
+    ln -s /lib64/ld-linux-x86-64.so.2 /usr/lib/ld-linux-x86-64.so.2 && \
+    apk -U upgrade
 
 ENV ORACLE_BASE=/usr/lib/instantclient
 ENV LD_LIBRARY_PATH=/usr/lib/instantclient
