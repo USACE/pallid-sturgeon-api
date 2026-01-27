@@ -47,6 +47,11 @@ type MacroMeso struct {
 	MesoHabitatCode  string `db:"mesohabitat_code" json:"mesoHabitatCode"`
 }
 
+type MicroStructure struct {
+	MicroStructureCode        string `db:"micro_structure_code" json:"code"`
+	MicroStructureDescription string `db:"micro_structure" json:"description"`
+}
+
 type MicroHabitat struct {
 	MhId               int    `db:"mh_id" json:"id"`
 	MicroStructure     string `db:"micro_structure" json:"microStructure"`

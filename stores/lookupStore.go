@@ -204,6 +204,30 @@ func (s *LookupStore) GetMacroMesos() ([]models.MacroMeso, error) {
 	return data, nil
 }
 
+func (s *LookupStore) GetMicroStructures() ([]models.MicroStructure, error) {
+	query := `
+        SELECT DISTINCT micro_structure, micro_structure_code
+		FROM micro_habitat_desc_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.MicroStructure{}
+
+	for rows.Next() {
+		var i models.MicroStructure
+		if err := rows.Scan(&i.MicroStructureDescription, &i.MicroStructureCode); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
 func (s *LookupStore) GetMicroHabitats() ([]models.MicroHabitat, error) {
 	query := `
         SELECT mh_id, micro_structure, micro_structure_code, structure_flow, structure_flow_code, structure_mod, structure_mod_code

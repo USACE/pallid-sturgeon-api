@@ -48,6 +48,11 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve macros/mesos data", err))
 	}
 
+	microStructures, err := s.Store.GetMicroStructures()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve micro structures", err))
+	}
+
 	microHabitats, err := s.Store.GetMicroHabitats()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve micro habitats", err))
@@ -67,6 +72,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"macros":            macros,
 		"mesos":             mesos,
 		"macroMesos":        macroMesos,
+		"microStructures": 	 microStructures,
 		"microHabitats":     microHabitats,
 		"u7":                u7,
 	}
