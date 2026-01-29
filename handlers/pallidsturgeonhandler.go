@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"strings"
 	"fmt"
 	
 	"github.com/USACE/pallid_sturgeon_api/server/models"
@@ -193,6 +194,15 @@ func (sd *PallidSturgeonHandler) GetYears(c echo.Context) error {
 
 func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	id, year, projectCode, segmentCode, seasonCode, bendrn, siteId := c.QueryParam("id"), c.QueryParam("year"), c.QueryParam("project"), c.QueryParam("segmentCode"), c.QueryParam("seasonCode"), c.QueryParam("bendrn"), c.QueryParam("siteId")
+	fieldOfficeParam := c.QueryParam("fieldoffice")
+
+	if fieldOfficeParam == "" {
+		fieldOfficeParam = c.QueryParam("officeCode")
+	}
+	if fieldOfficeParam == "" {
+		fieldOfficeParam = c.QueryParam("office")
+	}
+
 	queryParams, err := marshalQuery(c)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
@@ -203,7 +213,13 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
 
-	siteDataEntries, err := sd.Store.GetSiteDataEntries(siteId, year, userInfo.OfficeCode, projectCode, segmentCode, seasonCode, bendrn, queryParams)
+	setOffice := userInfo.OfficeCode
+
+	if strings.EqualFold(userInfo.Role, "ADMINISTRATOR") && fieldOfficeParam != "" {
+		setOffice = fieldOfficeParam
+	}
+
+	siteDataEntries, err := sd.Store.GetSiteDataEntries(siteId, year, setOffice, projectCode, segmentCode, seasonCode, bendrn, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve site data entries", err))
 	}

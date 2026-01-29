@@ -154,10 +154,10 @@ type SuppSummary struct {
 	UniqueID        int      `db:"mr_id" json:"uniqueID"`
 	FishID          int      `db:"f_id" json:"fishId"`
 	Year            int      `db:"year" json:"year"`
-	NetRiverMile	*float64 `db:"netrivermile" json:"netRiverMile"`
-	Length			*float32 `db:"length" json:"length"`
-	Weight			*float32 `db:"weight" json:"weight"`
-	Condition		*float64 `db:"condition" json:"condition"`
+	NetRiverMile    *float64 `db:"netrivermile" json:"netRiverMile"`
+	Length          *float32 `db:"length" json:"length"`
+	Weight          *float32 `db:"weight" json:"weight"`
+	Condition       *float64 `db:"condition" json:"condition"`
 	SuppID          int      `db:"sid_display" json:"suppId"`
 	FieldOffice     string   `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
 	Project         int      `db:"PROJECT_CODE" json:"project"`
@@ -299,6 +299,7 @@ type TelemetrySummary struct {
 	Segment            *int     `db:"segment_code" json:"segment"`
 	Season             *string  `db:"season_code" json:"season"`
 	Bend               *float64 `db:"bend_number" json:"bend"`
+	TBend              *float64 `db:"t_bend" json:"t_bend"`
 	RadioTagNum        int      `db:"radio_tag_num" json:"radioTagNum"`
 	FrequencyIdCode    int      `db:"frequency_id" json:"frequencyIdCode"`
 	CaptureTime        string   `db:"capture_time" json:"captureTime"`
