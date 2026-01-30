@@ -1,9 +1,9 @@
 module github.com/USACE/pallid_sturgeon_api/server
 
-go 1.25.5
+go 1.25.6
 
 require (
-	github.com/godror/godror v0.50.0
+	github.com/godror/godror v0.44.8
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/jmoiron/sqlx v1.4.0
