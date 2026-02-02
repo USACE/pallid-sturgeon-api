@@ -33,6 +33,11 @@ func main() {
 		log.Printf("Unable to connect to the Auth database: %s", err)
 	}
 
+	lookupStore, err := stores.InitLookupStore(appconfig)
+	if err != nil {
+		log.Printf("Unable to connect to the Lookup database: %s", err)
+	}
+
 	auth.Store = authStore
 
 	e := echo.New()
@@ -47,7 +52,13 @@ func main() {
 		Store: authStore,
 	}
 
+	LookupH := handlers.LookupHandler{
+		Store: lookupStore,
+	}
+
 	e.GET(urlContext+"/version", PallidSturgeonH.Version)
+
+	e.GET(urlContext+"/Lookup/getAllLookups", auth.Authorize(LookupH.GetAllLookups, PUBLIC))
 
 	e.GET(urlContext+"/projects", auth.Authorize(PallidSturgeonH.GetProjects, PUBLIC))
 	e.GET(urlContext+"/projectsFilter", auth.Authorize(PallidSturgeonH.GetProjectsFilter, PUBLIC))
