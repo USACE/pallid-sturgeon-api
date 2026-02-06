@@ -719,6 +719,7 @@ type MoriverLocation struct {
 	MrID             int       `db:"mr_id" json:"mrId"`
 	SiteID           int       `db:"site_id" json:"siteId"`
 	FieldOffice      string    `db:"FIELDOFFICE" json:"fieldOffice"`
+	Project			 int	   `db:"project" json:"project"`
 	SetDate          *string   `db:"setdate" json:"setdate"`
 	StartLatitude    float64   `db:"startlatitude" json:"startlatitude"`
 	StartLongitude   float64   `db:"startlongitude" json:"startlongitude"`

@@ -1033,8 +1033,8 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	return moriverDataEntryWithCount, err
 }
 
-var moriverLocationsSql = `SELECT mr_id, site_id, FIELDOFFICE, setdate, startlatitude, startlongitude
-	FROM ds_moriver WHERE startlatitude IS NOT NULL AND startlongitude IS NOT NULL`
+var moriverLocationsSql = `SELECT mr_id, site_id, FIELDOFFICE, project, setdate, startlatitude, startlongitude
+	FROM ds_moriver WHERE startlatitude IS NOT NULL AND startlongitude IS NOT NULL AND FIELDOFFICE is not null`
 
 var moriverLocationsCountSql = `SELECT count(*) FROM (select distinct mr_id from ds_moriver WHERE startlatitude IS NOT NULL and startlongitude IS NOT NULL)`
 
@@ -1048,7 +1048,7 @@ func (s *PallidSturgeonStore) GetMoriverLocations(queryParams models.SearchParam
 		queryParams.PageSize = 20
 	}
 	if queryParams.OrderBy == "" {
-		queryParams.OrderBy = "mr_id desc"
+		queryParams.OrderBy = "setdate desc"
 	}
 
 	queryParams.OrderBy = strings.ReplaceAll(strings.TrimSpace(queryParams.OrderBy), ";", "")
@@ -1098,6 +1098,7 @@ func (s *PallidSturgeonStore) GetMoriverLocations(queryParams models.SearchParam
 			&loc.MrID,
 			&loc.SiteID,
 			&loc.FieldOffice,
+			&loc.Project,
 			&loc.SetDate,
 			&loc.StartLatitude,
 			&loc.StartLongitude,
