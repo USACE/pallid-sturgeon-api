@@ -2741,6 +2741,21 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 
 	cols, _ := rows.Columns()
 
+	// omits from csv 
+	omit := map[string]bool{
+		"mr_id": true,
+		"last_updated": true,
+	}
+
+	keepIdx := make([]int, 0, len(cols))
+	filteredCols := make([]string, 0, len(cols))
+	for i, c := range cols {
+		if !omit[strings.ToLower(c)] {
+			keepIdx = append(keepIdx, i)
+			filteredCols = append(filteredCols, c)
+		}
+	}
+
 	file, err := os.Create("TelemetryDataSummary.csv")
 	if err != nil {
 		log.Fatal("Cannot create file", err)
@@ -2753,7 +2768,7 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 
 	//save header
 	data := make([]string, 0)
-	data = append(data, cols...)
+	data = append(data, filteredCols...)
 	err = writer.Write(data)
 	if err != nil {
 		log.Fatal("Cannot write to file", err)
@@ -2770,7 +2785,7 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 		rows.Scan(columnPointers...)
 
 		data := make([]string, 0)
-		for i := range cols {
+		for _, i := range keepIdx {
 			var v string
 			val := columns[i]
 
