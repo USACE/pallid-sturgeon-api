@@ -2123,7 +2123,18 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 			if val == nil {
 				v = ""
 			} else {
-				v = fmt.Sprintf("%v", val)
+				switch t := val.(type) {
+				case time.Time:
+					v = t.Format("2006-01-02")
+				case *time.Time:
+					if t == nil {
+						v = ""
+					} else {
+						v = t.Format("2006-01-02")
+					}
+				default:
+					v = fmt.Sprintf("%v", val)
+				}
 			}
 			data = append(data, v)
 		}
@@ -2247,7 +2258,18 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 			if val == nil {
 				v = ""
 			} else {
-				v = fmt.Sprintf("%v", val)
+				switch t := val.(type) {
+				case time.Time:
+					v = t.Format("2006-01-02")
+				case *time.Time:
+					if t == nil {
+						v = ""
+					} else {
+						v = t.Format("2006-01-02")
+					}
+				default:
+					v = fmt.Sprintf("%v", val)
+				}
 			}
 			data = append(data, v)
 		}
@@ -2947,7 +2969,18 @@ func (s *PallidSturgeonStore) GetFullProcedureDataSummary(year string, officeCod
 			if val == nil {
 				v = ""
 			} else {
-				v = fmt.Sprintf("%v", val)
+				switch t := val.(type) {
+				case time.Time:
+					v = t.Format("2006-01-02")
+				case *time.Time:
+					if t == nil {
+						v = ""
+					} else {
+						v = t.Format("2006-01-02")
+					}
+				default:
+					v = fmt.Sprintf("%v", val)
+				}
 			}
 			data = append(data, v)
 		}
