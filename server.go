@@ -88,9 +88,11 @@ func main() {
 	e.POST(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.SaveFishDataEntry, PUBLIC))
 	e.PUT(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.UpdateFishDataEntry, PUBLIC))
 	e.DELETE(urlContext+"/fishDataEntry/:id", auth.Authorize(PallidSturgeonH.DeleteFishDataEntry, PUBLIC))
-	e.GET(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.GetMoriverDataEntries, PUBLIC))
-	e.POST(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.SaveMoriverDataEntry, PUBLIC))
-	e.PUT(urlContext+"/moriverDataEntry", auth.Authorize(PallidSturgeonH.UpdateMoriverDataEntry, PUBLIC))
+
+	e.GET(urlContext+"/DataEntry/getMoriverDataEntry", auth.Authorize(PallidSturgeonH.GetMoriverDataEntries, PUBLIC))
+	e.POST(urlContext+"/DataEntry/addMoriverDataEntry", auth.Authorize(PallidSturgeonH.AddMoriverDataEntry, PUBLIC))
+	e.PUT(urlContext+"/DataEntry/updateMoriverDataEntry", auth.Authorize(PallidSturgeonH.UpdateMoriverDataEntry, PUBLIC))
+
 	e.GET(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.GetSupplementalDataEntries, PUBLIC))
 	e.POST(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.SaveSupplementalDataEntry, PUBLIC))
 	e.PUT(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.UpdateSupplementalDataEntry, PUBLIC))
