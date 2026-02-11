@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 	"strings"
-	
+	"time"
+
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
 	"github.com/labstack/echo/v4"
@@ -328,14 +328,11 @@ func (sd *PallidSturgeonHandler) GetMoriverDataEntries(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.NewErrorResponse("Failed to parse query parameters", err))
 	}
-
 	user := c.Get("PSUSER").(models.User)
-
 	userInfo, err := sd.Store.GetUser(user.Email)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user role", err))
 	}
-
 	dataSummary, err := sd.Store.GetMoriverDataEntries(tableId, fieldId, userInfo.OfficeCode, queryParams)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Missouri River data entries data", err))
@@ -343,28 +340,26 @@ func (sd *PallidSturgeonHandler) GetMoriverDataEntries(c echo.Context) error {
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Missouri River data entries retrieved successfully", dataSummary))
 }
 
-func (sd *PallidSturgeonHandler) SaveMoriverDataEntry(c echo.Context) error {
+func (sd *PallidSturgeonHandler) AddMoriverDataEntry(c echo.Context) error {
 	moriverData := models.UploadMoriver{}
 	if err := c.Bind(&moriverData); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Missouri River data model mismatch", err))
 	}
-
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	moriverData.UploadedBy = user.FirstName + " " + user.LastName
 	moriverData.SetDate = processStringTime(DerefString(moriverData.SetDate), "app")
-	id, err := sd.Store.SaveMoriverDataEntry(moriverData)
+	id, err := sd.Store.AddMoriverDataEntry(moriverData)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to add Missouri River data entry", err))
 	}
-
-	return c.JSON(200, id)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Successfully added Missouri River data entry", id))
 }
 
 func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 	moriverData := models.UploadMoriver{}
 	if err := c.Bind(&moriverData); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Missouri River data model mismatch", err))
 	}
 	moriverData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
@@ -372,10 +367,9 @@ func (sd *PallidSturgeonHandler) UpdateMoriverDataEntry(c echo.Context) error {
 	moriverData.SetDate = processStringTime(DerefString(moriverData.SetDate), "app")
 	err := sd.Store.UpdateMoriverDataEntry(moriverData)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to update Missouri River data entry", err))
 	}
-
-	return c.JSON(http.StatusOK, `{"result":"success"}`)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Successfully updated Missouri River data entry", moriverData))
 }
 
 func (sd *PallidSturgeonHandler) GetSupplementalDataEntries(c echo.Context) error {
