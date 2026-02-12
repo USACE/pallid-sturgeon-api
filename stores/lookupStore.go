@@ -275,3 +275,75 @@ func (s *LookupStore) GetU7() ([]models.U7, error) {
 
 	return data, nil
 }
+
+func (s *LookupStore) GetEstimations() ([]models.Estimation, error) {
+	query := `
+        SELECT estimation_code, estimation_description
+		FROM cobble_organic_est_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Estimation{}
+
+	for rows.Next() {
+		var i models.Estimation
+		if err := rows.Scan(&i.EstCode, &i.EstDesc); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetMicroSetSite() ([]models.MicroSetSite, error) {
+	query := `
+        SELECT ms_id, structure_code, micro_structure, set_site_1_code, set_site_1, set_site_two_code, set_site_two
+		FROM micro_set_site_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.MicroSetSite{}
+
+	for rows.Next() {
+		var i models.MicroSetSite
+		if err := rows.Scan(&i.MsId, &i.MicroStructureCode, &i.MicroStructureDesc, &i.Ss1Code, &i.Ss1Description, &i.Ss2Code, &i.Ss2Description); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSetSite3() ([]models.SetSite3, error) {
+	query := `
+        SELECT set_site_3_code, set_site_3
+		FROM micro_set_site3_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SetSite3{}
+
+	for rows.Next() {
+		var i models.SetSite3
+		if err := rows.Scan(&i.SsCode, &i.SsDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}

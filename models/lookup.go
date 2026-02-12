@@ -62,19 +62,28 @@ type MicroHabitat struct {
 	StructureModCode   int    `db:"structure_mod_code" json:"structureModCode"`
 }
 
-type StructureModLK struct {
-	ModDescription string `db:"mod_description" json:"description"`
-	ModCode        int    `db:"mod_code" json:"code"`
-}
-
 type U7 struct {
 	U7Code        string `db:"code" json:"code"`
 	U7Description string `db:"description" json:"description"`
 }
 
-type LookupData struct {
-	BendSelectionData BendSelection `json:"bendSelection"`
-	GearCodeData      GearCode      `json:"gearCode"`
-	GearTypeData      GearType      `json:"gearType"`
-	MacroData         Macro         `json:"macro"`
+type Estimation struct {
+	EstId   int    `db:"coe_id" json:"id"`
+	EstCode int    `db:"estimation_code" json:"code"`
+	EstDesc string `db:"estimation_description" json:"description"`
+}
+
+type MicroSetSite struct {
+	MsId               int    `db:"ms_id" json:"id"`
+	MicroStructureCode int    `db:"structure_code" json:"microStructureCode"`
+	MicroStructureDesc string `db:"micro_structure" json:"microStructureDescription"`
+	Ss1Code            int    `db:"set_site_1_code" json:"ss1Code"`
+	Ss1Description     string `db:"set_site_1" json:"ss1Description"`
+	Ss2Code            int    `db:"set_site_two_code" json:"ss2Code"`
+	Ss2Description     string `db:"set_site_two" json:"ss2Description"`
+}
+
+type SetSite3 struct {
+	SsCode        int    `db:"set_site_3_code" json:"code"`
+	SsDescription string `db:"set_site_3" json:"description"`
 }

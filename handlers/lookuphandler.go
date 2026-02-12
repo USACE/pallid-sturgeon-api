@@ -63,18 +63,36 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve U7 data", err))
 	}
 
+	estimations, err := s.Store.GetEstimations()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve estimation data", err))
+	}
+
+	microSetSite, err := s.Store.GetMicroSetSite()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve micro & set site data", err))
+	}
+
+	setSite3, err := s.Store.GetSetSite3()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve set site 3 data", err))
+	}
+
 	// Single combined response
 	response := map[string]any{
 		"bendSelections":    bendSelections,
-		"gearCodes":         gearCodes,
+		"estimations": 		 estimations,
 		"filteredGearCodes": filteredGearCodes,
+		"gearCodes":         gearCodes,
 		"gearTypes":         gearTypes,
 		"macros":            macros,
 		"mesos":             mesos,
 		"macroMesos":        macroMesos,
+		"microSetSite": 	 microSetSite,
 		"microStructures": 	 microStructures,
 		"microHabitats":     microHabitats,
-		"u7":                u7,
+		"setSite3Options":   setSite3,
+		"u7Options":         u7,
 	}
 
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Lookup data retrieved successfully", response))
