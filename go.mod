@@ -1,6 +1,6 @@
 module github.com/USACE/pallid_sturgeon_api/server
 
-go 1.25.6
+go 1.26.0
 
 require (
 	github.com/godror/godror v0.44.8
