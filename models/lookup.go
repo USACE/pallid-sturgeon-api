@@ -12,6 +12,7 @@ type GearCode struct {
 	GearCode        string `db:"gear_code" json:"code"`
 	GearType        string `db:"gear_type" json:"gearType"`
 	GearDescription string `db:"gear_description" json:"description"`
+	DeploymentType  string `db:"deploymenttype" json:"deploymentType"`
 }
 
 type FilteredGearCode struct {
@@ -86,4 +87,10 @@ type MicroSetSite struct {
 type SetSite3 struct {
 	SsCode        int    `db:"set_site_3_code" json:"code"`
 	SsDescription string `db:"set_site_3" json:"description"`
+}
+
+type BendRiverMile struct {
+	BrmId          int    `db:"brm_id" json:"id"`
+	UpperRiverMile string `db:"upper_river_mile" json:"upperRiverMile"`
+	LowerRiverMile string `db:"lower_river_mile" json:"lowerRiverMile"`
 }

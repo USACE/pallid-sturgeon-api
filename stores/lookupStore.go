@@ -62,7 +62,7 @@ func (s *LookupStore) GetBendSelections() ([]models.BendSelection, error) {
 
 func (s *LookupStore) GetGearCodes() ([]models.GearCode, error) {
 	query := `
-        SELECT gear_id, gear, gear_code, gear_type, gear_description
+        SELECT gear_id, gear, gear_code, gear_type, gear_description, deploymenttype
 		FROM gear_lk
     `
 	rows, err := s.db.Query(query)
@@ -75,7 +75,7 @@ func (s *LookupStore) GetGearCodes() ([]models.GearCode, error) {
 
 	for rows.Next() {
 		var i models.GearCode
-		if err := rows.Scan(&i.GearId, &i.Gear, &i.GearCode, &i.GearType, &i.GearDescription); err != nil {
+		if err := rows.Scan(&i.GearId, &i.Gear, &i.GearCode, &i.GearType, &i.GearDescription, &i.DeploymentType); err != nil {
 			return nil, err
 		}
 		data = append(data, i)
@@ -340,6 +340,30 @@ func (s *LookupStore) GetSetSite3() ([]models.SetSite3, error) {
 	for rows.Next() {
 		var i models.SetSite3
 		if err := rows.Scan(&i.SsCode, &i.SsDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetBendRiverMile() ([]models.BendRiverMile, error) {
+	query := `
+        SELECT brm_id, upper_river_mile, lower_river_mile
+		FROM bend_river_mile_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.BendRiverMile{}
+
+	for rows.Next() {
+		var i models.BendRiverMile
+		if err := rows.Scan(&i.BrmId, &i.UpperRiverMile, &i.LowerRiverMile); err != nil {
 			return nil, err
 		}
 		data = append(data, i)

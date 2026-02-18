@@ -78,9 +78,15 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve set site 3 data", err))
 	}
 
+	bendRiverMile, err := s.Store.GetBendRiverMile()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bend river mile data", err))
+	}
+
 	// Single combined response
 	response := map[string]any{
 		"bendSelections":    bendSelections,
+		"bendRiverMile": 	 bendRiverMile,
 		"estimations": 		 estimations,
 		"filteredGearCodes": filteredGearCodes,
 		"gearCodes":         gearCodes,
