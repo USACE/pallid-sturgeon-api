@@ -350,7 +350,7 @@ func (s *LookupStore) GetSetSite3() ([]models.SetSite3, error) {
 
 func (s *LookupStore) GetBendRiverMile() ([]models.BendRiverMile, error) {
 	query := `
-        SELECT brm_id, upper_river_mile, lower_river_mile
+        SELECT brm_id, b_segment, bend_num, state, upper_river_mile, lower_river_mile
 		FROM bend_river_mile_lk
     `
 	rows, err := s.db.Query(query)
@@ -363,7 +363,7 @@ func (s *LookupStore) GetBendRiverMile() ([]models.BendRiverMile, error) {
 
 	for rows.Next() {
 		var i models.BendRiverMile
-		if err := rows.Scan(&i.BrmId, &i.UpperRiverMile, &i.LowerRiverMile); err != nil {
+		if err := rows.Scan(&i.BrmId, &i.Segment, &i.Bend, &i.State, &i.UpperRiverMile, &i.LowerRiverMile); err != nil {
 			return nil, err
 		}
 		data = append(data, i)

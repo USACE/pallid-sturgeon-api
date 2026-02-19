@@ -90,7 +90,10 @@ type SetSite3 struct {
 }
 
 type BendRiverMile struct {
-	BrmId          int    `db:"brm_id" json:"id"`
-	UpperRiverMile string `db:"upper_river_mile" json:"upperRiverMile"`
-	LowerRiverMile string `db:"lower_river_mile" json:"lowerRiverMile"`
+	BrmId          int      `db:"brm_id" json:"id"`
+	Segment        int      `db:"b_segment" json:"segment"`
+	Bend           int      `db:"bend_num" json:"bend"`
+	State          string   `db:"state" json:"state"`
+	UpperRiverMile *float64 `db:"upper_river_mile" json:"upperRiverMile"`
+	LowerRiverMile *float64 `db:"lower_river_mile" json:"lowerRiverMile"`
 }
