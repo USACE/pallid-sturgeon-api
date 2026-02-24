@@ -53,9 +53,24 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve micro structures", err))
 	}
 
+	structureFlows, err := s.Store.GetStructureFlow()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve structure flow data", err))
+	}
+
+	structureMods, err := s.Store.GetStructureMod()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve structure mod data", err))
+	}
+
 	microHabitats, err := s.Store.GetMicroHabitats()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve micro habitats", err))
+	}
+
+	u6, err := s.Store.GetU6()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve U6 data", err))
 	}
 
 	u7, err := s.Store.GetU7()
@@ -71,6 +86,16 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 	microSetSite, err := s.Store.GetMicroSetSite()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve micro & set site data", err))
+	}
+
+	setSite1, err := s.Store.GetSetSite1()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve set site 1 data", err))
+	}
+
+	setSite2, err := s.Store.GetSetSite2()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve set site 2 data", err))
 	}
 
 	setSite3, err := s.Store.GetSetSite3()
@@ -97,7 +122,12 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"microSetSite": 	 microSetSite,
 		"microStructures": 	 microStructures,
 		"microHabitats":     microHabitats,
+		"setSite1Options":   setSite1,
+		"setSite2Options":   setSite2,
 		"setSite3Options":   setSite3,
+		"structureFlows": 	 structureFlows,
+		"structureMods": 	 structureMods,
+		"u6Options":         u6,
 		"u7Options":         u7,
 	}
 
