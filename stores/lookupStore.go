@@ -206,8 +206,8 @@ func (s *LookupStore) GetMacroMesos() ([]models.MacroMeso, error) {
 
 func (s *LookupStore) GetMicroStructures() ([]models.MicroStructure, error) {
 	query := `
-        SELECT DISTINCT micro_structure, micro_structure_code
-		FROM micro_habitat_desc_lk
+        SELECT ms_id, code, description
+		FROM micro_structure_lk WHERE is_active = 1
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -219,7 +219,55 @@ func (s *LookupStore) GetMicroStructures() ([]models.MicroStructure, error) {
 
 	for rows.Next() {
 		var i models.MicroStructure
-		if err := rows.Scan(&i.MicroStructureDescription, &i.MicroStructureCode); err != nil {
+		if err := rows.Scan(&i.MsId, &i.MicroStructureCode, &i.MicroStructureDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetStructureFlow() ([]models.StructureFlowLK, error) {
+	query := `
+        SELECT sf_id, code, description
+		FROM structure_flow_lk WHERE is_active = 1
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.StructureFlowLK{}
+
+	for rows.Next() {
+		var i models.StructureFlowLK
+		if err := rows.Scan(&i.SfId, &i.StructureFlowCode, &i.StructureFlowDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetStructureMod() ([]models.StructureModLK, error) {
+	query := `
+        SELECT sm_id, code, description
+		FROM structure_mod_lk WHERE is_active = 1
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.StructureModLK{}
+
+	for rows.Next() {
+		var i models.StructureModLK
+		if err := rows.Scan(&i.SmId, &i.StructureModCode, &i.StructureModDescription); err != nil {
 			return nil, err
 		}
 		data = append(data, i)
@@ -244,6 +292,30 @@ func (s *LookupStore) GetMicroHabitats() ([]models.MicroHabitat, error) {
 	for rows.Next() {
 		var i models.MicroHabitat
 		if err := rows.Scan(&i.MhId, &i.MicroStructure, &i.MicroStructureCode, &i.StructureFlow, &i.StructureFlowCode, &i.StructureMod, &i.StructureModCode); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetU6() ([]models.U6, error) {
+	query := `
+        SELECT u6_id, code, description
+		FROM u6_lk WHERE is_active = 1
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.U6{}
+
+	for rows.Next() {
+		var i models.U6
+		if err := rows.Scan(&i.U6Id, &i.U6Code, &i.U6Description); err != nil {
 			return nil, err
 		}
 		data = append(data, i)
@@ -316,6 +388,54 @@ func (s *LookupStore) GetMicroSetSite() ([]models.MicroSetSite, error) {
 	for rows.Next() {
 		var i models.MicroSetSite
 		if err := rows.Scan(&i.MsId, &i.MicroStructureCode, &i.MicroStructureDesc, &i.Ss1Code, &i.Ss1Description, &i.Ss2Code, &i.Ss2Description); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSetSite1() ([]models.SetSite1LK, error) {
+	query := `
+        SELECT ss1_id, code, description
+		FROM set_site_1_lk WHERE is_active = 1
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SetSite1LK{}
+
+	for rows.Next() {
+		var i models.SetSite1LK
+		if err := rows.Scan(&i.Ss1Id, &i.Ss1Code, &i.Ss1Description); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSetSite2() ([]models.SetSite2LK, error) {
+	query := `
+        SELECT ss2_id, code, description
+		FROM set_site_2_lk WHERE is_active = 1
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SetSite2LK{}
+
+	for rows.Next() {
+		var i models.SetSite2LK
+		if err := rows.Scan(&i.Ss2Id, &i.Ss2Code, &i.Ss2Description); err != nil {
 			return nil, err
 		}
 		data = append(data, i)

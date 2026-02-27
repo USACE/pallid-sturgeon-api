@@ -49,8 +49,21 @@ type MacroMeso struct {
 }
 
 type MicroStructure struct {
-	MicroStructureCode        string `db:"micro_structure_code" json:"code"`
-	MicroStructureDescription string `db:"micro_structure" json:"description"`
+	MsId                      int    `db:"ms_id" json:"id"`
+	MicroStructureCode        string `db:"code" json:"code"`
+	MicroStructureDescription string `db:"description" json:"description"`
+}
+
+type StructureFlowLK struct {
+	SfId                     int    `db:"sf_id" json:"id"`
+	StructureFlowCode        string `db:"code" json:"code"`
+	StructureFlowDescription string `db:"description" json:"description"`
+}
+
+type StructureModLK struct {
+	SmId                    int    `db:"sm_id" json:"id"`
+	StructureModCode        string `db:"code" json:"code"`
+	StructureModDescription string `db:"description" json:"description"`
 }
 
 type MicroHabitat struct {
@@ -61,6 +74,12 @@ type MicroHabitat struct {
 	StructureFlowCode  int    `db:"structure_flow_code" json:"structureFlowCode"`
 	StructureMod       string `db:"structure_mod" json:"structureMod"`
 	StructureModCode   int    `db:"structure_mod_code" json:"structureModCode"`
+}
+
+type U6 struct {
+	U6Id          int    `db:"u6_id" json:"id"`
+	U6Code        string `db:"code" json:"code"`
+	U6Description string `db:"description" json:"description"`
 }
 
 type U7 struct {
@@ -82,6 +101,18 @@ type MicroSetSite struct {
 	Ss1Description     string `db:"set_site_1" json:"ss1Description"`
 	Ss2Code            int    `db:"set_site_two_code" json:"ss2Code"`
 	Ss2Description     string `db:"set_site_two" json:"ss2Description"`
+}
+
+type SetSite1LK struct {
+	Ss1Id          int    `db:"ss1_id" json:"id"`
+	Ss1Code        int    `db:"code" json:"code"`
+	Ss1Description string `db:"description" json:"description"`
+}
+
+type SetSite2LK struct {
+	Ss2Id          int    `db:"ss2_id" json:"id"`
+	Ss2Code        int    `db:"code" json:"code"`
+	Ss2Description string `db:"description" json:"description"`
 }
 
 type SetSite3 struct {
