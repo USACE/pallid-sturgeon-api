@@ -883,9 +883,9 @@ var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PR
 	set_site_3, starttime, startlatitude, startlongitude, stoptime, stoplatitude, stoplongitude, depth1, velocitybot1, velocity08_1, 
 	velocity02or06_1, depth2, velocitybot2, velocity08_2, velocity02or06_2, depth3, velocitybot3, velocity08_3, velocity02or06_3, 
 	watervel, cobble, ORGANIC, silt, sand, gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, 
-	last_updated, uploaded_by, bend, bendrn, bendrivermile, micro) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
+	last_updated, uploaded_by, bend, bendrn, bendrivermile, micro, subsample_type) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
 		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49,:50,
-		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71,:72,:73,:74,:75,:76,:77,:78) returning mr_id into :79`
+		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71,:72,:73,:74,:75,:76,:77,:78,:79) returning mr_id into :80`
 
 func (s *PallidSturgeonStore) AddMoriverDataEntry(moriverDataEntry models.UploadMoriver) (int, error) {
 	var id int
@@ -901,7 +901,7 @@ func (s *PallidSturgeonStore) AddMoriverDataEntry(moriverDataEntry models.Upload
 		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
 		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
 		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy,
-		moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.Micro, sql.Out{Dest: &id})
+		moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.Micro, moriverDataEntry.SubsampleType,sql.Out{Dest: &id})
 	return id, err
 }
 
@@ -916,7 +916,7 @@ depth2 = :50, velocitybot2 = :51, velocity08_2 = :52, velocity02or06_2 = :53,
 depth3 = :54, velocitybot3 = :55, velocity08_3 = :56, velocity02or06_3 = :57, 
 watervel = :58, cobble = :59, ORGANIC = :60, silt = :61, sand = :62, gravel = :63, comments = :64, complete = :65, checkby = :66, 
 no_turbidity = :67, no_velocity = :68, edit_initials = :69,  mr_fid= :70, site_id = :71, FIELDOFFICE = :72, last_edit_comment = :73, last_updated = :74, 
-uploaded_by = :75, bend = :76, bendrn = :77, bendrivermile = :78, micro = :79 WHERE mr_id = :1`
+uploaded_by = :75, bend = :76, bendrn = :77, bendrivermile = :78, micro = :79, subsample_type = :80 WHERE mr_id = :1`
 
 func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.UploadMoriver) error {
 	_, err := s.db.Exec(updateMoriverDataSql,
@@ -931,7 +931,7 @@ func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.Upl
 		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
 		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
 		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
-		moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.Micro, moriverDataEntry.MrID)
+		moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.Micro, moriverDataEntry.SubsampleType, moriverDataEntry.MrID)
 	return err
 }
 
@@ -940,7 +940,7 @@ subsamplen, recorder, gear, GEAR_TYPE, temp, turbidity, conductivity, do, distan
 u1, u2, u3, u4, u5, u6, u7, MACRO, MESO, habitatrn, qc, micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
 starttime, startlatitude, startlongitude, stoptime, stoplatitude, stoplongitude, depth1, velocitybot1, velocity08_1, velocity02or06_1,
 depth2, velocitybot2, velocity08_2, velocity02or06_2,depth3, velocitybot3, velocity08_3, velocity02or06_3, watervel, cobble, ORGANIC, silt, sand,
-gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, uploaded_by, micro from ds_moriver 
+gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, uploaded_by, micro, subsample_type from ds_moriver 
 where mr_id = :1`
 
 var moriverDataEntriesCountByFidSql = `SELECT count(*) FROM ds_moriver where mr_id = :1`
@@ -950,7 +950,7 @@ subsamplen, recorder, gear, GEAR_TYPE, temp, turbidity, conductivity, do, distan
 u1, u2, u3, u4, u5, u6, u7, MACRO, MESO, habitatrn, qc, micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, set_site_3,
 starttime, startlatitude, startlongitude, stoptime, stoplatitude, stoplongitude, depth1, velocitybot1, velocity08_1, velocity02or06_1,
 depth2, velocitybot2, velocity08_2, velocity02or06_2,depth3, velocitybot3, velocity08_3, velocity02or06_3, watervel, cobble, ORGANIC, silt, sand,
-gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, uploaded_by, micro from ds_moriver 
+gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, uploaded_by, micro, subsample_type from ds_moriver 
 where mr_fid = :1`
 
 var moriverDataEntriesCountByFfidSql = `SELECT count(*) FROM ds_moriver where mr_fid = :1`
@@ -1021,7 +1021,7 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 			&moriverDataEntry.Depth2, &moriverDataEntry.Velocitybot2, &moriverDataEntry.Velocity08_2, &moriverDataEntry.Velocity02or06_2,
 			&moriverDataEntry.Depth3, &moriverDataEntry.Velocitybot3, &moriverDataEntry.Velocity08_3, &moriverDataEntry.Velocity02or06_3,
 			&moriverDataEntry.Watervel, &moriverDataEntry.Cobble, &moriverDataEntry.Organic, &moriverDataEntry.Silt, &moriverDataEntry.Sand, &moriverDataEntry.Gravel,
-			&moriverDataEntry.Comments, &moriverDataEntry.Complete, &moriverDataEntry.Checkby, &moriverDataEntry.NoTurbidity, &moriverDataEntry.NoVelocity, &moriverDataEntry.EditInitials, &moriverDataEntry.LastEditComment, &moriverDataEntry.UploadedBy, &moriverDataEntry.Micro)
+			&moriverDataEntry.Comments, &moriverDataEntry.Complete, &moriverDataEntry.Checkby, &moriverDataEntry.NoTurbidity, &moriverDataEntry.NoVelocity, &moriverDataEntry.EditInitials, &moriverDataEntry.LastEditComment, &moriverDataEntry.UploadedBy, &moriverDataEntry.Micro, &moriverDataEntry.SubsampleType)
 		if err != nil {
 			return moriverDataEntryWithCount, err
 		}

@@ -128,3 +128,9 @@ type BendRiverMile struct {
 	UpperRiverMile *float64 `db:"upper_river_mile" json:"upperRiverMile"`
 	LowerRiverMile *float64 `db:"lower_river_mile" json:"lowerRiverMile"`
 }
+
+type SubsampleType struct {
+	StId          int    `db:"st_id" json:"id"`
+	StCode        string `db:"code" json:"code"`
+	StDescription string `db:"description" json:"description"`
+}

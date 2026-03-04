@@ -714,6 +714,7 @@ type UploadMoriver struct {
 	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
+	SubsampleType 	 string    `db:"subsample_type" json:"subsampleType"`
 }
 
 type TelemetryDataEntryWithCount struct {

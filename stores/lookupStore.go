@@ -207,7 +207,7 @@ func (s *LookupStore) GetMacroMesos() ([]models.MacroMeso, error) {
 func (s *LookupStore) GetMicroStructures() ([]models.MicroStructure, error) {
 	query := `
         SELECT ms_id, code, description
-		FROM micro_structure_lk WHERE is_active = 1
+		FROM micro_structure_lk WHERE active_flag_tf = 'T'
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -231,7 +231,7 @@ func (s *LookupStore) GetMicroStructures() ([]models.MicroStructure, error) {
 func (s *LookupStore) GetStructureFlow() ([]models.StructureFlowLK, error) {
 	query := `
         SELECT sf_id, code, description
-		FROM structure_flow_lk WHERE is_active = 1
+		FROM structure_flow_lk WHERE active_flag_tf = 'T'
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -255,7 +255,7 @@ func (s *LookupStore) GetStructureFlow() ([]models.StructureFlowLK, error) {
 func (s *LookupStore) GetStructureMod() ([]models.StructureModLK, error) {
 	query := `
         SELECT sm_id, code, description
-		FROM structure_mod_lk WHERE is_active = 1
+		FROM structure_mod_lk WHERE active_flag_tf = 'T'
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -303,7 +303,7 @@ func (s *LookupStore) GetMicroHabitats() ([]models.MicroHabitat, error) {
 func (s *LookupStore) GetU6() ([]models.U6, error) {
 	query := `
         SELECT u6_id, code, description
-		FROM u6_lk WHERE is_active = 1
+		FROM u6_lk WHERE active_flag_tf = 'T'
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -399,7 +399,7 @@ func (s *LookupStore) GetMicroSetSite() ([]models.MicroSetSite, error) {
 func (s *LookupStore) GetSetSite1() ([]models.SetSite1LK, error) {
 	query := `
         SELECT ss1_id, code, description
-		FROM set_site_1_lk WHERE is_active = 1
+		FROM set_site_1_lk WHERE active_flag_tf = 'T'
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -423,7 +423,7 @@ func (s *LookupStore) GetSetSite1() ([]models.SetSite1LK, error) {
 func (s *LookupStore) GetSetSite2() ([]models.SetSite2LK, error) {
 	query := `
         SELECT ss2_id, code, description
-		FROM set_site_2_lk WHERE is_active = 1
+		FROM set_site_2_lk WHERE active_flag_tf = 'T'
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -484,6 +484,30 @@ func (s *LookupStore) GetBendRiverMile() ([]models.BendRiverMile, error) {
 	for rows.Next() {
 		var i models.BendRiverMile
 		if err := rows.Scan(&i.BrmId, &i.Segment, &i.Bend, &i.State, &i.UpperRiverMile, &i.LowerRiverMile); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSubsampleTypes() ([]models.SubsampleType, error) {
+	query := `
+        SELECT st_id, code, description
+		FROM subsample_type_lk WHERE active_flag_tf = 'T'
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SubsampleType{}
+
+	for rows.Next() {
+		var i models.SubsampleType
+		if err := rows.Scan(&i.StId, &i.StCode, &i.StDescription); err != nil {
 			return nil, err
 		}
 		data = append(data, i)

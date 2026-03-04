@@ -108,6 +108,11 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bend river mile data", err))
 	}
 
+	subsampleTypes, err := s.Store.GetSubsampleTypes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve subsample types data", err))
+	}
+
 	// Single combined response
 	response := map[string]any{
 		"bendSelections":    bendSelections,
@@ -127,6 +132,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"setSite3Options":   setSite3,
 		"structureFlows": 	 structureFlows,
 		"structureMods": 	 structureMods,
+		"subsampleTypes":     subsampleTypes,
 		"u6Options":         u6,
 		"u7Options":         u7,
 	}
