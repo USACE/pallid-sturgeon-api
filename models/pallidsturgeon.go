@@ -154,6 +154,10 @@ type SuppSummary struct {
 	UniqueID        int      `db:"mr_id" json:"uniqueID"`
 	FishID          int      `db:"f_id" json:"fishId"`
 	Year            int      `db:"year" json:"year"`
+	NetRiverMile    *float64 `db:"netrivermile" json:"netRiverMile"`
+	Length          *float32 `db:"length" json:"length"`
+	Weight          *float32 `db:"weight" json:"weight"`
+	Condition       *float64 `db:"condition" json:"condition"`
 	SuppID          int      `db:"sid_display" json:"suppId"`
 	FieldOffice     string   `db:"FIELD_OFFICE_CODE" json:"fieldOffice"`
 	Project         int      `db:"PROJECT_CODE" json:"project"`
@@ -270,13 +274,13 @@ type ProcedureSummary struct {
 	Season      *string `db:"season_code" json:"season"`
 	PurposeCode string  `db:"purpose_code" json:"purposeCode"`
 	// ProcedureDate     time.Time `db:"procedure_date" json:"procedureDate"`
-	NewRadioTagNum    *int    `db:"new_radio_tag_num" json:"newRadioTagNum"`
-	NewFrequencyId    *int    `db:"new_frequency_id" json:"newFrequencyId"`
-	SpawnCode         *string `db:"spawn_code" json:"spawnCode"`
-	ExpectedSpawnYear *int    `db:"expected_spawn_year" json:"expectedSpawnYear"`
-	Bend              int     `db:"bend_number" json:"bend"`
-	Bendrn            string  `db:"bend_r_or_n" json:"bendrn"`
-	BendRiverMile     float64 `db:"bend_river_mile" json:"bendRiverMile"`
+	NewRadioTagNum    *int     `db:"new_radio_tag_num" json:"newRadioTagNum"`
+	NewFrequencyId    *int     `db:"new_frequency_id" json:"newFrequencyId"`
+	SpawnCode         *string  `db:"spawn_code" json:"spawnCode"`
+	ExpectedSpawnYear *int     `db:"expected_spawn_year" json:"expectedSpawnYear"`
+	Bend              int      `db:"bend_number" json:"bend"`
+	Bendrn            string   `db:"bend_r_or_n" json:"bendrn"`
+	BendRiverMile     *float64 `db:"bend_river_mile" json:"bendRiverMile"`
 }
 
 type TelemetrySummaryWithCount struct {
@@ -295,6 +299,7 @@ type TelemetrySummary struct {
 	Segment            *int     `db:"segment_code" json:"segment"`
 	Season             *string  `db:"season_code" json:"season"`
 	Bend               *float64 `db:"bend_number" json:"bend"`
+	TBend              *float64 `db:"t_bend" json:"t_bend"`
 	RadioTagNum        int      `db:"radio_tag_num" json:"radioTagNum"`
 	FrequencyIdCode    int      `db:"frequency_id" json:"frequencyIdCode"`
 	CaptureTime        string   `db:"capture_time" json:"captureTime"`
@@ -532,6 +537,7 @@ type UploadProcedure struct {
 	UploadedBy                string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
 	Checkby                   string    `db:"checkby" json:"checkby"`
+	SerialNum 			      string    `db:"serial_num" json:"serialNum"`
 }
 
 type SupplementalDataEntryWithCount struct {
@@ -605,6 +611,7 @@ type UploadSupplemental struct {
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+	Project37 		   *int 	 `db:"project_3_7" json:"project37"`
 }
 
 type MoriverDataEntryWithCount struct {
@@ -750,6 +757,7 @@ type UploadTelemetry struct {
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+	SuspectedSpawningActivity *int `db:"suspected_spawning_activity" json:"suspectedSpawningActivity"`
 }
 
 type ProcedureOut struct {
