@@ -660,6 +660,7 @@ type UploadMoriver struct {
 	Meso             string    `db:"meso" json:"meso"`
 	Habitatrn        string    `db:"habitatrn" json:"habitatrn"`
 	Qc               string    `db:"qc" json:"qc"`
+	Micro 			 string    `db:"micro" json:"micro"`
 	MicroStructure   string    `db:"micro_structure" json:"microStructure"`
 	StructureFlow    string    `db:"structure_flow" json:"structureFlow"`
 	StructureMod     string    `db:"structure_mod" json:"structureMod"`
