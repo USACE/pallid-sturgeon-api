@@ -515,3 +515,125 @@ func (s *LookupStore) GetSubsampleTypes() ([]models.SubsampleType, error) {
 
 	return data, nil
 }
+
+// FISH LOOK UP QUERIES
+
+func (s *LookupStore) GetFishCodes() ([]models.FishCode, error) {
+	query := `
+        SELECT fish_id, common_name, scientific_name, alpha_code, numeric_codes, numeric_codes_txt
+		FROM fish_code_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.FishCode{}
+
+	for rows.Next() {
+		var i models.FishCode
+		if err := rows.Scan(&i.FishId, &i.CommonName, &i.ScientificName, &i.AlphaCode, &i.NumericCodes, &i.NumericCodesText); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetFishStructures() ([]models.FishStructure, error) {
+	query := `
+        SELECT code, description
+		FROM fish_structure_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.FishStructure{}
+
+	for rows.Next() {
+		var i models.FishStructure
+		if err := rows.Scan(&i.FsCode, &i.FsDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetFloyTagPrefixes() ([]models.FloyTagPrefix, error) {
+	query := `
+        SELECT floy_id, tag_prefix_code, tag_prefix_description
+		FROM floy_tag_prefix_code_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.FloyTagPrefix{}
+
+	for rows.Next() {
+		var i models.FloyTagPrefix
+		if err := rows.Scan(&i.FtpId, &i.FtpCode, &i.FtpDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetLengthTypes() ([]models.LengthType, error) {
+	query := `
+        SELECT lt_id, code, description
+		FROM length_type_lk WHERE active_flag_tf = 'T'
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.LengthType{}
+
+	for rows.Next() {
+		var i models.LengthType
+		if err := rows.Scan(&i.LtId, &i.LtCode, &i.LtDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetMarkRecapture() ([]models.MarkRecapture, error) {
+	query := `
+        SELECT mr_id, mark_recapture_code, mark_recapture_description
+		FROM mark_recapture_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.MarkRecapture{}
+
+	for rows.Next() {
+		var i models.MarkRecapture
+		if err := rows.Scan(&i.MrId, &i.MrCode, &i.MrDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}

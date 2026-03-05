@@ -134,3 +134,37 @@ type SubsampleType struct {
 	StCode        string `db:"code" json:"code"`
 	StDescription string `db:"description" json:"description"`
 }
+
+// FISH LOOK UP MODELS
+
+type FishCode struct {
+	FishId           int     `db:"lk_id" json:"id"`
+	CommonName       string  `db:"common_name" json:"commonName"`
+	ScientificName   string  `db:"scientific_name" json:"scientificName"`
+	AlphaCode        string  `db:"alpha_code" json:"alphaCode"`
+	NumericCodes     *int    `db:"numeric_codes" json:"numericCodes"`
+	NumericCodesText *string `db:"numeric_codes_txt" json:"numericCodesText"`
+}
+
+type FishStructure struct {
+	FsCode        string `db:"code" json:"code"`
+	FsDescription string `db:"description" json:"description"`
+}
+
+type FloyTagPrefix struct {
+	FtpId          int    `db:"floy_id" json:"id"`
+	FtpCode        string `db:"tag_prefix_code" json:"code"`
+	FtpDescription string `db:"tag_prefix_description" json:"description"`
+}
+
+type LengthType struct {
+	LtId          int    `db:"lk_id" json:"id"`
+	LtCode        string `db:"code" json:"code"`
+	LtDescription string `db:"description" json:"description"`
+}
+
+type MarkRecapture struct {
+	MrId          int    `db:"mr_id" json:"id"`
+	MrCode        string `db:"mark_recapture_code" json:"code"`
+	MrDescription string `db:"mark_recapture_description" json:"description"`
+}
