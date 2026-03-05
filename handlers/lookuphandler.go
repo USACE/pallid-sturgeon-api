@@ -13,6 +13,8 @@ type LookupHandler struct {
 }
 
 func (s *LookupHandler) GetAllLookups(c echo.Context) error {
+	// MORIVER LOOK UP QUERIES
+
 	bendSelections, err := s.Store.GetBendSelections()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bend selections", err))
@@ -113,17 +115,49 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve subsample types data", err))
 	}
 
+	// FISH LOOK UP QUERIES
+
+	fishCodes, err := s.Store.GetFishCodes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve fish codes data", err))
+	}
+
+	fishStructures, err := s.Store.GetFishStructures()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve fish structures data", err))
+	}
+
+	floyTagPrefixes, err := s.Store.GetFloyTagPrefixes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve floy tag prefixes data", err))
+	}
+
+	lengthTypes, err := s.Store.GetLengthTypes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve length types data", err))
+	}
+
+	markRecaptureOptions, err := s.Store.GetMarkRecapture()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve mark recapture data", err))
+	}
+
 	// Single combined response
 	response := map[string]any{
 		"bendSelections":    bendSelections,
 		"bendRiverMile": 	 bendRiverMile,
 		"estimations": 		 estimations,
 		"filteredGearCodes": filteredGearCodes,
+		"fishCodes":         fishCodes,
+		"fishStructures":    fishStructures,
+		"floyTagPrefixes":   floyTagPrefixes,
 		"gearCodes":         gearCodes,
 		"gearTypes":         gearTypes,
+		"lengthTypes": 	     lengthTypes,
 		"macros":            macros,
 		"mesos":             mesos,
 		"macroMesos":        macroMesos,
+		"markRecaptureOptions": markRecaptureOptions,
 		"microSetSite": 	 microSetSite,
 		"microStructures": 	 microStructures,
 		"microHabitats":     microHabitats,
@@ -132,7 +166,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"setSite3Options":   setSite3,
 		"structureFlows": 	 structureFlows,
 		"structureMods": 	 structureMods,
-		"subsampleTypes":     subsampleTypes,
+		"subsampleTypes":    subsampleTypes,
 		"u6Options":         u6,
 		"u7Options":         u7,
 	}
