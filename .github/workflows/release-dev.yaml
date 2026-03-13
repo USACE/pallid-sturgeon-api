@@ -1,0 +1,17 @@
+name: Release dev application to CWBI Gov DEV
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  build:
+    name: build
+    uses: USACE/pallid-sturgeon-api/.github/workflows/build.yaml@dev
+    with:
+      tag-name: dev
+      aws-region: us-gov-west-1
+      aws-account: 718787032875
+      ecr-repository: pallid-sturgeon-api
+    secrets: inherit
+
