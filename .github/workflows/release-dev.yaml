@@ -13,5 +13,6 @@ jobs:
       aws-region: us-gov-west-1
       aws-account: 718787032875
       ecr-repository: pallid-sturgeon-api
+      role-name: github-actions-ecr-pallid-sturgeon
     secrets: inherit
 

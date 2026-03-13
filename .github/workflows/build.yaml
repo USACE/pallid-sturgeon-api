@@ -19,6 +19,10 @@ on:
           type: string
           description: name of ECR repo
           required: true
+        role-name:
+          type: string
+          description: ADFS role for application
+          required: true
 
 env:
   GHCR_IMAGE: ghcr.io/${{ github.repository }}
@@ -67,7 +71,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{inputs.aws-region}}
-          role-to-assume: arn:aws-us-gov:iam::${{inputs.aws-account}}:role/github-actions-ecr-stig-mgr
+          role-to-assume: arn:aws-us-gov:iam::${{inputs.aws-account}}:role/${{inputs.role-name}}
           output-credentials: true
 
       - name: Sts GetCallerIdentity
