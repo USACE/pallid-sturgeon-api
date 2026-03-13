@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-var urlContext string = "/psapi"
+var urlContext string = "/api"
 
 func main() {
 	appconfig := config.GetEnv()
