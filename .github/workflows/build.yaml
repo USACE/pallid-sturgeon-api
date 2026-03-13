@@ -95,7 +95,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          tags: ${{REPO}}:${{inputs.tag-name}}
+          tags: ${REPO}:${{inputs.tag-name}}
           platforms: linux/amd64
           push: true
       - name: Push to ECR
@@ -103,7 +103,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{inputs.ecr-repository}}
         run: |
-          docker tag ${{REPO}}:${{inputs.tag-name}} $ECR_REGISTRY/$ECR_REPOSITORY:${{inputs.tag-name}}
+          docker tag ${REPO}:${{inputs.tag-name}} $ECR_REGISTRY/$ECR_REPOSITORY:${{inputs.tag-name}}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{inputs.tag-name}}   
       - name: ECR Logout
         if: always()
