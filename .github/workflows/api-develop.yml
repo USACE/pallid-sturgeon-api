@@ -2,12 +2,12 @@ name: Build API Develop
 
 on:
   push:
-    branches: [develop]
+    branches: [dev]
   workflow_dispatch:
 jobs:
   build:
     name: build
-    uses: USACE/pallid-sturgeon-api/.github/workflows/build.yaml@develop
+    uses: USACE/pallid-sturgeon-api/.github/workflows/build.yaml@dev
     with:
       tag-name: dev
       aws-region: us-gov-west-1
