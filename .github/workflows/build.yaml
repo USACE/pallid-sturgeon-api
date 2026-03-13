@@ -97,7 +97,7 @@ jobs:
           file: ./Dockerfile
           tags: ${{env.REPO}}:${{inputs.tag-name}}
           platforms: linux/amd64
-          push: true
+          push: false
       - name: Push to ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
