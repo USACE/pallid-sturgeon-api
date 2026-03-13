@@ -1035,8 +1035,8 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 
 var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,TAGNUMBER, PITRN,SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM2,ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic, genetics_vial_number,
 	BROODSTOCK, HATCH_WILD, species_id,head, snouttomouth, inter, mouthwidth, m_ib,l_ob, l_ib, r_ib,r_ob, anal, dorsal, status, HATCHERY_ORIGIN,SEX, stage, recapture, photo,genetic_needs, other_tag_info,comments,
-	edit_initials,last_edit_comment, last_updated, uploaded_by, complete, approved, checkby, recorder)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48) returning s_id into :49`
+	edit_initials,last_edit_comment, last_updated, uploaded_by, complete, approved, checkby, recorder, project_3_7)
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49) returning s_id into :50`
 
 func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
 	var id int
@@ -1089,6 +1089,7 @@ func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry mo
 		supplementalDataEntry.Approved,
 		supplementalDataEntry.Checkby,
 		supplementalDataEntry.Recorder,
+		supplementalDataEntry.Project37,
 		sql.Out{Dest: &id},
 	)
 	return id, err
@@ -1142,7 +1143,8 @@ species_id = :45,
 complete = :46,
 approved = :47,
 checkby = :48,
-recorder = :49
+recorder = :49,
+project_3_7 = :50
 WHERE s_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) error {
@@ -1195,13 +1197,14 @@ func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry 
 		supplementalDataEntry.Approved,
 		supplementalDataEntry.Checkby,
 		supplementalDataEntry.Recorder,
+		supplementalDataEntry.Project37,
 		supplementalDataEntry.Sid)
 	return err
 }
 
 var supplementalDataEntriesSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1215,7 +1218,7 @@ where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var supplementalDataEntriesByFidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1231,7 +1234,7 @@ and su.f_id = :1`
 
 var supplementalDataEntriesByFfidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1247,7 +1250,7 @@ and su.f_fid = :1`
 
 var supplementalDataEntriesByGeneticsVialSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1263,7 +1266,7 @@ and su.genetics_vial_number = :1`
 
 var supplementalDataEntriesByGeneticsPitTagSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1279,7 +1282,7 @@ and su.TAGNUMBER = :1`
 
 var supplementalDataEntriesByMrIdSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1295,7 +1298,7 @@ and su.mr_id = :1`
 
 var supplementalDataEntriesBySidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1463,6 +1466,7 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			&supplementalDataEntry.Approved,
 			&supplementalDataEntry.Checkby,
 			&supplementalDataEntry.Recorder,
+			&supplementalDataEntry.Project37,
 		)
 		if err != nil {
 			return supplementalDataEntryWithCount, err
@@ -1635,7 +1639,7 @@ func (s *PallidSturgeonStore) UpdateSearchDataEntry(searchDataEntry models.Uploa
 var telemetryDataEntriesSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
 te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
-te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
+te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
@@ -1648,7 +1652,7 @@ where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 var telemetryDataEntriesBySeIdSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
 te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
-te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
+te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
@@ -1663,7 +1667,7 @@ and te.se_id = :1`
 var telemetryDataEntriesByTidSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
 te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
-te.UPLOAD_SESSION_ID, si.site_id from ds_telemetry_fish te
+te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
@@ -1753,7 +1757,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 		err = rows.Scan(&telemetryDataEntry.Bend, &telemetryDataEntry.CaptureLatitude, &telemetryDataEntry.CaptureLongitude, &telemetryDataEntry.CaptureTime, &telemetryDataEntry.Checkby, &telemetryDataEntry.Comments, &telemetryDataEntry.Conductivity, &telemetryDataEntry.Depth,
 			&telemetryDataEntry.EditInitials, &telemetryDataEntry.FrequencyIdCode, &telemetryDataEntry.Gravel, &telemetryDataEntry.LastEditComment, &telemetryDataEntry.LastUpdated, &telemetryDataEntry.MacroId, &telemetryDataEntry.MesoId, &telemetryDataEntry.PositionConfidence,
 			&telemetryDataEntry.RadioTagNum, &telemetryDataEntry.Sand, &telemetryDataEntry.SeFid, &telemetryDataEntry.SeId, &telemetryDataEntry.Silt, &telemetryDataEntry.Temp, &telemetryDataEntry.Turbidity, &telemetryDataEntry.TFid, &telemetryDataEntry.TId, &telemetryDataEntry.UploadedBy,
-			&telemetryDataEntry.UploadFilename, &telemetryDataEntry.UploadSessionId, &telemetryDataEntry.SiteId)
+			&telemetryDataEntry.UploadFilename, &telemetryDataEntry.UploadSessionId, &telemetryDataEntry.SiteId, &telemetryDataEntry.SuspectedSpawningActivity)
 		if err != nil {
 			return telemetryDataEntryWithCount, err
 		}
@@ -1766,14 +1770,15 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 }
 
 var insertTelemetryDataSql = `insert into ds_telemetry_fish (BEND,CAPTURE_LATITUDE,CAPTURE_LONGITUDE,CAPTURE_TIME,CHECKBY,COMMENTS,conductivity,depth,EDIT_INITIALS,FREQUENCY_ID_CODE,gravel,LAST_EDIT_COMMENT,
-	LAST_UPDATED,MACRO_ID,MESO_ID,POSITION_CONFIDENCE,RADIO_TAG_NUM,sand,SE_FID,SE_ID,silt,temp,turbidity,T_FID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID) 
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27) returning t_id into :28`
+	LAST_UPDATED,MACRO_ID,MESO_ID,POSITION_CONFIDENCE,RADIO_TAG_NUM,sand,SE_FID,SE_ID,silt,temp,turbidity,T_FID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID,suspected_spawning_activity) 
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28) returning t_id into :29`
 
 func (s *PallidSturgeonStore) SaveTelemetryDataEntry(telemetryDataEntry models.UploadTelemetry) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertTelemetryDataSql, telemetryDataEntry.Bend, telemetryDataEntry.CaptureLatitude, telemetryDataEntry.CaptureLongitude, telemetryDataEntry.CaptureTime, telemetryDataEntry.Checkby, telemetryDataEntry.Comments, telemetryDataEntry.Conductivity, telemetryDataEntry.Depth,
 		telemetryDataEntry.EditInitials, telemetryDataEntry.FrequencyIdCode, telemetryDataEntry.Gravel, telemetryDataEntry.LastEditComment, telemetryDataEntry.LastUpdated, telemetryDataEntry.MacroId, telemetryDataEntry.MesoId, telemetryDataEntry.PositionConfidence, telemetryDataEntry.RadioTagNum,
-		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId, sql.Out{Dest: &id})
+		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId, 
+		telemetryDataEntry.SuspectedSpawningActivity,sql.Out{Dest: &id})
 	return id, err
 }
 
@@ -1804,13 +1809,15 @@ TURBIDITY = :24,
 T_FID = :25,
 UPLOADED_BY = :26,
 UPLOAD_FILENAME = :27,
-UPLOAD_SESSION_ID = :28
+UPLOAD_SESSION_ID = :28,
+suspected_spawning_activity = :29
 WHERE T_ID = :1`
 
 func (s *PallidSturgeonStore) UpdateTelemetryDataEntry(telemetryDataEntry models.UploadTelemetry) error {
 	_, err := s.db.Exec(updateTelemetryDataSql, telemetryDataEntry.Bend, telemetryDataEntry.CaptureLatitude, telemetryDataEntry.CaptureLongitude, telemetryDataEntry.CaptureTime, telemetryDataEntry.Checkby, telemetryDataEntry.Comments, telemetryDataEntry.Conductivity, telemetryDataEntry.Depth,
 		telemetryDataEntry.EditInitials, telemetryDataEntry.FrequencyIdCode, telemetryDataEntry.Gravel, telemetryDataEntry.LastEditComment, telemetryDataEntry.LastUpdated, telemetryDataEntry.MacroId, telemetryDataEntry.MesoId, telemetryDataEntry.PositionConfidence, telemetryDataEntry.RadioTagNum,
-		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId, telemetryDataEntry.TId)
+		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId, 
+		telemetryDataEntry.SuspectedSpawningActivity, telemetryDataEntry.TId)
 	return err
 }
 
@@ -1822,7 +1829,7 @@ func (s *PallidSturgeonStore) DeleteTelemetryDataEntry(id string) error {
 var procedureDataEntriesSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id, pr.serial_num from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1837,7 +1844,7 @@ where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 var procedureDataEntriesByIdSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id, pr.serial_num from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1854,7 +1861,7 @@ and pr.id = :1`
 var procedureDataEntriesByFidSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id, pr.serial_num from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1871,7 +1878,7 @@ and pr.f_id = :1`
 var procedureDataEntriesByFfidSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id, pr.serial_num from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1888,7 +1895,7 @@ and pr.f_fid = :1`
 var procedureDataEntriesByMrIdSql = `select pr.ID, pr.F_ID, pr.F_FID, si.site_id, pr.PURPOSE_CODE, pr.PROCEDURE_DATE, pr.PROCEDURE_START_TIME, pr.PROCEDURE_END_TIME, pr.PROCEDURE_BY, pr.ANTIBIOTIC_INJECTION_IND, pr.PHOTO_DORSAL_IND, pr.PHOTO_VENTRAL_IND, 
 pr.PHOTO_LEFT_IND, pr.OLD_RADIO_TAG_NUM, pr.OLD_FREQUENCY_ID, pr.DST_SERIAL_NUM, pr.DST_START_TIME, pr.DST_REIMPLANT_IND, pr.NEW_RADIO_TAG_NUM, pr.NEW_FREQUENCY_ID, pr.SEX_CODE, pr.COMMENTS, pr.FISH_HEALTH_COMMENTS, pr.SPAWN_CODE, pr.EVAL_LOCATION_CODE, 
 pr.BLOOD_SAMPLE_IND, pr.EGG_SAMPLE_IND, pr.VISUAL_REPRO_STATUS_CODE, pr.ULTRASOUND_REPRO_STATUS_CODE, pr.ULTRASOUND_GONAD_LENGTH, pr.GONAD_CONDITION, pr.EXPECTED_SPAWN_YEAR, pr.LAST_UPDATED, pr.UPLOAD_SESSION_ID, pr.UPLOADED_BY, pr.UPLOAD_FILENAME, 
-pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id from ds_procedure pr
+pr.CHECKBY, pr.EDIT_INITIALS, pr.LAST_EDIT_COMMENT, pr.MR_FID, pr.dst_start_date, pr.s_id, pr.serial_num from ds_procedure pr
 inner join ds_fish fi on fi.f_id = pr.f_id
 inner join ds_moriver mo on mo.mr_id = fi.mr_id
 inner join ds_sites si on si.site_id = mo.site_id
@@ -1987,7 +1994,7 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 			&procedureDataEntry.PhotoDorsalInd, &procedureDataEntry.PhotoVentralInd, &procedureDataEntry.PhotoLeftInd, &procedureDataEntry.OldRadioTagNum, &procedureDataEntry.OldFrequencyId, &procedureDataEntry.DstSerialNum, &procedureDataEntry.DstStartTime, &procedureDataEntry.DstReimplantInd,
 			&procedureDataEntry.NewRadioTagNum, &procedureDataEntry.NewFrequencyId, &procedureDataEntry.SexCode, &procedureDataEntry.Comments, &procedureDataEntry.FishHealthComments, &procedureDataEntry.SpawnStatus, &procedureDataEntry.EvalLocationCode, &procedureDataEntry.BloodSampleInd, &procedureDataEntry.EggSampleInd,
 			&procedureDataEntry.VisualReproStatusCode, &procedureDataEntry.UltrasoundReproStatusCode, &procedureDataEntry.UltrasoundGonadLength, &procedureDataEntry.GonadCondition, &procedureDataEntry.ExpectedSpawnYear, &procedureDataEntry.LastUpdated, &procedureDataEntry.UploadSessionId, &procedureDataEntry.UploadedBy,
-			&procedureDataEntry.UploadFilename, &procedureDataEntry.Checkby, &procedureDataEntry.EditInitials, &procedureDataEntry.LastEditComment, &procedureDataEntry.MrFid, &procedureDataEntry.DstStartDate, &procedureDataEntry.Sid)
+			&procedureDataEntry.UploadFilename, &procedureDataEntry.Checkby, &procedureDataEntry.EditInitials, &procedureDataEntry.LastEditComment, &procedureDataEntry.MrFid, &procedureDataEntry.DstStartDate, &procedureDataEntry.Sid, &procedureDataEntry.SerialNum)
 		if err != nil {
 			return procedureDataEntryWithCount, err
 		}
@@ -2001,8 +2008,8 @@ func (s *PallidSturgeonStore) GetProcedureDataEntries(tableId string, fId string
 
 var insertProcedureDataSql = `insert into ds_procedure (S_ID, F_ID, F_FID, PURPOSE_CODE, PROCEDURE_DATE, PROCEDURE_START_TIME, PROCEDURE_END_TIME, PROCEDURE_BY, ANTIBIOTIC_INJECTION_IND, PHOTO_DORSAL_IND, PHOTO_VENTRAL_IND, PHOTO_LEFT_IND, OLD_RADIO_TAG_NUM, OLD_FREQUENCY_ID, DST_SERIAL_NUM, DST_START_DATE, DST_START_TIME, 
 	DST_REIMPLANT_IND, NEW_RADIO_TAG_NUM, NEW_FREQUENCY_ID, SEX_CODE, COMMENTS, FISH_HEALTH_COMMENTS, SPAWN_CODE, EVAL_LOCATION_CODE, BLOOD_SAMPLE_IND, EGG_SAMPLE_IND, VISUAL_REPRO_STATUS_CODE, ULTRASOUND_REPRO_STATUS_CODE, ULTRASOUND_GONAD_LENGTH, GONAD_CONDITION, EXPECTED_SPAWN_YEAR, LAST_UPDATED, UPLOAD_SESSION_ID, UPLOADED_BY, 
-	UPLOAD_FILENAME, CHECKBY, EDIT_INITIALS, LAST_EDIT_COMMENT, MR_FID) 
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40) returning id into :41`
+	UPLOAD_FILENAME, CHECKBY, EDIT_INITIALS, LAST_EDIT_COMMENT, MR_FID, serial_num) 
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41) returning id into :42`
 
 func (s *PallidSturgeonStore) SaveProcedureDataEntry(procedureDataEntry models.UploadProcedure) (int, error) {
 	var id int
@@ -2010,7 +2017,7 @@ func (s *PallidSturgeonStore) SaveProcedureDataEntry(procedureDataEntry models.U
 		procedureDataEntry.PhotoDorsalInd, procedureDataEntry.PhotoVentralInd, procedureDataEntry.PhotoLeftInd, procedureDataEntry.OldRadioTagNum, procedureDataEntry.OldFrequencyId, procedureDataEntry.DstSerialNum, procedureDataEntry.DstStartDate, procedureDataEntry.DstStartTime, procedureDataEntry.DstReimplantInd,
 		procedureDataEntry.NewRadioTagNum, procedureDataEntry.NewFrequencyId, procedureDataEntry.SexCode, procedureDataEntry.Comments, procedureDataEntry.FishHealthComments, procedureDataEntry.SpawnStatus, procedureDataEntry.EvalLocationCode, procedureDataEntry.BloodSampleInd, procedureDataEntry.EggSampleInd,
 		procedureDataEntry.VisualReproStatusCode, procedureDataEntry.UltrasoundReproStatusCode, procedureDataEntry.UltrasoundGonadLength, procedureDataEntry.GonadCondition, procedureDataEntry.ExpectedSpawnYear, procedureDataEntry.LastUpdated, procedureDataEntry.UploadSessionId, procedureDataEntry.UploadedBy,
-		procedureDataEntry.UploadFilename, procedureDataEntry.Checkby, procedureDataEntry.EditInitials, procedureDataEntry.LastEditComment, procedureDataEntry.MrFid, sql.Out{Dest: &id})
+		procedureDataEntry.UploadFilename, procedureDataEntry.Checkby, procedureDataEntry.EditInitials, procedureDataEntry.LastEditComment, procedureDataEntry.MrFid, procedureDataEntry.SerialNum, sql.Out{Dest: &id})
 	return id, err
 }
 
@@ -2054,7 +2061,8 @@ CHECKBY = :37,
 EDIT_INITIALS = :38, 
 LAST_EDIT_COMMENT = :39, 
 mr_fid = :40,
-s_id = :41
+s_id = :41,
+serial_num = :42
 where id = :1`
 
 func (s *PallidSturgeonStore) UpdateProcedureDataEntry(procedureDataEntry models.UploadProcedure) error {
@@ -2062,7 +2070,7 @@ func (s *PallidSturgeonStore) UpdateProcedureDataEntry(procedureDataEntry models
 		procedureDataEntry.PhotoDorsalInd, procedureDataEntry.PhotoVentralInd, procedureDataEntry.PhotoLeftInd, procedureDataEntry.OldRadioTagNum, procedureDataEntry.OldFrequencyId, procedureDataEntry.DstSerialNum, procedureDataEntry.DstStartDate, procedureDataEntry.DstStartTime, procedureDataEntry.DstReimplantInd,
 		procedureDataEntry.NewRadioTagNum, procedureDataEntry.NewFrequencyId, procedureDataEntry.SexCode, procedureDataEntry.Comments, procedureDataEntry.FishHealthComments, procedureDataEntry.SpawnStatus, procedureDataEntry.EvalLocationCode, procedureDataEntry.BloodSampleInd, procedureDataEntry.EggSampleInd,
 		procedureDataEntry.VisualReproStatusCode, procedureDataEntry.UltrasoundReproStatusCode, procedureDataEntry.UltrasoundGonadLength, procedureDataEntry.GonadCondition, procedureDataEntry.ExpectedSpawnYear, procedureDataEntry.LastUpdated, procedureDataEntry.UploadSessionId, procedureDataEntry.UploadedBy,
-		procedureDataEntry.UploadFilename, procedureDataEntry.Checkby, procedureDataEntry.EditInitials, procedureDataEntry.LastEditComment, procedureDataEntry.MrFid, procedureDataEntry.Sid, procedureDataEntry.Id)
+		procedureDataEntry.UploadFilename, procedureDataEntry.Checkby, procedureDataEntry.EditInitials, procedureDataEntry.LastEditComment, procedureDataEntry.MrFid, procedureDataEntry.Sid, procedureDataEntry.SerialNum, procedureDataEntry.Id)
 	return err
 }
 
@@ -3301,8 +3309,8 @@ var insertSupplementalUploadSql = `insert into upload_supplemental (site_id, f_f
 	sex, stage, recapture, photo,
 	genetic_needs, other_tag_info,
 	comments,
-	last_updated, upload_session_id, uploaded_by, upload_filename) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45)`
+	last_updated, upload_session_id, uploaded_by, upload_filename, project_3_7) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46)`
 
 func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.UploadSupplemental) error {
 	_, err := s.db.Exec(insertSupplementalUploadSql,
@@ -3351,6 +3359,7 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 		uploadSupplemental.UploadSessionId,
 		uploadSupplemental.UploadedBy,
 		uploadSupplemental.UploadFilename,
+		uploadSupplemental.Project37,
 	)
 
 	return err
@@ -3361,8 +3370,8 @@ var insertProcedureUploadSql = `insert into upload_procedure (f_fid, mr_fid, pur
 	old_radio_tag_num, old_frequency_id, dst_serial_num, dst_start_date, dst_start_time, dst_reimplant_ind, new_radio_tag_num,
 	new_frequency_id, sex_code, blood_sample_ind, egg_sample_ind, comments, fish_health_comments,
 	eval_location_code, spawn_code, visual_repro_status_code, ultrasound_repro_status_code,
-	expected_spawn_year, ultrasound_gonad_length, gonad_condition, last_updated, upload_session_id, uploaded_by, upload_filename)                                                        
-values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35)`
+	expected_spawn_year, ultrasound_gonad_length, gonad_condition, last_updated, upload_session_id, uploaded_by, upload_filename, serial_num)                                                        
+values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36)`
 
 func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadProcedure) error {
 	_, err := s.db.Exec(insertProcedureUploadSql,
@@ -3401,6 +3410,7 @@ func (s *PallidSturgeonStore) SaveProcedureUpload(uploadProcedure models.UploadP
 		uploadProcedure.UploadSessionId,
 		uploadProcedure.UploadedBy,
 		uploadProcedure.UploadFilename,
+		uploadProcedure.SerialNum,
 	)
 
 	return err
@@ -3448,8 +3458,8 @@ func (s *PallidSturgeonStore) SaveMoriverUpload(UploadMoriver models.UploadMoriv
 }
 
 var insertTelemetryUploadSql = `insert into upload_telemetry_fish(t_fid, se_fid, bend, radio_tag_num, frequency_id_code, capture_time, capture_latitude, capture_longitude,
-	position_confidence, macro_id, meso_id, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, last_updated, upload_session_id, uploaded_by, upload_filename)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23)`
+	position_confidence, macro_id, meso_id, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, last_updated, upload_session_id, uploaded_by, upload_filename, suspected_spawning_activity)
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24)`
 
 func (s *PallidSturgeonStore) SaveTelemetryUpload(uploadTelemetry models.UploadTelemetry) error {
 	_, err := s.db.Exec(insertTelemetryUploadSql,
@@ -3476,6 +3486,7 @@ func (s *PallidSturgeonStore) SaveTelemetryUpload(uploadTelemetry models.UploadT
 		uploadTelemetry.UploadSessionId,
 		uploadTelemetry.UploadedBy,
 		uploadTelemetry.UploadFilename,
+		uploadTelemetry.SuspectedSpawningActivity,
 	)
 
 	return err
