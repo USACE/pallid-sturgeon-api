@@ -225,7 +225,7 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Site data entries retrieved successfully", siteDataEntries))
 }
 
-func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
+func (sd *PallidSturgeonHandler) AddSiteDataEntry(c echo.Context) error {
 	code, sampleUnitType, segment := c.QueryParam("code"), c.QueryParam("sampleUnitType"), c.QueryParam("segment")
 	siteData := models.Sites{}
 	if err := c.Bind(&siteData); err != nil {
@@ -235,7 +235,7 @@ func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
 	siteData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	siteData.UploadedBy = user.FirstName + " " + user.LastName
-	id, err := sd.Store.SaveSiteDataEntry(code, sampleUnitType, segment, siteData)
+	id, err := sd.Store.AddSiteDataEntry(code, sampleUnitType, segment, siteData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

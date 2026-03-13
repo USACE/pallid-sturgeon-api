@@ -1,10 +1,65 @@
 package models
 
+// GLOBAL LOOK UP MODELS
+
+type YearLK struct {
+	YearId int `db:"year_id" json:"id"`
+	Year   int `db:"year" json:"year"`
+}
+
+type FieldOfficeLK struct {
+	FoId          int    `db:"fo_id" json:"id"`
+	FoCode        string `db:"field_office_code" json:"code"`
+	FoDescription string `db:"field_office_description" json:"description"`
+	State         string `db:"state" json:"state"`
+}
+
+type FieldOfficeSegment struct {
+	FosId          		int    `db:"fos_id" json:"id"`
+	FieldOfficeCode     string `db:"field_office_code" json:"fieldOfficeCode"`
+	SegmentCode 		int `db:"segment_code" json:"segmentCode"`
+	ProjectCode         int `db:"project_code" json:"projectCode"`
+}
+
+type ProjectLK struct {
+	ProjectCode        int    `db:"project_code" json:"code"`
+	ProjectDescription string `db:"project_description" json:"description"`
+}
+
+type SegmentLK struct {
+	SegmentId          int    `db:"s_id" json:"id"`
+	SegmentCode        int    `db:"segment_code" json:"code"`
+	SegmentDescription string `db:"segment_description" json:"description"`
+}
+
+type SeasonLK struct {
+	SeasonId          int    `db:"s_id" json:"id"`
+	SeasonCode        string    `db:"season_code" json:"code"`
+	SeasonDescription string `db:"season_description" json:"description"`
+}
+
+type SampleUnitTypeLK struct {
+	SutCode        string    `db:"sample_unit_type_code" json:"code"`
+	SutDescription string `db:"sample_unit_type_description" json:"description"`
+}
+
+type BendRiverMile struct {
+	BrmId          int      `db:"brm_id" json:"id"`
+	Segment        int      `db:"b_segment" json:"segment"`
+	Bend           int      `db:"bend_num" json:"bend"`
+	BendDescription string `db:"b_desc" json:"bendDescription"`
+	State          string   `db:"state" json:"state"`
+	UpperRiverMile *float64 `db:"upper_river_mile" json:"upperRiverMile"`
+	LowerRiverMile *float64 `db:"lower_river_mile" json:"lowerRiverMile"`
+}
+
 type BendSelection struct {
 	BsId              int    `db:"bs_id" json:"id"`
 	BendSelectionCode string `db:"bend_selection_code" json:"code"`
 	BendSelectionDesc string `db:"bend_selection_description" json:"description"`
 }
+
+// MISSOURI RIVER LOOK UP MODELS
 
 type GearCode struct {
 	GearId          int    `db:"gear_id" json:"id"`
@@ -118,15 +173,6 @@ type SetSite2LK struct {
 type SetSite3 struct {
 	SsCode        int    `db:"set_site_3_code" json:"code"`
 	SsDescription string `db:"set_site_3" json:"description"`
-}
-
-type BendRiverMile struct {
-	BrmId          int      `db:"brm_id" json:"id"`
-	Segment        int      `db:"b_segment" json:"segment"`
-	Bend           int      `db:"bend_num" json:"bend"`
-	State          string   `db:"state" json:"state"`
-	UpperRiverMile *float64 `db:"upper_river_mile" json:"upperRiverMile"`
-	LowerRiverMile *float64 `db:"lower_river_mile" json:"lowerRiverMile"`
 }
 
 type SubsampleType struct {
