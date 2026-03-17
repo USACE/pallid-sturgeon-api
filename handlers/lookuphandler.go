@@ -59,6 +59,16 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bend river mile data", err))
 	}
 
+	chutes, err := s.Store.GetChutes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve chutes data", err))
+	}
+
+	reach, err := s.Store.GetReach()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve reach data", err))
+	}
+
 	// MORIVER LOOK UP QUERIES
 	gearCodes, err := s.Store.GetGearCodes()
 	if err != nil {
@@ -180,6 +190,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 	response := map[string]any{
 		"bendSelections":    bendSelections,
 		"bendRiverMile": 	 bendRiverMile,
+		"chutes": 			 chutes,
 		"estimations": 		 estimations,
 		"fieldOffices": 	 fieldOffices,
 		"fieldOfficeSegments": fieldOfficeSegments,
@@ -198,6 +209,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"microStructures": 	 microStructures,
 		"microHabitats":     microHabitats,
 		"projects": 		 projects,
+		"reach": 			 reach,
 		"sampleUnitTypes": 	 sampleUnitTypes,
 		"seasons": 			 seasons,
 		"segments": 		 segments,

@@ -256,6 +256,55 @@ func (s *LookupStore) GetBendRiverMile() ([]models.BendRiverMile, error) {
 	return data, nil
 }
 
+func (s *LookupStore) GetChutes() ([]models.Chute, error) {
+	query := `
+        SELECT chute_id, segment_id, chute_code, chute_desc, upper_river_mile
+		FROM chute_lk ORDER BY chute_desc asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Chute{}
+
+	for rows.Next() {
+		var i models.Chute
+		if err := rows.Scan(&i.ChuteId, &i.Segment, &i.ChuteCode, &i.ChuteDescription, &i.UpperRiverMile); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetReach() ([]models.Reach, error) {
+	query := `
+        SELECT reach_id, segment_id, reach_code, reach_desc, upper_river_mile
+		FROM reach_lk ORDER BY reach_desc asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Reach{}
+
+	for rows.Next() {
+		var i models.Reach
+		if err := rows.Scan(&i.ReachId, &i.Segment, &i.ReachCode, &i.ReachDescription, &i.UpperRiverMile); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+
 // MISSOURI RIVER LOOK UP QUERIES
 
 func (s *LookupStore) GetGearCodes() ([]models.GearCode, error) {

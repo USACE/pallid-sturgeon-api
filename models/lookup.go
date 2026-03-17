@@ -59,6 +59,22 @@ type BendSelection struct {
 	BendSelectionDesc string `db:"bend_selection_description" json:"description"`
 }
 
+type Chute struct {
+	ChuteId          int     `db:"chute_id" json:"id"`
+	Segment 	     int 	 `db:"segment_id" json:"segment"`
+	ChuteCode 		 string  `db:"chute_code" json:"code"`
+	ChuteDescription string  `db:"chute_desc" json:"description"`
+	UpperRiverMile 	 float64 `db:"upper_river_mile" json:"upperRiverMile"`
+}
+
+type Reach struct {
+	ReachId          int     `db:"reach_id" json:"id"`
+	Segment 	     int 	 `db:"segment_id" json:"segment"`
+	ReachCode 		 string  `db:"reach_code" json:"code"`
+	ReachDescription string  `db:"reach_desc" json:"description"`
+	UpperRiverMile 	 float64 `db:"upper_river_mile" json:"upperRiverMile"`
+}
+
 // MISSOURI RIVER LOOK UP MODELS
 
 type GearCode struct {
