@@ -60,6 +60,7 @@ func main() {
 
 	e.GET(urlContext+"/Lookup/getAllLookups", auth.Authorize(LookupH.GetAllLookups, PUBLIC))
 
+	// @TODO: Will deprecate soon as they will be covered by the Lookup query
 	e.GET(urlContext+"/projects", auth.Authorize(PallidSturgeonH.GetProjects, PUBLIC))
 	e.GET(urlContext+"/projectsFilter", auth.Authorize(PallidSturgeonH.GetProjectsFilter, PUBLIC))
 	e.GET(urlContext+"/roles", auth.Authorize(PallidSturgeonH.GetRoles, PUBLIC))
@@ -81,9 +82,10 @@ func main() {
 	e.GET(urlContext+"/setsite2", auth.Authorize(PallidSturgeonH.GetSetSite2, PUBLIC))
 	e.GET(urlContext+"/years", auth.Authorize(PallidSturgeonH.GetYears, PUBLIC))
 
-	e.GET(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.GetSiteDataEntries, PUBLIC))
-	e.POST(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.SaveSiteDataEntry, PUBLIC))
-	e.PUT(urlContext+"/siteDataEntry", auth.Authorize(PallidSturgeonH.UpdateSiteDataEntry, PUBLIC))
+	e.GET(urlContext+"/Sites/getSites", auth.Authorize(PallidSturgeonH.GetSiteDataEntries, PUBLIC))
+	e.POST(urlContext+"/Sites/addSite", auth.Authorize(PallidSturgeonH.AddSiteDataEntry, PUBLIC))
+	e.PUT(urlContext+"/Sites/updateSite", auth.Authorize(PallidSturgeonH.UpdateSiteDataEntry, PUBLIC))
+	
 	e.GET(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.GetFishDataEntries, PUBLIC))
 	e.POST(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.SaveFishDataEntry, PUBLIC))
 	e.PUT(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.UpdateFishDataEntry, PUBLIC))

@@ -13,13 +13,63 @@ type LookupHandler struct {
 }
 
 func (s *LookupHandler) GetAllLookups(c echo.Context) error {
-	// MORIVER LOOK UP QUERIES
+	// GLOBAL LOOK UP QUERIES
+	years, err := s.Store.GetYears()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve years data", err))
+	}
+
+	fieldOffices, err := s.Store.GetFieldOffices()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve field offices data", err))
+	}
+
+	fieldOfficeSegments, err := s.Store.GetFieldOfficeSegment()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve field office segments data", err))
+	}
+
+	projects, err := s.Store.GetProjects()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve projects data", err))
+	}
+
+	segments, err := s.Store.GetSegments()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve segments data", err))
+	}
+
+	seasons, err := s.Store.GetSeasons()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve seasons data", err))
+	}
+
+	sampleUnitTypes, err := s.Store.GetSampleUnitTypes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sample unit types data", err))
+	}
 
 	bendSelections, err := s.Store.GetBendSelections()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bend selections", err))
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bend selections data", err))
 	}
 
+	bendRiverMile, err := s.Store.GetBendRiverMile()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bend river mile data", err))
+	}
+
+	chutes, err := s.Store.GetChutes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve chutes data", err))
+	}
+
+	reach, err := s.Store.GetReach()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve reach data", err))
+	}
+
+	// MORIVER LOOK UP QUERIES
 	gearCodes, err := s.Store.GetGearCodes()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve gear codes", err))
@@ -105,18 +155,12 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve set site 3 data", err))
 	}
 
-	bendRiverMile, err := s.Store.GetBendRiverMile()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve bend river mile data", err))
-	}
-
 	subsampleTypes, err := s.Store.GetSubsampleTypes()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve subsample types data", err))
 	}
 
 	// FISH LOOK UP QUERIES
-
 	fishCodes, err := s.Store.GetFishCodes()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve fish codes data", err))
@@ -146,7 +190,10 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 	response := map[string]any{
 		"bendSelections":    bendSelections,
 		"bendRiverMile": 	 bendRiverMile,
+		"chutes": 			 chutes,
 		"estimations": 		 estimations,
+		"fieldOffices": 	 fieldOffices,
+		"fieldOfficeSegments": fieldOfficeSegments,
 		"filteredGearCodes": filteredGearCodes,
 		"fishCodes":         fishCodes,
 		"fishStructures":    fishStructures,
@@ -161,6 +208,11 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"microSetSite": 	 microSetSite,
 		"microStructures": 	 microStructures,
 		"microHabitats":     microHabitats,
+		"projects": 		 projects,
+		"reach": 			 reach,
+		"sampleUnitTypes": 	 sampleUnitTypes,
+		"seasons": 			 seasons,
+		"segments": 		 segments,
 		"setSite1Options":   setSite1,
 		"setSite2Options":   setSite2,
 		"setSite3Options":   setSite3,
@@ -169,6 +221,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"subsampleTypes":    subsampleTypes,
 		"u6Options":         u6,
 		"u7Options":         u7,
+		"years": 			 years,
 	}
 
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Lookup data retrieved successfully", response))
