@@ -663,7 +663,7 @@ var insertSiteDataSql = `insert into ds_sites (brm_id, site_fid, year, FIELDOFFI
 	ELSE 0
 	END),:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13) returning site_id into :23`
 
-func (s *PallidSturgeonStore) SaveSiteDataEntry(code string, sampleUnitType string, segmentCode string, sitehDataEntry models.Sites) (int, error) {
+func (s *PallidSturgeonStore) AddSiteDataEntry(code string, sampleUnitType string, segmentCode string, sitehDataEntry models.Sites) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertSiteDataSql, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId,
 		sitehDataEntry.SegmentId, sitehDataEntry.SeasonId, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bend, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated,
