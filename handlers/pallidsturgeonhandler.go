@@ -450,7 +450,7 @@ func (sd *PallidSturgeonHandler) GetSearchDataEntries(c echo.Context) error {
 func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
 	searchData := models.UploadSearch{}
 	if err := c.Bind(&searchData); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to search data", err))
 	}
 	searchData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
@@ -458,10 +458,10 @@ func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
 	searchData.SearchDate = processStringTime(DerefString(searchData.SearchDate), "app")
 	id, err := sd.Store.SaveSearchDataEntry(searchData)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search data entries", err))
 	}
 
-	return c.JSON(200, id)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Successfully saved Search Effort data entry", id))
 }
 
 func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
@@ -567,17 +567,17 @@ func (sd *PallidSturgeonHandler) GetTelemetryDataEntries(c echo.Context) error {
 func (sd *PallidSturgeonHandler) SaveTelemetryDataEntry(c echo.Context) error {
 	telemetryData := models.UploadTelemetry{}
 	if err := c.Bind(&telemetryData); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to upload telemetry data", err))
 	}
 	telemetryData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	telemetryData.UploadedBy = user.FirstName + " " + user.LastName
 	id, err := sd.Store.SaveTelemetryDataEntry(telemetryData)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to save telemetry data entries", err))
 	}
 
-	return c.JSON(200, id)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Telemetry data entries saved successfully", id))
 }
 
 func (sd *PallidSturgeonHandler) UpdateTelemetryDataEntry(c echo.Context) error {
