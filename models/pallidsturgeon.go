@@ -247,6 +247,7 @@ type SearchSummary struct {
 	StopLongitude  float64  `db:"stop_longitude" json:"stopLongitude"`
 	Temp           *string  `db:"temp" json:"temp"`
 	Conductivity   *string  `db:"conductivity" json:"conductivity"`
+	Status		   int		`db:"status" json:"status"`
 	Checkby        string   `db:"checkby" json:"checkby"`
 	Bend           *int     `db:"bend" json:"bend"`
 	Bendrn         string   `db:"bendrn" json:"bendrn"`
@@ -466,11 +467,12 @@ type UploadSearch struct {
 	StartTime       string    `db:"start_time" json:"startTime"`
 	StartLatitude   float64   `db:"start_latitude" json:"startLatitude"`
 	StartLongitude  float64   `db:"start_longitude" json:"startLongitude"`
-	StopTime        string    `db:"stop_time" json:"stopTime"`
-	StopLatitude    float64   `db:"stop_latitude" json:"stopLatitude"`
-	StopLongitude   float64   `db:"stop_longitude" json:"stopLongitude"`
+	StopTime        *string    `db:"stop_time" json:"stopTime"`
+	StopLatitude    *float64   `db:"stop_latitude" json:"stopLatitude"`
+	StopLongitude   *float64   `db:"stop_longitude" json:"stopLongitude"`
 	Temp            *float64  `db:"temp" json:"temp"`
 	Conductivity    *float64  `db:"conductivity" json:"conductivity"`
+	Status			int		  `db:"status" json:"status"`
 	TelemetryCount  int       `db:"telemetry_count" json:"telemetryCount"`
 	BkgColor        string    `db:"bkg_color" json:"bkgColor"`
 	Checkby         string    `db:"checkby" json:"checkby"`

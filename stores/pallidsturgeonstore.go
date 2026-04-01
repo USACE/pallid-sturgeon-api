@@ -1486,19 +1486,19 @@ func (s *PallidSturgeonStore) DeleteSupplementalDataEntry(id string) error {
 
 var searchDataEntriesSql = `select SE_FID, SE_ID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, search_day, 
 SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
-UPLOAD_SESSION_ID, ds_id from ds_search`
+UPLOAD_SESSION_ID, ds_id, status from ds_search`
 
 var searchDataEntriesCountSql = `select count(*) from ds_search`
 
 var searchDataEntriesBySeIdSql = `select SE_FID, SE_ID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, search_day, 
 SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
-UPLOAD_SESSION_ID, ds_id from ds_search where se_id = :1`
+UPLOAD_SESSION_ID, ds_id, status from ds_search where se_id = :1`
 
 var searchDataEntriesCountBySeIdSql = `select count(*) from ds_search where se_id = :1`
 
 var searchDataEntriesBySiteIdSql = `select SE_FID, SE_ID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, search_day, 
 SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
-UPLOAD_SESSION_ID, ds_id from ds_search where site_id = :1`
+UPLOAD_SESSION_ID, ds_id, status from ds_search where site_id = :1`
 
 var searchDataEntriesCountBySiteIdSql = `select count(*) from ds_search where site_id = :1`
 
@@ -1581,7 +1581,7 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 		err = rows.Scan(&searchDataEntry.SeFid, &searchDataEntry.SeId, &searchDataEntry.Checkby, &searchDataEntry.Conductivity, &searchDataEntry.EditInitials, &searchDataEntry.LastEditComment, &searchDataEntry.LastUpdated,
 			&searchDataEntry.Recorder, &searchDataEntry.SearchDate, &searchDataEntry.SearchDay, &searchDataEntry.SearchTypeCode, &searchDataEntry.SiteId, &searchDataEntry.StartLatitude, &searchDataEntry.StartLongitude,
 			&searchDataEntry.StartTime, &searchDataEntry.StopLatitude, &searchDataEntry.StopLongitude, &searchDataEntry.StopTime, &searchDataEntry.Temp, &searchDataEntry.UploadedBy, &searchDataEntry.UploadFilename,
-			&searchDataEntry.UploadSessionId, &searchDataEntry.DsId)
+			&searchDataEntry.UploadSessionId, &searchDataEntry.DsId, &searchDataEntry.Status)
 		if err != nil {
 			return searchDataEntryWithCount, err
 		}
@@ -1595,13 +1595,13 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 
 var insertSearchDataSql = `insert into ds_search (SE_FID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE,
 SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
-UPLOAD_SESSION_ID, ds_id) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21) returning se_id into :22`
+UPLOAD_SESSION_ID, ds_id, status) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21, :22) returning se_id into :23`
 
 func (s *PallidSturgeonStore) SaveSearchDataEntry(searchDataEntry models.UploadSearch) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertSearchDataSql, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
 		searchDataEntry.SearchDate, searchDataEntry.SearchTypeCode, searchDataEntry.SiteId, searchDataEntry.StartLatitude, searchDataEntry.StartLongitude, searchDataEntry.StartTime, searchDataEntry.StopLatitude,
-		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.DsId, sql.Out{Dest: &id})
+		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.DsId, searchDataEntry.Status, sql.Out{Dest: &id})
 	return id, err
 }
 
@@ -1626,13 +1626,14 @@ STOP_TIME = :18,
 TEMP = :19,
 UPLOADED_BY = :20,
 UPLOAD_FILENAME = :21,
-UPLOAD_SESSION_ID = :22
+UPLOAD_SESSION_ID = :22,
+STATUS = :23,
 WHERE SE_ID = :1`
 
 func (s *PallidSturgeonStore) UpdateSearchDataEntry(searchDataEntry models.UploadSearch) error {
-	_, err := s.db.Exec(updateSearchDataSql, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
+	_, err := s.db.Exec(updateSearchDataSql, searchDataEntry.SeId, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
 		searchDataEntry.SearchDate, searchDataEntry.SearchDay, searchDataEntry.SearchTypeCode, searchDataEntry.SiteId, searchDataEntry.StartLatitude, searchDataEntry.StartLongitude, searchDataEntry.StartTime, searchDataEntry.StopLatitude,
-		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.SeId)
+		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.Status)
 	return err
 }
 
@@ -3114,7 +3115,7 @@ func (s *PallidSturgeonStore) GetMissouriDatasheetById(siteId string, officeCode
 }
 
 var searchDatasheetsBySiteId = `select si.site_id, se.se_id, se.recorder, se.search_type_code, se.start_time, se.start_latitude, se.start_longitude, se.stop_time, se.stop_latitude, se.stop_longitude,
-se.temp, se.conductivity
+se.temp, se.conductivity, se.status
 , (select count(t.t_id)
            from ds_sites s, ds_search sea, ds_telemetry_fish t
            where s.site_id = sea.site_id
@@ -3173,7 +3174,7 @@ func (s *PallidSturgeonStore) GetSearchDatasheetById(siteId string, queryParams 
 	for rows.Next() {
 		datasheets := models.UploadSearch{}
 		err = rows.Scan(&datasheets.SiteId, &datasheets.SeId, &datasheets.Recorder, &datasheets.SearchTypeCode, &datasheets.StartTime, &datasheets.StartLatitude, &datasheets.StartLongitude, &datasheets.StopTime,
-			&datasheets.StopLatitude, &datasheets.StopLongitude, &datasheets.Temp, &datasheets.Conductivity, &datasheets.TelemetryCount, &datasheets.BkgColor)
+			&datasheets.StopLatitude, &datasheets.StopLongitude, &datasheets.Temp, &datasheets.Conductivity, &datasheets.Status, &datasheets.TelemetryCount, &datasheets.BkgColor)
 		if err != nil {
 			return searchDatasheetsWithCount, err
 		}
