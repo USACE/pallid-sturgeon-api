@@ -36,6 +36,178 @@ func InitLookupStore(appConfig *config.AppConfig) (*LookupStore, error) {
 	return &ss, nil
 }
 
+// GLOBAL LOOK UP QUERIES
+
+func (s *LookupStore) GetYears() ([]models.YearLK, error) {
+	query := `
+        SELECT year_id, year
+		FROM year_lk ORDER BY year desc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.YearLK{}
+
+	for rows.Next() {
+		var i models.YearLK
+		if err := rows.Scan(&i.YearId, &i.Year); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetFieldOffices() ([]models.FieldOfficeLK, error) {
+	query := `
+        SELECT fo_id, field_office_code, field_office_description, state
+		FROM field_office_lk ORDER BY fo_id desc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.FieldOfficeLK{}
+
+	for rows.Next() {
+		var i models.FieldOfficeLK
+		if err := rows.Scan(&i.FoId, &i.FoCode, &i.FoDescription, &i.State); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetFieldOfficeSegment() ([]models.FieldOfficeSegment, error) {
+	query := `
+        SELECT fos_id, field_office_code, segment_code, project_code
+		FROM field_office_segment_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.FieldOfficeSegment{}
+
+	for rows.Next() {
+		var i models.FieldOfficeSegment
+		if err := rows.Scan(&i.FosId, &i.FieldOfficeCode, &i.SegmentCode, &i.ProjectCode); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetProjects() ([]models.ProjectLK, error) {
+	query := `
+        SELECT project_code, project_description
+		FROM project_lk WHERE active_flag_tf = 'T'
+		ORDER BY project_code asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.ProjectLK{}
+
+	for rows.Next() {
+		var i models.ProjectLK
+		if err := rows.Scan(&i.ProjectCode, &i.ProjectDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSegments() ([]models.SegmentLK, error) {
+	query := `
+        SELECT s_id, segment_code, segment_description
+		FROM segment_lk ORDER BY segment_code asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SegmentLK{}
+
+	for rows.Next() {
+		var i models.SegmentLK
+		if err := rows.Scan(&i.SegmentId, &i.SegmentCode, &i.SegmentDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSeasons() ([]models.SeasonLK, error) {
+	query := `
+        SELECT s_id, season_code, season_description
+		FROM season_lk WHERE active_flag_tf = 'T'
+		ORDER BY s_id asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SeasonLK{}
+
+	for rows.Next() {
+		var i models.SeasonLK
+		if err := rows.Scan(&i.SeasonId, &i.SeasonCode, &i.SeasonDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSampleUnitTypes() ([]models.SampleUnitTypeLK, error) {
+	query := `
+        SELECT sample_unit_type_code, sample_unit_type_description
+		FROM sample_unit_type_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SampleUnitTypeLK{}
+
+	for rows.Next() {
+		var i models.SampleUnitTypeLK
+		if err := rows.Scan(&i.SutCode, &i.SutDescription ); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
 func (s *LookupStore) GetBendSelections() ([]models.BendSelection, error) {
 	query := `
         SELECT bs_id, bend_selection_code, bend_selection_description
@@ -59,6 +231,105 @@ func (s *LookupStore) GetBendSelections() ([]models.BendSelection, error) {
 
 	return data, nil
 }
+
+func (s *LookupStore) GetBendRiverMile() ([]models.BendRiverMile, error) {
+	query := `
+        SELECT brm_id, b_segment, bend_num, b_desc, state, upper_river_mile, lower_river_mile
+		FROM bend_river_mile_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.BendRiverMile{}
+
+	for rows.Next() {
+		var i models.BendRiverMile
+		if err := rows.Scan(&i.BrmId, &i.Segment, &i.Bend, &i.BendDescription, &i.State, &i.UpperRiverMile, &i.LowerRiverMile); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetChutes() ([]models.Chute, error) {
+	query := `
+        SELECT chute_id, segment_id, chute_code, chute_desc, upper_river_mile
+		FROM chute_lk ORDER BY chute_desc asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Chute{}
+
+	for rows.Next() {
+		var i models.Chute
+		if err := rows.Scan(&i.ChuteId, &i.Segment, &i.ChuteCode, &i.ChuteDescription, &i.UpperRiverMile); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetReach() ([]models.Reach, error) {
+	query := `
+        SELECT reach_id, segment_id, reach_code, reach_desc, upper_river_mile
+		FROM reach_lk ORDER BY reach_desc asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Reach{}
+
+	for rows.Next() {
+		var i models.Reach
+		if err := rows.Scan(&i.ReachId, &i.Segment, &i.ReachCode, &i.ReachDescription, &i.UpperRiverMile); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetRecaptureData() ([]models.Recapture, error) {
+	query := `
+        SELECT species, pit_tag
+		FROM recapture_data
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Recapture{}
+
+	for rows.Next() {
+		var i models.Recapture
+		if err := rows.Scan(&i.Species, &i.PitTag); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+
+// MISSOURI RIVER LOOK UP QUERIES
 
 func (s *LookupStore) GetGearCodes() ([]models.GearCode, error) {
 	query := `
@@ -460,30 +731,6 @@ func (s *LookupStore) GetSetSite3() ([]models.SetSite3, error) {
 	for rows.Next() {
 		var i models.SetSite3
 		if err := rows.Scan(&i.SsCode, &i.SsDescription); err != nil {
-			return nil, err
-		}
-		data = append(data, i)
-	}
-
-	return data, nil
-}
-
-func (s *LookupStore) GetBendRiverMile() ([]models.BendRiverMile, error) {
-	query := `
-        SELECT brm_id, b_segment, bend_num, state, upper_river_mile, lower_river_mile
-		FROM bend_river_mile_lk
-    `
-	rows, err := s.db.Query(query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	data := []models.BendRiverMile{}
-
-	for rows.Next() {
-		var i models.BendRiverMile
-		if err := rows.Scan(&i.BrmId, &i.Segment, &i.Bend, &i.State, &i.UpperRiverMile, &i.LowerRiverMile); err != nil {
 			return nil, err
 		}
 		data = append(data, i)
