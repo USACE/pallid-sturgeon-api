@@ -235,3 +235,9 @@ type Recapture struct {
 	Species string `db:"species" json:"species"`
 	PitTag string `db:"pit_tag" json:"pitTag"`
 }
+
+// SEARCH TYPE LOOK UP MODELS
+type SearchType struct {
+	StCode string `db:"search_type_code" json:"code"`
+	StDescription string `db:"search_type_description" json:"description"`
+}

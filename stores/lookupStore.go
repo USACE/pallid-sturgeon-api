@@ -884,3 +884,30 @@ func (s *LookupStore) GetMarkRecapture() ([]models.MarkRecapture, error) {
 
 	return data, nil
 }
+
+// SEARCH EFFORT LOOK UP QUERIES
+
+func (s *LookupStore) GetSearchTypes() ([]models.SearchType, error) {
+	query := `
+        SELECT search_type_code, search_type_description 
+		FROM search_type_lk WHERE active_flag_tf = 'T' ORDER BY sort_order asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SearchType{}
+
+	for rows.Next() {
+		var i models.SearchType
+		if err := rows.Scan(&i.StCode, &i.StDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+

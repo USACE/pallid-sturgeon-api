@@ -186,6 +186,13 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve mark recapture data", err))
 	}
 
+	// SEARCH EFFORT LOOK UP QUERIES
+	searchTypes, err := s.Store.GetSearchTypes()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search types data", err))
+	}
+
+
 	// Single combined response
 	response := map[string]any{
 		"bendSelections":    bendSelections,
@@ -211,6 +218,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"projects": 		 projects,
 		"reach": 			 reach,
 		"sampleUnitTypes": 	 sampleUnitTypes,
+		"searchTypes" :      searchTypes,
 		"seasons": 			 seasons,
 		"segments": 		 segments,
 		"setSite1Options":   setSite1,
