@@ -230,3 +230,8 @@ type MarkRecapture struct {
 	MrCode        string `db:"mark_recapture_code" json:"code"`
 	MrDescription string `db:"mark_recapture_description" json:"description"`
 }
+
+type Recapture struct {
+	Species string `db:"species" json:"species"`
+	PitTag string `db:"pit_tag" json:"pitTag"`
+}
