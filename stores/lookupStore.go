@@ -932,3 +932,27 @@ func (s *LookupStore) GetPositionConfidence() ([]models.PositionConfidence, erro
 
 	return data, nil
 }
+
+func (s *LookupStore) GetSearchType() ([]models.SearchType, error) {
+	query := `
+        SELECT search_type_code, search_type_description
+		FROM search_type_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SearchType{}
+
+	for rows.Next() {
+		var i models.SearchType
+		if err := rows.Scan(&i.SearchTypeCode, &i.SearchTypeDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}

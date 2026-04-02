@@ -201,6 +201,11 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve position confidence data", err))
 	}
 
+	searchTypeCodes, err := s.Store.GetSearchType()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search type data", err))
+	}
+
 	// Single combined response
 	response := map[string]any{
 		"bendSelections":    bendSelections,
@@ -240,6 +245,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"frequencyId":		 frequencyId,
 		"spawnBehavior":	 spawnBehavior,
 		"positionConfidence": positionConfidence,
+		"searchTypeCodes":	 searchTypeCodes,
 	}
 
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Lookup data retrieved successfully", response))
