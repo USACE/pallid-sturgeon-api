@@ -230,3 +230,18 @@ type MarkRecapture struct {
 	MrCode        string `db:"mark_recapture_code" json:"code"`
 	MrDescription string `db:"mark_recapture_description" json:"description"`
 }
+
+type FrequencyId struct {
+	FrequencyIdCode 		int 	`db:"frequency_id_code" json:"code"`
+	FrequencyIdDescription 	string 	`db:"frequency_id_description" json:"description"`
+}
+
+type SpawnBehavior struct {
+	SpawnCode			int		`db:"spawn_code" json:"code"`
+	SpawnDescription	string 	`db:"spawn_description" json:"description"`
+}
+
+type PositionConfidence struct {
+	PositionCode 		int 	`db:"position_confidence_code" json:"code"`
+	PositionDescription string `db:"position_confidence_description" json:"description"`
+}
