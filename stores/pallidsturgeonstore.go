@@ -2733,7 +2733,10 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(year string, officeCode strin
 	return searchSummariesWithCount, err
 }
 
-var telemetryDataSummaryFullDataSql = `select * FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var telemetryDataSummaryFullDataSql = `select year,field_office_code,project_code,segment_code,season_code, bend_number, bend_r_or_n, t_bend, bend_river_mile, radio_tag_num, trim(case when func.frequency_id_description is not null then to_char(func.frequency_id) || ' - ' || func.frequency_id_description else to_char(func.frequency_id) end) as frequency_id,
+capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, t_id, site_id, se_id, t_fid, se.search_date, suspected_spawning_activity
+FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY'))) func
+inner join ds_search se on se.se_id = func.se_id`
 
 func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
 	dbQuery, err := s.db.Prepare(telemetryDataSummaryFullDataSql)
@@ -2799,7 +2802,7 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number, t_bend, radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity, se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
+var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number, t_bend, radio_tag_num, trim(case when func.frequency_id_description is not null then to_char(func.frequency_id) || ' - ' || func.frequency_id_description else to_char(func.frequency_id) end) as frequency_id, capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity, se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
 FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY'))) func
 inner join ds_search se on se.se_id = func.se_id`
 
