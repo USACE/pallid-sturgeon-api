@@ -537,6 +537,7 @@ type UploadProcedure struct {
 	UploadedBy                string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
 	Checkby                   string    `db:"checkby" json:"checkby"`
+	SerialNum 			      string    `db:"serial_num" json:"serialNum"`
 }
 
 type SupplementalDataEntryWithCount struct {
@@ -610,6 +611,7 @@ type UploadSupplemental struct {
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+	Project37 		   *int 	 `db:"project_3_7" json:"project37"`
 }
 
 type MoriverDataEntryWithCount struct {
@@ -755,6 +757,7 @@ type UploadTelemetry struct {
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
+	SuspectedSpawningActivity *int `db:"suspected_spawning_activity" json:"suspectedSpawningActivity"`
 }
 
 type ProcedureOut struct {
