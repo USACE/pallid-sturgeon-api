@@ -60,7 +60,6 @@ func main() {
 
 	e.GET(urlContext+"/Lookup/getAllLookups", auth.Authorize(LookupH.GetAllLookups, PUBLIC))
 
-	// @TODO: Will deprecate soon as they will be covered by the Lookup query
 	e.GET(urlContext+"/projects", auth.Authorize(PallidSturgeonH.GetProjects, PUBLIC))
 	e.GET(urlContext+"/projectsFilter", auth.Authorize(PallidSturgeonH.GetProjectsFilter, PUBLIC))
 	e.GET(urlContext+"/roles", auth.Authorize(PallidSturgeonH.GetRoles, PUBLIC))
