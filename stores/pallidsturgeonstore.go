@@ -1595,9 +1595,10 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 
 var insertSearchDataSql = `insert into ds_search (SE_FID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE,
 SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
-UPLOAD_SESSION_ID, ds_id, status) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21, :22) returning se_id into :23`
+UPLOAD_SESSION_ID, ds_id, "STATUS") values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21, :22) returning se_id into :23`
 
 func (s *PallidSturgeonStore) SaveSearchDataEntry(searchDataEntry models.UploadSearch) (int, error) {
+
 	var id int
 	_, err := s.db.Exec(insertSearchDataSql, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
 		searchDataEntry.SearchDate, searchDataEntry.SearchTypeCode, searchDataEntry.SiteId, searchDataEntry.StartLatitude, searchDataEntry.StartLongitude, searchDataEntry.StartTime, searchDataEntry.StopLatitude,
@@ -1606,34 +1607,59 @@ func (s *PallidSturgeonStore) SaveSearchDataEntry(searchDataEntry models.UploadS
 }
 
 var updateSearchDataSql = `UPDATE ds_search SET 
-SE_FID = :2,
-CHECKBY = :3,
-CONDUCTIVITY = :4,
-EDIT_INITIALS = :5,
-LAST_EDIT_COMMENT = :6,
-LAST_UPDATED = :7,
-RECORDER = :8,
-SEARCH_DATE = :9,
-SEARCH_DAY = :10,
-SEARCH_TYPE_CODE = :11,
-SITE_ID = :12,
-START_LATITUDE = :13,
-START_LONGITUDE = :14,
-START_TIME = :15,
-STOP_LATITUDE = :16,
-STOP_LONGITUDE = :17,
-STOP_TIME = :18,
-TEMP = :19,
-UPLOADED_BY = :20,
-UPLOAD_FILENAME = :21,
-UPLOAD_SESSION_ID = :22,
-STATUS = :23,
-WHERE SE_ID = :1`
+SE_FID = :se_fid,
+CHECKBY = :checkby,
+CONDUCTIVITY = :conductivity,
+EDIT_INITIALS = :edit_initials,
+LAST_EDIT_COMMENT = :last_edit_comment,
+LAST_UPDATED = :last_updated,
+RECORDER = :recorder,
+SEARCH_DATE = :search_date,
+SEARCH_DAY = :search_day,
+SEARCH_TYPE_CODE = :search_type_code,
+SITE_ID = :site_id,
+START_LATITUDE = :start_latitude,
+START_LONGITUDE = :start_longitude,
+START_TIME = :start_time,
+STOP_LATITUDE = :stop_latitude,
+STOP_LONGITUDE = :stop_longitude,
+STOP_TIME = :stop_time,
+TEMP = :temp,
+UPLOADED_BY = :uploaded_by,
+UPLOAD_FILENAME = :upload_filename,
+UPLOAD_SESSION_ID = :upload_session_id,
+"STATUS" = :status
+WHERE SE_ID = :se_id`
 
 func (s *PallidSturgeonStore) UpdateSearchDataEntry(searchDataEntry models.UploadSearch) error {
-	_, err := s.db.Exec(updateSearchDataSql, searchDataEntry.SeId, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
-		searchDataEntry.SearchDate, searchDataEntry.SearchDay, searchDataEntry.SearchTypeCode, searchDataEntry.SiteId, searchDataEntry.StartLatitude, searchDataEntry.StartLongitude, searchDataEntry.StartTime, searchDataEntry.StopLatitude,
-		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.Status)
+
+	_, err := s.db.Exec(
+		updateSearchDataSql,
+		sql.Named("se_id", searchDataEntry.SeId), 
+		sql.Named("se_fid", searchDataEntry.SeFid), 
+		sql.Named("checkby", searchDataEntry.Checkby), 
+		sql.Named("conductivity", searchDataEntry.Conductivity), 
+		sql.Named("edit_initials", searchDataEntry.EditInitials), 
+		sql.Named("last_edit_comment", searchDataEntry.LastEditComment), 
+		sql.Named("last_updated", searchDataEntry.LastUpdated),
+		sql.Named("recorder", searchDataEntry.Recorder),
+		sql.Named("search_date", searchDataEntry.SearchDate),
+		sql.Named("search_day", searchDataEntry.SearchDay),
+		sql.Named("search_type_code", searchDataEntry.SearchTypeCode),
+		sql.Named("site_id", searchDataEntry.SiteId),
+		sql.Named("start_latitude", searchDataEntry.StartLatitude),
+		sql.Named("start_longitude", searchDataEntry.StartLongitude),
+		sql.Named("start_time", searchDataEntry.StartTime),
+		sql.Named("stop_latitude", searchDataEntry.StopLatitude),
+		sql.Named("stop_longitude", searchDataEntry.StopLongitude),
+		sql.Named("stop_time", searchDataEntry.StopTime),
+		sql.Named("temp", searchDataEntry.Temp),
+		sql.Named("uploaded_by", searchDataEntry.UploadedBy),
+		sql.Named("upload_filename", searchDataEntry.UploadFilename),
+		sql.Named("upload_session_id", searchDataEntry.UploadSessionId),
+		sql.Named("status", searchDataEntry.Status),
+	)
+
 	return err
 }
 
