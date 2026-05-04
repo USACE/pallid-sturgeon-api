@@ -662,7 +662,6 @@ type UploadMoriver struct {
 	Meso             string    `db:"meso" json:"meso"`
 	Habitatrn        string    `db:"habitatrn" json:"habitatrn"`
 	Qc               string    `db:"qc" json:"qc"`
-	Micro 			 string    `db:"micro" json:"micro"`
 	MicroStructure   string    `db:"micro_structure" json:"microStructure"`
 	StructureFlow    string    `db:"structure_flow" json:"structureFlow"`
 	StructureMod     string    `db:"structure_mod" json:"structureMod"`
@@ -670,11 +669,11 @@ type UploadMoriver struct {
 	SetSite2         string    `db:"set_site_2" json:"setSite2"`
 	SetSite3         string    `db:"set_site_3" json:"setSite3"`
 	StartTime        string    `db:"starttime" json:"startTime"`
-	StartLatitude    float64   `db:"startlatitude" json:"startLatitude"`
-	StartLongitude   float64   `db:"startlongitude" json:"startLongitude"`
-	StopTime         string    `db:"stoptime" json:"stopTime"`
-	StopLatitude     *float64  `db:"stoplatitude" json:"stopLatitude"`
-	StopLongitude    *float64  `db:"stop_longitude" json:"stopLongitude"`
+	StartLatitude    float64   `db:"startlatitude" json:"startlatitude"`
+	StartLongitude   float64   `db:"startlongitude" json:"startlongitude"`
+	StopTime         string    `db:"stoptime" json:"stoptime"`
+	StopLatitude     *float64  `db:"stoplatitude" json:"stoplatitude"`
+	StopLongitude    *float64  `db:"stop_longitude" json:"stoplongitude"`
 	Depth1           *float64  `db:"depth1" json:"depth1"`
 	Velocitybot1     *float64  `db:"velocitybot1" json:"velocitybot1"`
 	Velocity08_1     *float64  `db:"velocity08_1" json:"velocity081"`
@@ -716,7 +715,6 @@ type UploadMoriver struct {
 	UploadSessionId  int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
-	SubsampleType 	 string    `db:"subsample_type" json:"subsampleType"`
 }
 
 type TelemetryDataEntryWithCount struct {
