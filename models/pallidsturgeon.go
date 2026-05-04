@@ -301,7 +301,7 @@ type TelemetrySummary struct {
 	Bend               *float64 `db:"bend_number" json:"bend"`
 	TBend              *float64 `db:"t_bend" json:"t_bend"`
 	RadioTagNum        int      `db:"radio_tag_num" json:"radioTagNum"`
-	FrequencyIdCode    int      `db:"frequency_id" json:"frequencyIdCode"`
+	FrequencyIdCode    string      `db:"frequency_id" json:"frequencyIdCode"`
 	CaptureTime        string   `db:"capture_time" json:"captureTime"`
 	CaptureLatitude    float64  `db:"capture_latitude" json:"captureLatitude"`
 	CaptureLongitude   float64  `db:"capture_longitude" json:"captureLongitude"`
@@ -734,7 +734,7 @@ type UploadTelemetry struct {
 	SeId               int       `db:"se_id" json:"seId"`
 	SiteId             int       `db:"site_id" json:"siteId"`
 	Bend               *float64  `db:"bend" json:"bend"`
-	RadioTagNum        int       `db:"radio_tag_num" json:"radioTagNum"`
+	RadioTagNum        *int    	 `db:"radio_tag_num" json:"radioTagNum"`
 	FrequencyIdCode    int       `db:"frequency_id_code" json:"frequencyIdCode"`
 	CaptureTime        string    `db:"capture_time" json:"captureDate"`
 	CaptureLatitude    float64   `db:"capture_latitude" json:"captureLatitude"`
