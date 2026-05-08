@@ -75,6 +75,11 @@ type Reach struct {
 	UpperRiverMile 	 float64 `db:"upper_river_mile" json:"upperRiverMile"`
 }
 
+type Recapture struct {
+	Species string `db:"species" json:"species"`
+	PitTag string `db:"pit_tag" json:"pitTag"`
+}
+
 // MISSOURI RIVER LOOK UP MODELS
 
 type GearCode struct {
