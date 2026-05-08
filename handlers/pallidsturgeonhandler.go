@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"fmt"
 
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
