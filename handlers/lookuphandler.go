@@ -231,6 +231,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"projects": 		 projects,
 		"reach": 			 reach,
 		"sampleUnitTypes": 	 sampleUnitTypes,
+		"searchTypes" :      searchTypes,
 		"seasons": 			 seasons,
 		"segments": 		 segments,
 		"setSite1Options":   setSite1,
