@@ -186,12 +186,25 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve mark recapture data", err))
 	}
 
-	// SEARCH EFFORT LOOK UP QUERIES
-	searchTypes, err := s.Store.GetSearchTypes()
+	frequencyId, err := s.Store.GetFrequencyId()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search types data", err))
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve frequency id data", err))
 	}
 
+	spawnBehavior, err := s.Store.GetSpawnBehavior()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve spawn behavior data", err))
+	}
+
+	positionConfidence, err := s.Store.GetPositionConfidence()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve position confidence data", err))
+	}
+
+	searchTypeCodes, err := s.Store.GetSearchType()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search type data", err))
+	}
 
 	// Single combined response
 	response := map[string]any{
@@ -230,6 +243,10 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"u6Options":         u6,
 		"u7Options":         u7,
 		"years": 			 years,
+		"frequencyId":		 frequencyId,
+		"spawnBehavior":	 spawnBehavior,
+		"positionConfidence": positionConfidence,
+		"searchTypeCodes":	 searchTypeCodes,
 	}
 
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Lookup data retrieved successfully", response))

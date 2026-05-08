@@ -231,13 +231,22 @@ type MarkRecapture struct {
 	MrDescription string `db:"mark_recapture_description" json:"description"`
 }
 
-type Recapture struct {
-	Species string `db:"species" json:"species"`
-	PitTag string `db:"pit_tag" json:"pitTag"`
+type FrequencyId struct {
+	FrequencyIdCode 		int 	`db:"frequency_id_code" json:"code"`
+	FrequencyIdDescription 	string 	`db:"frequency_id_description" json:"description"`
 }
 
-// SEARCH TYPE LOOK UP MODELS
+type SpawnBehavior struct {
+	SpawnCode			int		`db:"spawn_code" json:"code"`
+	SpawnDescription	string 	`db:"spawn_description" json:"description"`
+}
+
+type PositionConfidence struct {
+	PositionCode 		int 	`db:"position_confidence_code" json:"code"`
+	PositionDescription string `db:"position_confidence_description" json:"description"`
+}
+
 type SearchType struct {
-	StCode string `db:"search_type_code" json:"code"`
-	StDescription string `db:"search_type_description" json:"description"`
+	SearchTypeCode	string `db:"search_type_code" json:"code"`
+	SearchTypeDescription string `db:"search_type_description" json:"description"`
 }

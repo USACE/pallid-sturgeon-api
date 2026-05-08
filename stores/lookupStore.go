@@ -885,12 +885,82 @@ func (s *LookupStore) GetMarkRecapture() ([]models.MarkRecapture, error) {
 	return data, nil
 }
 
-// SEARCH EFFORT LOOK UP QUERIES
-
-func (s *LookupStore) GetSearchTypes() ([]models.SearchType, error) {
+func (s *LookupStore) GetFrequencyId() ([]models.FrequencyId, error) {
 	query := `
-        SELECT search_type_code, search_type_description 
-		FROM search_type_lk WHERE active_flag_tf = 'T' ORDER BY sort_order asc
+        SELECT frequency_id_code, frequency_id_description
+		FROM frequency_id_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.FrequencyId{}
+
+	for rows.Next() {
+		var i models.FrequencyId
+		if err := rows.Scan(&i.FrequencyIdCode, &i.FrequencyIdDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSpawnBehavior() ([]models.SpawnBehavior, error) {
+	query := `
+        SELECT spawn_code, spawn_description
+		FROM spawn_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.SpawnBehavior{}
+
+	for rows.Next() {
+		var i models.SpawnBehavior
+		if err := rows.Scan(&i.SpawnCode, &i.SpawnDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetPositionConfidence() ([]models.PositionConfidence, error) {
+	query := `
+        SELECT position_confidence_code, position_confidence_description
+		FROM position_confidence_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.PositionConfidence{}
+
+	for rows.Next() {
+		var i models.PositionConfidence
+		if err := rows.Scan(&i.PositionCode, &i.PositionDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSearchType() ([]models.SearchType, error) {
+	query := `
+        SELECT search_type_code, search_type_description
+		FROM search_type_lk
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
@@ -902,7 +972,7 @@ func (s *LookupStore) GetSearchTypes() ([]models.SearchType, error) {
 
 	for rows.Next() {
 		var i models.SearchType
-		if err := rows.Scan(&i.StCode, &i.StDescription); err != nil {
+		if err := rows.Scan(&i.SearchTypeCode, &i.SearchTypeDescription); err != nil {
 			return nil, err
 		}
 		data = append(data, i)
@@ -910,4 +980,3 @@ func (s *LookupStore) GetSearchTypes() ([]models.SearchType, error) {
 
 	return data, nil
 }
-
