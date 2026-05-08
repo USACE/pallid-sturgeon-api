@@ -304,6 +304,30 @@ func (s *LookupStore) GetReach() ([]models.Reach, error) {
 	return data, nil
 }
 
+func (s *LookupStore) GetRecaptureData() ([]models.Recapture, error) {
+	query := `
+        SELECT species, pit_tag
+		FROM recapture_data
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Recapture{}
+
+	for rows.Next() {
+		var i models.Recapture
+		if err := rows.Scan(&i.Species, &i.PitTag); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
 
 // MISSOURI RIVER LOOK UP QUERIES
 
