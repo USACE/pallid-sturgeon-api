@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 	"strings"
-	
+	"time"
+
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
 	"github.com/labstack/echo/v4"
@@ -226,7 +226,7 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
-	code, sampleUnitType, segment := c.QueryParam("code"), c.QueryParam("sampleUnitType"), c.QueryParam("segment")
+	code, sampleUnitType, segment, season := c.QueryParam("code"), c.QueryParam("sampleUnitType"), c.QueryParam("segment"), c.QueryParam("season")
 	siteData := models.Sites{}
 	if err := c.Bind(&siteData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -235,7 +235,7 @@ func (sd *PallidSturgeonHandler) SaveSiteDataEntry(c echo.Context) error {
 	siteData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	siteData.UploadedBy = user.FirstName + " " + user.LastName
-	id, err := sd.Store.SaveSiteDataEntry(code, sampleUnitType, segment, siteData)
+	id, err := sd.Store.SaveSiteDataEntry(code, sampleUnitType, segment, user.ProjectCode, season, siteData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
