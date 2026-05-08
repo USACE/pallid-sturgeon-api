@@ -242,9 +242,9 @@ type SearchSummary struct {
 	StartTime      string   `db:"start_time" json:"startTime"`
 	StartLatitude  float64  `db:"start_latitude" json:"startLatitude"`
 	StartLongitude float64  `db:"start_longitude" json:"startLongitude"`
-	StopTime       string   `db:"stop_time" json:"stopTime"`
-	StopLatitude   float64  `db:"stop_latitude" json:"stopLatitude"`
-	StopLongitude  float64  `db:"stop_longitude" json:"stopLongitude"`
+	StopTime       *string   `db:"stop_time" json:"stopTime"`
+	StopLatitude   *float64  `db:"stop_latitude" json:"stopLatitude"`
+	StopLongitude  *float64  `db:"stop_longitude" json:"stopLongitude"`
 	Temp           *string  `db:"temp" json:"temp"`
 	Conductivity   *string  `db:"conductivity" json:"conductivity"`
 	Status		   int		`db:"status" json:"status"`

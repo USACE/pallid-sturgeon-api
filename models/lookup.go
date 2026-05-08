@@ -245,3 +245,8 @@ type PositionConfidence struct {
 	PositionCode 		int 	`db:"position_confidence_code" json:"code"`
 	PositionDescription string `db:"position_confidence_description" json:"description"`
 }
+
+type SearchType struct {
+	SearchTypeCode	string `db:"search_type_code" json:"code"`
+	SearchTypeDescription string `db:"search_type_description" json:"description"`
+}

@@ -6,11 +6,27 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"fmt"
 
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
 	"github.com/labstack/echo/v4"
 )
+
+func getInitials(firstName string, lastName string) string {
+		result := ""
+
+		if firstName != "" {
+			result += strings.ToUpper(firstName[:1])
+		}
+		if lastName != "" {
+			result += strings.ToUpper(lastName[:1])
+		}
+		if len(result) > 3 {
+			return result[:3]
+		}
+		return result
+	}
 
 type PallidSturgeonHandler struct {
 	Store *stores.PallidSturgeonStore
@@ -455,7 +471,9 @@ func (sd *PallidSturgeonHandler) SaveSearchDataEntry(c echo.Context) error {
 	searchData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	searchData.UploadedBy = user.FirstName + " " + user.LastName
+	searchData.Checkby = getInitials(user.FirstName, user.LastName)
 	searchData.SearchDate = processStringTime(DerefString(searchData.SearchDate), "app")
+	
 	id, err := sd.Store.SaveSearchDataEntry(searchData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search data entries", err))
@@ -472,7 +490,9 @@ func (sd *PallidSturgeonHandler) UpdateSearchDataEntry(c echo.Context) error {
 	searchData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	searchData.UploadedBy = user.FirstName + " " + user.LastName
+	searchData.Checkby = getInitials(user.FirstName, user.LastName)
 	searchData.SearchDate = processStringTime(DerefString(searchData.SearchDate), "app")
+	
 	err := sd.Store.UpdateSearchDataEntry(searchData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
