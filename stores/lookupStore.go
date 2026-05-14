@@ -885,9 +885,229 @@ func (s *LookupStore) GetMarkRecapture() ([]models.MarkRecapture, error) {
 	return data, nil
 }
 
+// SUPPLEMENTAL LOOK UP MODELS
+func (s *LookupStore) GetPitRnzOptions() ([]models.PitRnz, error) {
+	query := `
+        SELECT pit_code, pit_desc
+		FROM pit_rnz_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.PitRnz{}
+
+	for rows.Next() {
+		var i models.PitRnz
+		if err := rows.Scan(&i.PrCode, &i.PrDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetElastomerColors() ([]models.ElastomerColor, error) {
+	query := `
+        SELECT elastomer_code, elastomer_description, color
+		FROM elastomer_colors_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.ElastomerColor{}
+
+	for rows.Next() {
+		var i models.ElastomerColor
+		if err := rows.Scan(&i.EcCode, &i.EcDescription, &i.EcColor); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetElastomerHvxOptions() ([]models.ElastomerHvx, error) {
+	query := `
+        SELECT elastomer_hvx_code, elastomer_hvx_desc
+		FROM elastomer_hvx_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.ElastomerHvx{}
+
+	for rows.Next() {
+		var i models.ElastomerHvx
+		if err := rows.Scan(&i.EhCode, &i.EhDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetPallidLocationStatusOptions() ([]models.PallidLocationStatus, error) {
+	query := `
+        SELECT l_id, pallid_location_status_code, pallid_location_status_descrip, status
+		FROM pallid_location_status_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.PallidLocationStatus{}
+
+	for rows.Next() {
+		var i models.PallidLocationStatus
+		if err := rows.Scan(&i.PlsId, &i.PlsCode, &i.PlsDescription, &i.PlsStatus); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetHatcheryOriginOptions() ([]models.HatcheryOrigin, error) {
+	query := `
+        SELECT origin_code, origin_description
+		FROM hatchery_origin_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.HatcheryOrigin{}
+
+	for rows.Next() {
+		var i models.HatcheryOrigin
+		if err := rows.Scan(&i.HoCode, &i.HoDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+// PROCEDURE LOOK UP MODELS
+func (s *LookupStore) GetPurposeOptions() ([]models.Purpose, error) {
+	query := `
+        SELECT purpose_code, purpose_lk
+		FROM purpose_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Purpose{}
+
+	for rows.Next() {
+		var i models.Purpose
+		if err := rows.Scan(&i.PCode, &i.PDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetEvalLocationOptions() ([]models.EvalLocation, error) {
+	query := `
+        SELECT eval_location_code, eval_location_description
+		FROM eval_location_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.EvalLocation{}
+
+	for rows.Next() {
+		var i models.EvalLocation
+		if err := rows.Scan(&i.EvlCode, &i.EvlDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetSexOptions() ([]models.Sex, error) {
+	query := `
+        SELECT sex_code, sex_desc
+		FROM sex_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.Sex{}
+
+	for rows.Next() {
+		var i models.Sex
+		if err := rows.Scan(&i.SexCode, &i.SexDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+func (s *LookupStore) GetReproductiveStatusOptions() ([]models.ReproductiveStatus, error) {
+	query := `
+        SELECT reproductive_status_code, reproductive_status_descriptio
+		FROM reproductive_status_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.ReproductiveStatus{}
+
+	for rows.Next() {
+		var i models.ReproductiveStatus
+		if err := rows.Scan(&i.RsCode, &i.RsDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
+// SEARCH EFFORT LOOK UP QUERIES
+
 func (s *LookupStore) GetFrequencyId() ([]models.FrequencyId, error) {
 	query := `
-        SELECT frequency_id_code, frequency_id_description
+    SELECT frequency_id_code, frequency_id_description
 		FROM frequency_id_lk
     `
 	rows, err := s.db.Query(query)
@@ -980,3 +1200,30 @@ func (s *LookupStore) GetSearchType() ([]models.SearchType, error) {
 
 	return data, nil
 }
+
+// GENERAL LOOK UP QUERIES
+
+func (s *LookupStore) GetYesNoOptions() ([]models.YesNo, error) {
+	query := `
+        SELECT yn_code, yn_text
+		FROM yes_no_lk ORDER BY yn_order asc
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.YesNo{}
+
+	for rows.Next() {
+		var i models.YesNo
+		if err := rows.Scan(&i.YnCode, &i.YnText); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}
+
