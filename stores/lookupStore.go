@@ -887,8 +887,8 @@ func (s *LookupStore) GetMarkRecapture() ([]models.MarkRecapture, error) {
 
 func (s *LookupStore) GetFrequencyId() ([]models.FrequencyId, error) {
 	query := `
-        SELECT frequency_id_code, frequency_id_description
-		FROM frequency_id_lk
+        SELECT frequency_id_code, frequency_id_description FROM frequency_id_lk
+		WHERE active_flag_tf = 'T' ORDER BY sort_order asc
     `
 	rows, err := s.db.Query(query)
 	if err != nil {

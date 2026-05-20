@@ -206,6 +206,11 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search type data", err))
 	}
 
+	frequencyIds, err := s.Store.GetFrequencyIds()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Frequency ID data", err))
+	}
+
 	// Single combined response
 	response := map[string]any{
 		"bendSelections":    bendSelections,
@@ -246,6 +251,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"spawnBehavior":	 spawnBehavior,
 		"positionConfidence": positionConfidence,
 		"searchTypeCodes":	 searchTypeCodes,
+		"frequencyIds":    frequencyIds,
 	}
 
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Lookup data retrieved successfully", response))

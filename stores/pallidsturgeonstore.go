@@ -131,8 +131,8 @@ func (s *PallidSturgeonStore) GetProjects(fieldOfficeCode string) ([]models.Proj
 }
 
 // For Data Summaries Project Filter
-var getProjectOneSql = `select * from project_lk where project_code <> 2`
-var getProjectTwoSql = `select * from project_lk where project_code = 2`
+var getProjectOneSql = `select project_code, project_description from project_lk where project_code <> 2`
+var getProjectTwoSql = `select project_code, project_description from project_lk where project_code = 2`
 
 func (s *PallidSturgeonStore) GetProjectsFilter(project string) ([]models.Project, error) {
 	projects := []models.Project{}
@@ -656,16 +656,36 @@ func (s *PallidSturgeonStore) GetSiteDataEntries(siteId string, year string, off
 
 var insertSiteDataSql = `insert into ds_sites (brm_id, site_fid, year, FIELDOFFICE, PROJECT_ID,
 	SEGMENT_ID, SEASON, SAMPLE_UNIT_TYPE, bend, BENDRN, edit_initials, last_updated, last_edit_comment, uploaded_by) 
-	values ((CASE 
-	when :14 = 'B' THEN (select brm_id from bend_river_mile_lk where bend_num = :15 and b_segment = :16)
-	when :17 = 'C' THEN (select chute_id from chute_lk where chute_code = :18 and segment_id = :19)
-	when :20 = 'R' THEN (select reach_id from reach_lk where reach_code = :21 and segment_id = :22)
-	ELSE 0
-	END),:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13) returning site_id into :23`
+	values ((CASE
+        WHEN :14 IN ('B','S') THEN (
+            SELECT MAX(brm_id)
+            FROM bend_river_mile_lk
+            WHERE bend_num = :15
+              AND b_segment = :16
+        )
 
-func (s *PallidSturgeonStore) AddSiteDataEntry(code string, sampleUnitType string, segmentCode string, sitehDataEntry models.Sites) (int, error) {
+        WHEN :17 = 'C' THEN (
+            SELECT MAX(chute_id)
+            FROM chute_lk
+            WHERE chute_code = :18
+              AND segment_id = :19
+        )
+
+        WHEN :20 = 'R' THEN (
+            SELECT MAX(reach_id)
+            FROM reach_lk
+            WHERE reach_code = :21
+              AND segment_id = :22
+			  and project_id = :23
+			  and season = :24
+        )
+
+        ELSE 0
+    END),:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13) returning site_id into :25`
+
+func (s *PallidSturgeonStore) AddSiteDataEntry(code string, sampleUnitType string, segmentCode string, projectId string, season string, sitehDataEntry models.Sites) (int, error) {
 	var id int
-	_, err := s.db.Exec(insertSiteDataSql, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId,
+	_, err := s.db.Exec(insertSiteDataSql, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, sampleUnitType, code, segmentCode, projectId, season, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId,
 		sitehDataEntry.SegmentId, sitehDataEntry.SeasonId, sitehDataEntry.SampleUnitTypeCode, sitehDataEntry.Bend, sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated,
 		sitehDataEntry.LastEditComment, sitehDataEntry.UploadedBy, sql.Out{Dest: &id})
 
@@ -2158,7 +2178,18 @@ func (s *PallidSturgeonStore) GetFullFishDataSummary(year string, officeCode str
 			if val == nil {
 				v = ""
 			} else {
-				v = fmt.Sprintf("%v", val)
+				switch t := val.(type) {
+				case time.Time:
+					v = t.Format("2006-01-02")
+				case *time.Time:
+					if t == nil {
+						v = ""
+					} else {
+						v = t.Format("2006-01-02")
+					}
+				default:
+					v = fmt.Sprintf("%v", val)
+				}
 			}
 			data = append(data, v)
 		}
@@ -2282,7 +2313,18 @@ func (s *PallidSturgeonStore) GetFullSuppDataSummary(year string, officeCode str
 			if val == nil {
 				v = ""
 			} else {
-				v = fmt.Sprintf("%v", val)
+				switch t := val.(type) {
+				case time.Time:
+					v = t.Format("2006-01-02")
+				case *time.Time:
+					if t == nil {
+						v = ""
+					} else {
+						v = t.Format("2006-01-02")
+					}
+				default:
+					v = fmt.Sprintf("%v", val)
+				}
 			}
 			data = append(data, v)
 		}
@@ -2760,7 +2802,10 @@ func (s *PallidSturgeonStore) GetSearchDataSummary(year string, officeCode strin
 	return searchSummariesWithCount, err
 }
 
-var telemetryDataSummaryFullDataSql = `select * FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY')))`
+var telemetryDataSummaryFullDataSql = `select year,field_office_code,project_code,segment_code,season_code, bend_number, bend_r_or_n, t_bend, bend_river_mile, radio_tag_num, trim(case when func.frequency_id_description is not null then func.frequency_id_description else to_char(func.frequency_id) end) as frequency_id,
+capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, temp, conductivity, turbidity, silt, sand, gravel, comments, t_id, site_id, se_id, t_fid, se.search_date, suspected_spawning_activity
+FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY'))) func
+inner join ds_search se on se.se_id = func.se_id`
 
 func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCode string, project string, approved string, season string, spice string, month string, fromDate string, toDate string) (string, error) {
 	dbQuery, err := s.db.Prepare(telemetryDataSummaryFullDataSql)
@@ -2826,7 +2871,7 @@ func (s *PallidSturgeonStore) GetFullTelemetryDataSummary(year string, officeCod
 	return file.Name(), err
 }
 
-var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number, t_bend, radio_tag_num,frequency_id,capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity, se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
+var telemetryDataSummarySql = `select t_id, year,field_office_code,project_code,segment_code,season_code,bend_number, t_bend, radio_tag_num, trim(case when func.frequency_id_description is not null then func.frequency_id_description else to_char(func.frequency_id) end) as frequency_id, capture_time, capture_latitude, capture_longitude, position_confidence, macro_code, meso_code, depth, conductivity, turbidity, se_id, site_id, se.search_date, se.search_day, temp, silt, sand, gravel, comments
 FROM table (pallid_data_api.telemetry_datasummary_fnc(:1, :2, :3, :4, :5, :6, :7, to_date(:8,'MM/DD/YYYY'), to_date(:9,'MM/DD/YYYY'))) func
 inner join ds_search se on se.se_id = func.se_id`
 
@@ -2982,7 +3027,18 @@ func (s *PallidSturgeonStore) GetFullProcedureDataSummary(year string, officeCod
 			if val == nil {
 				v = ""
 			} else {
-				v = fmt.Sprintf("%v", val)
+				switch t := val.(type) {
+				case time.Time:
+					v = t.Format("2006-01-02")
+				case *time.Time:
+					if t == nil {
+						v = ""
+					} else {
+						v = t.Format("2006-01-02")
+					}
+				default:
+					v = fmt.Sprintf("%v", val)
+				}
 			}
 			data = append(data, v)
 		}
@@ -4039,7 +4095,8 @@ func (s *PallidSturgeonStore) GetUploadSessionLogs(user string, uploadSessionId 
 	return logs, err
 }
 
-var getSitesExportSql = `select site_id, COALESCE(site_fid, 0) as site_fid, year, fieldoffice, field_office_description, project_id, project_description, segment_id, segment_description, season, season_description, bend, bendrn, bend_river_mile, sample_unit_type, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
+var getSitesExportSql = `select site_id, COALESCE(site_fid, 0) as site_fid, year, fieldoffice, field_office_description, project_id, project_description, segment_id, segment_description, season, season_description, bend, bendrn,
+bend_river_mile, sample_unit_type, sample_unit_desc from table (pallid_data_entry_api.data_entry_site_fnc(:1,:2,:3,:4,:5,:6))`
 
 func (s *PallidSturgeonStore) GetSitesExport(year string, officeCode string, project string, segment string, season string, bendrn string) ([]models.ExportSite, error) {
 	rows, err := s.db.Query(getSitesExportSql, year, officeCode, project, bendrn, season, segment)
