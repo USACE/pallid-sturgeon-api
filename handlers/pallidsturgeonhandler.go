@@ -241,7 +241,7 @@ func (sd *PallidSturgeonHandler) GetSiteDataEntries(c echo.Context) error {
 }
 
 func (sd *PallidSturgeonHandler) AddSiteDataEntry(c echo.Context) error {
-	code, sampleUnitType, segment := c.QueryParam("code"), c.QueryParam("sampleUnitType"), c.QueryParam("segment")
+	code, sampleUnitType, segment, season := c.QueryParam("code"), c.QueryParam("sampleUnitType"), c.QueryParam("segment"), c.QueryParam("season")
 	siteData := models.Sites{}
 	if err := c.Bind(&siteData); err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to bind Site data entry to data model", err))
@@ -250,7 +250,7 @@ func (sd *PallidSturgeonHandler) AddSiteDataEntry(c echo.Context) error {
 	siteData.LastUpdated = time.Now()
 	user := c.Get("PSUSER").(models.User)
 	siteData.UploadedBy = user.FirstName + " " + user.LastName
-	id, err := sd.Store.AddSiteDataEntry(code, sampleUnitType, segment, siteData)
+	id, err := sd.Store.AddSiteDataEntry(code, sampleUnitType, segment, user.ProjectCode, season, siteData)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to add Site data entry", err))
 	}

@@ -260,6 +260,11 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 	}
 
 
+	frequencyIds, err := s.Store.GetFrequencyIds()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Frequency ID data", err))
+	}
+
 	// Single combined response
 	response := map[string]any{
 		"bendSelections":    bendSelections,
@@ -300,6 +305,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"spawnBehavior":	 spawnBehavior,
 		"positionConfidence": positionConfidence,
 		"searchTypeCodes":	 searchTypeCodes,
+		"frequencyIds":    frequencyIds,
 		"pitRnzOptions": pitRnzOptions,
 		"elastomerColorOptions": elastomerColorOptions,
 		"elastomerHvxOptions": elastomerHvxOptions,
