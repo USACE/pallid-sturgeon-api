@@ -251,7 +251,64 @@ type PositionConfidence struct {
 	PositionDescription string `db:"position_confidence_description" json:"description"`
 }
 
+// SUPPLEMENTAL LOOK UP MODELS
+type PitRnz struct {
+	PrCode        string `db:"pit_code" json:"code"`
+	PrDescription string `db:"pit_desc" json:"description"`
+}
+
+type ElastomerColor struct {
+	EcCode        string `db:"elastomer_code" json:"code"`
+	EcDescription string `db:"elastomer_description" json:"description"`
+	EcColor       string `db:"color" json:"color"`
+}
+
+type ElastomerHvx struct {
+	EhCode        string `db:"elastomer_hvx_code" json:"code"`
+	EhDescription string `db:"elastomer_hvx_desc" json:"description"`
+}
+
+type PallidLocationStatus struct {
+	PlsId          int    `db:"l_id" json:"id"`
+	PlsCode        string `db:"pallid_location_status_code" json:"code"`
+	PlsDescription string `db:"pallid_location_status_descrip" json:"description"`
+	PlsStatus      string `db:"status" json:"status"`
+}
+
+type HatcheryOrigin struct {
+	HoCode        string `db:"origin_code" json:"code"`
+	HoDescription string `db:"origin_description" json:"description"`
+}
+
+// PROCEDURE LOOK UP MODELS
+type Purpose struct {
+	PCode        string `db:"purpose_code" json:"code"`
+	PDescription string `db:"purpose_lk" json:"description"`
+}
+
+type EvalLocation struct {
+	EvlCode        string `db:"eval_location_code" json:"code"`
+	EvlDescription string `db:"eval_location_description" json:"description"`
+}
+
+type Sex struct {
+	SexCode        string `db:"sex_code" json:"code"`
+	SexDescription string `db:"sex_desc" json:"description"`
+}
+
+type ReproductiveStatus struct {
+	RsCode        string `db:"reproductive_status_code" json:"code"`
+	RsDescription string `db:"reproductive_status_descriptio" json:"description"`
+}
+
+// SEARCH TYPE LOOK UP MODELS
 type SearchType struct {
 	SearchTypeCode	string `db:"search_type_code" json:"code"`
 	SearchTypeDescription string `db:"search_type_description" json:"description"`
+}
+
+// GENERAL LOOK UP MODELS
+type YesNo struct {
+	YnCode string `db:"yn_code" json:"code"`
+	YnText string `db:"yn_text" json:"description"`
 }

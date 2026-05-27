@@ -191,6 +191,54 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve frequency id data", err))
 	}
 
+	// SUPPLEMENTAL LOOK UP MODELS
+	pitRnzOptions, err := s.Store.GetPitRnzOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve pit RNZ option data", err))
+	}
+
+	elastomerColorOptions, err := s.Store.GetElastomerColors()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve elastomer color data", err))
+	}
+
+	elastomerHvxOptions, err := s.Store.GetElastomerHvxOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve elastomer HVX option data", err))
+	}
+
+	pallidLocationStatusOptions, err := s.Store.GetPallidLocationStatusOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve pallid location status option data", err))
+	}
+
+	hatcheryOriginOptions, err := s.Store.GetHatcheryOriginOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve hatchery origin data", err))
+	}
+	
+	// PROCEDURE LOOK UP MODELS
+	
+	purposeOptions, err := s.Store.GetPurposeOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve purpose option data", err))
+	}
+	
+	evalLocationOptions, err := s.Store.GetEvalLocationOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve evaluation location option data", err))
+	}
+
+	sexOptions, err := s.Store.GetSexOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sex option data", err))
+	}
+
+	reproductiveStatusOptions, err := s.Store.GetReproductiveStatusOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve reproductive status option data", err))
+	}
+
 	spawnBehavior, err := s.Store.GetSpawnBehavior()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve spawn behavior data", err))
@@ -205,6 +253,12 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve search type data", err))
 	}
+	// GENERAL LOOK UP QUERIES
+	yesNoOptions, err := s.Store.GetYesNoOptions()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve yes/no option data", err))
+	}
+
 
 	frequencyIds, err := s.Store.GetFrequencyIds()
 	if err != nil {
@@ -252,6 +306,16 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"positionConfidence": positionConfidence,
 		"searchTypeCodes":	 searchTypeCodes,
 		"frequencyIds":    frequencyIds,
+		"pitRnzOptions": pitRnzOptions,
+		"elastomerColorOptions": elastomerColorOptions,
+		"elastomerHvxOptions": elastomerHvxOptions,
+		"pallidLocationStatusOptions": pallidLocationStatusOptions,
+		"hatcheryOriginOptions": hatcheryOriginOptions,
+		"purposeOptions": purposeOptions,
+		"evalLocationOptions": evalLocationOptions,
+		"sexOptions": sexOptions,
+		"reproductiveStatusOptions": reproductiveStatusOptions,
+		"yesNoOptions": yesNoOptions,
 	}
 
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Lookup data retrieved successfully", response))
