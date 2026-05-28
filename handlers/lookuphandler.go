@@ -260,7 +260,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 	}
 
 
-	frequencyIds, err := s.Store.GetFrequencyIds()
+	frequencyIds, err := s.Store.GetFrequencyId()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Frequency ID data", err))
 	}
