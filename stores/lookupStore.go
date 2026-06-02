@@ -885,7 +885,7 @@ func (s *LookupStore) GetMarkRecapture() ([]models.MarkRecapture, error) {
 	return data, nil
 }
 
-func (s *LookupStore) GetFrequencyId() ([]models.FrequencyId, error) {
+func (s *LookupStore) GetFrequencyIds() ([]models.FrequencyId, error) {
 	query := `
         SELECT frequency_id_code, frequency_id_description FROM frequency_id_lk
 		WHERE active_flag_tf = 'T' ORDER BY sort_order asc

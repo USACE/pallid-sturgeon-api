@@ -186,11 +186,6 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve mark recapture data", err))
 	}
 
-	frequencyId, err := s.Store.GetFrequencyId()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve frequency id data", err))
-	}
-
 	spawnBehavior, err := s.Store.GetSpawnBehavior()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve spawn behavior data", err))
@@ -247,7 +242,7 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		"u6Options":         u6,
 		"u7Options":         u7,
 		"years": 			 years,
-		"frequencyId":		 frequencyId,
+		"frequencyId":		 frequencyIds,
 		"spawnBehavior":	 spawnBehavior,
 		"positionConfidence": positionConfidence,
 		"searchTypeCodes":	 searchTypeCodes,
