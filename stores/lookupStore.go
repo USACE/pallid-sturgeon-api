@@ -61,3 +61,27 @@ func (s *LookupStore) GetFrequencyIds() ([]models.FrequencyId, error) {
 
 	return data, nil
 }
+
+func (s *LookupStore) GetScuteLocations() ([]models.ScuteLocation, error) {
+	query := `
+        SELECT scute_location_code, scute_location_description
+		FROM scute_location_lk
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.ScuteLocation{}
+
+	for rows.Next() {
+		var i models.ScuteLocation
+		if err := rows.Scan(&i.ScuteLocationCode, &i.ScuteLocationDescription); err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, nil
+}

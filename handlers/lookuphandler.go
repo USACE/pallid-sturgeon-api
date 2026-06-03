@@ -19,9 +19,15 @@ func (s *LookupHandler) GetAllLookups(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Frequency ID data", err))
 	}
 
+	scuteLocations, err := s.Store.GetScuteLocations()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve Scute Location data", err))
+	}
+
 	// Single combined response
 	response := map[string]any{
 		"frequencyIds":    frequencyIds,
+		"scuteLocations":  scuteLocations,
 	}
 
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Lookup data retrieved successfully", response))
