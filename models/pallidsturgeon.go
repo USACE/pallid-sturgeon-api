@@ -411,7 +411,7 @@ type UploadFish struct {
 	SiteID             int       `db:"site_id" json:"siteId"`
 	MrFid              string    `db:"mr_fid" json:"mrFid"`
 	Fid                int       `db:"f_id" json:"fid"`
-	Ffid               string    `db:"f_fid" json:"ffid"`
+	Ffid               string    `db:"f_fid" json:"fFid"`
 	MrID               *int      `db:"mr_id" json:"mrId"`
 	Panelhook          *string   `db:"panelhook" json:"panelHook"`
 	Bait               *string   `db:"bait" json:"bait"`
@@ -440,6 +440,7 @@ type UploadFish struct {
 	Fieldoffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
 	Condition          *float64  `db:"condition" json:"condition"`
+	LengthType 		   string 	 `db:"length_type" json:"lengthType"`
 }
 
 type SearchDataEntryWithCount struct {
@@ -719,6 +720,7 @@ type UploadMoriver struct {
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
 	SubsampleType 	 string    `db:"subsample_type" json:"subsampleType"`
+	Status 			 int 	   `db:"status" json:"status"`
 }
 
 type TelemetryDataEntryWithCount struct {
@@ -734,7 +736,7 @@ type UploadTelemetryData struct {
 type UploadTelemetry struct {
 	TId                int       `db:"t_id" json:"tId"`
 	TFid               string    `db:"t_fid" json:"tFid"`
-	SeFid              string    `db:"se_fid" json:"seFieldId"`
+	SeFid              string    `db:"se_fid" json:"seFid"`
 	SeId               int       `db:"se_id" json:"seId"`
 	SiteId             int       `db:"site_id" json:"siteId"`
 	Bend               *float64  `db:"bend" json:"bend"`
