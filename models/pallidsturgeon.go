@@ -617,6 +617,32 @@ type UploadSupplemental struct {
 	Project37 		   *int 	 `db:"project_3_7" json:"project37"`
 }
 
+type StockedJuveniles struct {
+	Hatchery        *string `db:"hatchery" json:"hatchery"`
+	StockSite 		*string `db:"stock_site" json:"stockSite"`
+	YearClass       *int 	`db:"year_stock" json:"yearClass"`
+	CWT 			*string `db:"coded_wire" json:"cwt"`
+	Scute      		*string `db:"scure_removed" json:"scute"`
+	ElastomerLeft 	*string `db:"ell" json:"el"`
+	ElastomerRight  *string `db:"elr" json:"er"`
+}
+
+type RecapturedData struct {
+	RecapturedId 	  int 	  `db:"id" json:"id"`
+	Tagnumber         *string `db:"pit_tag" json:"tagnumber"`
+	Tagnumber2 		  *string `db:"pit_tag_2" json:"tagnumber2"`
+	CaptureDate       string  `db:"capture_date" json:"captureDate"`
+	CaptureLocation   *string `db:"capture_location" json:"captureLocation"`
+	Hatchery      	  *string `db:"hatchery" json:"hatchery"`
+	StockDate 		  *string `db:"stock_date" json:"stockDate"`
+	Sex  			  *string `db:"sex" json:"sex"`
+	PallidHybrid      *string `db:"pallid_hybrid" json:"pallidHybrid"`
+	CWT 			  *string `db:"coded_wire_tag" json:"cwt"`
+	Scute       	  *string `db:"scute_removed" json:"scute"`
+	ElastomerLeft 	  *string `db:"elastomer_left" json:"el"`
+	ElastomerRight    *string `db:"elastomer_right" json:"er"`
+}
+
 type MoriverDataEntryWithCount struct {
 	Items      []UploadMoriver `json:"items"`
 	TotalCount int             `json:"totalCount"`

@@ -4120,3 +4120,109 @@ func (s *PallidSturgeonStore) GetSitesExport(year string, officeCode string, pro
 
 	return exportData, err
 }
+
+func (s *PallidSturgeonStore) ValidateSpeciesTagNumber(species string, tagnumber string) (int, error) {
+	var count int
+
+	err := s.db.QueryRow(`
+        SELECT COUNT(*)
+		FROM recapture_data
+		WHERE species = :1 and pit_tag = :2
+    `, species, tagnumber).Scan(&count)
+
+	if err != nil {
+        return 0, err
+    }
+
+	return count, nil
+}
+
+func (s *PallidSturgeonStore) GetGeneticNeeds(tagnumber string) (string, error) {
+	var data string
+
+	err := s.db.QueryRow(`
+        SELECT reason
+		FROM parental_genetics_lk where pit_tag = :1
+    `, tagnumber).Scan(&data)
+
+	if errors.Is(err, sql.ErrNoRows) {
+        return "", nil
+    }
+
+	if err != nil {
+        return "", err
+    }
+
+	return data, nil
+}
+
+func (s *PallidSturgeonStore) GetLab(tagnumber string) (string, error) {
+	var data string
+
+	err := s.db.QueryRow(`
+        SELECT send_to
+		FROM parental_genetics_lk where pit_tag = :1
+    `, tagnumber).Scan(&data)
+
+	if errors.Is(err, sql.ErrNoRows) {
+        return "", nil
+    }
+
+	if err != nil {
+        return "", err
+    }
+
+	return data, nil
+}
+
+func (s *PallidSturgeonStore) GetStockedJuveniles(tagnumber string) ([]models.StockedJuveniles, error) {
+	query := `
+        SELECT hatchery, stock_site, year_stock, coded_wire, scute_removed, elr, ell
+		FROM stocked_juveniles WHERE pit_tag = :1
+    `
+
+	rows, err := s.db.Query(query, tagnumber)
+
+	data := []models.StockedJuveniles{}
+	if err != nil {
+		return data, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		i := models.StockedJuveniles{}
+		err = rows.Scan(&i.Hatchery, &i.StockSite, &i.YearClass, &i.CWT, &i.Scute, &i.ElastomerRight, &i.ElastomerLeft)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, err
+}
+
+func (s *PallidSturgeonStore) GetRecapturedData(tagnumber string) ([]models.RecapturedData, error) {
+	query := `
+        SELECT id, pit_tag, pit_tag_2, capture_date, capture_location, hatchery, stock_date, sex, pallid_hybrid, coded_wire_tag, scute_removed, ELASTOMER_LEFT, ELASTOMER_RIGHT
+		FROM recaptured_pallids where pit_tag = :1
+    `
+
+	rows, err := s.db.Query(query, tagnumber)
+
+	data := []models.RecapturedData{}
+	if err != nil {
+		return data, err
+	} 
+	defer rows.Close()
+
+	for rows.Next() {
+		i := models.RecapturedData{}
+		err = rows.Scan(&i.RecapturedId, &i.Tagnumber, &i.Tagnumber2, &i.CaptureDate, &i.CaptureLocation, &i.Hatchery, &i.StockDate, &i.Sex, &i.PallidHybrid, &i.CWT, &i.Scute, &i.ElastomerLeft, &i.ElastomerRight)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, err
+}
