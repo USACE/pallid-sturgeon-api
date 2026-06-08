@@ -1312,3 +1312,52 @@ func (sd *PallidSturgeonHandler) GetSitesExport(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Sites data retrieved successfully", exportData))
 }
+
+func (sd *PallidSturgeonHandler) ValidateSpeciesTagNumber(c echo.Context) error {
+	species, tagnumber := c.QueryParam("species"), c.QueryParam("tagnumber")
+
+	data, err := sd.Store.ValidateSpeciesTagNumber(species, tagnumber)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve recaptured species", err))
+	}
+
+	response := map[string]bool{
+        "match": data > 0,
+    }
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Successfully retrieved recaptured species", response))
+}
+
+func (sd *PallidSturgeonHandler) GetPallidIdData(c echo.Context) error {
+	tagnumber := c.QueryParam("tagnumber")
+
+	geneticNeeds, err := sd.Store.GetGeneticNeeds(tagnumber)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve genetic needs data", err))
+	}
+
+	lab, err := sd.Store.GetLab(tagnumber)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve lab data", err))
+	}
+
+	stockedJuvenileInfo, err := sd.Store.GetStockedJuveniles(tagnumber)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve stocked juvenile data", err))
+	}
+
+	recaptureInfo, err := sd.Store.GetRecapturedData(tagnumber)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve recapture data", err))
+	}
+
+	response := map[string]any{
+        "geneticNeeds":    		geneticNeeds,
+		"lab": 	 				lab,
+		"stockedJuvenileInfo": 	stockedJuvenileInfo,
+		"recaptureInfo": 		recaptureInfo,
+    }
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Successfully retrieved pallid ID data", response))
+}

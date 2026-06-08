@@ -99,6 +99,8 @@ func main() {
 	e.POST(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.SaveSupplementalDataEntry, PUBLIC))
 	e.PUT(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.UpdateSupplementalDataEntry, PUBLIC))
 	e.DELETE(urlContext+"/supplementalDataEntry/:id", auth.Authorize(PallidSturgeonH.DeleteSupplementalDataEntry, PUBLIC))
+	e.GET(urlContext+"/DataEntry/getPallidIdData", auth.Authorize(PallidSturgeonH.GetPallidIdData, PUBLIC))
+
 	e.GET(urlContext+"/searchDataEntry", auth.Authorize(PallidSturgeonH.GetSearchDataEntries, PUBLIC))
 	e.POST(urlContext+"/searchDataEntry", auth.Authorize(PallidSturgeonH.SaveSearchDataEntry, PUBLIC))
 	e.PUT(urlContext+"/searchDataEntry", auth.Authorize(PallidSturgeonH.UpdateSearchDataEntry, PUBLIC))
@@ -127,6 +129,8 @@ func main() {
 	e.GET(urlContext+"/procedureDataSummary", auth.Authorize(PallidSturgeonH.GetProcedureDataSummary, PUBLIC))
 	e.GET(urlContext+"/missouriDatasheets", auth.Authorize(PallidSturgeonH.GetMissouriDatasheetById, PUBLIC))
 	e.GET(urlContext+"/searchDatasheets", auth.Authorize(PallidSturgeonH.GetSearchDatasheetById, PUBLIC))
+
+	e.GET(urlContext+"/Validation/validateSpeciesTagNumber", auth.Authorize(PallidSturgeonH.ValidateSpeciesTagNumber, PUBLIC))
 
 	e.GET(urlContext+"/uploadSessionId", auth.Authorize(PallidSturgeonH.GetUploadSessionId, PUBLIC))
 	e.POST(urlContext+"/upload", auth.Authorize(PallidSturgeonH.Upload, PUBLIC))
