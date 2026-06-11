@@ -715,14 +715,14 @@ func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.Sites) e
 }
 
 var fishDataEntriesSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl, fi.length_type, fi.mr_fid from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var fishDataEntriesCountSql = `select count(*) from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var fishDataEntriesByFidSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl, fi.length_type, fi.mr_fid from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and fi.f_id = :1`
 
@@ -731,7 +731,7 @@ where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_id = :1`
 
 var fishDataEntriesByFfidSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl, fi.length_type, fi.mr_fid from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_fid = :1`
 
@@ -740,7 +740,7 @@ where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4
 and fi.f_fid = :1`
 
 var fishDataEntriesByMridSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
-fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
+fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl, fi.length_type, fi.mr_fid from ds_fish fi inner join ds_moriver mo on fi.mr_id = mo.mr_id inner join ds_sites si on si.site_id = mo.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
 and fi.mr_id = :1`
 
@@ -831,7 +831,7 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 	for rows.Next() {
 		fishDataEntry := models.UploadFish{}
 		err = rows.Scan(&fishDataEntry.Fid, &fishDataEntry.Ffid, &fishDataEntry.MrID, &fishDataEntry.SiteID, &fishDataEntry.Panelhook, &fishDataEntry.Bait, &fishDataEntry.Species, &fishDataEntry.Length, &fishDataEntry.Weight, &fishDataEntry.Fishcount, &fishDataEntry.Otolith, &fishDataEntry.Rayspine,
-			&fishDataEntry.Scale, &fishDataEntry.Ftprefix, &fishDataEntry.Ftnum, &fishDataEntry.Ftmr, &fishDataEntry.EditInitials, &fishDataEntry.LastEditComment, &fishDataEntry.UploadedBy, &fishDataEntry.GeneticsVialNumber, &fishDataEntry.Condition, &fishDataEntry.FinCurl)
+			&fishDataEntry.Scale, &fishDataEntry.Ftprefix, &fishDataEntry.Ftnum, &fishDataEntry.Ftmr, &fishDataEntry.EditInitials, &fishDataEntry.LastEditComment, &fishDataEntry.UploadedBy, &fishDataEntry.GeneticsVialNumber, &fishDataEntry.Condition, &fishDataEntry.FinCurl, &fishDataEntry.LengthType, &fishDataEntry.MrFid)
 		if err != nil {
 			return fishDataEntryWithCount, err
 		}
@@ -844,15 +844,15 @@ func (s *PallidSturgeonStore) GetFishDataEntries(tableId string, fieldId string,
 }
 
 var insertFishDataSql = `insert into ds_fish (FIELDOFFICE,PROJECT,SEGMENT,uniqueidentifier,id,panelhook,bait,SPECIES,length,weight,FISHCOUNT,otolith,rayspine,scale,FTPREFIX,FTNUM,FTMR,mr_id,edit_initials,last_edit_comment, 
-last_updated, uploaded_by, genetics_vial_number, condition, fin_curl) 
-values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25) returning f_id into :26`
+last_updated, uploaded_by, genetics_vial_number, condition, fin_curl, f_fid, length_type, mr_fid) 
+values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28) returning f_id into :29`
 
 func (s *PallidSturgeonStore) SaveFishDataEntry(fishDataEntry models.UploadFish) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertFishDataSql, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
 		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.MrID, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy,
-		fishDataEntry.GeneticsVialNumber, fishDataEntry.Condition, fishDataEntry.FinCurl, sql.Out{Dest: &id})
+		fishDataEntry.GeneticsVialNumber, fishDataEntry.Condition, fishDataEntry.FinCurl, fishDataEntry.Ffid, fishDataEntry.LengthType, fishDataEntry.MrFid, sql.Out{Dest: &id})
 
 	return id, err
 }
@@ -881,14 +881,16 @@ last_updated = :21,
 uploaded_by = :22,
 genetics_vial_number = :23,
 condition = :24,
-fin_curl = :25
+fin_curl = :25,
+f_fid = :26,
+length_type = :27
 WHERE f_id = :1`
 
 func (s *PallidSturgeonStore) UpdateFishDataEntry(fishDataEntry models.UploadFish) error {
 	_, err := s.db.Exec(updateFishDataSql, fishDataEntry.Fieldoffice, fishDataEntry.Project, fishDataEntry.Segment, fishDataEntry.UniqueID, fishDataEntry.Id, fishDataEntry.Panelhook,
 		fishDataEntry.Bait, fishDataEntry.Species, fishDataEntry.Length, fishDataEntry.Weight, fishDataEntry.Fishcount, fishDataEntry.Otolith, fishDataEntry.Rayspine,
 		fishDataEntry.Scale, fishDataEntry.Ftprefix, fishDataEntry.Ftnum, fishDataEntry.Ftmr, fishDataEntry.EditInitials, fishDataEntry.LastEditComment, fishDataEntry.LastUpdated, fishDataEntry.UploadedBy,
-		fishDataEntry.GeneticsVialNumber, fishDataEntry.Condition, fishDataEntry.FinCurl, fishDataEntry.Fid)
+		fishDataEntry.GeneticsVialNumber, fishDataEntry.Condition, fishDataEntry.FinCurl, fishDataEntry.Ffid, fishDataEntry.LengthType, fishDataEntry.Fid)
 	return err
 }
 
@@ -903,9 +905,9 @@ var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PR
 	set_site_3, starttime, startlatitude, startlongitude, stoptime, stoplatitude, stoplongitude, depth1, velocitybot1, velocity08_1, 
 	velocity02or06_1, depth2, velocitybot2, velocity08_2, velocity02or06_2, depth3, velocitybot3, velocity08_3, velocity02or06_3, 
 	watervel, cobble, ORGANIC, silt, sand, gravel, comments, complete, checkby, no_turbidity, no_velocity, edit_initials,last_edit_comment, 
-	last_updated, uploaded_by, bend, bendrn, bendrivermile, micro, subsample_type) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
+	last_updated, uploaded_by, bend, bendrn, bendrivermile, micro, subsample_type, "STATUS") values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
 		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49,:50,
-		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71,:72,:73,:74,:75,:76,:77,:78,:79) returning mr_id into :80`
+		:51,:52,:53,:54,:55,:56,:57,:58,:59,:60,:61,:62,:63,:64,:65,:66,:67,:68,:69,:70,:71,:72,:73,:74,:75,:76,:77,:78,:79,:80) returning mr_id into :81`
 
 func (s *PallidSturgeonStore) AddMoriverDataEntry(moriverDataEntry models.UploadMoriver) (int, error) {
 	var id int
@@ -921,7 +923,7 @@ func (s *PallidSturgeonStore) AddMoriverDataEntry(moriverDataEntry models.Upload
 		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
 		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
 		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy,
-		moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.Micro, moriverDataEntry.SubsampleType,sql.Out{Dest: &id})
+		moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.Micro, moriverDataEntry.SubsampleType, moriverDataEntry.Status, sql.Out{Dest: &id})
 	return id, err
 }
 
@@ -936,7 +938,7 @@ depth2 = :50, velocitybot2 = :51, velocity08_2 = :52, velocity02or06_2 = :53,
 depth3 = :54, velocitybot3 = :55, velocity08_3 = :56, velocity02or06_3 = :57, 
 watervel = :58, cobble = :59, ORGANIC = :60, silt = :61, sand = :62, gravel = :63, comments = :64, complete = :65, checkby = :66, 
 no_turbidity = :67, no_velocity = :68, edit_initials = :69,  mr_fid= :70, site_id = :71, FIELDOFFICE = :72, last_edit_comment = :73, last_updated = :74, 
-uploaded_by = :75, bend = :76, bendrn = :77, bendrivermile = :78, micro = :79, subsample_type = :80 WHERE mr_id = :1`
+uploaded_by = :75, bend = :76, bendrn = :77, bendrivermile = :78, micro = :79, subsample_type = :80, status = :81 WHERE mr_id = :1`
 
 func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.UploadMoriver) error {
 	_, err := s.db.Exec(updateMoriverDataSql,
@@ -951,7 +953,7 @@ func (s *PallidSturgeonStore) UpdateMoriverDataEntry(moriverDataEntry models.Upl
 		moriverDataEntry.Depth3, moriverDataEntry.Velocitybot3, moriverDataEntry.Velocity08_3, moriverDataEntry.Velocity02or06_3,
 		moriverDataEntry.Watervel, moriverDataEntry.Cobble, moriverDataEntry.Organic, moriverDataEntry.Silt, moriverDataEntry.Sand, moriverDataEntry.Gravel,
 		moriverDataEntry.Comments, moriverDataEntry.Complete, moriverDataEntry.Checkby, moriverDataEntry.NoTurbidity, moriverDataEntry.NoVelocity, moriverDataEntry.EditInitials, moriverDataEntry.MrFid, moriverDataEntry.SiteID, moriverDataEntry.FieldOffice,
-		moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.Micro, moriverDataEntry.SubsampleType, moriverDataEntry.MrID)
+		moriverDataEntry.LastEditComment, moriverDataEntry.LastUpdated, moriverDataEntry.UploadedBy, moriverDataEntry.Bend, moriverDataEntry.BendRn, moriverDataEntry.BendRiverMile, moriverDataEntry.Micro, moriverDataEntry.SubsampleType, moriverDataEntry.Status, moriverDataEntry.MrID)
 	return err
 }
 
@@ -3140,7 +3142,7 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 	return procedureSummaryWithCount, err
 }
 
-var missouriDatasheetsBySiteId = `select site_id, mr_id, mr_fid, subsample, subsamplepass, subsamplen, recorder, conductivity, bkg_color, fish_count, supp_count, supp_bkg_color, setdate, proc_count, proc_bkg_color from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
+var missouriDatasheetsBySiteId = `select site_id, mr_id, mr_fid, subsample, subsamplepass, subsamplen, recorder, conductivity, bkg_color, fish_count, supp_count, supp_bkg_color, setdate, proc_count, proc_bkg_color, status from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
 
 var missouriDatasheetsCountBySiteId = `select count(*) from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
 
@@ -3184,7 +3186,7 @@ func (s *PallidSturgeonStore) GetMissouriDatasheetById(siteId string, officeCode
 	for rows.Next() {
 		datasheets := models.UploadMoriver{}
 		err = rows.Scan(&datasheets.SiteID, &datasheets.MrID, &datasheets.MrFid, &datasheets.Subsample, &datasheets.Subsamplepass, &datasheets.Subsamplen, &datasheets.Recorder, &datasheets.Conductivity, &datasheets.BkgColor,
-			&datasheets.FishCount, &datasheets.SuppCount, &datasheets.SuppBkgColor, &datasheets.SetDate, &datasheets.ProcCount, &datasheets.ProcBkgColor)
+			&datasheets.FishCount, &datasheets.SuppCount, &datasheets.SuppBkgColor, &datasheets.SetDate, &datasheets.ProcCount, &datasheets.ProcBkgColor, &datasheets.Status)
 		if err != nil {
 			return missouriDatasheetsWithCount, err
 		}
@@ -4117,4 +4119,110 @@ func (s *PallidSturgeonStore) GetSitesExport(year string, officeCode string, pro
 	}
 
 	return exportData, err
+}
+
+func (s *PallidSturgeonStore) ValidateSpeciesTagNumber(species string, tagnumber string) (int, error) {
+	var count int
+
+	err := s.db.QueryRow(`
+        SELECT COUNT(*)
+		FROM recapture_data
+		WHERE species = :1 and pit_tag = :2
+    `, species, tagnumber).Scan(&count)
+
+	if err != nil {
+        return 0, err
+    }
+
+	return count, nil
+}
+
+func (s *PallidSturgeonStore) GetGeneticNeeds(tagnumber string) (string, error) {
+	var data string
+
+	err := s.db.QueryRow(`
+        SELECT reason
+		FROM parental_genetics_lk where pit_tag = :1
+    `, tagnumber).Scan(&data)
+
+	if errors.Is(err, sql.ErrNoRows) {
+        return "", nil
+    }
+
+	if err != nil {
+        return "", err
+    }
+
+	return data, nil
+}
+
+func (s *PallidSturgeonStore) GetLab(tagnumber string) (string, error) {
+	var data string
+
+	err := s.db.QueryRow(`
+        SELECT send_to
+		FROM parental_genetics_lk where pit_tag = :1
+    `, tagnumber).Scan(&data)
+
+	if errors.Is(err, sql.ErrNoRows) {
+        return "", nil
+    }
+
+	if err != nil {
+        return "", err
+    }
+
+	return data, nil
+}
+
+func (s *PallidSturgeonStore) GetStockedJuveniles(tagnumber string) ([]models.StockedJuveniles, error) {
+	query := `
+        SELECT hatchery, stock_site, year_stock, coded_wire, scute_removed, elr, ell
+		FROM stocked_juveniles WHERE pit_tag = :1
+    `
+
+	rows, err := s.db.Query(query, tagnumber)
+
+	data := []models.StockedJuveniles{}
+	if err != nil {
+		return data, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		i := models.StockedJuveniles{}
+		err = rows.Scan(&i.Hatchery, &i.StockSite, &i.YearClass, &i.CWT, &i.Scute, &i.ElastomerRight, &i.ElastomerLeft)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, err
+}
+
+func (s *PallidSturgeonStore) GetRecapturedData(tagnumber string) ([]models.RecapturedData, error) {
+	query := `
+        SELECT id, pit_tag, pit_tag_2, capture_date, capture_location, hatchery, stock_date, sex, pallid_hybrid, coded_wire_tag, scute_removed, ELASTOMER_LEFT, ELASTOMER_RIGHT
+		FROM recaptured_pallids where pit_tag = :1
+    `
+
+	rows, err := s.db.Query(query, tagnumber)
+
+	data := []models.RecapturedData{}
+	if err != nil {
+		return data, err
+	} 
+	defer rows.Close()
+
+	for rows.Next() {
+		i := models.RecapturedData{}
+		err = rows.Scan(&i.RecapturedId, &i.Tagnumber, &i.Tagnumber2, &i.CaptureDate, &i.CaptureLocation, &i.Hatchery, &i.StockDate, &i.Sex, &i.PallidHybrid, &i.CWT, &i.Scute, &i.ElastomerLeft, &i.ElastomerRight)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, i)
+	}
+
+	return data, err
 }

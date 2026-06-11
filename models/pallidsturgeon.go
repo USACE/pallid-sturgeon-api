@@ -411,7 +411,7 @@ type UploadFish struct {
 	SiteID             int       `db:"site_id" json:"siteId"`
 	MrFid              string    `db:"mr_fid" json:"mrFid"`
 	Fid                int       `db:"f_id" json:"fid"`
-	Ffid               string    `db:"f_fid" json:"ffid"`
+	Ffid               string    `db:"f_fid" json:"fFid"`
 	MrID               *int      `db:"mr_id" json:"mrId"`
 	Panelhook          *string   `db:"panelhook" json:"panelHook"`
 	Bait               *string   `db:"bait" json:"bait"`
@@ -440,6 +440,7 @@ type UploadFish struct {
 	Fieldoffice        string    `db:"FIELDOFFICE" json:"fieldOffice"`
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
 	Condition          *float64  `db:"condition" json:"condition"`
+	LengthType 		   string 	 `db:"length_type" json:"lengthType"`
 }
 
 type SearchDataEntryWithCount struct {
@@ -616,6 +617,32 @@ type UploadSupplemental struct {
 	Project37 		   *int 	 `db:"project_3_7" json:"project37"`
 }
 
+type StockedJuveniles struct {
+	Hatchery        *string `db:"hatchery" json:"hatchery"`
+	StockSite 		*string `db:"stock_site" json:"stockSite"`
+	YearClass       *int 	`db:"year_stock" json:"yearClass"`
+	CWT 			*string `db:"coded_wire" json:"cwt"`
+	Scute      		*string `db:"scure_removed" json:"scute"`
+	ElastomerLeft 	*string `db:"ell" json:"el"`
+	ElastomerRight  *string `db:"elr" json:"er"`
+}
+
+type RecapturedData struct {
+	RecapturedId 	  int 	  `db:"id" json:"id"`
+	Tagnumber         *string `db:"pit_tag" json:"tagnumber"`
+	Tagnumber2 		  *string `db:"pit_tag_2" json:"tagnumber2"`
+	CaptureDate       string  `db:"capture_date" json:"captureDate"`
+	CaptureLocation   *string `db:"capture_location" json:"captureLocation"`
+	Hatchery      	  *string `db:"hatchery" json:"hatchery"`
+	StockDate 		  *string `db:"stock_date" json:"stockDate"`
+	Sex  			  *string `db:"sex" json:"sex"`
+	PallidHybrid      *string `db:"pallid_hybrid" json:"pallidHybrid"`
+	CWT 			  *string `db:"coded_wire_tag" json:"cwt"`
+	Scute       	  *string `db:"scute_removed" json:"scute"`
+	ElastomerLeft 	  *string `db:"elastomer_left" json:"el"`
+	ElastomerRight    *string `db:"elastomer_right" json:"er"`
+}
+
 type MoriverDataEntryWithCount struct {
 	Items      []UploadMoriver `json:"items"`
 	TotalCount int             `json:"totalCount"`
@@ -719,6 +746,7 @@ type UploadMoriver struct {
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
 	SubsampleType 	 string    `db:"subsample_type" json:"subsampleType"`
+	Status 			 int 	   `db:"status" json:"status"`
 }
 
 type TelemetryDataEntryWithCount struct {
@@ -734,7 +762,7 @@ type UploadTelemetryData struct {
 type UploadTelemetry struct {
 	TId                int       `db:"t_id" json:"tId"`
 	TFid               string    `db:"t_fid" json:"tFid"`
-	SeFid              string    `db:"se_fid" json:"seFieldId"`
+	SeFid              string    `db:"se_fid" json:"seFid"`
 	SeId               int       `db:"se_id" json:"seId"`
 	SiteId             int       `db:"site_id" json:"siteId"`
 	Bend               *float64  `db:"bend" json:"bend"`
