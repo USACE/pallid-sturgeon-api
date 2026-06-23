@@ -1206,7 +1206,9 @@ func (s *LookupStore) GetSearchType() ([]models.SearchType, error) {
 func (s *LookupStore) GetYesNoOptions() ([]models.YesNo, error) {
 	query := `
         SELECT yn_code, yn_text
-		FROM yes_no_lk ORDER BY yn_order asc
+		FROM yes_no_lk
+		WHERE yn_code IS NOT NULL
+		ORDER BY yn_order asc
     `
 	rows, err := s.db.Query(query)
 	if err != nil {
