@@ -614,7 +614,10 @@ type UploadSupplemental struct {
 	UploadSessionId    int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
-	Project37 		   *int 	 `db:"project_3_7" json:"project37"`
+	Project37 		     *int 	   `db:"project_3_7" json:"project37"`
+	Lscute             *int      `db:"lscute" json:"lscute"`
+	Rscute						 *int      `db:"rscute" json:"rscute"`
+	Dscute						 *int      `db:"dscute" json:"dscute"`
 }
 
 type StockedJuveniles struct {

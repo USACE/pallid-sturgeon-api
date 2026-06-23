@@ -1057,8 +1057,8 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 
 var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,TAGNUMBER, PITRN,SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM2,ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic, genetics_vial_number,
 	BROODSTOCK, HATCH_WILD, species_id,head, snouttomouth, inter, mouthwidth, m_ib,l_ob, l_ib, r_ib,r_ob, anal, dorsal, status, HATCHERY_ORIGIN,SEX, stage, recapture, photo,genetic_needs, other_tag_info,comments,
-	edit_initials,last_edit_comment, last_updated, uploaded_by, complete, approved, checkby, recorder, project_3_7)
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49) returning s_id into :50`
+	edit_initials,last_edit_comment, last_updated, uploaded_by, complete, approved, checkby, recorder, project_3_7, lscute, rscute, dscute)
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48,:49,:50,:51,:52) returning s_id into :53`
 
 func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) (int, error) {
 	var id int
@@ -1112,6 +1112,9 @@ func (s *PallidSturgeonStore) SaveSupplementalDataEntry(supplementalDataEntry mo
 		supplementalDataEntry.Checkby,
 		supplementalDataEntry.Recorder,
 		supplementalDataEntry.Project37,
+		supplementalDataEntry.Lscute,
+		supplementalDataEntry.Rscute,
+		supplementalDataEntry.Dscute,
 		sql.Out{Dest: &id},
 	)
 	return id, err
@@ -1166,7 +1169,10 @@ complete = :46,
 approved = :47,
 checkby = :48,
 recorder = :49,
-project_3_7 = :50
+project_3_7 = :50,
+lscute = :51,
+rscute = :52,
+dscute = :53
 WHERE s_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry models.UploadSupplemental) error {
@@ -1220,13 +1226,16 @@ func (s *PallidSturgeonStore) UpdateSupplementalDataEntry(supplementalDataEntry 
 		supplementalDataEntry.Checkby,
 		supplementalDataEntry.Recorder,
 		supplementalDataEntry.Project37,
+		supplementalDataEntry.Lscute,
+		supplementalDataEntry.Rscute,
+		supplementalDataEntry.Dscute,
 		supplementalDataEntry.Sid)
 	return err
 }
 
 var supplementalDataEntriesSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7, su.lscute, su.rscute, su.dscute from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1240,7 +1249,7 @@ where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 
 var supplementalDataEntriesByFidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7, su.lscute, su.rscute, su.dscute from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1256,7 +1265,7 @@ and su.f_id = :1`
 
 var supplementalDataEntriesByFfidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7, su.lscute, su.rscute, su.dscute from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1272,7 +1281,7 @@ and su.f_fid = :1`
 
 var supplementalDataEntriesByGeneticsVialSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7, su.lscute, su.rscute, su.dscute from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1288,7 +1297,7 @@ and su.genetics_vial_number = :1`
 
 var supplementalDataEntriesByGeneticsPitTagSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7, su.lscute, su.rscute, su.dscute from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1304,7 +1313,7 @@ and su.TAGNUMBER = :1`
 
 var supplementalDataEntriesByMrIdSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7, su.lscute, su.rscute, su.dscute from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1320,7 +1329,7 @@ and su.mr_id = :1`
 
 var supplementalDataEntriesBySidSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mo.netrivermile, fi.length, fi.weight, fi.condition, su.tagnumber, su.pitrn, su.scuteloc, su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.cwtyn, 
 su.dangler, su.genetic, su.genetics_vial_number, su.broodstock, su.hatch_wild, su.species_id, fi.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal, su.status, 
-su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7 from ds_supplemental su
+su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment, su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7, su.lscute, su.rscute, su.dscute from ds_supplemental su
 join ds_moriver mo on su.mr_id = mo.mr_id
 join ds_sites si on si.site_id = mo.site_id
 join ds_fish fi on fi.f_id = su.f_id
@@ -1489,6 +1498,9 @@ func (s *PallidSturgeonStore) GetSupplementalDataEntries(tableId string, fieldId
 			&supplementalDataEntry.Checkby,
 			&supplementalDataEntry.Recorder,
 			&supplementalDataEntry.Project37,
+			&supplementalDataEntry.Lscute,
+			&supplementalDataEntry.Rscute,
+			&supplementalDataEntry.Dscute,
 		)
 		if err != nil {
 			return supplementalDataEntryWithCount, err
@@ -3394,8 +3406,8 @@ var insertSupplementalUploadSql = `insert into upload_supplemental (site_id, f_f
 	sex, stage, recapture, photo,
 	genetic_needs, other_tag_info,
 	comments,
-	last_updated, upload_session_id, uploaded_by, upload_filename, project_3_7) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
-		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46)`
+	last_updated, upload_session_id, uploaded_by, upload_filename, project_3_7, lscute, rscute, dscute) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,
+		:21,:22,:23,:24,:25,:26,:27,:28,:29,:30,:31,:32,:33,:34,:35,:36,:37,:38,:39,:40,:41,:42,:43,:44,:45,:46,:47,:48)`
 
 func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.UploadSupplemental) error {
 	_, err := s.db.Exec(insertSupplementalUploadSql,
@@ -3445,6 +3457,9 @@ func (s *PallidSturgeonStore) SaveSupplementalUpload(uploadSupplemental models.U
 		uploadSupplemental.UploadedBy,
 		uploadSupplemental.UploadFilename,
 		uploadSupplemental.Project37,
+		uploadSupplemental.Lscute,
+		uploadSupplemental.Rscute,
+		uploadSupplemental.Dscute,
 	)
 
 	return err
