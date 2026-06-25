@@ -441,6 +441,7 @@ type UploadFish struct {
 	GeneticsVialNumber string    `db:"genetics_vial_number" json:"geneticsVialNumber"`
 	Condition          *float64  `db:"condition" json:"condition"`
 	LengthType 		   string 	 `db:"length_type" json:"lengthType"`
+	SupplementalCount  *int 	 `db:"supplemental_data" json:"supplementalData"`
 }
 
 type SearchDataEntryWithCount struct {
@@ -541,6 +542,10 @@ type UploadProcedure struct {
 	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
 	Checkby                   string    `db:"checkby" json:"checkby"`
 	SerialNum 			      string    `db:"serial_num" json:"serialNum"`
+	OldRtSerial				  *int 		`db:"old_rt_serial" json:"oldRtSerial"`
+	NewRtSerial				  *int 		`db:"new_rt_serial" json:"newRtSerial"`
+	OldDstSerial			  *int 		`db:"old_dst_serial" json:"oldDstSerial"`
+	PolarizationIndex		  *int 		`db:"polarization_index" json:"pi"`
 }
 
 type SupplementalDataEntryWithCount struct {
