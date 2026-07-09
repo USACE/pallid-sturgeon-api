@@ -32,14 +32,9 @@ update ds_moriver
 set status = 2
 where status is null;
 
--- make stop time/latitude/longitude nullable
-alter table ds_moriver
-modify stoptime null;
+-- alter DATA_ENTRY_MISSOURI_OBJ_TYPE object type
+ALTER TYPE DATA_ENTRY_MISSOURI_OBJ_TYPE ADD ATTRIBUTE (status NUMBER(1)) CASCADE
 
-alter table ds_moriver
-modify stoplatitude null;
-
-alter table ds_moriver
-modify stoplongitude null; 
+-- @TODO: Manually had status column in package pallid_data_entry_api.data_entry_missouri_fnc
 
 commit;
