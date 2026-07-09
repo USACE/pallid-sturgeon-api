@@ -5,3 +5,28 @@ alter table DS_SUPPLEMENTAL add (
   rscute number(1),
   dscute number(1)
 );
+
+
+update ds_supplemental
+set lscute = scutenum
+where scuteloc = 'L';
+
+update ds_supplemental
+set lscute = scutenum2
+where scuteloc2 = 'L' and lscute is null;
+
+update ds_supplemental
+set rscute = scutenum
+where scuteloc = 'R';
+
+update ds_supplemental
+set rscute = scutenum2
+where scuteloc2 = 'R' and rscute is null;
+
+update ds_supplemental
+set dscute = scutenum
+where scuteloc = 'D';
+
+update ds_supplemental
+set dscute = scutenum2
+where scuteloc2 = 'D' and dscute is null;
