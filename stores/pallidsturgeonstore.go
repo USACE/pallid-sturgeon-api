@@ -1670,14 +1670,14 @@ func (s *PallidSturgeonStore) GetSearchDataEntries(tableId string, siteId string
 
 var insertSearchDataSql = `insert into ds_search (SE_FID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE,
 SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
-UPLOAD_SESSION_ID, ds_id, "STATUS") values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21, :22) returning se_id into :23`
+UPLOAD_SESSION_ID, ds_id, "STATUS", search_day) values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23) returning se_id into :24`
 
 func (s *PallidSturgeonStore) SaveSearchDataEntry(searchDataEntry models.UploadSearch) (int, error) {
 
 	var id int
 	_, err := s.db.Exec(insertSearchDataSql, searchDataEntry.SeFid, searchDataEntry.Checkby, searchDataEntry.Conductivity, searchDataEntry.EditInitials, searchDataEntry.LastEditComment, searchDataEntry.LastUpdated, searchDataEntry.Recorder,
 		searchDataEntry.SearchDate, searchDataEntry.SearchTypeCode, searchDataEntry.SiteId, searchDataEntry.StartLatitude, searchDataEntry.StartLongitude, searchDataEntry.StartTime, searchDataEntry.StopLatitude,
-		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.DsId, searchDataEntry.Status, sql.Out{Dest: &id})
+		searchDataEntry.StopLongitude, searchDataEntry.StopTime, searchDataEntry.Temp, searchDataEntry.UploadedBy, searchDataEntry.UploadFilename, searchDataEntry.UploadSessionId, searchDataEntry.DsId, searchDataEntry.Status, searchDataEntry.SearchDay, sql.Out{Dest: &id})
 	return id, err
 }
 
