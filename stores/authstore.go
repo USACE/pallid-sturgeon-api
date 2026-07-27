@@ -20,6 +20,8 @@ var userSql = `select id, edipi, username, email, first_name,last_name from user
 
 var userByIdSql = `select id, edipi, username, email, first_name,last_name from users_t where id=:1`
 
+var userByTokenSql = `select id, edipi, username, email, first_name,last_name from users_t where id=:1`
+
 // var userSql = `select id,username,email,rate,
 // 				(select bool_or(is_admin)
 // 					from org_members
