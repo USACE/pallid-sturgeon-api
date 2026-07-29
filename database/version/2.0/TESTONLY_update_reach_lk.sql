@@ -1,4 +1,5 @@
 -- Apply to TEST environment only -- 
+-- DB Script applied 7/24/2026 --
 
 INSERT INTO REACH_LK (REACH_ID, SEGMENT_ID, REACH_CODE, REACH_DESC, UPPER_RIVER_MILE, LOWER_RIVER_MILE, SEASON, PROJECT_ID)
 VALUES (19, 14, 1, null, 10, 0, 'A0', 1);

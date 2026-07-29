@@ -474,7 +474,7 @@ type UploadSearch struct {
 	StopLongitude   *float64   `db:"stop_longitude" json:"stopLongitude"`
 	Temp            *float64  `db:"temp" json:"temp"`
 	Conductivity    *float64  `db:"conductivity" json:"conductivity"`
-	Status			int		  `db:"status" json:"status"`
+	Status			*int		  `db:"status" json:"status"`
 	TelemetryCount  int       `db:"telemetry_count" json:"telemetryCount"`
 	BkgColor        string    `db:"bkg_color" json:"bkgColor"`
 	Checkby         string    `db:"checkby" json:"checkby"`
@@ -754,7 +754,7 @@ type UploadMoriver struct {
 	UploadedBy       string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename   string    `db:"upload_filename" json:"uploadFilename"`
 	SubsampleType 	 string    `db:"subsample_type" json:"subsampleType"`
-	Status 			 int 	   `db:"status" json:"status"`
+	Status 			 *int 	   `db:"status" json:"status"`
 }
 
 type TelemetryDataEntryWithCount struct {
