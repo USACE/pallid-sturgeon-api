@@ -86,3 +86,35 @@ func (u *UserHandler) GetUsers2(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, users)
 }
+
+func (u *UserHandler) GetUserToken(c echo.Context) error {
+	email := c.Param("email")
+	userToken, err := u.Store.GetUserToken(email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, userToken)
+}
+
+func (u *UserHandler) SetUserToken(c echo.Context) error {
+	tokenData := models.UserToken{}
+	if err := c.Bind(&tokenData); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	email := c.Param("email")
+	err := u.Store.SetUserToken(email, tokenData)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}
+
+func (u *UserHandler) DeleteUserToken(c echo.Context) error {
+	email := c.Param("email")
+	err := u.Store.DeleteUserToken(email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, `{"result":"success"}`)
+}

@@ -22,6 +22,12 @@ var userByIdSql = `select id, edipi, username, email, first_name,last_name from 
 
 var userByTokenSql = `select id, edipi, username, email, first_name,last_name from users_t where id=:1`
 
+var getUserTokenInfoSql = `select token_access_id, token_expiration FROM users_t WHERE email = :1`
+
+var setUserTokenSql = `update user_t set token_access_id = :1, token_secret_id = :2, token_expiration = :3 WHERE email = :4`
+
+var clearUserTokenSql = `update user_t set token_access_id = NULL, token_secret_id = NULL, token_expiration = NULL WHERE email = :1`
+
 // var userSql = `select id,username,email,rate,
 // 				(select bool_or(is_admin)
 // 					from org_members
@@ -369,4 +375,40 @@ func (auth *AuthStore) GetUsers2() ([]models.User, error) {
 	}
 
 	return users, err
+}
+
+func (auth *AuthStore) GetUserToken(email string) (models.UserToken, error) {
+	userToken := models.UserToken{}
+	selectQuery, err := auth.db.Prepare(getUserTokenInfoSql)
+	if err != nil {
+		return userToken, err
+	}
+
+	rows, err := selectQuery.Query(email)
+	if err != nil {
+		return userToken, err 
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&userToken.TokenAccess, &userToken.TokenSecret, &userToken.TokenExpiration)
+		if err != nil {
+			return userToken, err
+		}
+	}
+	defer rows.Close()
+
+	return userToken, err
+}
+
+
+func (auth *AuthStore) SetUserToken(email string, UserToken models.UserToken) error {
+	_, err := auth.db.Exec(setUserTokenSql, UserToken.TokenAccess, UserToken.TokenSecret, UserToken.TokenExpiration, email)
+
+	return err
+}
+
+func (auth *AuthStore) DeleteUserToken(email string) error {
+	_, err := auth.db.Exec(clearUserTokenSql, email)
+
+	return err
 }

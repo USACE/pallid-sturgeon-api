@@ -76,6 +76,33 @@ func (a *Auth) Authorize(handler echo.HandlerFunc, roles ...int) echo.HandlerFun
 	}
 }
 
+func (a *Auth) AuthorizeAdminOrSelf(handler echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		auth := c.Request().Header.Get(echo.HeaderAuthorization)
+		tokenString := strings.TrimPrefix(auth, "Bearer ")
+		claims, err := a.marshalJwt(tokenString)
+		//claims, err := marshalJwts(tokenString)
+		if err != nil {
+			log.Print(err)
+			return echo.NewHTTPError(http.StatusUnauthorized, "bad token")
+		}
+		user, err := a.Store.GetUserFromJwt(claims)
+		if err != nil {
+			return err
+		}
+		role, err := a.Store.GetUserRoleOffice(user.Email)
+		if err != nil {
+			return err
+		}
+		c.Set("PSUSER", user)
+		if role.Role == "ADMINISTRATOR" || user.Email == c.Param("email") {
+			return handler(c)
+		}
+
+		return echo.NewHTTPError(http.StatusUnauthorized, "")
+	}
+}
+
 func (a *Auth) LoadVerificationKey(publicKey string) error {
 	pk, err := jwt.ParseRSAPublicKeyFromPEM([]byte("-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----"))
 	if err != nil {
