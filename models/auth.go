@@ -81,3 +81,9 @@ type JSONWebKeys struct {
 	E   string   `json:"e"`
 	X5c []string `json:"x5c"`
 }
+
+type UserToken struct {
+	TokenAccess string `db:"token_access_id" json:"accessKey"`
+	TokenSecret string `db:"token_secret_id" json:"secretKey"`
+	TokenExpiration string `db:"token_expiration" json:"expiration"`
+}

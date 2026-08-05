@@ -150,6 +150,10 @@ func main() {
 	e.POST(urlContext+"/userRoleOffice", auth.Authorize(userH.AddUserRoleOffice, ADMIN))
 	e.PUT(urlContext+"/userRoleOffice", auth.Authorize(userH.UpdateUserRoleOffice, PUBLIC))
 
+	e.GET(urlContext+"/user/token/:email", auth.AuthorizeAdminOrSelf(userH.GetUserToken))
+	e.POST(urlContext+"/user/token/:email", auth.AuthorizeAdminOrSelf(userH.SetUserToken))
+	e.DELETE(urlContext+"/user/token/:email", auth.AuthorizeAdminOrSelf(userH.DeleteUserToken))
+
 	// e.Logger.Fatal(e.Start(":8080"))
 	// force update
 	e.Logger.Debug(e.Start(":8080"))
