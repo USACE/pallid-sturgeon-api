@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"crypto/sha256"
+	"encoding/hex"
 
 	"github.com/USACE/pallid_sturgeon_api/server/models"
 	"github.com/USACE/pallid_sturgeon_api/server/stores"
@@ -103,6 +105,36 @@ func (a *Auth) AuthorizeAdminOrSelf(handler echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func (a *Auth) AuthorizeViaToken(handler echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		access := c.Request().Header.Get("access-key")
+		secret := c.Request().Header.Get("secret-key")
+		if access == "" {
+			access = c.QueryParam("access")
+			secret = c.QueryParam("secret")
+		}
+
+		if len(access) == 0 {
+			return echo.NewHTTPError(http.StatusUnauthorized, "Access/Secret must be provided via query param access and secret or headers access-key and secret-key")
+		}
+
+		tokenInfo, err := a.Store.GetTokenByAccess(access)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Token Fetch via Access Key Failed", err))
+		}
+
+		if tokenInfo.TokenExpiration != "Valid" {
+			return echo.NewHTTPError(http.StatusUnauthorized, "Token Expired. Please access the Pallid Sturgeon website and refresh your token.")
+		}
+
+		if HashValid(secret, tokenInfo.TokenSecret) {
+			return handler(c)
+		}
+
+		return echo.NewHTTPError(http.StatusUnauthorized, "")
+	}
+}
+
 func (a *Auth) LoadVerificationKey(publicKey string) error {
 	pk, err := jwt.ParseRSAPublicKeyFromPEM([]byte("-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----"))
 	if err != nil {
@@ -141,4 +173,19 @@ func contains(a []int, x int) bool {
 		}
 	}
 	return false
+}
+
+func HashValid(input string, hash string) bool {
+	
+	// Convert text to bytes and compute the raw 32-byte array
+	bytes := []byte(input)
+	hashArray := sha256.Sum256(bytes) 
+
+	// Convert the 32-byte array into a readable 64-character hex string
+	hexString := hex.EncodeToString(hashArray[:])
+	// fmt.Println("input: "+input)
+	// fmt.Println("hash: "+hash)
+	// fmt.Println("hexString: " +hexString)
+
+	return hexString == hash
 }

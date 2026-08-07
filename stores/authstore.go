@@ -3,6 +3,7 @@ package stores
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	//"net/smtp"
 
@@ -22,11 +23,13 @@ var userByIdSql = `select id, edipi, username, email, first_name,last_name from 
 
 var userByTokenSql = `select id, edipi, username, email, first_name,last_name from users_t where id=:1`
 
-var getUserTokenInfoSql = `select token_access_id, token_expiration FROM users_t WHERE email = :1`
+var getUserTokenInfoSql = `select token_access_id, CASE WHEN token_expiration IS NULL THEN '' ELSE TO_CHAR(token_expiration,'YYYY-MM-DD HH24:MI:SS') END AS expiration FROM users_t WHERE LOWER(email) = LOWER(:1)`
 
-var setUserTokenSql = `update user_t set token_access_id = :1, token_secret_id = :2, token_expiration = :3 WHERE email = :4`
+var getTokenByAccessSql = `select token_secret_id, CASE WHEN token_expiration > SYSDATE THEN 'Valid' ELSE 'Expired' END as token_expiration FROM users_t WHERE token_access_id = :1`
 
-var clearUserTokenSql = `update user_t set token_access_id = NULL, token_secret_id = NULL, token_expiration = NULL WHERE email = :1`
+var setUserTokenSql = `update users_t set token_access_id = :1, token_secret_id = :2, token_expiration = TO_DATE(:3,'YYYY-MM-DD HH24:MI:SS') WHERE LOWER(email) = LOWER(:4)`
+
+var clearUserTokenSql = `update users_t set token_access_id = NULL, token_secret_id = NULL, token_expiration = NULL WHERE LOWER(email) = LOWER(:1)`
 
 // var userSql = `select id,username,email,rate,
 // 				(select bool_or(is_admin)
@@ -37,7 +40,7 @@ var clearUserTokenSql = `update user_t set token_access_id = NULL, token_secret_
 
 var insertUserSql = `insert into users_t (username,email,first_name,last_name,edipi) values (:1,:2,:3,:4,:5)`
 
-var getUsersSql = `select uro.id, uro.user_id, u.username, u.first_name, u.last_name, u.email, uro.role_id, r.description, uro.office_id, f.field_office_code, uro.project_code from users_t u 
+var getUsersSql = `select uro.id, uro.user_id, u.username, u.first_name, u.last_name, u.email, uro.role_id, r.description, uro.office_id, f.field_office_code, uro.project_code, CASE WHEN u.token_access_id IS NULL THEN '' ELSE 'access' END AS token_access_id, CASE WHEN u.token_expiration IS NULL THEN 'None' WHEN u.token_expiration > SYSDATE THEN 'Active' ELSE 'Expired' END AS token_expiration from users_t u 
 	inner join user_role_office_lk uro on uro.user_id = u.id 
 	inner join role_lk r on r.id = uro.role_id 
 	inner join field_office_lk f on f.fo_id = uro.office_id order by u.last_name`
@@ -161,7 +164,7 @@ func (auth *AuthStore) GetUsers() ([]models.User, error) {
 
 	for rows.Next() {
 		user := models.User{}
-		err = rows.Scan(&user.ID, &user.UserID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.RoleID, &user.Role, &user.OfficeID, &user.OfficeCode, &user.ProjectCode)
+		err = rows.Scan(&user.ID, &user.UserID, &user.UserName, &user.FirstName, &user.LastName, &user.Email, &user.RoleID, &user.Role, &user.OfficeID, &user.OfficeCode, &user.ProjectCode, &user.TokenAccess, &user.TokenExpiration)
 		if err != nil {
 			return users, err
 		}
@@ -390,7 +393,7 @@ func (auth *AuthStore) GetUserToken(email string) (models.UserToken, error) {
 	}
 
 	for rows.Next() {
-		err = rows.Scan(&userToken.TokenAccess, &userToken.TokenSecret, &userToken.TokenExpiration)
+		err = rows.Scan(&userToken.TokenAccess, &userToken.TokenExpiration)
 		if err != nil {
 			return userToken, err
 		}
@@ -400,9 +403,31 @@ func (auth *AuthStore) GetUserToken(email string) (models.UserToken, error) {
 	return userToken, err
 }
 
+func (auth *AuthStore) GetTokenByAccess(accessKey string) (models.UserToken, error) {
+	userToken := models.UserToken{}
+	selectQuery, err := auth.db.Prepare(getTokenByAccessSql)
+	if err != nil {
+		return userToken, err
+	}
+
+	rows, err := selectQuery.Query(accessKey)
+	if err != nil {
+		return userToken, err 
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&userToken.TokenSecret, &userToken.TokenExpiration)
+		if err != nil {
+			return userToken, err
+		}
+	}
+	defer rows.Close()
+
+	return userToken, err
+}
 
 func (auth *AuthStore) SetUserToken(email string, UserToken models.UserToken) error {
-	_, err := auth.db.Exec(setUserTokenSql, UserToken.TokenAccess, UserToken.TokenSecret, UserToken.TokenExpiration, email)
+	_, err := auth.db.Exec(setUserTokenSql, UserToken.TokenAccess, UserToken.TokenSecret, strings.ReplaceAll(UserToken.TokenExpiration[:len(UserToken.TokenExpiration)-5],"T"," "), email)
 
 	return err
 }

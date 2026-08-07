@@ -91,10 +91,10 @@ func (u *UserHandler) GetUserToken(c echo.Context) error {
 	email := c.Param("email")
 	userToken, err := u.Store.GetUserToken(email)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve token", err))
 	}
 
-	return c.JSON(http.StatusOK, userToken)
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Token retrieved successfully", userToken))
 }
 
 func (u *UserHandler) SetUserToken(c echo.Context) error {
