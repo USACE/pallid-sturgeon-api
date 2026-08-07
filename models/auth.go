@@ -38,6 +38,9 @@ type User struct {
 	Role        string  `db:"description" json:"role"`
 	OfficeCode  string  `db:"code" json:"officeCode"`
 	ProjectCode string  `db:"project_code" json:"projectCode"`
+	TokenAccess string `db:"token_access_id" json:"accessKey"`
+	TokenSecret string `db:"token_secret_id" json:"secretKey"`
+	TokenExpiration string `db:"token_expiration" json:"expiration"`
 }
 
 type UserRoleOffice struct {

@@ -162,6 +162,14 @@ func main() {
 	e.POST(urlContext+"/user/token/:email", auth.AuthorizeAdminOrSelf(userH.SetUserToken))
 	e.DELETE(urlContext+"/user/token/:email", auth.AuthorizeAdminOrSelf(userH.DeleteUserToken))
 
+	e.GET(urlContext+"/export/fishDataSummary", auth.AuthorizeViaToken(PallidSturgeonH.GetFullFishDataSummary))
+	e.GET(urlContext+"/export/suppDataSummary", auth.AuthorizeViaToken(PallidSturgeonH.GetFullSuppDataSummary))
+	e.GET(urlContext+"/export/missouriDataSummary", auth.AuthorizeViaToken(PallidSturgeonH.GetFullMissouriDataSummary))
+	e.GET(urlContext+"/export/geneticDataSummary", auth.AuthorizeViaToken(PallidSturgeonH.GetFullGeneticDataSummary))
+	e.GET(urlContext+"/export/searchDataSummary", auth.AuthorizeViaToken(PallidSturgeonH.GetFullSearchDataSummary))
+	e.GET(urlContext+"/export/telemetryDataSummary", auth.AuthorizeViaToken(PallidSturgeonH.GetFullTelemetryDataSummary))
+	e.GET(urlContext+"/export/procedureDataSummary", auth.AuthorizeViaToken(PallidSturgeonH.GetFullProcedureDataSummary))
+
 	// e.Logger.Fatal(e.Start(":8080"))
 	// force update
 	e.Logger.Debug(e.Start(":8080"))

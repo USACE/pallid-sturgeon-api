@@ -29,6 +29,7 @@ func getInitials(firstName string, lastName string) string {
 
 type PallidSturgeonHandler struct {
 	Store *stores.PallidSturgeonStore
+	AuthStore *stores.AuthStore
 }
 
 func (ps *PallidSturgeonHandler) Version(c echo.Context) error {
