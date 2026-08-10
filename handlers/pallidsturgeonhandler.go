@@ -523,7 +523,8 @@ func (sd *PallidSturgeonHandler) SaveProcedureDataEntry(c echo.Context) error {
 	if err := c.Bind(&procedureData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	procedureData.LastUpdated = time.Now()
+	now := time.Now()
+	procedureData.LastUpdated = &now
 	user := c.Get("PSUSER").(models.User)
 	procedureData.UploadedBy = user.FirstName + " " + user.LastName
 	procedureData.ProcedureDate = processStringTime(DerefString(procedureData.ProcedureDate), "app")
@@ -541,7 +542,8 @@ func (sd *PallidSturgeonHandler) UpdateProcedureDataEntry(c echo.Context) error 
 	if err := c.Bind(&procedureData); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	procedureData.LastUpdated = time.Now()
+	now := time.Now()
+	procedureData.LastUpdated = &now
 	user := c.Get("PSUSER").(models.User)
 	procedureData.UploadedBy = user.FirstName + " " + user.LastName
 	procedureData.ProcedureDate = processStringTime(DerefString(procedureData.ProcedureDate), "app")
@@ -1088,9 +1090,11 @@ func (sd *PallidSturgeonHandler) Upload(c echo.Context) error {
 	for _, uploadProcedure := range uploads.ProcedureUpload.Items {
 		uploadProcedure.ProcedureDate = processStringTime(DerefString(uploadProcedure.ProcedureDate), "db")
 		uploadProcedure.DstStartDate = processStringTime(DerefString(uploadProcedure.DstStartDate), "db")
-		uploadProcedure.LastUpdated = time.Now()
+		now := time.Now()
+		uploadProcedure.LastUpdated = &now
 		uploadProcedure.UploadedBy = user.FirstName + " " + user.LastName
-		uploadProcedure.UploadSessionId = sessionId
+		uploadSessionId := sessionId
+		uploadProcedure.UploadSessionId = &uploadSessionId
 		uploadProcedure.EditInitials = uploads.EditInitials
 		uploadProcedure.UploadFilename = uploads.ProcedureUpload.UploadFilename
 		err = sd.Store.SaveProcedureUpload(uploadProcedure)
