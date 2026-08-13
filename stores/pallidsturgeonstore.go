@@ -559,14 +559,18 @@ func (s *PallidSturgeonStore) GetYears() ([]models.Year, error) {
 }
 
 var siteDataEntriesSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,si.complete,
-si.approved,si.UPLOAD_FILENAME,si.UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,si.brm_id,fnc.bkg_color,fnc.bend_river_mile
+si.approved,si.UPLOAD_FILENAME,si.UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,si.brm_id,
+CASE WHEN EXISTS (select 1 from ds_moriver mr where mr.site_id = si.site_id) or exists (select 1 from ds_search se where se.site_id = si.site_id) then '#daf2ea' else null end as bkg_color,
+fnc.bend_river_mile
 from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id`
 
 var siteDataEntriesCountSql = `SELECT count(*) from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id`
 
 var siteDataEntriesBySiteIdSql = `select si.SITE_ID,si.YEAR,si.FIELDOFFICE,si.PROJECT_ID,si.SEGMENT_ID,si.SEASON,si.BEND,si.BENDRN,si.SITE_FID,si.UPLOADED_BY,si.LAST_EDIT_COMMENT,si.EDIT_INITIALS,si.complete,
-si.approved,si.UPLOAD_FILENAME,si.UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,si.brm_id,fnc.bkg_color,fnc.bend_river_mile
-from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id where site_id=:1`
+si.approved,si.UPLOAD_FILENAME,si.UPLOAD_SESSION_ID,si.SAMPLE_UNIT_TYPE,si.brm_id,
+CASE WHEN EXISTS (select 1 from ds_moriver mr where mr.site_id = si.site_id) or exists (select 1 from ds_search se where se.site_id = si.site_id) then '#daf2ea' else null end as bkg_color,
+fnc.bend_river_mile
+from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id where si.site_id=:1`
 
 var siteDataEntriesCountBySiteIdSql = `SELECT count(*) from ds_sites si inner join table (pallid_data_entry_api.data_entry_site_fnc(:2,:3,:4,:5,:6,:7)) fnc on si.site_id = fnc.site_id where site_id=:1`
 

@@ -536,8 +536,8 @@ type UploadProcedure struct {
 	GonadCondition            string    `db:"gonad_condition" json:"gonadCondition"`
 	EditInitials              string    `db:"edit_initials" json:"editInitials"`
 	LastEditComment           string    `db:"last_edit_comment" json:"lastEditComment"`
-	LastUpdated               time.Time `db:"last_updated" json:"lastUpdated"`
-	UploadSessionId           int       `db:"upload_session_id" json:"uploadSessionId"`
+	LastUpdated               *time.Time `db:"last_updated" json:"lastUpdated"`
+	UploadSessionId           *int       `db:"upload_session_id" json:"uploadSessionId"`
 	UploadedBy                string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename            string    `db:"upload_filename" json:"uploadFilename"`
 	Checkby                   string    `db:"checkby" json:"checkby"`
