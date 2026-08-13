@@ -1745,7 +1745,7 @@ func (s *PallidSturgeonStore) UpdateSearchDataEntry(searchDataEntry models.Uploa
 var telemetryDataEntriesSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
 te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
-te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity from ds_telemetry_fish te
+te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity, te.bend_river_mile from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
@@ -1758,7 +1758,7 @@ where (CASE when :1 != 'ZZ' THEN si.fieldoffice ELSE :2 END) = :3`
 var telemetryDataEntriesBySeIdSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
 te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
-te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity from ds_telemetry_fish te
+te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity, te.bend_river_mile from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
@@ -1773,7 +1773,7 @@ and te.se_id = :1`
 var telemetryDataEntriesByTidSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
 te.FREQUENCY_ID_CODE,te.gravel,te.LAST_EDIT_COMMENT,te.LAST_UPDATED,te.MACRO_ID,te.MESO_ID,te.position_confidence,te.RADIO_TAG_NUM,
 te.sand,te.SE_FID,te.SE_ID,te.silt,te.temp,te.turbidity,te.T_FID,te.T_ID,te.UPLOADED_BY,te.UPLOAD_FILENAME,
-te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity from ds_telemetry_fish te
+te.UPLOAD_SESSION_ID, si.site_id, te.suspected_spawning_activity, te.bend_river_mile from ds_telemetry_fish te
 inner join ds_search se on te.se_id = se.se_id
 inner join ds_sites si on si.site_id = se.site_id
 where (CASE when :2 != 'ZZ' THEN si.fieldoffice ELSE :3 END) = :4 
@@ -1863,7 +1863,7 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 		err = rows.Scan(&telemetryDataEntry.Bend, &telemetryDataEntry.CaptureLatitude, &telemetryDataEntry.CaptureLongitude, &telemetryDataEntry.CaptureTime, &telemetryDataEntry.Checkby, &telemetryDataEntry.Comments, &telemetryDataEntry.Conductivity, &telemetryDataEntry.Depth,
 			&telemetryDataEntry.EditInitials, &telemetryDataEntry.FrequencyIdCode, &telemetryDataEntry.Gravel, &telemetryDataEntry.LastEditComment, &telemetryDataEntry.LastUpdated, &telemetryDataEntry.MacroId, &telemetryDataEntry.MesoId, &telemetryDataEntry.PositionConfidence,
 			&telemetryDataEntry.RadioTagNum, &telemetryDataEntry.Sand, &telemetryDataEntry.SeFid, &telemetryDataEntry.SeId, &telemetryDataEntry.Silt, &telemetryDataEntry.Temp, &telemetryDataEntry.Turbidity, &telemetryDataEntry.TFid, &telemetryDataEntry.TId, &telemetryDataEntry.UploadedBy,
-			&telemetryDataEntry.UploadFilename, &telemetryDataEntry.UploadSessionId, &telemetryDataEntry.SiteId, &telemetryDataEntry.SuspectedSpawningActivity)
+			&telemetryDataEntry.UploadFilename, &telemetryDataEntry.UploadSessionId, &telemetryDataEntry.SiteId, &telemetryDataEntry.SuspectedSpawningActivity, &telemetryDataEntry.BendRiverMile)
 		if err != nil {
 			return telemetryDataEntryWithCount, err
 		}
@@ -1876,15 +1876,15 @@ func (s *PallidSturgeonStore) GetTelemetryDataEntries(tableId string, seId strin
 }
 
 var insertTelemetryDataSql = `insert into ds_telemetry_fish (BEND,CAPTURE_LATITUDE,CAPTURE_LONGITUDE,CAPTURE_TIME,CHECKBY,COMMENTS,conductivity,depth,EDIT_INITIALS,FREQUENCY_ID_CODE,gravel,LAST_EDIT_COMMENT,
-	LAST_UPDATED,MACRO_ID,MESO_ID,POSITION_CONFIDENCE,RADIO_TAG_NUM,sand,SE_FID,SE_ID,silt,temp,turbidity,T_FID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID,suspected_spawning_activity) 
-	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28) returning t_id into :29`
+	LAST_UPDATED,MACRO_ID,MESO_ID,POSITION_CONFIDENCE,RADIO_TAG_NUM,sand,SE_FID,SE_ID,silt,temp,turbidity,T_FID,UPLOADED_BY,UPLOAD_FILENAME,UPLOAD_SESSION_ID,suspected_spawning_activity,bend_river_mile) 
+	values (:1,:2,:3,:4,:5,:6,:7,:8,:9,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:22,:23,:24,:25,:26,:27,:28,:29) returning t_id into :30`
 
 func (s *PallidSturgeonStore) SaveTelemetryDataEntry(telemetryDataEntry models.UploadTelemetry) (int, error) {
 	var id int
 	_, err := s.db.Exec(insertTelemetryDataSql, telemetryDataEntry.Bend, telemetryDataEntry.CaptureLatitude, telemetryDataEntry.CaptureLongitude, telemetryDataEntry.CaptureTime, telemetryDataEntry.Checkby, telemetryDataEntry.Comments, telemetryDataEntry.Conductivity, telemetryDataEntry.Depth,
 		telemetryDataEntry.EditInitials, telemetryDataEntry.FrequencyIdCode, telemetryDataEntry.Gravel, telemetryDataEntry.LastEditComment, telemetryDataEntry.LastUpdated, telemetryDataEntry.MacroId, telemetryDataEntry.MesoId, telemetryDataEntry.PositionConfidence, telemetryDataEntry.RadioTagNum,
 		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId, 
-		telemetryDataEntry.SuspectedSpawningActivity,sql.Out{Dest: &id})
+		telemetryDataEntry.SuspectedSpawningActivity, telemetryDataEntry.BendRiverMile,sql.Out{Dest: &id})
 	return id, err
 }
 
@@ -1916,14 +1916,15 @@ T_FID = :25,
 UPLOADED_BY = :26,
 UPLOAD_FILENAME = :27,
 UPLOAD_SESSION_ID = :28,
-suspected_spawning_activity = :29
+suspected_spawning_activity = :29,
+bend_river_mile = :30
 WHERE T_ID = :1`
 
 func (s *PallidSturgeonStore) UpdateTelemetryDataEntry(telemetryDataEntry models.UploadTelemetry) error {
 	_, err := s.db.Exec(updateTelemetryDataSql, telemetryDataEntry.Bend, telemetryDataEntry.CaptureLatitude, telemetryDataEntry.CaptureLongitude, telemetryDataEntry.CaptureTime, telemetryDataEntry.Checkby, telemetryDataEntry.Comments, telemetryDataEntry.Conductivity, telemetryDataEntry.Depth,
 		telemetryDataEntry.EditInitials, telemetryDataEntry.FrequencyIdCode, telemetryDataEntry.Gravel, telemetryDataEntry.LastEditComment, telemetryDataEntry.LastUpdated, telemetryDataEntry.MacroId, telemetryDataEntry.MesoId, telemetryDataEntry.PositionConfidence, telemetryDataEntry.RadioTagNum,
 		telemetryDataEntry.Sand, telemetryDataEntry.SeFid, telemetryDataEntry.SeId, telemetryDataEntry.Silt, telemetryDataEntry.Temp, telemetryDataEntry.Turbidity, telemetryDataEntry.TFid, telemetryDataEntry.UploadedBy, telemetryDataEntry.UploadFilename, telemetryDataEntry.UploadSessionId, 
-		telemetryDataEntry.SuspectedSpawningActivity, telemetryDataEntry.TId)
+		telemetryDataEntry.SuspectedSpawningActivity, telemetryDataEntry.BendRiverMile, telemetryDataEntry.TId)
 	return err
 }
 

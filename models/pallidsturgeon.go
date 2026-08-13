@@ -798,6 +798,7 @@ type UploadTelemetry struct {
 	UploadedBy         string    `db:"uploaded_by" json:"uploadedBy"`
 	UploadFilename     string    `db:"upload_filename" json:"uploadFilename"`
 	SuspectedSpawningActivity *int `db:"suspected_spawning_activity" json:"suspectedSpawningActivity"`
+	BendRiverMile      *float64  `db:"bend_river_mile" json:"bendRiverMile"`
 }
 
 type ProcedureOut struct {
