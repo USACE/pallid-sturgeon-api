@@ -4226,6 +4226,32 @@ func (s *PallidSturgeonStore) GetGeneticNeeds(tagnumber string) (string, error) 
 	return data, nil
 }
 
+func (s *PallidSturgeonStore) GetAllPallidGenetics() ([]models.PallidGeneticsOffline, error) {
+	query := `SELECT pit_tag, reason, send_to
+			 FROM parental_genetics_lk
+			 WHERE pit_tag is not null`
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.PallidGeneticsOffline{}
+
+	for rows.Next() {
+		item := models.PallidGeneticsOffline{}
+
+		err = rows.Scan(&item.PitTag, &item.Reason, &item.SendTo,)
+
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, item)
+	}
+	return data, rows.Err()
+}
+
 func (s *PallidSturgeonStore) GetLab(tagnumber string) (string, error) {
 	var data string
 
@@ -4271,6 +4297,31 @@ func (s *PallidSturgeonStore) GetStockedJuveniles(tagnumber string) ([]models.St
 	return data, err
 }
 
+func (s *PallidSturgeonStore) GetAllPallidStockedJuveniles() ([]models.PallidStockedJuvenileOffline, error) {
+	query := `SELECT pit_tag, hatchery, stock_site, year_stock, coded_wire, scute_removed, elr, ell
+			FROM stocked_juveniles
+			WHERE pit_tag is not null`
+	
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.PallidStockedJuvenileOffline{}
+
+	for rows.Next() {
+		item := models.PallidStockedJuvenileOffline{}
+
+		err = rows.Scan(&item.PitTag, &item.Hatchery, &item.StockSite, &item.YearClass, &item.CWT, &item.Scute, &item.ElastomerRight, &item.ElastomerLeft,)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, item)
+	}
+	return data, rows.Err()
+}
+
 func (s *PallidSturgeonStore) GetRecapturedData(tagnumber string) ([]models.RecapturedData, error) {
 	query := `
         SELECT id, pit_tag, pit_tag_2, capture_date, capture_location, hatchery, stock_date, sex, pallid_hybrid, coded_wire_tag, scute_removed, ELASTOMER_LEFT, ELASTOMER_RIGHT
@@ -4295,4 +4346,30 @@ func (s *PallidSturgeonStore) GetRecapturedData(tagnumber string) ([]models.Reca
 	}
 
 	return data, err
+}
+
+func (s *PallidSturgeonStore) GetAllPallidRecapturedData() ([]models.RecapturedData, error) {
+	query := `
+        SELECT id, pit_tag, pit_tag_2, capture_date, capture_location, hatchery, stock_date, sex, pallid_hybrid, coded_wire_tag, scute_removed, ELASTOMER_LEFT, ELASTOMER_RIGHT
+		FROM recaptured_pallids where pit_tag is not null
+    `
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := []models.RecapturedData{}
+
+	for rows.Next() {
+		item := models.RecapturedData{}
+		err = rows.Scan(&item.RecapturedId, &item.Tagnumber, &item.Tagnumber2, &item.CaptureDate, &item.CaptureLocation, &item.Hatchery, &item.StockDate, &item.Sex, &item.PallidHybrid, &item.CWT, &item.Scute, &item.ElastomerLeft, &item.ElastomerRight,)
+
+		if err != nil {
+			return nil, err
+		}
+		
+		data = append(data, item)
+	}
+	return data, rows.Err()
 }

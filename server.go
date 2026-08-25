@@ -100,6 +100,7 @@ func main() {
 	e.PUT(urlContext+"/supplementalDataEntry", auth.Authorize(PallidSturgeonH.UpdateSupplementalDataEntry, PUBLIC))
 	e.DELETE(urlContext+"/supplementalDataEntry/:id", auth.Authorize(PallidSturgeonH.DeleteSupplementalDataEntry, PUBLIC))
 	e.GET(urlContext+"/DataEntry/getPallidIdData", auth.Authorize(PallidSturgeonH.GetPallidIdData, PUBLIC))
+	e.GET(urlContext+"/DataEntry/getAllPallidIdOfflineData", auth.Authorize(PallidSturgeonH.GetAllPallidIdOfflineData, PUBLIC))
 
 	e.GET(urlContext+"/searchDataEntry", auth.Authorize(PallidSturgeonH.GetSearchDataEntries, PUBLIC))
 	e.POST(urlContext+"/searchDataEntry", auth.Authorize(PallidSturgeonH.SaveSearchDataEntry, PUBLIC))
