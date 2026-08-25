@@ -630,7 +630,7 @@ type StockedJuveniles struct {
 	StockSite 		*string `db:"stock_site" json:"stockSite"`
 	YearClass       *int 	`db:"year_stock" json:"yearClass"`
 	CWT 			*string `db:"coded_wire" json:"cwt"`
-	Scute      		*string `db:"scure_removed" json:"scute"`
+	Scute      		*string `db:"scute_removed" json:"scute"`
 	ElastomerLeft 	*string `db:"ell" json:"el"`
 	ElastomerRight  *string `db:"elr" json:"er"`
 }
@@ -639,7 +639,7 @@ type RecapturedData struct {
 	RecapturedId 	  int 	  `db:"id" json:"id"`
 	Tagnumber         *string `db:"pit_tag" json:"tagnumber"`
 	Tagnumber2 		  *string `db:"pit_tag_2" json:"tagnumber2"`
-	CaptureDate       string  `db:"capture_date" json:"captureDate"`
+	CaptureDate       *string  `db:"capture_date" json:"captureDate"`
 	CaptureLocation   *string `db:"capture_location" json:"captureLocation"`
 	Hatchery      	  *string `db:"hatchery" json:"hatchery"`
 	StockDate 		  *string `db:"stock_date" json:"stockDate"`
@@ -649,6 +649,30 @@ type RecapturedData struct {
 	Scute       	  *string `db:"scute_removed" json:"scute"`
 	ElastomerLeft 	  *string `db:"elastomer_left" json:"el"`
 	ElastomerRight    *string `db:"elastomer_right" json:"er"`
+}
+
+// OFFLINE PALLID ID TRACKER
+type PallidGeneticsOffline struct {
+	PitTag string `db:"pit_tag" json:"pitTag"`
+	Reason *string `db:"reason" json:"reason"`
+	SendTo *string `db:"send_to" json:"sendTo"`
+}
+
+type PallidStockedJuvenileOffline struct {
+	PitTag string `db:"pit_tag" json:"pitTag"`
+	Hatchery *string `db:"hatchery" json:"hatchery"`
+	StockSite *string `db:"stock_site" json:"stockSite"`
+	YearClass *int `db:"year_stock" json:"yearClass"`
+	CWT *string `db:"coded_wire" json:"cwt"`
+	Scute *string `db:"scute_removed" json:"scute"`
+	ElastomerRight *string `db:"elr" json:"er"`
+	ElastomerLeft *string `db:"ell" json:"el"`
+}
+
+type PallidOfflineData struct {
+	Genetics []PallidGeneticsOffline `json:"genetics"`
+	StockedJuveniles []PallidStockedJuvenileOffline `json:"stockedJuveniles"`
+	RecaptureInfo []RecapturedData `json:"recaptureInfo"`
 }
 
 type MoriverDataEntryWithCount struct {

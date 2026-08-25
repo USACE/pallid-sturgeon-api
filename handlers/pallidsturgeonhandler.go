@@ -1365,3 +1365,40 @@ func (sd *PallidSturgeonHandler) GetPallidIdData(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Successfully retrieved pallid ID data", response))
 }
+
+func (sd *PallidSturgeonHandler) GetAllPallidIdOfflineData(c echo.Context) error {
+	genetics, err := sd.Store.GetAllPallidGenetics()
+	if err != nil {
+		return c.JSON(
+			http.StatusInternalServerError,
+			models.NewErrorResponse("Failed to retrieve Pallid genetics data", err),
+		)
+	}
+
+	stockedJuveniles, err := sd.Store.GetAllPallidStockedJuveniles()
+	if err != nil {
+		return c.JSON(
+			http.StatusInternalServerError,
+			models.NewErrorResponse("Failed to retrieve stocked juvenile data", err),
+		)
+	}
+
+	recaptureInfo, err := sd.Store.GetAllPallidRecapturedData()
+	if err != nil {
+		return c.JSON(
+			http.StatusInternalServerError,
+			models.NewErrorResponse("Failed to retrieve recapture data", err),
+		)
+	}
+
+	response := models.PallidOfflineData{
+		Genetics: genetics,
+		StockedJuveniles: stockedJuveniles,
+		RecaptureInfo: recaptureInfo,
+	}
+
+	return c.JSON(
+		http.StatusOK,
+		models.NewSuccessResponse("Successfully retrieved offline Pallid ID data", response),
+	)
+}
