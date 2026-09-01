@@ -776,7 +776,7 @@ type UploadTelemetry struct {
 	Bend               *float64  `db:"bend" json:"bend"`
 	RadioTagNum        *int    	 `db:"radio_tag_num" json:"radioTagNum"`
 	FrequencyIdCode    int       `db:"frequency_id_code" json:"frequencyIdCode"`
-	CaptureTime        string    `db:"capture_time" json:"captureDate"`
+	CaptureTime        string    `db:"capture_time" json:"captureTime"`
 	CaptureLatitude    float64   `db:"capture_latitude" json:"captureLatitude"`
 	CaptureLongitude   float64   `db:"capture_longitude" json:"captureLongitude"`
 	PositionConfidence *float64  `db:"position_confidence" json:"positionConfidence"`
