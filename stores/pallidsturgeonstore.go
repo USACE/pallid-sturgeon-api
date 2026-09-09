@@ -709,12 +709,13 @@ SET site_fid = :2,
 	  last_updated = :11, 
 	  uploaded_by = :12,
 	  brm_id = :13,
-		last_edit_comment = :14
+		last_edit_comment = :14,
+		BEND = :15
 WHERE site_id = :1`
 
 func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.Sites) error {
 	_, err := s.db.Exec(updateSiteDataSql, sitehDataEntry.SiteFID, sitehDataEntry.Year, sitehDataEntry.FieldofficeId, sitehDataEntry.ProjectId, sitehDataEntry.SegmentId, sitehDataEntry.SeasonId, sitehDataEntry.SampleUnitTypeCode,
-		sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.BrmID, sitehDataEntry.LastEditComment, sitehDataEntry.SiteID)
+		sitehDataEntry.Bendrn, sitehDataEntry.EditInitials, sitehDataEntry.LastUpdated, sitehDataEntry.UploadedBy, sitehDataEntry.BrmID, sitehDataEntry.LastEditComment, sitehDataEntry.Bend, sitehDataEntry.SiteID)
 	return err
 }
 
@@ -3209,7 +3210,7 @@ func (s *PallidSturgeonStore) GetProcedureDataSummary(year string, officeCode st
 	return procedureSummaryWithCount, err
 }
 
-var missouriDatasheetsBySiteId = `select site_id, mr_id, mr_fid, subsample, subsamplepass, subsamplen, recorder, conductivity, bkg_color, fish_count, supp_count, supp_bkg_color, setdate, proc_count, proc_bkg_color, status from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
+var missouriDatasheetsBySiteId = `select site_id, mr_id, mr_fid, subsample, subsamplepass, subsamplen, recorder, conductivity, bkg_color, fish_count, supp_count, supp_bkg_color, setdate, proc_count, proc_bkg_color, status, gear from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
 
 var missouriDatasheetsCountBySiteId = `select count(*) from table (pallid_data_entry_api.data_entry_missouri_fnc(:1,:2,:3,:4,:5,:6))`
 
@@ -3253,7 +3254,7 @@ func (s *PallidSturgeonStore) GetMissouriDatasheetById(siteId string, officeCode
 	for rows.Next() {
 		datasheets := models.UploadMoriver{}
 		err = rows.Scan(&datasheets.SiteID, &datasheets.MrID, &datasheets.MrFid, &datasheets.Subsample, &datasheets.Subsamplepass, &datasheets.Subsamplen, &datasheets.Recorder, &datasheets.Conductivity, &datasheets.BkgColor,
-			&datasheets.FishCount, &datasheets.SuppCount, &datasheets.SuppBkgColor, &datasheets.SetDate, &datasheets.ProcCount, &datasheets.ProcBkgColor, &datasheets.Status)
+			&datasheets.FishCount, &datasheets.SuppCount, &datasheets.SuppBkgColor, &datasheets.SetDate, &datasheets.ProcCount, &datasheets.ProcBkgColor, &datasheets.Status, &datasheets.Gear)
 		if err != nil {
 			return missouriDatasheetsWithCount, err
 		}
