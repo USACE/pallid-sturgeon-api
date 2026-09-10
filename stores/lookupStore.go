@@ -161,7 +161,7 @@ func (s *LookupStore) GetSegments() ([]models.SegmentLK, error) {
 
 func (s *LookupStore) GetSeasons() ([]models.SeasonLK, error) {
 	query := `
-        SELECT s_id, season_code, season_description
+        SELECT s_id, season_code, season_description, project_code
 		FROM season_lk WHERE active_flag_tf = 'T'
 		ORDER BY s_id asc
     `
@@ -175,7 +175,7 @@ func (s *LookupStore) GetSeasons() ([]models.SeasonLK, error) {
 
 	for rows.Next() {
 		var i models.SeasonLK
-		if err := rows.Scan(&i.SeasonId, &i.SeasonCode, &i.SeasonDescription); err != nil {
+		if err := rows.Scan(&i.SeasonId, &i.SeasonCode, &i.SeasonDescription, &i.ProjectCode); err != nil {
 			return nil, err
 		}
 		data = append(data, i)
