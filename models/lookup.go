@@ -36,6 +36,7 @@ type SeasonLK struct {
 	SeasonId          int    `db:"s_id" json:"id"`
 	SeasonCode        string    `db:"season_code" json:"code"`
 	SeasonDescription string `db:"season_description" json:"description"`
+	ProjectCode 	  int    `db:"project_code" json:"projectCode"`
 }
 
 type SampleUnitTypeLK struct {
