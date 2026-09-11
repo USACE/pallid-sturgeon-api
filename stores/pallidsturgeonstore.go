@@ -719,6 +719,44 @@ func (s *PallidSturgeonStore) UpdateSiteDataEntry(sitehDataEntry models.Sites) e
 	return err
 }
 
+var offlineSitesSql = `select si.site_id, si.year, si.fieldoffice, si.project_id, si.segment_id, si.season, si.bend, si.bendrn, si.site_fid, si.uploaded_by, si.last_edit_comment, si.edit_initials, si.complete, si.approved, si.upload_filename, si.upload_session_id, si.sample_unit_type, si.brm_id,
+		case when exists (select 1 from ds_moriver mr where mr.site_id = si.site_id) or exists (select 1 from ds_search se where se.site_id = si.site_id) then '#daf2ea' else null end as bkg_color,
+		to_char(brm.bend_river_mile), si.last_updated
+		from ds_sites si
+		left join bend_river_mile_lk brm
+		on brm.brm_id = si.brm_id
+		where si.fieldoffice = :1
+		and si.year = :2
+		order by si.site_id`
+
+func (s *PallidSturgeonStore) GetOfflineSites(officeCode string, fieldYear int) ([]models.Sites, error) {
+	sites := []models.Sites{}
+	rows, err := s.db.Query(offlineSitesSql, officeCode, fieldYear)
+
+	if err != nil {
+		return sites, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		site := models.Sites{}
+		err = rows.Scan(&site.SiteID, &site.Year, &site.FieldofficeId, &site.ProjectId, &site.SegmentId, &site.SeasonId, &site.Bend, &site.Bendrn, &site.SiteFID, &site.UploadedBy, &site.LastEditComment, &site.EditInitials,
+						&site.Complete, &site.Approved, &site.UploadFilename, &site.UploadSessionId, &site.SampleUnitTypeCode, &site.BrmID, &site.BkgColor, &site.BendRiverMile, &site.LastUpdated)
+
+		if err != nil {
+			return sites, err
+		}
+		sites = append(sites, site)
+	}
+
+	if err := rows.Err(); err != nil {
+		return sites, err
+	}
+
+	return sites, nil
+}
+
+
 // Get ALL Fish Data Entries
 var fishDataEntriesSql = `select fi.f_id, fi.f_fid, fi.mr_id, si.site_id, fi.panelhook,fi.bait,fi.species, fi.length, fi.weight, fi.fishcount, fi.otolith, fi.rayspine, fi.scale, fi.ftprefix, fi.ftnum, fi.ftmr, fi.edit_initials, 
 fi.last_edit_comment, fi.uploaded_by, fi.genetics_vial_number, fi.condition, fi.fin_curl, fi.length_type, fi.mr_fid,
@@ -934,6 +972,44 @@ func (s *PallidSturgeonStore) DeleteFishDataEntry(id string) error {
 	return err
 }
 
+var offlineFishDraftsSql = `select f.f_id, f.f_fid, f.mr_id, si.site_id, f.panelhook, f.bait, f.species, f.length, f.weight, f.fishcount, f.otolith, f.rayspine, f.scale, f.ftprefix, f.ftnum, f.ftmr, f.edit_initials,
+							f.last_edit_comment, f.uploaded_by, f.genetics_vial_number, f.condition, f.fin_curl, f.length_type, f.mr_fid,
+							(select count(*) from ds_supplemental su where su.f_id = f.f_id or su.f_fid = f.f_fid) as supplemental_data, f.last_updated
+							from ds_fish f
+							inner join ds_moriver mr 
+							on f.mr_id = mr.mr_id
+							inner join ds_sites si
+							on si.site_id = mr.site_id
+							where si.fieldoffice = :1
+							and si.year = :2
+							and mr.status = 1
+							order by f.f_id`
+
+func (s *PallidSturgeonStore) GetOfflineFishDrafts(officeCode string, fieldYear int) ([]models.UploadFish, error) {
+	items := []models.UploadFish{}
+	rows, err := s.db.Query(offlineFishDraftsSql, officeCode, fieldYear)
+	if err != nil {
+		return items, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		item := models.UploadFish{}
+		err = rows.Scan(&item.Fid, &item.Ffid, &item.MrID, &item.SiteID, &item.Panelhook, &item.Bait, &item.Species, &item.Length, &item.Weight, &item.Fishcount, &item.Otolith, &item.Rayspine, &item.Scale
+						&item.Ftprefix, &item.Ftnum, &item.Ftmr, &item.EditInitials, &item.LastEditComment, &item.UploadedBy, &item.GeneticsVialNumber, &item.Condition, &item.FinCurl, &item.LengthType, &item.MrFid,
+						&item.SupplementalCount, &item.LastUpdated)
+		if err != nil {
+			return items, err
+		}
+		items = append(items, item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return items, err
+	}
+	return items, nil
+}
+
 var insertMoriverDataSql = `insert into ds_moriver(mr_fid,site_id,FIELDOFFICE,PROJECT,SEGMENT,SEASON,setdate, subsample, subsamplepass, subsamplen, recorder, 
 	gear, GEAR_TYPE, temp, turbidity, conductivity, do, distance, width, netrivermile, structurenumber, usgs, riverstage, discharge,
 	u1, u2, u3, u4, u5, u6, u7, MACRO, MESO, habitatrn, qc, micro_structure, structure_flow, structure_mod, set_site_1, set_site_2, 
@@ -1088,6 +1164,46 @@ func (s *PallidSturgeonStore) GetMoriverDataEntries(tableId string, fieldId stri
 	moriverDataEntryWithCount.Items = moriverEntries
 
 	return moriverDataEntryWithCount, err
+}
+
+var offlineMoriverDraftsSql = `select mr.mr_fid, mr.mr_id, mr.site_id, mr.fieldoffice, mr.project, mr.segment, mr.season, mr.setdate, mr.subsample, mr.subsamplepass, mr.subsamplen, mr.recorder, mr.gear, mr.gear_type, mr.temp, mr.turbidity, mr.conductivity, mr.do, mr.distance, mr.width, mr.netrivermile, mr.structurenumber,
+							mr.usgs, mr.riverstage, mr.discharge, mr.u1, mr.u2, mr.u3, mr.u4, mr.u5, mr.u6, mr.u7, mr.macro, mr.meso, mr.habitatrn, mr.qc, mr.micro_structure, mr.structure_flow, mr.structure_mod, mr.set_site_1, mr.set_site_2, mr.set_site_3, mr.starttime, mr.startlatitude, mr.startlongitude, mr.stoptime, mr.stoplatitude,
+							mr.stoplongitude, mr.depth1, mr.velocitybot1, mr.velocity08_1, mr.velocity02or06_1, mr.depth2, mr.velocitybot2, mr.velocity08_2, mr.velocity02or06_2, mr.depth3, mr.velocitybot3, mr.velocity08_3, mr.velocity02or06_3, mr.watervel, mr.cobble, mr.organic, mr.silt, mr.sand, mr.gravel, mr.comments, mr.complete, mr.checkby,
+							mr.no_turbidity, mr.no_velocity, mr.edit_initials, mr.last_edit_comment, mr.uploaded_by, mr.micro, mr.subsample_type, mr.status, mr.last_updated
+							from ds_moriver mr
+							inner join ds_sites si
+							on si.site_id = mr.site_id
+							where si.fieldoffice = :1
+							and si.year = :2
+							and mr.status = 1
+							order by mr.mr_id`
+
+func (s *PallidSturgeonStore) GetOfflineMoriverDrafts(officeCode string, fieldYear int) ([]models.UploadMoriver, error) {
+	items := []models.UploadMoriver{}
+	rows, err := s.db.Query(offlineMoriverDraftsSql, officeCode, fieldYear)
+	if err != nil {
+		return items, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		item := models.UploadMoriver{}
+		err = rows.Scan(&item.MrFid, &item.MrID, &item.SiteID, &item.FieldOffice, &item.Project, &item.Segment, &item.Season, &item.SetDate, &item.Subsample, &item.Subsamplepass, &item.Subsamplen, &item.Recorder, &item.Gear, &item.GearType, &item.Temp,
+					&item.Turbidity, &item.Conductivity, &item.Do, &item.Distance, &item.Width, &item.Netrivermile, &item.Structurenumber, &item.Usgs, &item.Riverstage, &item.Discharge, &item.U1, &item.U2, &item.U3, &item.U4, &item.U5, &item.U6, &item.U7,
+					&item.Macro, &item.Meso, &item.Habitatrn, &item.Qc, &item.MicroStructure, &item.StructureFlow, &item.StructureMod, &item.SetSite1, &item.SetSite2, &item.SetSite3, &item.StartTime, &item.StartLatitude, &item.StartLongitude, &item.StopTime,
+					&item.StopLatitude, &item.StopLongitude, &item.Depth1, &item.Velocitybot1, &item.Velocity08_1, &item.Velocity02or06_1, &item.Depth2, &item.Velocitybot2, &item.Velocity08_2, &item.Velocity02or06_2, &item.Depth3, &item.Velocitybot3, &item.Velocity08_3,
+					&item.Velocity02or06_3, &item.Watervel, &item.Cobble, &item.Organic, &item.Silt, &item.Sand, &item.Gravel, &item.Comments, &item.Complete, &item.Checkby, &item.NoTurbidity, &item.NoVelocity, &item.EditInitials, &item.LastEditComment, &item.UploadedBy,
+					&item.Micro, &item.SubsampleType, &item.Status, &item.LastUpdated)
+	if err != nil {
+		return items, err
+	}
+
+	items = append(items, item)
+	}
+	if err := rows.Err(); err != nil {
+		return items, err
+	}
+	return items, nil
 }
 
 var insertSupplementalDataSql = `insert into ds_supplemental(f_id, f_fid, mr_id,TAGNUMBER, PITRN,SCUTELOC, SCUTENUM, SCUTELOC2, SCUTENUM2,ELHV, ELCOLOR, ERHV, ERCOLOR, CWTYN, DANGLER, genetic, genetics_vial_number,
@@ -1564,6 +1680,17 @@ func (s *PallidSturgeonStore) DeleteSupplementalDataEntry(id string) error {
 	return err
 }
 
+// var offlineSuppDraftsSql = `select su.s_id, su.f_id, su.f_fid, su.mr_id, si.site_id, mr.netrivermile, f.length, f.weight, f.condition, su.tagnumber, su.pitrn, su.scuteloc,
+// 							su.scutenum, su.scuteloc2, su.scutenum2, su.elhv, su.elcolor, su.erhv, su.ercolor, su.swtyn, su.dangler, su.genetic, su.genetics_vial_number, su.broodstock,
+// 							su.hatch_wild, su.species_id, f.species, su.head, su.snouttomouth, su.inter, su.mouthwidth, su.m_ib, su.l_ob, su.l_ib, su.r_ib, su.r_ob, su.anal, su.dorsal,
+// 							su.status, su.hatchery_origin, su.sex, su.stage, su.recapture, su.photo, su.genetic_needs, su.other_tag_info, su.comments, su.edit_initials, su.last_edit_comment,
+// 							su.uploaded_by, su.complete, su.approved, su.checkby, su.recorder, su.project_3_7, su.lscute, su.rscute, su.dscute, su.archive, su.last_updated
+// 							from ds_supplemental su
+// 							inner join ds_fish f
+// 							on f.f_id = su.f_id
+// 							inner join ds_moriver mr
+// 							on mr.mr_id = `
+
 var searchDataEntriesSql = `select SE_FID, SE_ID, CHECKBY, conductivity, EDIT_INITIALS, LAST_EDIT_COMMENT, LAST_UPDATED, RECORDER, SEARCH_DATE, search_day, 
 SEARCH_TYPE_CODE, SITE_ID, START_LATITUDE, START_LONGITUDE, START_TIME, STOP_LATITUDE, STOP_LONGITUDE, STOP_TIME, temp, UPLOADED_BY, UPLOAD_FILENAME,
 UPLOAD_SESSION_ID, ds_id, status from ds_search`
@@ -1741,6 +1868,42 @@ func (s *PallidSturgeonStore) UpdateSearchDataEntry(searchDataEntry models.Uploa
 	)
 
 	return err
+}
+
+var offlineSearchDraftsSql = `select se.se_fid, se.se_id, se.checkby, se.conductivity, se.edit_initials, se.last_edit_comment, se.last_updated, se.recorder, se.search_date, se.search_day, se.search_type_code, se.site_id, se.start_latitude, se.start_longitude,
+							se.start_time, se.stop_latitude, se.stop_longitude, se.stop_time, se.temp, se.uploaded_by, se.upload_filename, se.upload_session_id, se.ds_id, se.status
+							from ds_search se
+							inner join ds_sites si
+							on si.site_id = se.site_id
+							where si.fieldoffice = :1
+							and si.year = :2
+							and se.status = 1
+							order by se.se_id`
+
+func (s *PallidSturgeonStore) GetOfflineSearchDrafts(officeCode string, fieldYear int) ([]models.UploadSearch, error) {
+	items := []models.UploadSearch{}
+	rows, err := s.db.Query(offlineSearchDraftsSql, officeCode, fieldYear)
+
+	if err != nil {
+		return items, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		item := models.UploadSearch{}
+
+		err = rows.Scan(&item.SeFid, &item.SeId, &item.Checkby, &item.Conductivity, &item.EditInitials, &item.LastEditComment, &item.LastUpdated, &item.Recorder, &item.SearchDate, &item.SearchDay, &item.SearchTypeCode, &item.SiteId,
+						&item.StartLatitude, &item.StartLongitude, &item.StartTime, &item.StopLatitude, &item.StopLongitude, &item.StopTime, &item.Temp, &item.UploadedBy, &item.UploadFilename, &item.UploadSessionId, &item.DsId, &item.Status)
+
+		if err != nil {
+			return items, err
+		}
+		items = append(items, item)
+	}
+	if err := rows.Err(); err != nil {
+		return items, err
+	}
+	return items, nil
 }
 
 var telemetryDataEntriesSql = `select te.bend,te.CAPTURE_LATITUDE,te.CAPTURE_LONGITUDE,te.CAPTURE_TIME,te.CHECKBY,te.COMMENTS,te.conductivity,te.depth,te.EDIT_INITIALS,
@@ -4296,4 +4459,49 @@ func (s *PallidSturgeonStore) GetRecapturedData(tagnumber string) ([]models.Reca
 	}
 
 	return data, err
+}
+
+func (s *PallidSturgeonStore) GetOfflineDraftDatasheets(officeCode string, fieldYear int) (models.OfflineDraftDatasheets, error) {
+	result := models.OfflineDraftDatasheets{
+		FieldYear: fieldYear
+	}
+
+	moriver, err := s.GetOfflineMoriverDrafts(officeCode, fieldYear)
+	if err != nil {
+		return result, err
+	}
+
+	fish, err := s.GetOfflineFishDrafts(officeCode, fieldYear)
+	if err != nil {
+		return result, err
+	}
+
+	supplemental, err := s.GetOfflineSuppDrafts(officeCode, fieldYear)
+	if err != nil {
+		return result, err
+	}
+
+	procedure, err := s.GetOfflineProcDrafts(officeCode, fieldYear)
+	if err != nil {
+		return result, err
+	}
+
+	search, err := s.GetOfflineSearchDrafts(officeCode, fieldYear)
+	if err != nil {
+		return result, err
+	}
+
+	telemetry, err := s.GetOfflineTelemetryDrafts(officeCode, fieldYear)
+	if err != nil {
+		return result, err
+	}
+
+	result.Moriver = moriver
+	result.Fish = fish
+	result.Supplemental = supplemental
+	result.Procedure = procedure
+	result.Search = search
+	result.Telemetry = telemetry
+
+	return result, nil
 }

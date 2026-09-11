@@ -948,3 +948,18 @@ type ExportSite struct {
 	BendRiverMile  *float64 `db:"bend_river_mile" json:"BENDRIVERMILE"`
 	SampleUnitDesc string   `db:"sample_unit_desc" json:"SAMPLE_UNIT_DESC"`
 }
+
+type OfflineSites struct {
+	FieldYear 		int 	`json:"fieldYear"`
+	Sites 			[]Sites `json:"sites"`
+}
+
+type OfflineDraftDatasheets struct {
+	FieldYear 		int 					`json:"fieldYear"`
+	Moriver 		[]UploadMoriver 		`json:"moriver"`
+	Fish 			[]UploadFish 			`json:"fish"`
+	Supplemental 	[]UploadSupplemental 	`json:"supplemental"`
+	Procedure 		[]UploadProcedure 		`json:"procedure"`
+	Search 			[]UploadSearch 			`json:"search"`
+	Telemetry 		[]UploadTelemetry		`json:"telemetry"`
+}

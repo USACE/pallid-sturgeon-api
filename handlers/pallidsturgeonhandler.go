@@ -31,6 +31,17 @@ type PallidSturgeonHandler struct {
 	Store *stores.PallidSturgeonStore
 }
 
+func getCurrentFieldYear() int {
+	now := time.Now()
+	fieldYear := now.Year()
+
+	if now.Month() >= time.October {
+		fieldYear++
+	}
+
+	return fieldYear
+}
+
 func (ps *PallidSturgeonHandler) Version(c echo.Context) error {
 	return c.String(http.StatusOK, "Pallid Sturgeon API v0.02")
 }
@@ -273,6 +284,45 @@ func (sd *PallidSturgeonHandler) UpdateSiteDataEntry(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to update Site data entry", err))
 	}
 	return c.JSON(http.StatusOK, models.NewSuccessResponse("Successfully updated Site data entry", siteData))
+}
+
+func (sd *PallidSturgeonHandler) GetOfflineSites(c echo.Context) error {
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user info for offline sites", err))
+	}
+
+	fieldYear := getCurrentFieldYear()
+
+	sites, err := sd.Store.GetOfflineSites(userInfo.OfficeCode, fieldYear)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve sites for offline", err))
+	}
+
+	response := models.OfflineSites{
+		FieldYear: fieldYear,
+		Sites: sites,
+	}
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Offline sites retrieved successfully", response))
+}
+
+func (sd *PallidSturgeonHandler) GetOfflineDraftDatasheets(c echo.Context) error {
+	user := c.Get("PSUSER").(models.User)
+	userInfo, err := sd.Store.GetUser(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve user info for offline datasheets", err))
+	}
+
+	fieldYear := getCurrentFieldYear()
+	data, err := sd.Store.GetOfflineDraftDatasheets(userInfo.OfficeCode, fieldYear)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.NewErrorResponse("Failed to retrieve draft datasheets for offline", err))
+	}
+
+	return c.JSON(http.StatusOK, models.NewSuccessResponse("Offline draft datasheets retrieved successfully", data))
 }
 
 func (sd *PallidSturgeonHandler) GetFishDataEntries(c echo.Context) error {

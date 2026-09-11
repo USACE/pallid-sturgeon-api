@@ -85,6 +85,9 @@ func main() {
 	e.GET(urlContext+"/Sites/getSites", auth.Authorize(PallidSturgeonH.GetSiteDataEntries, PUBLIC))
 	e.POST(urlContext+"/Sites/addSite", auth.Authorize(PallidSturgeonH.AddSiteDataEntry, PUBLIC))
 	e.PUT(urlContext+"/Sites/updateSite", auth.Authorize(PallidSturgeonH.UpdateSiteDataEntry, PUBLIC))
+	e.GET(urlContext+"/Offline/sites", auth.Authorize(PallidSturgeonH.GetOfflineSites, PUBLIC))
+
+	e.GET(urlContext+"/Offline/draftDatasheets", auth.Authorize(PallidSturgeonH.GetOfflineDraftDatasheets, PUBLIC))
 	
 	e.GET(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.GetFishDataEntries, PUBLIC))
 	e.POST(urlContext+"/fishDataEntry", auth.Authorize(PallidSturgeonH.SaveFishDataEntry, PUBLIC))
